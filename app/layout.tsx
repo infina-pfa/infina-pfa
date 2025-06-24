@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/components/providers/i18n-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { DevLanguageSwitcher } from "@/components/ui/language-switcher";
 
 const nunito = Nunito({
@@ -23,10 +24,12 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className={`${nunito.variable} antialiased font-nunito`}>
-        <I18nProvider>
-          {children}
-          <DevLanguageSwitcher />
-        </I18nProvider>
+        <AuthProvider>
+          <I18nProvider>
+            {children}
+            <DevLanguageSwitcher />
+          </I18nProvider>
+        </AuthProvider>
       </body>
     </html>
   );

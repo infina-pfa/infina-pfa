@@ -1,0 +1,68 @@
+export const authVi = {
+  // Sign In
+  signIn: "Đăng nhập",
+  signInTitle: "Chào mừng trở lại",
+  signInDescription: "Đăng nhập vào tài khoản Infina của bạn",
+  signInButton: "Đăng nhập",
+  signingIn: "Đang đăng nhập...",
+
+  // Sign Up
+  signUp: "Đăng ký",
+  signUpTitle: "Tạo tài khoản",
+  signUpDescription: "Tham gia Infina để bắt đầu gia tăng tài sản",
+  createAccount: "Tạo tài khoản",
+  creatingAccount: "Đang tạo tài khoản...",
+
+  // Form Fields
+  emailAddress: "Địa chỉ email",
+  enterEmail: "Nhập email của bạn",
+  password: "Mật khẩu",
+  enterPassword: "Nhập mật khẩu",
+  confirmPassword: "Xác nhận mật khẩu",
+  confirmPasswordPlaceholder: "Xác nhận mật khẩu của bạn",
+
+  // Navigation
+  dontHaveAccount: "Chưa có tài khoản?",
+  alreadyHaveAccount: "Đã có tài khoản?",
+  getStarted: "Bắt đầu",
+
+  // Errors
+  pleaseEnterAllFields: "Vui lòng điền đầy đủ thông tin",
+  passwordsDontMatch: "Mật khẩu không khớp",
+  passwordTooShort: "Mật khẩu phải có ít nhất 6 ký tự",
+  unexpectedError: "Đã xảy ra lỗi không mong muốn",
+
+  // Auth Layout
+  financialJourneyStarts: "Hành trình tài chính của bạn bắt đầu từ đây",
+  financialJourneyDescription:
+    "Kiểm soát tương lai tài chính với lời khuyên cá nhân hóa, đầu tư thông minh và công cụ quy hoạch toàn diện.",
+  personalizedAdvice: "Lời khuyên tài chính cá nhân hóa",
+  smartRecommendations: "Khuyến nghị đầu tư thông minh",
+  planningTools: "Công cụ quy hoạch toàn diện",
+  securePlatform: "Nền tảng an toàn và đáng tin cậy",
+  personalFinanceAssistant: "Trợ lý Tài chính Cá nhân",
+
+  // Dashboard
+  welcomeBack: "Chào mừng trở lại!",
+  financialOverview: "Đây là tổng quan tài chính của bạn hôm nay",
+  totalBalance: "Tổng Số Dư",
+  monthlyGrowth: "Tăng Trưởng Tháng",
+  savingsGoal: "Mục Tiêu Tiết Kiệm",
+  profileScore: "Điểm Hồ Sơ",
+  recentActivity: "Hoạt Động Gần Đây",
+  quickActions: "Thao Tác Nhanh",
+  investmentPortfolio: "Danh Mục Đầu Tư",
+  updatedHoursAgo: "Cập nhật 2 giờ trước",
+  monthlyBudget: "Ngân Sách Tháng",
+  budgetReviewCompleted: "Đã hoàn thành xem xét ngân sách",
+  emergencyFund: "Tiến độ quỹ khẩn cấp",
+  addTransaction: "Thêm Giao Dịch",
+  addTransactionDesc: "Ghi lại thu nhập hoặc chi phí",
+  setBudget: "Thiết Lập Ngân Sách",
+  setBudgetDesc: "Tạo ngân sách hàng tháng",
+  investmentAdvice: "Lời Khuyên Đầu Tư",
+  investmentAdviceDesc: "Nhận khuyến nghị từ AI",
+
+  // Auth Actions
+  signOut: "Đăng xuất",
+};

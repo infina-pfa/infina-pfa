@@ -6,6 +6,7 @@ import { featuresEn } from "./features";
 import { testimonialsEn } from "./testimonials";
 import { ctaEn } from "./cta";
 import { footerEn } from "./footer";
+import { authEn } from "./auth";
 
 export const enTranslations = {
   ...commonEn,
@@ -16,4 +17,5 @@ export const enTranslations = {
   ...testimonialsEn,
   ...ctaEn,
   ...footerEn,
+  ...authEn,
 };

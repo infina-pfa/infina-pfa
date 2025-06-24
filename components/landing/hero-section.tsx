@@ -3,7 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
+
 import { useTranslation } from "react-i18next";
 
 export function HeroSection() {
@@ -11,18 +11,6 @@ export function HeroSection() {
   return (
     <section className="max-w-6xl mx-auto px-6 py-20">
       <div className="text-center">
-        {/* Infina Logo */}
-        <div className="mb-8">
-          <Image
-            src="/infina-logo.png"
-            alt="Infina"
-            width={200}
-            height={60}
-            className="mx-auto"
-            priority
-          />
-        </div>
-
         <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
           {t("heroMainTitle")}
           <br />
