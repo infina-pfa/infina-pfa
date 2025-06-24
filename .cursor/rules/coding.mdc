@@ -1,0 +1,181 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# INFINA PFA - CODING & COMPONENT RULES
+
+## 🎯 CORE PRINCIPLES
+
+### SOLID PRINCIPLES (Mandatory)
+
+- **Single Responsibility**: Each component/function has one clear purpose
+- **Open/Closed**: Components should be open for extension, closed for modification
+- **Liskov Substitution**: Components should be replaceable with their subtypes
+- **Interface Segregation**: Create focused, specific interfaces
+- **Dependency Inversion**: Depend on abstractions, not concretions
+
+## 📦 COMPONENT ARCHITECTURE
+
+### Component Size & Structure
+
+- **Max 200 lines per component file** (strictly enforced)
+- **One component per file** (no exceptions)
+- **Separate logic from UI** when component becomes complex (>100 lines)
+- Extract custom hooks for complex state logic
+- Use composition over inheritance
+
+### Component Naming Conventions
+
+- **PascalCase for components**: `UserProfile`, `PaymentButton`
+- **camelCase for functions/variables**: `handleSubmit`, `isLoading`
+- **SCREAMING_SNAKE_CASE for constants**: `API_ENDPOINTS`, `DEFAULT_CONFIG`
+- **kebab-case for files**: `user-profile.tsx`, `payment-button.tsx`
+
+## 🔧 TYPESCRIPT RULES
+
+### Type Safety (Mandatory)
+
+- **No `any` types** - use proper typing or `unknown`
+- **Strict mode enabled** in tsconfig.json
+- **Interface over type** for object shapes
+- **Generic types** for reusable components
+- **Proper return types** for all functions
+
+### Props & Interface Patterns
+
+```typescript
+// ✅ Good - Proper interface with JSDoc
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Button variant styling */
+  variant?: "primary" | "secondary" | "ghost";
+  /** Loading state */
+  isLoading?: boolean;
+  /** Icon to display */
+  icon?: React.ReactNode;
+}
+
+// ❌ Bad - No documentation, loose typing
+type ButtonProps = {
+  variant?: string;
+  isLoading?: any;
+};
+```
+
+## 🪝 HOOKS & STATE MANAGEMENT
+
+### Custom Hooks Rules
+
+- **Prefix with 'use'**: `useUserData`, `usePaymentFlow`
+- **Single responsibility** per hook
+- **Return objects for multiple values**: `{ data, loading, error }`
+- **Proper cleanup** in useEffect
+- **Memoization** when appropriate (useMemo, useCallback)
+
+### State Management Patterns
+
+```typescript
+// ✅ Good - Proper state structure
+const useUserProfile = () => {
+  const [state, setState] = useState<UserProfileState>({
+    data: null,
+    loading: true,
+    error: null,
+  });
+
+  // ... logic
+
+  return {
+    user: state.data,
+    isLoading: state.loading,
+    error: state.error,
+    updateUser,
+    refreshUser,
+  };
+};
+```
+
+## 📁 FILE STRUCTURE & IMPORTS
+
+### File Naming
+
+- **Components**: `user-profile.tsx`, `payment-form.tsx`
+- **Hooks**: `use-user-data.ts`, `use-payment-flow.ts`
+- **Utils**: `format-currency.ts`, `validate-email.ts`
+- **Types**: `user.types.ts`, `payment.types.ts`
+
+## 🚀 PERFORMANCE RULES
+
+### Optimization Patterns
+
+- **Lazy loading** for large components: `React.lazy()`
+- **Memoization** for expensive calculations: `useMemo`
+- **Callback memoization**: `useCallback` for functions passed as props
+- **Component memoization**: `React.memo` for expensive renders
+- **Image optimization**: Use Next.js `Image` component
+
+## 🧪 TESTING & QUALITY
+
+### Code Quality
+
+- **ESLint + Prettier** configured and enforced
+- **Pre-commit hooks** with lint-staged
+- **TypeScript strict mode** enabled
+- **No console.log** in production code
+
+## 📱 ACCESSIBILITY & UX
+
+### A11y Requirements
+
+- **Semantic HTML** elements
+- **ARIA labels** where needed
+- **Keyboard navigation** support
+- **Focus management** for modals/dropdowns
+- **Screen reader** compatibility
+
+### UX Patterns
+
+- **Loading states** for async operations
+- **Error boundaries** for error handling
+- **Progressive enhancement**
+- **Responsive design** (mobile-first)
+
+## 🔒 SECURITY & BEST PRACTICES
+
+### Security Rules
+
+- **Input validation** and sanitization
+- **XSS prevention** - no dangerouslySetInnerHTML without sanitization
+- **CSRF protection** for forms
+- **Environment variables** for sensitive data
+- **Content Security Policy** headers
+
+### Error Handling
+
+```typescript
+// ✅ Good - Proper error handling
+const useApiCall = () => {
+  try {
+    // API call logic
+  } catch (error) {
+    console.error("API Error:", error);
+    // User-friendly error handling
+    setError("Something went wrong. Please try again.");
+  }
+};
+```
+
+## 📋 CODE REVIEW CHECKLIST
+
+Before submitting any code:
+
+- [ ] Component is under 200 lines
+- [ ] All props are properly typed
+- [ ] Error handling implemented
+- [ ] Loading states handled
+- [ ] Mobile responsive
+- [ ] Follows naming conventions
+
+---
+
+_These rules are living guidelines - update them as the project evolves_
