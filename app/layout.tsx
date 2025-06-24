@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
+import { I18nProvider } from "@/components/providers/i18n-provider";
+import { DevLanguageSwitcher } from "@/components/ui/language-switcher";
 
 const nunito = Nunito({
   variable: "--font-nunito",
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
   title: "Infina PFA",
-  description: "Personal Financial Assistant by Infina",
+  description: "Trợ lý tài chính cá nhân thông minh",
 };
 
 export default function RootLayout({
@@ -19,9 +21,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <body className={`${nunito.variable} antialiased font-nunito`}>
-        {children}
+        <I18nProvider>
+          {children}
+          <DevLanguageSwitcher />
+        </I18nProvider>
       </body>
     </html>
   );

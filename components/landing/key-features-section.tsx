@@ -1,3 +1,5 @@
+"use client";
+
 import {
   DollarSign,
   CreditCard,
@@ -6,13 +8,15 @@ import {
   Target,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 export function KeyFeaturesSection() {
+  const { t } = useTranslation();
   return (
     <section className="bg-white py-20">
       <div className="max-w-6xl mx-auto px-6">
         <h2 className="text-4xl font-bold text-foreground text-center mb-16">
-          Everything you need in one place
+          {t("keyFeaturesMainTitle")}
         </h2>
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -24,11 +28,10 @@ export function KeyFeaturesSection() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Budget tracking
+                    {t("featureBudgetTitle")}
                   </h3>
                   <p className="text-muted-foreground">
-                    Automatically categorize expenses and track spending
-                    patterns with intelligent insights
+                    {t("featureBudgetDescription")}
                   </p>
                 </div>
               </div>
@@ -39,11 +42,10 @@ export function KeyFeaturesSection() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Debt guidance
+                    {t("featureDebtTitle")}
                   </h3>
                   <p className="text-muted-foreground">
-                    Get personalized strategies to pay off debt faster and save
-                    thousands in interest
+                    {t("featureDebtDescription")}
                   </p>
                 </div>
               </div>
@@ -54,11 +56,10 @@ export function KeyFeaturesSection() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Investment planning
+                    {t("featureInvestmentTitle")}
                   </h3>
                   <p className="text-muted-foreground">
-                    Build wealth with tailored investment recommendations based
-                    on your risk tolerance
+                    {t("featureInvestmentDescription")}
                   </p>
                 </div>
               </div>
@@ -69,11 +70,10 @@ export function KeyFeaturesSection() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">
-                    AI micro-interactions
+                    {t("featureAITitle")}
                   </h3>
                   <p className="text-muted-foreground">
-                    Daily check-ins and smart notifications to keep you
-                    motivated and on track
+                    {t("featureAIDescription")}
                   </p>
                 </div>
               </div>
@@ -84,11 +84,10 @@ export function KeyFeaturesSection() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Progress tracking
+                    {t("featureProgressTitle")}
                   </h3>
                   <p className="text-muted-foreground">
-                    Visualize your financial growth with clear milestones and
-                    achievement celebrations
+                    {t("featureProgressDescription")}
                   </p>
                 </div>
               </div>
@@ -101,11 +100,13 @@ export function KeyFeaturesSection() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-3 h-3 bg-infina-green rounded-full"></div>
                   <span className="text-sm font-medium text-muted-foreground">
-                    EMERGENCY FUND
+                    {t("emergencyFund")}
                   </span>
                 </div>
                 <p className="text-2xl font-bold text-foreground">$8,247</p>
-                <p className="text-sm text-infina-green">↗ 12% this month</p>
+                <p className="text-sm text-infina-green">
+                  ↗ 12% {t("thisMonth")}
+                </p>
               </CardContent>
             </Card>
 
@@ -114,11 +115,13 @@ export function KeyFeaturesSection() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-3 h-3 bg-infina-blue rounded-full"></div>
                   <span className="text-sm font-medium text-muted-foreground">
-                    INVESTMENTS
+                    {t("investments")}
                   </span>
                 </div>
                 <p className="text-2xl font-bold text-foreground">$24,891</p>
-                <p className="text-sm text-infina-blue">↗ 8% this month</p>
+                <p className="text-sm text-infina-blue">
+                  ↗ 8% {t("thisMonth")}
+                </p>
               </CardContent>
             </Card>
 
@@ -127,11 +130,13 @@ export function KeyFeaturesSection() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-3 h-3 bg-infina-orange rounded-full"></div>
                   <span className="text-sm font-medium text-muted-foreground">
-                    DEBT PAYOFF
+                    {t("debtPayoff")}
                   </span>
                 </div>
                 <p className="text-2xl font-bold text-foreground">-$3,247</p>
-                <p className="text-sm text-infina-orange">↘ 15% this month</p>
+                <p className="text-sm text-infina-orange">
+                  ↘ 15% {t("thisMonth")}
+                </p>
               </CardContent>
             </Card>
           </div>

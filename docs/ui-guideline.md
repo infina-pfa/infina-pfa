@@ -1,126 +1,215 @@
-### 📘 Infina UI Design Guideline (Flat & Borderless – 2025)
+# 📘 Infina UI Design Guideline (2025 Edition)
 
-**Inspired by Wise visual style, aligned with Infina brand (Nunito + #0055FF)**
+**Style:** Flat & Borderless  
+**Inspired by:** Wise Design System  
+**Aligned with:** Infina Branding (Nunito Font & Brand Colors)
 
----
-
-#### 1. 🎯 Design Philosophy
-
-- **Flat Design**: No shadows or depth-based effects.
-- **Borderless**: No visible outlines or container borders.
-- **Soft Rounding**: Use border-radius to maintain modern, approachable feel.
-- **Whitespace Over Dividers**: Structure layout via spacing instead of lines.
-- **Friendly & Professional**: Guided by positivity, clarity, and trust.
+This guideline establishes a unified visual language for Infina's financial web application. It bridges the design and development teams, ensuring consistency, usability, and brand clarity across all digital touchpoints.
 
 ---
 
-#### 2. 🔤 Typography – Nunito
+## 🎯 1. Design Philosophy
 
-| Use Case            | Size (pt) | Weight        |
-| ------------------- | --------- | ------------- |
-| H1 – Hero/Headline  | 48–64     | ExtraBold     |
-| H2 – Section Header | 32–40     | Bold          |
-| H3 – Subhead        | 24–32     | Medium/Bold   |
-| Body Text           | 14–20     | Regular       |
-| Caption/Label       | 10–12     | Light/Regular |
-
-- Only capitalize first letters (e.g., "Tài khoản sinh lời")
-- Line-height: 1.5x font size
-- No shadows or effects
+- **Flat & Minimalist:** No use of shadows or gradients. Depth is expressed through layout, contrast, and typography.
+- **Borderless Layout:** Separate elements using **whitespace**, **color blocks**, and **text hierarchy** rather than visible borders.
+- **Clean UI:** Focus on readability, clarity, and calmness. Avoid visual noise.
+- **Functional Aesthetic:** Every design choice should support user trust, clarity of financial data, and actionability.
 
 ---
 
-#### 3. 🎨 Color System
+## 🏷️ 2. Brand Identity
 
-**Primary Color**
-
-- Bright Royal Blue: `#0055FF`
-
-**Support Colors**
-
-- Success: `#2ECC71`
-- Warning: `#FFC107`
-- Error: `#F44336`
-- Info/Highlight: `#FF9800`
-
-**Backgrounds**
-
-- App: `#F6F7F9` or white
-- Components: White or light neutral blocks (`#F0F2F5`)
-
-**Divider (if needed)**: `#E0E0E0`, subtle only
+- **Logo Usage:**
+  - Full-color logo only on white or light backgrounds.
+  - Monochrome (white or black) logo when necessary on colored backgrounds.
+  - Clear space: Minimum padding equals the height of the letter "I" in "Infina".
+- **Tone of Voice:**
+  - Friendly, trustworthy, and simple. Avoid jargon.
+  - Use action-driven phrasing: _"Grow your money"_ instead of _"Investment options"_.
+- **Font:** Nunito (Google Font)
+  - Rounded, modern, humanistic sans-serif.
+  - Use exclusively across all UI text unless in charts or code blocks.
 
 ---
 
-#### 4. 🧱 Layout & Spacing
+## 🔠 3. Typography System
 
-- **Grid**: 8pt base spacing system
-- **Padding**: 16–32px for section blocks
-- **Cards**:
+| Style     | Size | Weight    | Line Height | Case      |
+| --------- | ---- | --------- | ----------- | --------- |
+| H1        | 40px | Bold      | 48px        | Sentence  |
+| H2        | 32px | Bold      | 40px        | Sentence  |
+| H3        | 24px | Semi-Bold | 32px        | Sentence  |
+| H4        | 20px | Semi-Bold | 28px        | Sentence  |
+| H5        | 18px | Medium    | 24px        | Sentence  |
+| H6        | 16px | Medium    | 24px        | Sentence  |
+| Body      | 16px | Regular   | 24px        | Sentence  |
+| Caption   | 14px | Regular   | 20px        | Sentence  |
+| Button LG | 16px | Semi-Bold | 20px        | Uppercase |
+| Button SM | 14px | Semi-Bold | 18px        | Uppercase |
 
-  - No borders
-  - Background: white
-  - Border-radius: 12–16px
-  - Shadow: none
-
-- **Mobile-first responsive layout**
-
----
-
-#### 5. 🧩 Components
-
-**Buttons**
-
-- Primary: `#0055FF` background, white text, border-radius 8–12px
-- Secondary: Text-only, underline on hover
-- No border unless ghost style; no shadow
-
-**Inputs**
-
-- Fill background: `#F0F2F5`
-- No border
-- Focus: `2px` bottom border in `#0055FF`
-- Error: Red bottom border + message
-
-**Cards/Sections**
-
-- Flat surface, white or light gray background
-- Border-radius: 12px
-- Padding: 24–32px
-- No border or outline
-
-**Modals**
-
-- No outline or shadow
-- Rounded corners: 12px
-- Full-width mobile layout
+> ❌ Avoid text shadows, outlines, or letter spacing beyond +2%.
 
 ---
 
-#### 6. 📱 Icons & Imagery
+## 🎨 4. Color System
 
-- **Icons**: Use Lucide/Feather/Heroicons, stroke width 1.5–2px
-- **No background or circle wraps**
-- **Imagery**:
+| Purpose      | Color Code | Usage                          |
+| ------------ | ---------- | ------------------------------ |
+| Primary      | #0055FF    | CTA, highlights, links         |
+| Success      | #2ECC71    | Confirmation, growth, verified |
+| Warning      | #FFC107    | Warnings, caution              |
+| Highlight    | #FF9800    | Promo tags, attention          |
+| Error        | #F44336    | Validation errors, critical    |
+| Text Primary | #111827    | Main content                   |
+| Text Muted   | #6B7280    | Secondary labels               |
+| Background   | #F9FAFB    | App background                 |
+| Surface      | #FFFFFF    | Cards, modals                  |
+| Divider      | #E5E7EB    | Line dividers                  |
 
-  - Characters with positive emotions
-  - 2/3 face focus
-  - Neutral/light-toned backgrounds
-
----
-
-#### 7. 🔁 Interaction & Feedback
-
-- **Hover**: Tint or underline (no shadows)
-- **Active**: Bold text or filled background
-- **Disabled**: 50% opacity, cursor-not-allowed
-- **Loading**: Use skeleton or linear bar
-- **No spinners unless necessary**
+> ✅ Maintain sufficient contrast. See Section 12 for accessibility ratios.
 
 ---
 
-#### 8. 🧰 Tooling
+## 📐 5. Layout & Grid System
 
-- **Font**: Nunito (`font-family: 'Nunito', sans-serif;`)
-- **Framework**: TailwindCSS + shadcn/ui (custom tokens)
-- **Icons**: Lucide
+- **Grid:** 12-column layout
+- **Column Gutter:** 24px
+- **Max Width (Desktop):** 1280px
+- **Spacing Scale:** 4px base (4, 8, 12, 16, 24, 32, 40, 64...)
+- **Content Padding:** 24px (desktop), 16px (mobile)
+- **Section Padding:** 64px vertical on large screens, 40px on smaller screens
+- **Cards & Blocks:**
+  - Border-radius: 12px
+  - Padding inside: 24px
+
+---
+
+## 🧩 6. Components
+
+### Buttons
+
+| Type      | Default                | Hover          | Disabled     |
+| --------- | ---------------------- | -------------- | ------------ |
+| Primary   | #0055FF                | #0041CC        | #B3CCFF text |
+| Secondary | #FFFFFF border #0055FF | Filled #0055FF | Muted text   |
+
+- Radius: 8px
+- Padding: 12px 24px
+- Icon spacing: 8px to left/right of label
+
+### Inputs
+
+- Borderless with 1px solid `#E5E7EB` on focus
+- Placeholder: `#9CA3AF`
+- Radius: 8px; Padding: 12px
+
+### Cards
+
+- Use `#FFFFFF` background
+- Drop shadow: ❌ None
+- Separate content via padding and headers
+
+### Modals
+
+- Fullscreen on mobile; centered card on desktop
+- Close icon top-right (24px)
+- Max-width: 480px
+
+---
+
+## 🧠 7. Icons & Visuals
+
+- Use **Lucide** or **Feather Icons** (line style)
+  - Default color: #6B7280
+  - Active/Primary: #0055FF
+- Size: 20px or 24px depending on text size
+- Image Style:
+  - 2/3 character close-up
+  - Neutral or soft gradient backgrounds
+  - Always positive, calm emotional tone
+
+---
+
+## ⚙️ 8. Interaction & Feedback
+
+### States
+
+| Type    | Style                                                  |
+| ------- | ------------------------------------------------------ |
+| Hover   | Background tint (8% of primary), underline link        |
+| Active  | Darker shade or inner border highlight                 |
+| Error   | Border or text in `#F44336`, error message below field |
+| Success | Inline success message, green icon                     |
+
+### Loaders
+
+- **Skeleton loaders:** use light grey blocks (`#E5E7EB`)
+- **Progress indicators:** thin linear bar or spinning icon
+
+---
+
+## 📱 9. Responsive Behavior
+
+| Breakpoint   | Screen Width | Notes                           |
+| ------------ | ------------ | ------------------------------- |
+| Desktop      | ≥1440px      | Full layout, 12 columns         |
+| Large Tablet | ≥1024px      | 8–10 columns layout             |
+| Tablet       | ≥768px       | Stack elements, hide nav items  |
+| Mobile       | <480px       | Single-column, larger tap areas |
+
+- Stack columns vertically on mobile
+- Prioritize primary actions at top or bottom
+
+---
+
+## 🧭 10. Navigation & Hierarchy
+
+- **Top Navbar:** Sticky, height 64px, contains logo, nav items, and avatar
+- **Tab Nav (Internal Sections):**
+  - Underline active tab in `#0055FF`
+  - Use icons optionally beside text
+- **Hierarchy Rules:**
+  - H1: Page Title
+  - H2: Section Headings
+  - H3/H4: Nested content
+  - Use dividers (`#E5E7EB`) between sections
+
+---
+
+## 🎞️ 11. Motion & Transitions
+
+| Use Case         | Duration | Easing      |
+| ---------------- | -------- | ----------- |
+| Button Hover     | 150ms    | ease-in-out |
+| Modal Open/Close | 200ms    | ease-in-out |
+| Tab Transition   | 250ms    | ease-in-out |
+
+> ❌ Avoid bounce, spring, or overshoot effects  
+> ✅ Use subtle fade, slide, or scale animations
+
+---
+
+## ♿ 12. Accessibility Guidelines
+
+- **Color Contrast:** WCAG 2.1 AA compliance
+  - Text vs. background ≥ 4.5:1
+  - Large text ≥ 3:1
+- **Keyboard Navigation:** All interactive elements must be focusable
+- **Focus State:** Outline or border (2px) in `#0055FF`
+- **Alt Text:** All meaningful images and icons
+- **ARIA Labels:** Use for inputs, error messages, role identification
+
+---
+
+## ✅ 13. DOs & DON'Ts Table
+
+| ✅ DOs                                      | ❌ DON'Ts                         |
+| ------------------------------------------- | --------------------------------- |
+| Use whitespace for separation               | Add borders to divide content     |
+| Stick to Nunito font                        | Mix multiple typefaces            |
+| Use consistent icon sizing (20–24px)        | Scale icons arbitrarily           |
+| Use solid primary for actions               | Use gradients or shadows          |
+| Align to 4px spacing system                 | Use inconsistent paddings/margins |
+| Maintain consistent modal width (max 480px) | Use fullscreen modals on desktop  |
+
+---

@@ -1,9 +1,13 @@
+"use client";
+
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import { useTranslation } from "react-i18next";
 
 export function HeroSection() {
+  const { t } = useTranslation();
   return (
     <section className="max-w-6xl mx-auto px-6 py-20">
       <div className="text-center">
@@ -20,16 +24,16 @@ export function HeroSection() {
         </div>
 
         <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-          Your AI Financial Coach —<br />
-          <span className="text-primary">One Step Closer to Freedom</span>
+          {t("heroMainTitle")}
+          <br />
+          <span className="text-primary">{t("heroSubTitle")}</span>
         </h1>
         <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-          Track your money. Get smart advice. Grow your wealth — without
-          overwhelm.
+          {t("heroDescription")}
         </p>
 
         <Button size="lg" className="text-lg px-8 py-6 mb-12">
-          Start your free journey
+          {t("startFreeJourney")}
           <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
 
@@ -42,28 +46,21 @@ export function HeroSection() {
                   AI
                 </div>
                 <div>
-                  <p className="font-semibold">Your AI coach</p>
-                  <p className="text-sm text-muted-foreground">Online now</p>
+                  <p className="font-semibold">{t("aiCoach")}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("onlineNow")}
+                  </p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="bg-white rounded-md p-4">
-                  <p className="text-foreground">
-                    I noticed you spent $247 on dining out this week.
-                    That&apos;s 23% more than your usual budget. Would you like
-                    me to suggest some strategies to help you stay on track?
-                  </p>
+                  <p className="text-foreground">{t("aiMessage1")}</p>
                 </div>
                 <div className="bg-primary text-primary-foreground rounded-md p-4 ml-8">
-                  <p>Yes, please help me with that</p>
+                  <p>{t("userResponse")}</p>
                 </div>
                 <div className="bg-white rounded-md p-4">
-                  <p className="text-foreground">
-                    Great! Here are 3 simple steps: 1) Try meal prepping on
-                    Sundays, 2) Set a daily dining limit of $25, 3) I&apos;ll
-                    send you a gentle reminder when you&apos;re close to your
-                    limit. Sound good?
-                  </p>
+                  <p className="text-foreground">{t("aiMessage2")}</p>
                 </div>
               </div>
             </div>

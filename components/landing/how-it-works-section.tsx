@@ -1,3 +1,5 @@
+"use client";
+
 import { MessageCircle, Brain, TrendingUp } from "lucide-react";
 import {
   Card,
@@ -5,13 +7,15 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 export function HowItWorksSection() {
+  const { t } = useTranslation();
   return (
     <section className="bg-white py-20">
       <div className="max-w-6xl mx-auto px-6">
         <h2 className="text-4xl font-bold text-foreground text-center mb-16">
-          How it works
+          {t("howItWorksTitle")}
         </h2>
 
         <div className="grid md:grid-cols-3 gap-12">
@@ -21,11 +25,10 @@ export function HowItWorksSection() {
                 <MessageCircle className="w-10 h-10 text-infina-blue" />
               </div>
               <CardTitle className="text-2xl mb-4">
-                Answer a few questions
+                {t("howItWorksStep1Title")}
               </CardTitle>
               <CardDescription className="text-lg">
-                Tell us about your goals, income, and current financial
-                situation through a simple onboarding process
+                {t("howItWorksStep1Description")}
               </CardDescription>
             </CardContent>
           </Card>
@@ -36,11 +39,10 @@ export function HowItWorksSection() {
                 <Brain className="w-10 h-10 text-infina-green" />
               </div>
               <CardTitle className="text-2xl mb-4">
-                Meet your AI coach
+                {t("howItWorksStep2Title")}
               </CardTitle>
               <CardDescription className="text-lg">
-                Get personalized insights and advice tailored to your unique
-                financial stage and goals
+                {t("howItWorksStep2Description")}
               </CardDescription>
             </CardContent>
           </Card>
@@ -51,11 +53,10 @@ export function HowItWorksSection() {
                 <TrendingUp className="w-10 h-10 text-infina-orange" />
               </div>
               <CardTitle className="text-2xl mb-4">
-                Take small daily steps
+                {t("howItWorksStep3Title")}
               </CardTitle>
               <CardDescription className="text-lg">
-                Build lasting financial habits through guided daily actions and
-                consistent progress tracking
+                {t("howItWorksStep3Description")}
               </CardDescription>
             </CardContent>
           </Card>
