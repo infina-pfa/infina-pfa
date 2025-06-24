@@ -63,9 +63,16 @@ const config: Config = {
         highlight: "var(--highlight)",
       },
       borderRadius: {
-        lg: "0",
-        md: "0",
-        sm: "0",
+        DEFAULT: "8px",
+        sm: "8px",
+        md: "12px",
+        lg: "16px",
+        xl: "20px",
+        "2xl": "24px",
+        button: "8px",
+        card: "12px",
+        input: "8px",
+        modal: "12px",
       },
       boxShadow: {
         // Override all shadows to none for flat design
@@ -77,6 +84,17 @@ const config: Config = {
         xl: "none",
         "2xl": "none",
         inner: "none",
+      },
+      spacing: {
+        // 8pt grid system as specified in guidelines
+        "18": "72px",
+        "22": "88px",
+      },
+      fontSize: {
+        // Typography system from guidelines
+        hero: ["3.5rem", { lineHeight: "1.2", fontWeight: "800" }], // 56px
+        section: ["2.25rem", { lineHeight: "1.3", fontWeight: "700" }], // 36px
+        subhead: ["1.5rem", { lineHeight: "1.4", fontWeight: "600" }], // 24px
       },
       textShadow: {
         none: "none",
