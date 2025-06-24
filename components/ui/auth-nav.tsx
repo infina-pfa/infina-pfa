@@ -50,7 +50,7 @@ export function AuthNav() {
         <Button
           variant="ghost"
           size="sm"
-          className="text-gray-700 hover:text-infina-blue"
+          className="text-gray-700 hover:text-infina-blue hover:bg-blue-50 font-medium"
         >
           {t("signIn")}
         </Button>
@@ -58,7 +58,7 @@ export function AuthNav() {
       <Link href="/auth/sign-up">
         <Button
           size="sm"
-          className="bg-infina-blue hover:bg-blue-700 text-white"
+          className="bg-infina-blue hover:bg-blue-700 text-white font-medium"
         >
           {t("getStarted")}
         </Button>
