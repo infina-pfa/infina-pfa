@@ -1,0 +1,82 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Infina UI Design Cursor Rules
+# Based on /docs/ui-guideline.md - Flat & Borderless UI Design Guideline (2025 Edition)
+
+## Core Design Principles
+- Always implement flat & modern design with minimalist approach
+- Use borderless layouts with separation via whitespace, color blocks, and typographic hierarchy
+- Maintain clarity & approachability with friendly but professional tone
+- Strictly adhere to Infina branding guidelines
+- Never add visual noise, shadows, borders, or complex effects
+
+## Typography Rules
+- **Font Family**: Always use Nunito font family
+- **Capitalization**: Only capitalize the first letter unless highlighting specific keywords
+- **Text Effects**: Never use shadows, outlines, or bevel effects on text
+- Use typographic hierarchy for content separation instead of borders
+
+## Color Palette (MANDATORY)
+Use only these approved brand colors:
+
+### Primary Color
+- Bright Royal Blue: `#0055FF` (main action buttons, links, active states)
+
+### Supporting Colors
+- Emerald Green: `#2ECC71` (success states, positive feedback)
+- Amber Yellow: `#FFC107` (warning states, caution messages)
+- Orange: `#FF9800` (highlights, attention-grabbing elements)
+- Reddish Coral: `#F44336` (error states, destructive actions)
+
+### Background Colors
+- App Background: `#F6F7F9` or white (`#FFFFFF`)
+- Section Blocks: `#F0F2F5` (slightly toned backgrounds)
+- Dividers (if absolutely necessary): `#E0E0E0` (very subtle)
+
+## Icons & Visual Elements
+- **Icon Library**: Use line icons from Lucide or Feather icon sets only
+- **Icon Colors**: Match brand palette (blue for default, green/red for states)
+- **Images**: 
+  - Focus on 2/3 close-up on character faces
+  - Emphasize positive emotions
+  - Use neutral or light backgrounds
+
+## Interaction States & Feedback
+- **Hover States**: Use color tinting or subtle background tone shifts (NO borders or shadows)
+- **Active States**: Use text weight changes or underlines
+- **Error Messages**: Display inline with `#F44336` color
+- **Warning Messages**: Display inline with `#FFC107` color
+- **Loading States**: Use skeleton loading or linear progress bars (avoid spinners)
+
+## Layout Guidelines
+- Use whitespace generously for visual separation
+- Group related content with color blocks instead of borders
+- Maintain consistent spacing using a grid system
+- Avoid complex visual hierarchies that create noise
+
+## Component Standards
+- All buttons should be flat with brand colors and hover states
+- Forms should use borderless inputs with subtle backgrounds
+- Cards should use background color differentiation, not borders
+- Navigation should be clean and minimal
+
+## What NOT to Do
+- Never add drop shadows, box shadows, or text shadows
+- Never use borders for visual separation
+- Never use gradients or complex visual effects
+- Never deviate from the approved color palette
+- Never use fonts other than Nunito
+- Never create visual noise with unnecessary decorative elements
+- Never use complex animations or transitions
+
+## Implementation Priority
+1. Color palette compliance is mandatory
+2. Typography (Nunito font) is required
+3. Flat design principles must be maintained
+4. Borderless layout approach is essential
+5. Brand consistency is non-negotiable
+
+When generating any UI code, components, or styling, always reference and strictly follow these guidelines. 
