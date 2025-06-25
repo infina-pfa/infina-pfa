@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up";
@@ -23,6 +24,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
 
   const { signIn, signUp, loading } = useAuth();
   const { t } = useTranslation();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +53,8 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
 
       if (result.error) {
         setFormError(result.error);
+      } else {
+        router.push("/dashboard");
       }
     } catch {
       setFormError(t("unexpectedError"));
@@ -194,7 +198,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
           <button
             type="button"
             onClick={onToggleMode}
-            className="text-infina-blue hover:text-blue-700 font-medium"
+            className="text-infina-blue hover:text-blue-700 font-medium cursor-pointer"
           >
             {mode === "sign-in" ? t("signUp") : t("signIn")}
           </button>
