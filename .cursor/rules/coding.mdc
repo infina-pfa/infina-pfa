@@ -3,17 +3,69 @@ description:
 globs: 
 alwaysApply: true
 ---
-# INFINA PFA - CODING & COMPONENT RULES
+# INFINA PFA - CODING & COMPONENT RULES (Updated 2025)
 
 ## 🎯 CORE PRINCIPLES
 
 ### SOLID PRINCIPLES (Mandatory)
 
-- **Single Responsibility**: Each component/function has one clear purpose
+- **Single Responsibility**: Each component/function/hook has ONE clear purpose
 - **Open/Closed**: Components should be open for extension, closed for modification
 - **Liskov Substitution**: Components should be replaceable with their subtypes
 - **Interface Segregation**: Create focused, specific interfaces
-- **Dependency Inversion**: Depend on abstractions, not concretions
+- **Dependency Inversion**: Depend on abstractions (services), not implementations (direct API calls)
+
+## 🏗️ ARCHITECTURE LAYERS (New)
+
+### API Service Layer (Mandatory)
+
+- **No direct fetch() calls in hooks/components**
+- **All API calls must go through service layer**
+- **Centralized error handling and response transformation**
+
+```typescript
+// ✅ Good - Service layer pattern
+const budgetService = {
+  async getAll(): Promise<Budget[]> {
+    return apiClient.get<Budget[]>('/budgets');
+  },
+  async create(data: CreateBudgetRequest): Promise<Budget> {
+    return apiClient.post<Budget>('/budgets', data);
+  }
+};
+
+// ❌ Bad - Direct API calls in hooks
+const useBudgets = () => {
+  const response = await fetch('/api/budgets'); // Forbidden!
+};
+```
+
+### Error Handling Strategy (Mandatory)
+
+- **Centralized error codes and messages**
+- **Consistent error transformation across the app**
+- **User-friendly error messages only**
+
+```typescript
+// ✅ Good - Centralized error handling
+import { handleError } from '@/lib/error-handler';
+
+const createBudget = async (data) => {
+  try {
+    return await budgetService.create(data);
+  } catch (error) {
+    const appError = handleError(error);
+    setError(appError.message);
+    return null;
+  }
+};
+
+// ❌ Bad - Inconsistent error handling
+} catch (error) {
+  const errorMessage = error instanceof Error ? error.message : "An error occurred";
+  setError(errorMessage);
+}
+```
 
 ## 📦 COMPONENT ARCHITECTURE
 
@@ -22,51 +74,60 @@ alwaysApply: true
 - **Max 200 lines per component file** (strictly enforced)
 - **One component per file** (no exceptions)
 - **Separate logic from UI** when component becomes complex (>100 lines)
-- Extract custom hooks for complex state logic
-- Use composition over inheritance
-
-### Component Naming Conventions
-
-- **PascalCase for components**: `UserProfile`, `PaymentButton`
-- **camelCase for functions/variables**: `handleSubmit`, `isLoading`
-- **SCREAMING_SNAKE_CASE for constants**: `API_ENDPOINTS`, `DEFAULT_CONFIG`
-- **kebab-case for files**: `user-profile.tsx`, `payment-button.tsx`
-
-## 🔧 TYPESCRIPT RULES
-
-### Type Safety (Mandatory)
-
-- **No `any` types** - use proper typing or `unknown`
-- **Strict mode enabled** in tsconfig.json
-- **Interface over type** for object shapes
-- **Generic types** for reusable components
-- **Proper return types** for all functions
-
-### Props & Interface Patterns
+- **Extract custom hooks for complex state logic**
+- **Use composition over inheritance**
+- **Split large components into feature-specific components**
 
 ```typescript
-// ✅ Good - Proper interface with JSDoc
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Button variant styling */
-  variant?: "primary" | "secondary" | "ghost";
-  /** Loading state */
-  isLoading?: boolean;
-  /** Icon to display */
-  icon?: React.ReactNode;
-}
+// ✅ Good - Component composition
+const DashboardPage = () => (
+  <div>
+    <DashboardHeader />
+    <DashboardStats />
+    <DashboardContent />
+  </div>
+);
 
-// ❌ Bad - No documentation, loose typing
-type ButtonProps = {
-  variant?: string;
-  isLoading?: any;
+// ❌ Bad - Monolithic component (180+ lines)
+const DashboardPage = () => {
+  // 180+ lines of mixed logic and UI
 };
 ```
 
-## 🪝 HOOKS & STATE MANAGEMENT
+## 🪝 HOOKS & STATE MANAGEMENT (Updated)
+
+### Single Responsibility Hooks (Mandatory)
+
+- **One hook = One responsibility**
+- **No monolithic hooks** (like the old useBudgets with 271 lines)
+- **Compose hooks when multiple operations needed**
+
+```typescript
+// ✅ Good - Single responsibility hooks
+const useBudgetList = () => { /* Only manages list */ };
+const useBudgetCreate = () => { /* Only handles creation */ };
+const useBudgetUpdate = () => { /* Only handles updates */ };
+const useBudgetDelete = () => { /* Only handles deletion */ };
+
+// Composition when needed
+const useBudgetManagement = () => {
+  const list = useBudgetList();
+  const create = useBudgetCreate();
+  const update = useBudgetUpdate();
+  const delete = useBudgetDelete();
+  
+  return { list, create, update, delete };
+};
+
+// ❌ Bad - Monolithic hook
+const useBudgets = () => {
+  // 271 lines handling everything
+};
+```
 
 ### Custom Hooks Rules
 
-- **Prefix with 'use'**: `useUserData`, `usePaymentFlow`
+- **Prefix with 'use'**: `useBudgetList`, `useBudgetCreate`
 - **Single responsibility** per hook
 - **Return objects for multiple values**: `{ data, loading, error }`
 - **Proper cleanup** in useEffect
@@ -75,107 +136,44 @@ type ButtonProps = {
 ### State Management Patterns
 
 ```typescript
-// ✅ Good - Proper state structure
-const useUserProfile = () => {
-  const [state, setState] = useState<UserProfileState>({
-    data: null,
-    loading: true,
-    error: null,
-  });
+// ✅ Good - Simple state for focused hooks
+const useBudgetCreate = () => {
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // ... logic
-
-  return {
-    user: state.data,
-    isLoading: state.loading,
-    error: state.error,
-    updateUser,
-    refreshUser,
+  const createBudget = async (data: CreateBudgetRequest) => {
+    try {
+      setIsCreating(true);
+      setError(null);
+      return await budgetService.create(data);
+    } catch (error) {
+      const appError = handleError(error);
+      setError(appError.message);
+      return null;
+    } finally {
+      setIsCreating(false);
+    }
   };
+
+  return { createBudget, isCreating, error };
+};
+
+// ✅ Good - useReducer for complex state
+const useBudgetList = () => {
+  const [state, dispatch] = useReducer(budgetReducer, initialState);
+  // ...
 };
 ```
 
-## 📁 FILE STRUCTURE & IMPORTS
+## 📁 FILE STRUCTURE & IMPORTS (Updated)
 
 ### File Naming
 
 - **Components**: `user-profile.tsx`, `payment-form.tsx`
-- **Hooks**: `use-user-data.ts`, `use-payment-flow.ts`
+- **Hooks**: `use-budget-list.ts`, `use-budget-create.ts`
+- **Services**: `budget.service.ts`, `auth.service.ts`
 - **Utils**: `format-currency.ts`, `validate-email.ts`
-- **Types**: `user.types.ts`, `payment.types.ts`
+- **Types**: `budget.types.ts`, `auth.types.ts`
+- **Errors**: `errors.ts`, `error-handler.ts`
 
-## 🚀 PERFORMANCE RULES
-
-### Optimization Patterns
-
-- **Lazy loading** for large components: `React.lazy()`
-- **Memoization** for expensive calculations: `useMemo`
-- **Callback memoization**: `useCallback` for functions passed as props
-- **Component memoization**: `React.memo` for expensive renders
-- **Image optimization**: Use Next.js `Image` component
-
-## 🧪 TESTING & QUALITY
-
-### Code Quality
-
-- **ESLint + Prettier** configured and enforced
-- **Pre-commit hooks** with lint-staged
-- **TypeScript strict mode** enabled
-- **No console.log** in production code
-
-## 📱 ACCESSIBILITY & UX
-
-### A11y Requirements
-
-- **Semantic HTML** elements
-- **ARIA labels** where needed
-- **Keyboard navigation** support
-- **Focus management** for modals/dropdowns
-- **Screen reader** compatibility
-
-### UX Patterns
-
-- **Loading states** for async operations
-- **Error boundaries** for error handling
-- **Progressive enhancement**
-- **Responsive design** (mobile-first)
-
-## 🔒 SECURITY & BEST PRACTICES
-
-### Security Rules
-
-- **Input validation** and sanitization
-- **XSS prevention** - no dangerouslySetInnerHTML without sanitization
-- **CSRF protection** for forms
-- **Environment variables** for sensitive data
-- **Content Security Policy** headers
-
-### Error Handling
-
-```typescript
-// ✅ Good - Proper error handling
-const useApiCall = () => {
-  try {
-    // API call logic
-  } catch (error) {
-    console.error("API Error:", error);
-    // User-friendly error handling
-    setError("Something went wrong. Please try again.");
-  }
-};
-```
-
-## 📋 CODE REVIEW CHECKLIST
-
-Before submitting any code:
-
-- [ ] Component is under 200 lines
-- [ ] All props are properly typed
-- [ ] Error handling implemented
-- [ ] Loading states handled
-- [ ] Mobile responsive
-- [ ] Follows naming conventions
-
----
-
-_These rules are living guidelines - update them as the project evolves_
+### Directory Structure
