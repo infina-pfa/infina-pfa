@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { handleError } from "@/lib/error-handler";
+import { useToast } from "@/components/ui/toast";
 
 interface AuthState {
   user: User | null;
@@ -15,6 +16,7 @@ export const useAuth = () => {
     loading: true,
     error: null,
   });
+  const { success, error: showError } = useToast();
 
   useEffect(() => {
     // Get initial session
@@ -74,6 +76,7 @@ export const useAuth = () => {
         error: null,
       });
 
+      success('Welcome back!', 'Successfully signed in');
       return { user: data.user, error: null };
     } catch (error) {
       const appError = handleError(error);
@@ -82,6 +85,7 @@ export const useAuth = () => {
         loading: false,
         error: appError.message,
       }));
+      showError('Sign in failed', appError.message);
       return { user: null, error: appError.message };
     }
   };
@@ -103,6 +107,7 @@ export const useAuth = () => {
         error: null,
       });
 
+      success('Account created!', 'Welcome to Infina PFA');
       return { user: data.user, error: null };
     } catch (error) {
       const appError = handleError(error);
@@ -111,6 +116,7 @@ export const useAuth = () => {
         loading: false,
         error: appError.message,
       }));
+      showError('Sign up failed', appError.message);
       return { user: null, error: appError.message };
     }
   };
@@ -127,6 +133,8 @@ export const useAuth = () => {
         loading: false,
         error: null,
       });
+      
+      success('Signed out successfully', 'See you next time!');
     } catch (error) {
       const appError = handleError(error);
       setState(prev => ({
@@ -134,6 +142,7 @@ export const useAuth = () => {
         loading: false,
         error: appError.message,
       }));
+      showError('Sign out failed', appError.message);
     }
   };
 
