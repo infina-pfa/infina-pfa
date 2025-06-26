@@ -5,13 +5,13 @@ export const heroVi = {
     "Infina PFA giúp bạn lập kế hoạch tài chính cá nhân một cách dễ dàng và hiệu quả với sức mạnh của trí tuệ nhân tạo",
 
   // Hero Section - Detailed
-  heroMainTitle: "Huấn luyện viên tài chính AI của bạn —",
+  heroMainTitle: "Cố vấn tài chính AI của bạn —",
   heroSubTitle: "Một bước gần hơn tới tự do",
   heroDescription:
     "Theo dõi tiền của bạn. Nhận lời khuyên thông minh. Tăng trưởng tài sản — mà không có sự choáng ngợp.",
 
   // AI Chat Content
-  aiCoach: "Huấn luyện viên AI của bạn",
+  aiCoach: "Cố vấn AI của bạn",
   onlineNow: "Đang trực tuyến",
   aiMessage1:
     "Tôi nhận thấy bạn đã chi $247 cho việc ăn uống tuần này. Đó là nhiều hơn 23% so với ngân sách thường lệ của bạn. Bạn có muốn tôi đề xuất một số chiến lược để giúp bạn theo dõi không?",

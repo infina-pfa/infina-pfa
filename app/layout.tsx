@@ -4,7 +4,6 @@ import "./globals.css";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { ToastProvider } from "@/components/ui/toast";
-import { DevLanguageSwitcher } from "@/components/ui/language-switcher";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -27,10 +26,7 @@ export default function RootLayout({
       <body className={`${nunito.variable} antialiased font-nunito`}>
         <ToastProvider>
           <AuthProvider>
-            <I18nProvider>
-              {children}
-              <DevLanguageSwitcher />
-            </I18nProvider>
+            <I18nProvider>{children}</I18nProvider>
           </AuthProvider>
         </ToastProvider>
       </body>

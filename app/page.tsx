@@ -1,11 +1,10 @@
-import { Header } from "@/components/ui/header";
+import { CTASection } from "@/components/landing/cta-section";
+import { FinancialStagesSection } from "@/components/landing/financial-stages-section";
+import { Footer } from "@/components/landing/footer";
 import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
-import { FinancialStagesSection } from "@/components/landing/financial-stages-section";
-import { KeyFeaturesSection } from "@/components/landing/key-features-section";
 import { TestimonialSection } from "@/components/landing/testimonial-section";
-import { CTASection } from "@/components/landing/cta-section";
-import { Footer } from "@/components/landing/footer";
+import { Header } from "@/components/ui/header";
 
 export default function Home() {
   return (
@@ -14,7 +13,6 @@ export default function Home() {
       <HeroSection />
       <HowItWorksSection />
       <FinancialStagesSection />
-      <KeyFeaturesSection />
       <TestimonialSection />
       <CTASection />
       <Footer />
