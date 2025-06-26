@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { User, AuthError } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { handleError } from "@/lib/error-handler";
 
 interface AuthState {
   user: User | null;
@@ -31,10 +32,11 @@ export const useAuth = () => {
           error: null,
         });
       } catch (error) {
+        const appError = handleError(error);
         setState({
           user: null,
           loading: false,
-          error: error instanceof Error ? error.message : "An error occurred",
+          error: appError.message,
         });
       }
     };
@@ -74,14 +76,13 @@ export const useAuth = () => {
 
       return { user: data.user, error: null };
     } catch (error) {
-      const errorMessage =
-        error instanceof AuthError ? error.message : "Failed to sign in";
-      setState((prev) => ({
+      const appError = handleError(error);
+      setState(prev => ({
         ...prev,
         loading: false,
-        error: errorMessage,
+        error: appError.message,
       }));
-      return { user: null, error: errorMessage };
+      return { user: null, error: appError.message };
     }
   };
 
@@ -104,14 +105,13 @@ export const useAuth = () => {
 
       return { user: data.user, error: null };
     } catch (error) {
-      const errorMessage =
-        error instanceof AuthError ? error.message : "Failed to sign up";
-      setState((prev) => ({
+      const appError = handleError(error);
+      setState(prev => ({
         ...prev,
         loading: false,
-        error: errorMessage,
+        error: appError.message,
       }));
-      return { user: null, error: errorMessage };
+      return { user: null, error: appError.message };
     }
   };
 
@@ -128,10 +128,11 @@ export const useAuth = () => {
         error: null,
       });
     } catch (error) {
-      setState((prev) => ({
+      const appError = handleError(error);
+      setState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : "Failed to sign out",
+        error: appError.message,
       }));
     }
   };
