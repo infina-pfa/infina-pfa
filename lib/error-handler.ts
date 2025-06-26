@@ -66,6 +66,14 @@ export const handleError = (error: unknown): AppError => {
     }
     
     // Check for not found errors
+    if (message.includes('income not found')) {
+      return { 
+        code: ErrorCode.INCOME_NOT_FOUND, 
+        message: ERROR_MESSAGES[ErrorCode.INCOME_NOT_FOUND],
+        originalError: error
+      };
+    }
+    
     if (message.includes('expense not found')) {
       return { 
         code: ErrorCode.EXPENSE_NOT_FOUND, 
@@ -91,8 +99,33 @@ export const handleError = (error: unknown): AppError => {
       };
     }
     
+    // Check for income-specific errors
+    if (message.includes('income amount must be greater than 0') || (message.includes('amount must be greater than 0') && message.includes('income'))) {
+      return { 
+        code: ErrorCode.INVALID_INCOME_AMOUNT, 
+        message: ERROR_MESSAGES[ErrorCode.INVALID_INCOME_AMOUNT],
+        originalError: error
+      };
+    }
+    
+    if (message.includes('income description is required') || message.includes('description is required')) {
+      return { 
+        code: ErrorCode.INCOME_DESCRIPTION_REQUIRED, 
+        message: ERROR_MESSAGES[ErrorCode.INCOME_DESCRIPTION_REQUIRED],
+        originalError: error
+      };
+    }
+    
+    if (message.includes('pay yourself percent must be between 0 and 100')) {
+      return { 
+        code: ErrorCode.INVALID_PAY_YOURSELF_PERCENT, 
+        message: ERROR_MESSAGES[ErrorCode.INVALID_PAY_YOURSELF_PERCENT],
+        originalError: error
+      };
+    }
+    
     // Check for expense-specific errors
-    if (message.includes('expense amount must be greater than 0') || message.includes('amount must be greater than 0')) {
+    if (message.includes('expense amount must be greater than 0') || (message.includes('amount must be greater than 0') && message.includes('expense'))) {
       return { 
         code: ErrorCode.INVALID_EXPENSE_AMOUNT, 
         message: ERROR_MESSAGES[ErrorCode.INVALID_EXPENSE_AMOUNT],

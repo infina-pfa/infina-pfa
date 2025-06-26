@@ -22,6 +22,13 @@ export enum ErrorCode {
   FUTURE_EXPENSE_DATE = 'FUTURE_EXPENSE_DATE',
   INVALID_RECURRING_MONTH = 'INVALID_RECURRING_MONTH',
   EXPENSE_DESCRIPTION_TOO_LONG = 'EXPENSE_DESCRIPTION_TOO_LONG',
+
+  // Business Logic - Incomes
+  INCOME_NOT_FOUND = 'INCOME_NOT_FOUND',
+  INVALID_INCOME_AMOUNT = 'INVALID_INCOME_AMOUNT',
+  INCOME_DESCRIPTION_REQUIRED = 'INCOME_DESCRIPTION_REQUIRED',
+  INCOME_DESCRIPTION_TOO_LONG = 'INCOME_DESCRIPTION_TOO_LONG',
+  INVALID_PAY_YOURSELF_PERCENT = 'INVALID_PAY_YOURSELF_PERCENT',
   
   // Network & Server
   NETWORK_ERROR = 'NETWORK_ERROR',
@@ -52,6 +59,12 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.FUTURE_EXPENSE_DATE]: 'Expense date cannot be in the future',
   [ErrorCode.INVALID_RECURRING_MONTH]: 'Recurring month must be between 1 and 12',
   [ErrorCode.EXPENSE_DESCRIPTION_TOO_LONG]: 'Description cannot exceed 500 characters',
+  
+  [ErrorCode.INCOME_NOT_FOUND]: 'Income not found',
+  [ErrorCode.INVALID_INCOME_AMOUNT]: 'Income amount must be greater than 0',
+  [ErrorCode.INCOME_DESCRIPTION_REQUIRED]: 'Income description is required',
+  [ErrorCode.INCOME_DESCRIPTION_TOO_LONG]: 'Description cannot exceed 500 characters',
+  [ErrorCode.INVALID_PAY_YOURSELF_PERCENT]: 'Pay yourself percent must be between 0 and 100',
   
   [ErrorCode.NETWORK_ERROR]: 'Please check your internet connection and try again',
   [ErrorCode.SERVER_ERROR]: 'Something went wrong on our end. Please try again',
