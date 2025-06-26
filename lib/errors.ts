@@ -29,6 +29,17 @@ export enum ErrorCode {
   INCOME_DESCRIPTION_REQUIRED = 'INCOME_DESCRIPTION_REQUIRED',
   INCOME_DESCRIPTION_TOO_LONG = 'INCOME_DESCRIPTION_TOO_LONG',
   INVALID_PAY_YOURSELF_PERCENT = 'INVALID_PAY_YOURSELF_PERCENT',
+
+  // Business Logic - Conversations
+  CONVERSATION_NOT_FOUND = 'CONVERSATION_NOT_FOUND',
+  CONVERSATION_TITLE_REQUIRED = 'CONVERSATION_TITLE_REQUIRED',
+  CONVERSATION_TITLE_TOO_LONG = 'CONVERSATION_TITLE_TOO_LONG',
+
+  // Business Logic - Messages
+  MESSAGE_NOT_FOUND = 'MESSAGE_NOT_FOUND',
+  MESSAGE_CONTENT_REQUIRED = 'MESSAGE_CONTENT_REQUIRED',
+  MESSAGE_CONTENT_TOO_LONG = 'MESSAGE_CONTENT_TOO_LONG',
+  INVALID_SENDER_TYPE = 'INVALID_SENDER_TYPE',
   
   // Network & Server
   NETWORK_ERROR = 'NETWORK_ERROR',
@@ -65,6 +76,15 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.INCOME_DESCRIPTION_REQUIRED]: 'Income description is required',
   [ErrorCode.INCOME_DESCRIPTION_TOO_LONG]: 'Description cannot exceed 500 characters',
   [ErrorCode.INVALID_PAY_YOURSELF_PERCENT]: 'Pay yourself percent must be between 0 and 100',
+  
+  [ErrorCode.CONVERSATION_NOT_FOUND]: 'Conversation not found',
+  [ErrorCode.CONVERSATION_TITLE_REQUIRED]: 'Conversation title is required',
+  [ErrorCode.CONVERSATION_TITLE_TOO_LONG]: 'Title cannot exceed 255 characters',
+  
+  [ErrorCode.MESSAGE_NOT_FOUND]: 'Message not found',
+  [ErrorCode.MESSAGE_CONTENT_REQUIRED]: 'Message content is required',
+  [ErrorCode.MESSAGE_CONTENT_TOO_LONG]: 'Message content cannot exceed 10,000 characters',
+  [ErrorCode.INVALID_SENDER_TYPE]: 'Sender type must be either BOT or USER',
   
   [ErrorCode.NETWORK_ERROR]: 'Please check your internet connection and try again',
   [ErrorCode.SERVER_ERROR]: 'Something went wrong on our end. Please try again',
