@@ -1,5 +1,6 @@
 "use client";
 
+import { BudgetList } from "@/components/budgets/budget-list";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { Card } from "@/components/ui/card";
 import { Header } from "@/components/ui/header";
@@ -102,76 +103,12 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity */}
-          <Card className="lg:col-span-2 p-6 bg-white">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {t("recentActivity")}
-            </h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                <div>
-                  <p className="font-medium text-gray-900">
-                    {t("investmentPortfolio")}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {t("updatedHoursAgo")}
-                  </p>
-                </div>
-                <span className="text-infina-green font-medium">+$124.50</span>
-              </div>
-              <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                <div>
-                  <p className="font-medium text-gray-900">
-                    {t("monthlyBudget")}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {t("budgetReviewCompleted")}
-                  </p>
-                </div>
-                <span className="text-gray-900 font-medium">$2,450</span>
-              </div>
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-medium text-gray-900">
-                    {t("savingsGoal")}
-                  </p>
-                  <p className="text-sm text-gray-600">{t("emergencyFund")}</p>
-                </div>
-                <span className="text-infina-blue font-medium">73%</span>
-              </div>
-            </div>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="p-6 bg-white">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {t("quickActions")}
-            </h2>
-            <div className="space-y-3">
-              <button className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                <p className="font-medium text-gray-900">
-                  {t("addTransaction")}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {t("addTransactionDesc")}
-                </p>
-              </button>
-              <button className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                <p className="font-medium text-gray-900">{t("setBudget")}</p>
-                <p className="text-sm text-gray-600">{t("setBudgetDesc")}</p>
-              </button>
-              <button className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                <p className="font-medium text-gray-900">
-                  {t("investmentAdvice")}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {t("investmentAdviceDesc")}
-                </p>
-              </button>
-            </div>
-          </Card>
+        {/* Budget List */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            {t("myBudgets")}
+          </h2>
+          <BudgetList />
         </div>
       </main>
     </div>

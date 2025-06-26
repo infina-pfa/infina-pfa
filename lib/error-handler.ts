@@ -66,7 +66,15 @@ export const handleError = (error: unknown): AppError => {
     }
     
     // Check for not found errors
-    if (message.includes('not found')) {
+    if (message.includes('expense not found')) {
+      return { 
+        code: ErrorCode.EXPENSE_NOT_FOUND, 
+        message: ERROR_MESSAGES[ErrorCode.EXPENSE_NOT_FOUND],
+        originalError: error
+      };
+    }
+    
+    if (message.includes('budget not found') || message.includes('not found')) {
       return { 
         code: ErrorCode.BUDGET_NOT_FOUND, 
         message: ERROR_MESSAGES[ErrorCode.BUDGET_NOT_FOUND],
@@ -79,6 +87,39 @@ export const handleError = (error: unknown): AppError => {
       return { 
         code: ErrorCode.DUPLICATE_BUDGET_NAME, 
         message: ERROR_MESSAGES[ErrorCode.DUPLICATE_BUDGET_NAME],
+        originalError: error
+      };
+    }
+    
+    // Check for expense-specific errors
+    if (message.includes('expense amount must be greater than 0') || message.includes('amount must be greater than 0')) {
+      return { 
+        code: ErrorCode.INVALID_EXPENSE_AMOUNT, 
+        message: ERROR_MESSAGES[ErrorCode.INVALID_EXPENSE_AMOUNT],
+        originalError: error
+      };
+    }
+    
+    if (message.includes('expense date cannot be in the future') || message.includes('future')) {
+      return { 
+        code: ErrorCode.FUTURE_EXPENSE_DATE, 
+        message: ERROR_MESSAGES[ErrorCode.FUTURE_EXPENSE_DATE],
+        originalError: error
+      };
+    }
+    
+    if (message.includes('recurring month must be between')) {
+      return { 
+        code: ErrorCode.INVALID_RECURRING_MONTH, 
+        message: ERROR_MESSAGES[ErrorCode.INVALID_RECURRING_MONTH],
+        originalError: error
+      };
+    }
+    
+    if (message.includes('description cannot exceed 500 characters')) {
+      return { 
+        code: ErrorCode.EXPENSE_DESCRIPTION_TOO_LONG, 
+        message: ERROR_MESSAGES[ErrorCode.EXPENSE_DESCRIPTION_TOO_LONG],
         originalError: error
       };
     }

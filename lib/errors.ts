@@ -10,11 +10,18 @@ export enum ErrorCode {
   REQUIRED_FIELD = 'REQUIRED_FIELD',
   INVALID_FORMAT = 'INVALID_FORMAT',
   
-  // Business Logic
+  // Business Logic - Budgets
   BUDGET_NOT_FOUND = 'BUDGET_NOT_FOUND',
   DUPLICATE_BUDGET_NAME = 'DUPLICATE_BUDGET_NAME',
   BUDGET_LIMIT_EXCEEDED = 'BUDGET_LIMIT_EXCEEDED',
   INVALID_DATE_RANGE = 'INVALID_DATE_RANGE',
+  
+  // Business Logic - Expenses
+  EXPENSE_NOT_FOUND = 'EXPENSE_NOT_FOUND',
+  INVALID_EXPENSE_AMOUNT = 'INVALID_EXPENSE_AMOUNT',
+  FUTURE_EXPENSE_DATE = 'FUTURE_EXPENSE_DATE',
+  INVALID_RECURRING_MONTH = 'INVALID_RECURRING_MONTH',
+  EXPENSE_DESCRIPTION_TOO_LONG = 'EXPENSE_DESCRIPTION_TOO_LONG',
   
   // Network & Server
   NETWORK_ERROR = 'NETWORK_ERROR',
@@ -39,6 +46,12 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.DUPLICATE_BUDGET_NAME]: 'A budget with this name already exists',
   [ErrorCode.BUDGET_LIMIT_EXCEEDED]: 'You have reached the maximum number of budgets',
   [ErrorCode.INVALID_DATE_RANGE]: 'End date must be after start date',
+  
+  [ErrorCode.EXPENSE_NOT_FOUND]: 'Expense not found',
+  [ErrorCode.INVALID_EXPENSE_AMOUNT]: 'Expense amount must be greater than 0',
+  [ErrorCode.FUTURE_EXPENSE_DATE]: 'Expense date cannot be in the future',
+  [ErrorCode.INVALID_RECURRING_MONTH]: 'Recurring month must be between 1 and 12',
+  [ErrorCode.EXPENSE_DESCRIPTION_TOO_LONG]: 'Description cannot exceed 500 characters',
   
   [ErrorCode.NETWORK_ERROR]: 'Please check your internet connection and try again',
   [ErrorCode.SERVER_ERROR]: 'Something went wrong on our end. Please try again',
