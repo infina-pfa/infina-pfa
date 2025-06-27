@@ -2,6 +2,7 @@ export const commonVi = {
   // Navigation
   home: "Trang chủ",
   features: "Tính năng",
+  pricing: "Bảng giá",
   about: "Giới thiệu",
   contact: "Liên hệ",
   advisor: "Tư vấn",

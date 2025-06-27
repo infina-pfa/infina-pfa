@@ -2,6 +2,7 @@ export const commonEn = {
   // Navigation
   home: "Home",
   features: "Features",
+  pricing: "Pricing",
   about: "About",
   contact: "Contact",
   advisor: "Advisor",

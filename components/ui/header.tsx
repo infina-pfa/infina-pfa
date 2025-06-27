@@ -1,7 +1,7 @@
 "use client";
 
 import { MobileMenu } from "@/components/ui/mobile-menu";
-import { Navbar } from "@/components/ui/navbar";
+import { LandingNavbar } from "@/components/ui/landing-navbar";
 import { useAuthContext } from "@/components/providers/auth-provider";
 
 export function Header() {
@@ -16,22 +16,9 @@ export function Header() {
             <MobileMenu />
           </div>
 
-          {/* Desktop Navigation - Only show when user is not authenticated (landing page) */}
-          {!user && (
-            <div className="hidden md:flex items-center justify-between w-full">
-              {/* Logo for landing page only */}
-              <div className="flex items-center space-x-2">
-                <img
-                  src="/infina-logo.png"
-                  alt="Infina"
-                  className="h-8 w-auto"
-                />
-              </div>
-
-              {/* Navigation */}
-              <Navbar />
-            </div>
-          )}
+          <div className="hidden md:flex w-full">
+            <LandingNavbar />
+          </div>
         </div>
       </div>
     </header>
