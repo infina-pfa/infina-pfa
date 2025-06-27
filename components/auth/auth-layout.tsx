@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
+import { Shield, TrendingUp, Target, Brain } from "lucide-react";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -17,66 +18,103 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className="hidden lg:flex lg:w-1/2 bg-infina-blue relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-infina-blue to-blue-800" />
 
-          <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white">
-            <div className="max-w-md text-center">
-              {/* Logo/Brand */}
-              <div className="mb-8">
-                <Image
-                  src="/infina-logo.png"
-                  alt="Infina"
-                  width={200}
-                  height={60}
-                  className="mx-auto mb-4"
-                  priority
-                />
-                <div className="w-16 h-1 bg-white mx-auto rounded-full" />
+          <div className="relative z-10 flex flex-col justify-between p-12 text-white">
+            {/* Top Section - Hero Content */}
+            <div className="flex-1 flex flex-col justify-center max-w-lg">
+              {/* Hero Image */}
+              <div className="mb-8 text-center">
+                <div className="w-32 h-32 mx-auto mb-6 rounded-2xl overflow-hidden bg-white/10 p-2">
+                  <Image
+                    src="/auth/hero.png"
+                    alt="Woman using Infina financial app"
+                    width={120}
+                    height={120}
+                    className="w-full h-full object-cover rounded-xl"
+                    priority
+                  />
+                </div>
               </div>
 
-              {/* Hero Content */}
-              <h2 className="text-3xl font-semibold mb-6 leading-tight">
+              <h1 className="text-4xl font-bold mb-4 leading-tight">
                 {t("financialJourneyStarts")}
-              </h2>
+              </h1>
 
-              <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+              <p className="text-xl text-blue-100 mb-10 leading-relaxed">
                 {t("financialJourneyDescription")}
               </p>
 
-              {/* Features */}
-              <div className="space-y-4 text-left">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-infina-green rounded-full" />
-                  <span className="text-blue-100">
-                    {t("personalizedAdvice")}
-                  </span>
+              {/* Enhanced Features with Icons */}
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 bg-infina-green/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <Brain className="w-5 h-5 text-infina-green" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-1">
+                      {t("personalizedAdvice")}
+                    </h3>
+                    <p className="text-blue-100 text-sm">
+                      AI-powered insights tailored to your financial goals
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-infina-green rounded-full" />
-                  <span className="text-blue-100">
-                    {t("smartRecommendations")}
-                  </span>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 bg-infina-green/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <TrendingUp className="w-5 h-5 text-infina-green" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-1">
+                      {t("smartRecommendations")}
+                    </h3>
+                    <p className="text-blue-100 text-sm">
+                      Data-driven suggestions to optimize your finances
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-infina-green rounded-full" />
-                  <span className="text-blue-100">{t("planningTools")}</span>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 bg-infina-green/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <Target className="w-5 h-5 text-infina-green" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-1">
+                      {t("planningTools")}
+                    </h3>
+                    <p className="text-blue-100 text-sm">
+                      Comprehensive tools for budgeting and goal tracking
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-infina-green rounded-full" />
-                  <span className="text-blue-100">{t("securePlatform")}</span>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 bg-infina-green/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <Shield className="w-5 h-5 text-infina-green" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-1">
+                      {t("securePlatform")}
+                    </h3>
+                    <p className="text-blue-100 text-sm">
+                      Bank-level security to protect your financial data
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full transform translate-x-32 -translate-y-32" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full transform -translate-x-48 translate-y-48" />
+          {/* Enhanced Decorative Elements */}
+          <div className="absolute top-0 right-0 w-72 h-72 bg-white opacity-5 rounded-full transform translate-x-36 -translate-y-36" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-white opacity-5 rounded-full transform -translate-x-40 translate-y-40" />
+          <div className="absolute top-1/2 right-0 w-32 h-32 bg-infina-green opacity-10 rounded-full transform translate-x-16" />
         </div>
 
         {/* Right Side - Auth Form */}
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="w-full max-w-md">
-            {/* Mobile Logo */}
-            <div className="lg:hidden text-center mb-8">
+            {/* Logo - Now visible on all screen sizes */}
+            <div className="text-center mb-8">
               <Image
                 src="/infina-logo.png"
                 alt="Infina"
