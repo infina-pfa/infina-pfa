@@ -54,7 +54,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
       if (result.error) {
         setFormError(result.error);
       } else {
-        router.push("/dashboard");
+        router.push("/chat");
       }
     } catch {
       setFormError(t("unexpectedError"));

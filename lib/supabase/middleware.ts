@@ -37,6 +37,21 @@ export const updateSession = async (request: NextRequest) => {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // If user is authenticated and trying to access landing, auth pages, redirect to chat
+  if (user) {
+    const pathname = request.nextUrl.pathname;
+    if (
+      pathname === "/" ||
+      pathname.startsWith("/auth/sign-in") ||
+      pathname.startsWith("/auth/sign-up")
+    ) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/chat";
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // If user is not authenticated and trying to access protected pages, redirect to sign-in
   if (
     !user &&
     !request.nextUrl.pathname.startsWith("/auth") &&
