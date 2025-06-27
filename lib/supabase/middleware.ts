@@ -43,7 +43,8 @@ export const updateSession = async (request: NextRequest) => {
     if (
       pathname === "/" ||
       pathname.startsWith("/auth/sign-in") ||
-      pathname.startsWith("/auth/sign-up")
+      pathname.startsWith("/auth/sign-up") ||
+      pathname.startsWith("/auth/forgot-password")
     ) {
       const url = request.nextUrl.clone();
       url.pathname = "/chat";
@@ -57,7 +58,9 @@ export const updateSession = async (request: NextRequest) => {
     const isPublicPage = 
       pathname === "/" ||
       pathname.startsWith("/auth/sign-in") ||
-      pathname.startsWith("/auth/sign-up");
+      pathname.startsWith("/auth/sign-up") ||
+      pathname.startsWith("/auth/forgot-password") ||
+      pathname.startsWith("/auth/reset-password");
     
     if (!isPublicPage) {
       // Redirect unauthenticated users to sign-in page

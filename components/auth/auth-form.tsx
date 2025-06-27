@@ -169,7 +169,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
             <button
               type="button"
               onClick={() => router.push("/auth/forgot-password")}
-              className="text-sm text-infina-blue hover:text-blue-700 font-medium"
+              className="text-sm text-infina-blue hover:text-blue-700 font-medium cursor-pointer"
             >
               Forgot password?
             </button>
