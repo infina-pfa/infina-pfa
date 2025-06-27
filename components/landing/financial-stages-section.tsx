@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { ReactLenis } from "lenis/react";
 import { useTransform, motion, useScroll, MotionValue } from "motion/react";
 import { useRef } from "react";
+import { useRouter } from "next/navigation";
 
 interface FinancialStage {
   id: string;
@@ -148,11 +149,16 @@ const StageCard = ({
 
 export function FinancialStagesSection() {
   const { t } = useTranslation();
+  const router = useRouter();
   const container = useRef(null);
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ["start start", "end end"],
   });
+
+  const handleSignUp = () => {
+    router.push("/auth/sign-up");
+  };
 
   const stages: FinancialStage[] = [
     {
@@ -323,7 +329,10 @@ export function FinancialStagesSection() {
                 "Get personalized guidance tailored to your current financial stage and goals."
               )}
             </p>
-            <button className="px-8 py-4 bg-primary text-white font-semibold rounded-xl hover:opacity-90 transition-opacity">
+            <button
+              onClick={handleSignUp}
+              className="px-8 py-4 bg-primary text-white font-semibold rounded-xl hover:opacity-90 transition-opacity"
+            >
               {t("startJourney", "Start your personalized plan")}
             </button>
           </div>

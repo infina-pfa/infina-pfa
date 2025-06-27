@@ -3,9 +3,16 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
 
 export function CTASection() {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const handleSignUp = () => {
+    router.push("/auth/sign-up");
+  };
+
   return (
     <section className="bg-primary py-12 sm:py-16 lg:py-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
@@ -21,6 +28,7 @@ export function CTASection() {
         <Button
           size="lg"
           variant="secondary"
+          onClick={handleSignUp}
           className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 bg-white text-primary hover:bg-opacity-90 mb-3 sm:mb-4"
         >
           {t("ctaMainButton")}
