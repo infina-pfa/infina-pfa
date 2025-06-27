@@ -9,7 +9,7 @@ import { useMessageCreate } from "@/hooks/message/use-message-create";
 import { ConversationSidebar } from "@/components/chat/conversation-sidebar";
 import { ChatArea } from "@/components/chat/chat-area";
 import { EmptyState } from "@/components/chat/empty-state";
-import { Header } from "@/components/ui/header";
+import { AppLayout } from "@/components/ui/app-layout";
 import { Conversation } from "@/lib/types/conversation.types";
 
 export default function ChatPage() {
@@ -59,11 +59,8 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-app-bg font-nunito">
-      {/* Header for desktop navigation */}
-      <Header />
-
-      <div className="flex h-[calc(100vh-64px)] bg-[#F6F7F9] relative">
+    <AppLayout>
+      <div className="flex h-full bg-[#F6F7F9] relative">
         {/* Mobile Sidebar Overlay */}
         {isSidebarOpen && (
           <div
@@ -153,6 +150,6 @@ export default function ChatPage() {
           )}
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }

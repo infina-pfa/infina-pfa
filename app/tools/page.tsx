@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuthContext } from "@/components/providers/auth-provider";
-import { Header } from "@/components/ui/header";
+import { AppLayout } from "@/components/ui/app-layout";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -20,12 +20,11 @@ export default function ToolsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-app-bg font-nunito">
-        <Header />
-        <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
+      <AppLayout>
+        <div className="flex items-center justify-center h-full">
           <div className="w-8 h-8 border-2 border-infina-blue border-t-transparent rounded-full animate-spin" />
         </div>
-      </div>
+      </AppLayout>
     );
   }
 
@@ -65,10 +64,8 @@ export default function ToolsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-app-bg font-nunito">
-      <Header />
-
-      <main className="max-w-6xl mx-auto px-6 py-8">
+    <AppLayout>
+      <div className="p-6">
         {/* Header Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 font-nunito">
@@ -140,7 +137,7 @@ export default function ToolsPage() {
             will make managing your finances even easier.
           </p>
         </div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

@@ -23,11 +23,6 @@ import { usePathname } from "next/navigation";
 
 const navigationItems = [
   {
-    key: "dashboard",
-    href: "/dashboard",
-    icon: Home,
-  },
-  {
     key: "advisor",
     href: "/chat",
     icon: MessageSquare,
@@ -148,7 +143,7 @@ export function MobileMenu() {
                             flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors
                             ${
                               isActive
-                                ? "bg-blue-50 text-infina-blue"
+                                ? "bg-infina-blue text-white"
                                 : "text-gray-700 hover:bg-blue-50 hover:text-infina-blue"
                             }
                           `}
