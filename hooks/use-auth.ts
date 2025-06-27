@@ -25,13 +25,13 @@ export const useAuth = () => {
     const getInitialSession = async () => {
       try {
         const {
-          data: { session },
+          data: { user },
           error,
-        } = await supabase.auth.getSession();
+        } = await supabase.auth.getUser();
         if (error) throw error;
 
         setState({
-          user: session?.user ?? null,
+          user: user ?? null,
           loading: false,
           error: null,
         });
