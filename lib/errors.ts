@@ -4,6 +4,8 @@ export enum ErrorCode {
   INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
   EMAIL_NOT_CONFIRMED = 'EMAIL_NOT_CONFIRMED',
   TOKEN_EXPIRED = 'TOKEN_EXPIRED',
+  EMAIL_NOT_FOUND = 'EMAIL_NOT_FOUND',
+  PASSWORD_RESET_FAILED = 'PASSWORD_RESET_FAILED',
   
   // Validation
   VALIDATION_ERROR = 'VALIDATION_ERROR',
@@ -55,6 +57,8 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.INVALID_CREDENTIALS]: 'Invalid email or password',
   [ErrorCode.EMAIL_NOT_CONFIRMED]: 'Please check your email and click the confirmation link',
   [ErrorCode.TOKEN_EXPIRED]: 'Your session has expired. Please sign in again',
+  [ErrorCode.EMAIL_NOT_FOUND]: 'No account found with this email address',
+  [ErrorCode.PASSWORD_RESET_FAILED]: 'Failed to reset password. Please try again',
   
   [ErrorCode.VALIDATION_ERROR]: 'Please check your input and try again',
   [ErrorCode.REQUIRED_FIELD]: 'This field is required',

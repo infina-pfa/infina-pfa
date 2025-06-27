@@ -163,6 +163,19 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
           </div>
         )}
 
+        {/* Forgot Password Link (Sign In Only) */}
+        {mode === "sign-in" && (
+          <div className="text-right">
+            <button
+              type="button"
+              onClick={() => router.push("/auth/forgot-password")}
+              className="text-sm text-infina-blue hover:text-blue-700 font-medium"
+            >
+              Forgot password?
+            </button>
+          </div>
+        )}
+
         {/* Error Message */}
         {formError && (
           <div className="text-infina-red text-sm bg-red-50 p-3 rounded-lg">

@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { handleError } from "@/lib/error-handler";
-import { AuthUser, SignInRequest, SignUpRequest, AuthResponse } from "@/lib/types/auth.types";
+import { AuthUser, SignInRequest, SignUpRequest, AuthResponse, ForgotPasswordRequest, ResetPasswordRequest } from "@/lib/types/auth.types";
 
 export const authService = {
   /**
@@ -58,6 +58,52 @@ export const authService = {
         user: null,
         error: appError.message,
       };
+    }
+  },
+
+  /**
+   * Send password reset email
+   */
+  async forgotPassword(request: ForgotPasswordRequest): Promise<{ error: string | null }> {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(request.email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+      
+      if (error) throw error;
+      
+      return { error: null };
+    } catch (error) {
+      const appError = handleError(error);
+      return { error: appError.message };
+    }
+  },
+
+  /**
+   * Reset password with new password
+   */
+  async resetPassword(request: ResetPasswordRequest): Promise<{ error: string | null }> {
+    try {
+      // Validate passwords match
+      if (request.password !== request.confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
+
+      // Validate password strength
+      if (request.password.length < 6) {
+        throw new Error('Password must be at least 6 characters long');
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: request.password,
+      });
+      
+      if (error) throw error;
+      
+      return { error: null };
+    } catch (error) {
+      const appError = handleError(error);
+      return { error: appError.message };
     }
   },
 

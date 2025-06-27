@@ -15,6 +15,15 @@ export interface SignUpRequest {
   password: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  password: string;
+  confirmPassword: string;
+}
+
 export interface AuthResponse {
   user: AuthUser | null;
   error: string | null;

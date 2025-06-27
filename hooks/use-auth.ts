@@ -96,6 +96,46 @@ export const useAuth = () => {
     return { user: result.user, error: null };
   };
 
+  const forgotPassword = async (email: string) => {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+
+    const result = await authService.forgotPassword({ email });
+    
+    setState(prev => ({
+      ...prev,
+      loading: false,
+      error: result.error,
+    }));
+
+    if (result.error) {
+      showError('Failed to send reset email', result.error);
+      return { success: false, error: result.error };
+    }
+
+    success('Reset email sent!', 'Check your email for password reset instructions');
+    return { success: true, error: null };
+  };
+
+  const resetPassword = async (password: string, confirmPassword: string) => {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+
+    const result = await authService.resetPassword({ password, confirmPassword });
+    
+    setState(prev => ({
+      ...prev,
+      loading: false,
+      error: result.error,
+    }));
+
+    if (result.error) {
+      showError('Failed to reset password', result.error);
+      return { success: false, error: result.error };
+    }
+
+    success('Password reset successful!', 'You can now sign in with your new password');
+    return { success: true, error: null };
+  };
+
   const signOut = async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
@@ -130,5 +170,7 @@ export const useAuth = () => {
     signIn,
     signUp,
     signOut,
+    forgotPassword,
+    resetPassword,
   };
 };
