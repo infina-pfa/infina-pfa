@@ -2,26 +2,71 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { useAuth } from "@/hooks/use-auth";
-import { Menu, User, LogOut, Home } from "lucide-react";
+import {
+  Menu,
+  User,
+  LogOut,
+  Home,
+  MessageSquare,
+  Calculator,
+  Wrench,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { usePathname } from "next/navigation";
+
+const navigationItems = [
+  {
+    key: "dashboard",
+    href: "/dashboard",
+    icon: Home,
+  },
+  {
+    key: "advisor",
+    href: "/chat",
+    icon: MessageSquare,
+  },
+  {
+    key: "budgeting",
+    href: "/dashboard",
+    icon: Calculator,
+  },
+  {
+    key: "tools",
+    href: "/tools",
+    icon: Wrench,
+  },
+];
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, loading } = useAuthContext();
   const { signOut } = useAuth();
   const { t } = useTranslation();
+  const pathname = usePathname();
 
   const closeMenu = () => setIsOpen(false);
 
   const handleSignOut = async () => {
     await signOut();
     closeMenu();
+  };
+
+  const getUserInitials = (email?: string) => {
+    return email ? email.charAt(0).toUpperCase() : "U";
+  };
+
+  const isActiveRoute = (href: string) => {
+    if (href === "/dashboard") {
+      return pathname === "/dashboard";
+    }
+    return pathname.startsWith(href);
   };
 
   if (loading) {
@@ -31,10 +76,6 @@ export function MobileMenu() {
       </div>
     );
   }
-
-  const getUserInitials = (email?: string) => {
-    return email ? email.charAt(0).toUpperCase() : "U";
-  };
 
   return (
     <div className="md:hidden">
@@ -50,14 +91,34 @@ export function MobileMenu() {
           </Button>
         </SheetTrigger>
 
-        <SheetContent side="right" className="w-80 p-0 bg-white">
+        <SheetContent side="left" className="w-80 p-0 bg-white">
           <div className="flex flex-col h-full">
+            {/* Logo Section */}
+            <div className="p-6 bg-section-bg">
+              <Link
+                href="/"
+                onClick={closeMenu}
+                className="flex items-center space-x-3"
+              >
+                <Image
+                  src="/infina-logo.png"
+                  alt="Infina"
+                  width={120}
+                  height={36}
+                  className="h-auto w-auto"
+                  priority
+                />
+              </Link>
+            </div>
+
+            <Separator />
+
             {user ? (
               <>
                 {/* User Profile Section */}
-                <div className="p-6 bg-gray-50">
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="w-12 h-12">
+                <div className="p-4">
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <Avatar className="w-10 h-10">
                       <AvatarFallback className="bg-infina-blue text-white font-medium">
                         {getUserInitials(user.email)}
                       </AvatarFallback>
@@ -71,19 +132,32 @@ export function MobileMenu() {
                   </div>
                 </div>
 
-                <Separator />
+                {/* Navigation Items */}
+                <div className="flex-1 px-4">
+                  <nav className="space-y-1">
+                    {navigationItems.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = isActiveRoute(item.href);
 
-                {/* Menu Items */}
-                <div className="flex-1 p-4">
-                  <nav className="space-y-2">
-                    <Link
-                      href="/dashboard"
-                      onClick={closeMenu}
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-infina-blue rounded-lg transition-colors"
-                    >
-                      <Home className="w-5 h-5" />
-                      <span className="font-medium">{t("dashboard")}</span>
-                    </Link>
+                      return (
+                        <Link
+                          key={item.key}
+                          href={item.href}
+                          onClick={closeMenu}
+                          className={`
+                            flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors
+                            ${
+                              isActive
+                                ? "bg-blue-50 text-infina-blue"
+                                : "text-gray-700 hover:bg-blue-50 hover:text-infina-blue"
+                            }
+                          `}
+                        >
+                          <Icon className="w-5 h-5" />
+                          <span>{t(item.key)}</span>
+                        </Link>
+                      );
+                    })}
                   </nav>
                 </div>
 
@@ -103,45 +177,59 @@ export function MobileMenu() {
               </>
             ) : (
               <>
-                {/* Guest Header */}
-                <div className="p-6 bg-gray-50">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {t("welcome")}
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {t("getStartedMessage")}
-                  </p>
+                {/* Guest Welcome Section */}
+                <div className="p-4">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                      {t("welcome")}
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      {t("getStartedMessage")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Guest Navigation - Limited */}
+                <div className="flex-1 px-4">
+                  <nav className="space-y-1">
+                    <Link
+                      href="/"
+                      onClick={closeMenu}
+                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-infina-blue rounded-lg transition-colors"
+                    >
+                      <Home className="w-5 h-5" />
+                      <span className="font-medium">{t("home")}</span>
+                    </Link>
+                  </nav>
                 </div>
 
                 <Separator />
 
-                {/* Guest Menu */}
-                <div className="flex-1 p-4">
-                  <div className="space-y-3">
-                    <Link
-                      href="/auth/sign-in"
-                      onClick={closeMenu}
-                      className="block w-full"
+                {/* Guest Auth Actions */}
+                <div className="p-4 space-y-3">
+                  <Link
+                    href="/auth/sign-in"
+                    onClick={closeMenu}
+                    className="block w-full"
+                  >
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-gray-700 hover:text-infina-blue hover:bg-blue-50 font-medium"
                     >
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start text-gray-700 hover:text-infina-blue hover:bg-blue-50 font-medium"
-                      >
-                        <User className="w-4 h-4 mr-3" />
-                        {t("signIn")}
-                      </Button>
-                    </Link>
+                      <User className="w-4 h-4 mr-3" />
+                      {t("signIn")}
+                    </Button>
+                  </Link>
 
-                    <Link
-                      href="/auth/sign-up"
-                      onClick={closeMenu}
-                      className="block w-full"
-                    >
-                      <Button className="w-full bg-infina-blue hover:bg-blue-700 text-white font-medium">
-                        {t("getStarted")}
-                      </Button>
-                    </Link>
-                  </div>
+                  <Link
+                    href="/auth/sign-up"
+                    onClick={closeMenu}
+                    className="block w-full"
+                  >
+                    <Button className="w-full bg-infina-blue hover:bg-blue-700 text-white font-medium">
+                      {t("getStarted")}
+                    </Button>
+                  </Link>
                 </div>
               </>
             )}
