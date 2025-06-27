@@ -93,7 +93,7 @@ This guideline establishes a unified visual language for Infina's financial web 
 | Primary   | #0055FF                | #0041CC        | #B3CCFF text |
 | Secondary | #FFFFFF border #0055FF | Filled #0055FF | Muted text   |
 
-- Radius: 8px
+- Radius: Full rounded (9999px)
 - Padding: 12px 24px
 - Icon spacing: 8px to left/right of label
 
@@ -140,6 +140,12 @@ This guideline establishes a unified visual language for Infina's financial web 
 | Active  | Darker shade or inner border highlight                 |
 | Error   | Border or text in `#F44336`, error message below field |
 | Success | Inline success message, green icon                     |
+
+### Cursor Behavior
+
+- **All clickable elements** must use `cursor: pointer`
+- This includes: buttons, links, tabs, cards (when clickable), icons (when interactive)
+- Non-interactive elements should maintain default cursor
 
 ### Loaders
 
