@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { budgetService } from '@/lib/services/budget.service';
 import { CreateBudgetRequest, Budget } from '@/lib/types/budget.types';
 import { handleError } from '@/lib/error-handler';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 
 export const useBudgetCreate = () => {
   const [isCreating, setIsCreating] = useState(false);

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { budgetService } from '@/lib/services/budget.service';
 import { handleError } from '@/lib/error-handler';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 
 export const useBudgetDelete = () => {
   const [isDeleting, setIsDeleting] = useState(false);

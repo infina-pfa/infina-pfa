@@ -3,7 +3,7 @@ import { Nunito } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
-import { ToastProvider } from "@/components/ui/toast";
+import { Toaster } from "sonner";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -24,11 +24,20 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className={`${nunito.variable} antialiased font-nunito`}>
-        <ToastProvider>
-          <AuthProvider>
-            <I18nProvider>{children}</I18nProvider>
-          </AuthProvider>
-        </ToastProvider>
+        <AuthProvider>
+          <I18nProvider>{children}</I18nProvider>
+        </AuthProvider>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: "#FFFFFF",
+              border: "1px solid #E0E0E0",
+              borderRadius: "8px",
+              fontFamily: "var(--font-nunito)",
+            },
+          }}
+        />
       </body>
     </html>
   );
