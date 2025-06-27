@@ -1,15 +1,8 @@
 import { useState, useEffect } from "react";
-import { User } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
-import { handleError } from "@/lib/error-handler";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-
-interface AuthState {
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-}
+import { authService } from "@/lib/services/auth.service";
+import { AuthState, AuthUser } from "@/lib/types/auth.types";
 
 export const useAuth = () => {
   const [state, setState] = useState<AuthState>({
@@ -24,23 +17,17 @@ export const useAuth = () => {
     // Get initial session
     const getInitialSession = async () => {
       try {
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.getUser();
-        if (error) throw error;
-
+        const user = await authService.getCurrentUser();
         setState({
-          user: user ?? null,
+          user,
           loading: false,
           error: null,
         });
       } catch (error) {
-        const appError = handleError(error);
         setState({
           user: null,
           loading: false,
-          error: appError.message,
+          error: error instanceof Error ? error.message : 'Failed to get user',
         });
       }
     };
@@ -48,11 +35,9 @@ export const useAuth = () => {
     getInitialSession();
 
     // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = authService.onAuthStateChange((user: AuthUser | null) => {
       setState({
-        user: session?.user ?? null,
+        user,
         loading: false,
         error: null,
       });
@@ -64,72 +49,59 @@ export const useAuth = () => {
   const signIn = async (email: string, password: string) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      setState({
-        user: data.user,
-        loading: false,
-        error: null,
-      });
-
-      success('Welcome back!', 'Successfully signed in');
-      return { user: data.user, error: null };
-    } catch (error) {
-      const appError = handleError(error);
+    const result = await authService.signIn({ email, password });
+    
+    if (result.error) {
       setState(prev => ({
         ...prev,
         loading: false,
-        error: appError.message,
+        error: result.error,
       }));
-      showError('Sign in failed', appError.message);
-      return { user: null, error: appError.message };
+      showError('Sign in failed', result.error);
+      return { user: null, error: result.error };
     }
+
+    setState({
+      user: result.user,
+      loading: false,
+      error: null,
+    });
+
+    success('Welcome back!', 'Successfully signed in');
+    return { user: result.user, error: null };
   };
 
   const signUp = async (email: string, password: string) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      setState({
-        user: data.user,
-        loading: false,
-        error: null,
-      });
-
-      success('Account created!', 'Welcome to Infina PFA');
-      return { user: data.user, error: null };
-    } catch (error) {
-      const appError = handleError(error);
+    const result = await authService.signUp({ email, password });
+    
+    if (result.error) {
       setState(prev => ({
         ...prev,
         loading: false,
-        error: appError.message,
+        error: result.error,
       }));
-      showError('Sign up failed', appError.message);
-      return { user: null, error: appError.message };
+      showError('Sign up failed', result.error);
+      return { user: null, error: result.error };
     }
+
+    setState({
+      user: result.user,
+      loading: false,
+      error: null,
+    });
+
+    success('Account created!', 'Welcome to Infina PFA');
+    return { user: result.user, error: null };
   };
 
   const signOut = async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
+      await authService.signOut();
+      
       setState({
         user: null,
         loading: false,
@@ -141,13 +113,13 @@ export const useAuth = () => {
       // Redirect to sign-in page after successful sign out
       router.push('/auth/sign-in');
     } catch (error) {
-      const appError = handleError(error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sign out';
       setState(prev => ({
         ...prev,
         loading: false,
-        error: appError.message,
+        error: errorMessage,
       }));
-      showError('Sign out failed', appError.message);
+      showError('Sign out failed', errorMessage);
     }
   };
 
