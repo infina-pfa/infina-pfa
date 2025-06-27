@@ -67,6 +67,117 @@ const createBudget = async (data) => {
 }
 ```
 
+## 🌍 INTERNATIONALIZATION & TRANSLATIONS (Mandatory)
+
+### Translation Requirements
+
+- **NEVER hardcode text in components** - All user-facing text must use translations
+- **All text must support Vietnamese and English** - Current supported languages
+- **Use react-i18next** for translation management
+- **Organize translations by page/section** for better maintainability
+
+```typescript
+// ✅ Good - Using translations
+import { useTranslation } from "react-i18next";
+
+const WelcomeMessage = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div>
+      <h1>{t("welcome")}</h1>
+      <p>{t("getStartedMessage")}</p>
+      <button>{t("getStarted")}</button>
+    </div>
+  );
+};
+
+// ❌ Bad - Hardcoded text
+const WelcomeMessage = () => {
+  return (
+    <div>
+      <h1>Welcome</h1>
+      <p>Get started with your financial journey</p>
+      <button>Get Started</button>
+    </div>
+  );
+};
+```
+
+### Translation File Organization
+
+- **Organize translations by section**: `common.ts`, `auth.ts`, `hero.ts`, etc.
+- **Use descriptive keys**: `heroMainTitle`, `authSignInButton`, `budgetCreateSuccess`
+- **Maintain consistency** across language files
+- **Keep translations in sync** - every key must exist in all language files
+
+```typescript
+// ✅ Good - Well-organized translation structure
+export const authEn = {
+  // Sign In
+  signInTitle: "Sign in to your account",
+  signInButton: "Sign In",
+  signInSuccess: "Successfully signed in",
+  
+  // Sign Up
+  signUpTitle: "Create your account",
+  signUpButton: "Sign Up",
+  signUpSuccess: "Account created successfully",
+  
+  // Validation
+  emailRequired: "Email is required",
+  passwordRequired: "Password is required",
+};
+
+// ❌ Bad - Unclear or missing organization
+export const authEn = {
+  title: "Sign in", // Too generic
+  btn: "Go", // Unclear abbreviation
+  msg: "OK", // Too vague
+};
+```
+
+### Translation Best Practices
+
+- **Dynamic content**: Use interpolation for dynamic values
+- **Pluralization**: Handle singular/plural forms properly
+- **Context**: Provide context in key names for better understanding
+- **Error messages**: Always translate error messages
+- **Accessibility**: Translate alt texts, aria-labels, and screen reader content
+
+```typescript
+// ✅ Good - Dynamic translations with interpolation
+const { t } = useTranslation();
+
+const BudgetSummary = ({ amount, budgetName }: { amount: number; budgetName: string }) => {
+  return (
+    <div>
+      <h2>{t("budgetSummaryTitle", { name: budgetName })}</h2>
+      <p>{t("budgetRemainingAmount", { amount: formatCurrency(amount) })}</p>
+      <p>{t("expenseCount", { count: expenses.length })}</p>
+    </div>
+  );
+};
+
+// Translation files should include interpolation:
+export const budgetEn = {
+  budgetSummaryTitle: "{{name}} Budget Summary",
+  budgetRemainingAmount: "Remaining: {{amount}}",
+  expenseCount_one: "{{count}} expense",
+  expenseCount_other: "{{count}} expenses",
+};
+
+// ❌ Bad - Hardcoded dynamic content
+const BudgetSummary = ({ amount, budgetName }) => {
+  return (
+    <div>
+      <h2>{budgetName} Budget Summary</h2>
+      <p>Remaining: {formatCurrency(amount)}</p>
+    </div>
+  );
+};
+```
+
 ## 📦 COMPONENT ARCHITECTURE
 
 ### Component Size & Structure
