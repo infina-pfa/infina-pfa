@@ -52,16 +52,19 @@ export const updateSession = async (request: NextRequest) => {
   }
 
   // If user is not authenticated and trying to access protected pages, redirect to sign-in
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith("/auth") &&
-    !request.nextUrl.pathname.startsWith("/") &&
-    request.nextUrl.pathname !== "/"
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone();
-    url.pathname = "/auth/sign-in";
-    return NextResponse.redirect(url);
+  if (!user) {
+    const pathname = request.nextUrl.pathname;
+    const isPublicPage = 
+      pathname === "/" ||
+      pathname.startsWith("/auth/sign-in") ||
+      pathname.startsWith("/auth/sign-up");
+    
+    if (!isPublicPage) {
+      // Redirect unauthenticated users to sign-in page
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/sign-in";
+      return NextResponse.redirect(url);
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

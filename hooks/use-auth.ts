@@ -3,6 +3,7 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { handleError } from "@/lib/error-handler";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface AuthState {
   user: User | null;
@@ -17,6 +18,7 @@ export const useAuth = () => {
     error: null,
   });
   const { success, error: showError } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     // Get initial session
@@ -135,6 +137,9 @@ export const useAuth = () => {
       });
       
       success('Signed out successfully', 'See you next time!');
+      
+      // Redirect to sign-in page after successful sign out
+      router.push('/auth/sign-in');
     } catch (error) {
       const appError = handleError(error);
       setState(prev => ({
