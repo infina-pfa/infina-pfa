@@ -1,24 +1,24 @@
 import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 cursor-pointer",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 font-nunito",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        default: "bg-infina-blue text-white hover:bg-infina-blue/90",
+        destructive: "bg-infina-red text-white hover:bg-infina-red/90",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "border border-infina-blue text-infina-blue hover:bg-infina-blue hover:text-white",
+        secondary: "bg-section-bg text-foreground hover:bg-section-bg/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        purple:
-          "bg-finance-purple text-white shadow-purple-400/20 hover:bg-finance-purple/90",
+        link: "text-infina-blue underline-offset-4 hover:underline",
+        success: "bg-infina-green text-white hover:bg-infina-green/90",
+        warning: "bg-infina-yellow text-white hover:bg-infina-yellow/90",
+        highlight: "bg-infina-orange text-white hover:bg-infina-orange/90",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -42,17 +42,9 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    if (asChild) {
-      return (
-        <div
-          className={cn(buttonVariants({ variant, size, className }))}
-          {...(props as React.HTMLAttributes<HTMLDivElement>)}
-        />
-      );
-    }
-
+    const Comp = asChild ? Slot : "button";
     return (
-      <button
+      <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
