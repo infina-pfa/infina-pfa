@@ -26,10 +26,12 @@ export const authVi = {
   alreadyHaveAccount: "Đã có tài khoản?",
   getStarted: "Bắt đầu",
 
-  // Errors
-  pleaseEnterAllFields: "Vui lòng điền đầy đủ thông tin",
+  // Error Messages
+  pleaseEnterAllFields: "Vui lòng điền đầy đủ các trường",
   passwordsDontMatch: "Mật khẩu không khớp",
   passwordTooShort: "Mật khẩu phải có ít nhất 6 ký tự",
+  pleaseEnterEmail: "Vui lòng nhập địa chỉ email",
+  invalidEmailAddress: "Vui lòng nhập địa chỉ email hợp lệ",
   unexpectedError: "Đã xảy ra lỗi không mong muốn",
 
   // Auth Layout
@@ -65,4 +67,23 @@ export const authVi = {
 
   // Auth Actions
   signOut: "Đăng xuất",
+
+  // Forgot Password
+  forgotPassword: "Quên mật khẩu?",
+  forgotPasswordTitle: "Đặt lại mật khẩu",
+  forgotPasswordDescription: "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu.",
+  forgotPasswordButton: "Gửi hướng dẫn đặt lại",
+  
+  // Reset Password
+  resetPasswordTitle: "Tạo mật khẩu mới",
+  resetPasswordDescription: "Nhập mật khẩu mới của bạn bên dưới",
+  newPassword: "Mật khẩu mới",
+  confirmNewPassword: "Xác nhận mật khẩu mới",
+  enterNewPassword: "Nhập mật khẩu mới",
+  confirmNewPasswordPlaceholder: "Xác nhận mật khẩu mới",
+  updatePasswordButton: "Cập nhật mật khẩu",
+  
+  // Password Requirements
+  passwordRequirements: "Yêu cầu mật khẩu:",
+  passwordMinLength: "Ít nhất 6 ký tự",
 };

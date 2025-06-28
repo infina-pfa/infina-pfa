@@ -27,9 +27,11 @@ export const authEn = {
   getStarted: "Get started",
 
   // Errors
-  pleaseEnterAllFields: "Please fill in all fields",
+  pleaseEnterAllFields: "Please fill out all fields",
   passwordsDontMatch: "Passwords do not match",
-  passwordTooShort: "Password must be at least 6 characters",
+  passwordTooShort: "Password must be at least 6 characters long",
+  pleaseEnterEmail: "Please enter your email address",
+  invalidEmailAddress: "Please enter a valid email address",
   unexpectedError: "An unexpected error occurred",
 
   // Auth Layout
@@ -65,4 +67,23 @@ export const authEn = {
 
   // Auth Actions
   signOut: "Sign out",
+
+  // Forgot Password
+  forgotPassword: "Forgot password?",
+  forgotPasswordTitle: "Reset your password",
+  forgotPasswordDescription: "Enter your email address and we'll send you instructions to reset your password.",
+  forgotPasswordButton: "Send reset instructions",
+  
+  // Reset Password
+  resetPasswordTitle: "Create new password",
+  resetPasswordDescription: "Enter your new password below",
+  newPassword: "New password",
+  confirmNewPassword: "Confirm new password",
+  enterNewPassword: "Enter new password",
+  confirmNewPasswordPlaceholder: "Confirm new password",
+  updatePasswordButton: "Update password",
+  
+  // Password Requirements
+  passwordRequirements: "Password requirements:",
+  passwordMinLength: "At least 6 characters long",
 };

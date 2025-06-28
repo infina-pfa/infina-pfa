@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Mail, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useTranslation } from "react-i18next";
 
 interface ForgotPasswordFormProps {
   onBackToSignIn?: () => void;
@@ -19,19 +20,20 @@ export function ForgotPasswordForm({
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const { forgotPassword, loading } = useAuth();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
 
     if (!email) {
-      setFormError("Please enter your email address");
+      setFormError(t("pleaseEnterEmail"));
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setFormError("Please enter a valid email address");
+      setFormError(t("invalidEmailAddress"));
       return;
     }
 
@@ -140,7 +142,7 @@ export function ForgotPasswordForm({
               Sending reset email...
             </div>
           ) : (
-            "Send reset instructions"
+            t("forgotPasswordButton")
           )}
         </Button>
 

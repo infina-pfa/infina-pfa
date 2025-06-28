@@ -11,19 +11,18 @@ const buttonVariants = cva(
       variant: {
         default: "bg-infina-blue text-white hover:bg-infina-blue/90",
         destructive: "bg-infina-red text-white hover:bg-infina-red/90",
-        outline:
-          "border border-infina-blue text-infina-blue hover:bg-infina-blue hover:text-white",
+        outline: "bg-transparent text-infina-blue hover:bg-infina-blue/10",
         secondary: "bg-section-bg text-foreground hover:bg-section-bg/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-infina-blue underline-offset-4 hover:underline",
+        link: "text-infina-blue underline-offset-4 hover:underline bg-transparent",
         success: "bg-infina-green text-white hover:bg-infina-green/90",
         warning: "bg-infina-yellow text-white hover:bg-infina-yellow/90",
         highlight: "bg-infina-orange text-white hover:bg-infina-orange/90",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
+        sm: "h-9 px-3 text-xs",
+        lg: "h-11 px-8 text-base",
         icon: "h-10 w-10",
       },
     },

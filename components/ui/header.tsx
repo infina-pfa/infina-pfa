@@ -2,13 +2,10 @@
 
 import { MobileMenu } from "@/components/ui/mobile-menu";
 import { LandingNavbar } from "@/components/ui/landing-navbar";
-import { useAuthContext } from "@/components/providers/auth-provider";
 
 export function Header() {
-  const { user } = useAuthContext();
-
   return (
-    <header className="bg-white relative border-b border-gray-100">
+    <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Mobile Menu - Show on mobile for all users */}

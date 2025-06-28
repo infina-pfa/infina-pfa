@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Conversation } from "@/lib/types/conversation.types";
 import { Message } from "@/lib/types/message.types";
 
@@ -25,6 +26,7 @@ export const ChatArea = ({
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { t } = useTranslation();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -128,7 +130,7 @@ export const ChatArea = ({
             {conversation.title}
           </h2>
           <p className="text-sm text-gray-500">
-            {messages.length} {messages.length === 1 ? "message" : "messages"}
+            {t("messageCount", { count: messages.length })}
           </p>
         </div>
       )}
@@ -162,10 +164,8 @@ export const ChatArea = ({
           <div className="flex items-center justify-center h-full text-center">
             <div className="text-gray-500">
               <Bot size={48} className="mx-auto mb-3 text-gray-300" />
-              <p className="text-sm">No messages yet</p>
-              <p className="text-xs mt-1">
-                Start the conversation by sending a message
-              </p>
+              <p className="text-sm">{t("noMessagesYet")}</p>
+              <p className="text-xs mt-1">{t("startConversation")}</p>
             </div>
           </div>
         ) : (
@@ -209,7 +209,7 @@ export const ChatArea = ({
               value={inputValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Type your message..."
+              placeholder={t("typeYourMessage")}
               className="w-full px-3 md:px-4 py-2 md:py-3 pr-10 md:pr-12 bg-[#F0F2F5] rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-[#0055FF]/20 text-sm min-h-[44px] md:min-h-[48px] max-h-[120px]"
               rows={1}
               disabled={isSending}

@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface ResetPasswordFormProps {
   onBackToSignIn?: () => void;
@@ -21,23 +22,24 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
 
   const { resetPassword, loading } = useAuth();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
 
     if (!password || !confirmPassword) {
-      setFormError("Please fill out all fields");
+      setFormError(t("pleaseEnterAllFields"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setFormError("Passwords do not match");
+      setFormError(t("passwordsDontMatch"));
       return;
     }
 
     if (password.length < 6) {
-      setFormError("Password must be at least 6 characters long");
+      setFormError(t("passwordTooShort"));
       return;
     }
 
@@ -169,7 +171,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
               Updating password...
             </div>
           ) : (
-            "Update password"
+            t("updatePasswordButton")
           )}
         </Button>
 

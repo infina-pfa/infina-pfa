@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
+import { AuthFormFields } from "./auth-form-fields";
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up";
@@ -73,95 +72,21 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Email Field */}
-        <div className="space-y-2">
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            {t("emailAddress")}
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 bg-gray-50 border-0 focus:bg-white focus:ring-2 focus:ring-infina-blue"
-              placeholder={t("enterEmail")}
-              required
-            />
-          </div>
-        </div>
-
-        {/* Password Field */}
-        <div className="space-y-2">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700"
-          >
-            {t("password")}
-          </label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-10 bg-gray-50 border-0 focus:bg-white focus:ring-2 focus:ring-infina-blue"
-              placeholder={t("enterPassword")}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              {showPassword ? (
-                <EyeOff className="w-5 h-5" />
-              ) : (
-                <Eye className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Confirm Password Field (Sign Up Only) */}
-        {mode === "sign-up" && (
-          <div className="space-y-2">
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700"
-            >
-              {t("confirmPassword")}
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="pl-10 pr-10 bg-gray-50 border-0 focus:bg-white focus:ring-2 focus:ring-infina-blue"
-                placeholder={t("confirmPasswordPlaceholder")}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-          </div>
-        )}
+        <AuthFormFields
+          mode={mode}
+          email={email}
+          password={password}
+          confirmPassword={confirmPassword}
+          showPassword={showPassword}
+          showConfirmPassword={showConfirmPassword}
+          onEmailChange={setEmail}
+          onPasswordChange={setPassword}
+          onConfirmPasswordChange={setConfirmPassword}
+          onToggleShowPassword={() => setShowPassword(!showPassword)}
+          onToggleShowConfirmPassword={() =>
+            setShowConfirmPassword(!showConfirmPassword)
+          }
+        />
 
         {/* Forgot Password Link (Sign In Only) */}
         {mode === "sign-in" && (
@@ -171,7 +96,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
               onClick={() => router.push("/auth/forgot-password")}
               className="text-sm text-infina-blue hover:text-blue-700 font-medium cursor-pointer"
             >
-              Forgot password?
+              {t("forgotPassword")}
             </button>
           </div>
         )}

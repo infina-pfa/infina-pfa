@@ -14,7 +14,6 @@ interface HowItWorksStepProps {
 export const HowItWorksStep = ({ step, isReversed }: HowItWorksStepProps) => {
   const stepRef = useRef(null);
   const isStepInView = useInView(stepRef, { once: true, margin: "-100px" });
-  const Icon = step.icon;
 
   return (
     <motion.div
@@ -35,17 +34,7 @@ export const HowItWorksStep = ({ step, isReversed }: HowItWorksStepProps) => {
         }
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <div className="flex items-center gap-4 mb-6">
-          <motion.div
-            className={`w-12 h-12 sm:w-14 sm:h-14 bg-${step.iconColor.replace(
-              "text-",
-              ""
-            )}/10 rounded-2xl flex items-center justify-center`}
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <Icon className={`w-6 h-6 sm:w-7 sm:h-7 ${step.iconColor}`} />
-          </motion.div>
+        <div className="mb-6">
           <CardTitle className="text-xl sm:text-2xl lg:text-3xl text-foreground">
             {step.title}
           </CardTitle>

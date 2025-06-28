@@ -1,6 +1,5 @@
 "use client";
 
-import { Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 
@@ -11,7 +10,6 @@ export function TestimonialSection() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <Card>
           <CardContent className="p-6 sm:p-8 lg:p-12">
-            <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-infina-blue mx-auto mb-6 sm:mb-8" />
             <blockquote className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-medium text-foreground mb-6 sm:mb-8 leading-relaxed px-4">
               &ldquo;{t("testimonialQuote")}&rdquo;
             </blockquote>
