@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { chatService } from "@/lib/services/chat.service";
 import { ChatMessage } from "@/lib/types/chat.types";
 
@@ -18,6 +19,7 @@ interface UseChatMessagesReturn {
 }
 
 export const useChatMessages = (): UseChatMessagesReturn => {
+  const { t } = useTranslation("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,13 +48,13 @@ export const useChatMessages = (): UseChatMessagesReturn => {
       addMessage(userMessage);
       return userMessage;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to send message";
+      const errorMessage = err instanceof Error ? err.message : t("messageSendFailed");
       setError(errorMessage);
       return null;
     } finally {
       setIsSending(false);
     }
-  }, [addMessage]);
+  }, [addMessage, t]);
 
   const saveAIMessage = useCallback(async (
     content: string,
@@ -63,11 +65,11 @@ export const useChatMessages = (): UseChatMessagesReturn => {
       const aiMessage = await chatService.saveAIMessage(content, conversationId, metadata);
       return aiMessage;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to save AI message";
+      const errorMessage = err instanceof Error ? err.message : t("aiStreamFailed");
       setError(errorMessage);
       return null;
     }
-  }, []);
+  }, [t]);
 
   const clearMessages = useCallback(() => {
     setMessages([]);

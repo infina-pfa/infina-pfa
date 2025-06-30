@@ -1,91 +1,52 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { 
-  ChatSession, 
-  CreateConversationResponse,
-  ChatError 
-} from "@/lib/types/chat.types";
+import { useTranslation } from "react-i18next";
+import { chatService } from "@/lib/services/chat.service";
+import { Conversation } from "@/lib/types/chat.types";
 
-interface UseChatSessionReturn {
+interface UseSimpleChatSessionReturn {
   // State
-  session: ChatSession | null;
-  isLoading: boolean;
-  error: ChatError | null;
+  conversation: Conversation | null;
+  isCreating: boolean;
+  error: string | null;
   
   // Actions
-  createSession: () => Promise<string | null>;
+  createConversation: (title?: string) => Promise<string | null>;
   clearSession: () => void;
   clearError: () => void;
 }
 
-export const useChatSession = (): UseChatSessionReturn => {
+export const useSimpleChatSession = (): UseSimpleChatSessionReturn => {
   const { user } = useAuth();
-  const [session, setSession] = useState<ChatSession | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<ChatError | null>(null);
+  const { t } = useTranslation("chat");
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const createSession = useCallback(async (): Promise<string | null> => {
+  const createConversation = useCallback(async (title?: string): Promise<string | null> => {
     if (!user) {
-      setError({
-        code: "UNAUTHORIZED",
-        message: "User must be authenticated to create a chat session"
-      });
+      setError(t("conversationCreateFailed"));
       return null;
     }
 
-    setIsLoading(true);
+    setIsCreating(true);
     setError(null);
 
     try {
-      // Create new conversation
-      const response = await fetch("/api/conversations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: `Chat Session - ${new Date().toLocaleString()}`
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create conversation");
-      }
-
-      const data: CreateConversationResponse = await response.json();
-
-      if (!data.success || !data.data) {
-        throw new Error(data.error || "Failed to create conversation");
-      }
-
-      // Create new session without any messages
-      const newSession: ChatSession = {
-        conversationId: data.data.id,
-        messages: [],
-        isAiTyping: false,
-        componentState: {
-          isOpen: false,
-          history: []
-        }
-      };
-
-      setSession(newSession);
-      return data.data.id;
-
+      const newConversation = await chatService.createConversation(title);
+      setConversation(newConversation);
+      return newConversation.id;
     } catch (err) {
-      console.error("Error creating chat session:", err);
-      setError({
-        code: "SESSION_CREATE_FAILED",
-        message: err instanceof Error ? err.message : "Failed to create chat session"
-      });
+      const errorMessage = err instanceof Error ? err.message : t("conversationCreateFailed");
+      setError(errorMessage);
       return null;
     } finally {
-      setIsLoading(false);
+      setIsCreating(false);
     }
-  }, [user]);
+  }, [user, t]);
 
   const clearSession = useCallback(() => {
-    setSession(null);
+    setConversation(null);
     setError(null);
   }, []);
 
@@ -94,10 +55,10 @@ export const useChatSession = (): UseChatSessionReturn => {
   }, []);
 
   return {
-    session,
-    isLoading,
+    conversation,
+    isCreating,
     error,
-    createSession,
+    createConversation,
     clearSession,
     clearError
   };

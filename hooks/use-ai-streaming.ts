@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useAIAdvisorStreamProcessor } from "@/hooks/use-ai-advisor-stream";
 import { chatService } from "@/lib/services/chat.service";
 import { 
@@ -29,6 +30,7 @@ interface UseAIStreamingOptions {
 }
 
 export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingReturn => {
+  const { t } = useTranslation("chat");
   const [isStreaming, setIsStreaming] = useState(false);
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState<ChatMessage | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,8 +40,6 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
     conversationId: options.conversationId,
     userId: options.userId,
     onMessageComplete: async (message) => {
-      console.log("✅ AI message complete:", message.id);
-      
       // Clear streaming state
       setCurrentStreamingMessage(null);
       setIsStreaming(false);
@@ -48,12 +48,9 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
       options.onMessageComplete?.(message);
     },
     onFunctionToolComplete: (action) => {
-      console.log("🔧 Function tool complete:", action.type);
       options.onFunctionToolComplete?.(action);
     },
     onMessageStreaming: (message) => {
-      console.log("🌊 AI message streaming:", message.id);
-      
       // Update current streaming message
       setCurrentStreamingMessage(message);
       
@@ -61,8 +58,6 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
       options.onMessageStreaming?.(message);
     },
     onMessageUpdate: (messageId, message) => {
-      console.log("🔄 AI message update:", messageId, "content length:", message.content.length);
-      
       // Update current streaming message if it matches
       if (currentStreamingMessage?.id === messageId) {
         setCurrentStreamingMessage(message);
@@ -79,23 +74,18 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
     setCurrentStreamingMessage(null);
 
     try {
-      console.log("🔄 Starting AI advisor stream...");
-      
       // Get stream from service
       const stream = await chatService.startAIAdvisorStream(request);
       
       // Process the stream
       await aiAdvisorProcessor.processStreamData(stream);
-      
-      console.log("✅ AI advisor stream completed");
     } catch (err) {
-      console.error("💥 Error in AI streaming:", err);
-      const errorMessage = err instanceof Error ? err.message : "Failed to process AI stream";
+      const errorMessage = err instanceof Error ? err.message : t("aiStreamFailed");
       setError(errorMessage);
       setIsStreaming(false);
       setCurrentStreamingMessage(null);
     }
-  }, [aiAdvisorProcessor]);
+  }, [aiAdvisorProcessor, t]);
 
   const stopStreaming = useCallback(() => {
     setIsStreaming(false);

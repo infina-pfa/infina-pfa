@@ -14,7 +14,7 @@ export const useAIAdvisorStreamProcessor = ({
   conversationId,
   userId,
   onMessageComplete = () => {},
-  onFunctionToolComplete = (action) => console.log("Function tool complete:", action),
+  onFunctionToolComplete = () => {},
   onMessageStreaming = () => {},
   onMessageUpdate = () => {},
 }: UseAIAdvisorStreamProcessorOptions): UseAIAdvisorStreamProcessorReturn => {
@@ -282,7 +282,6 @@ export const useAIAdvisorStreamProcessor = ({
         }
 
         case "error": {
-          console.error("Stream error:", event.error);
           setIsStreaming(false);
           setIsProcessing(false);
           
@@ -291,7 +290,7 @@ export const useAIAdvisorStreamProcessor = ({
             const errorMessage = updateStreamingMessage(
               currentTextMessageRef.current,
               {
-                content: currentTextMessageRef.current.content || "Xin lỗi, tôi gặp lỗi khi phản hồi.",
+                content: currentTextMessageRef.current.content || "Sorry, I encountered an error while responding.",
                 isStreaming: false,
                 isComplete: true,
               }
@@ -304,7 +303,6 @@ export const useAIAdvisorStreamProcessor = ({
         }
 
         default:
-          console.log("Unhandled stream event:", type, event);
           break;
       }
     },
@@ -355,19 +353,9 @@ export const useAIAdvisorStreamProcessor = ({
                 if (eventData.startsWith("{") && eventData.endsWith("}")) {
                   const parsedEvent: AdvisorStreamEvent = JSON.parse(eventData);
                   processStreamEvent(parsedEvent);
-                } else {
-                  console.warn(
-                    "Incomplete JSON event, skipping:",
-                    eventData.substring(0, 100) + "..."
-                  );
                 }
-              } catch (error) {
-                console.error(
-                  "Error parsing stream event:",
-                  error,
-                  "Event data:",
-                  event.substring(0, 200) + "..."
-                );
+              } catch {
+                // Skip malformed events
               }
             }
           }
@@ -385,12 +373,12 @@ export const useAIAdvisorStreamProcessor = ({
               const parsedEvent: AdvisorStreamEvent = JSON.parse(eventData);
               processStreamEvent(parsedEvent);
             }
-          } catch (error) {
-            console.error("Error parsing final buffer event:", error);
+          } catch {
+            // Skip malformed final event
           }
         }
-      } catch (error) {
-        console.error("Error processing stream:", error);
+      } catch {
+        setIsStreaming(false);
         setIsProcessing(false);
       }
     },

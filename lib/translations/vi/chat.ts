@@ -4,6 +4,12 @@ export const chatVi = {
   
   // Error Messages
   dismissError: "Đóng",
+  connectionError: "Lỗi kết nối. Vui lòng thử lại.",
+  messageEmpty: "Nội dung tin nhắn không được để trống",
+  messageTooLong: "Nội dung tin nhắn không được vượt quá 10.000 ký tự",
+  conversationCreateFailed: "Không thể tạo cuộc trò chuyện",
+  messageSendFailed: "Không thể gửi tin nhắn",
+  aiStreamFailed: "Không thể xử lý phản hồi từ AI",
   
   // Welcome Screen
   welcomeTitle: "Chào mừng đến với Cố vấn Tài chính AI",

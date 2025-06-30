@@ -6,13 +6,11 @@ import {
   AdvisorStreamRequest 
 } from "@/lib/types/chat.types";
 
-type TranslationFunction = (key: string) => string;
-
 export const chatService = {
   /**
    * Create a new conversation
    */
-  async createConversation(title?: string, t?: TranslationFunction): Promise<Conversation> {
+  async createConversation(title?: string): Promise<Conversation> {
     try {
       const response = await fetch("/api/conversations", {
         method: "POST",
@@ -36,7 +34,7 @@ export const chatService = {
 
       return data.data;
     } catch (error) {
-      const appError = handleError(error, t);
+      const appError = handleError(error);
       throw new Error(appError.message);
     }
   },
@@ -46,8 +44,7 @@ export const chatService = {
    */
   async sendUserMessage(
     content: string, 
-    conversationId: string, 
-    t?: TranslationFunction
+    conversationId: string
   ): Promise<ChatMessage> {
     try {
       if (!content.trim()) {
@@ -92,7 +89,7 @@ export const chatService = {
 
       return userMessage;
     } catch (error) {
-      const appError = handleError(error, t);
+      const appError = handleError(error);
       throw new Error(appError.message);
     }
   },
@@ -103,8 +100,7 @@ export const chatService = {
   async saveAIMessage(
     content: string,
     conversationId: string,
-    metadata?: Record<string, unknown>,
-    t?: TranslationFunction
+    metadata?: Record<string, unknown>
   ): Promise<ChatMessage> {
     try {
       const requestData = {
@@ -139,7 +135,7 @@ export const chatService = {
         component: null
       };
     } catch (error) {
-      const appError = handleError(error, t);
+      const appError = handleError(error);
       throw new Error(appError.message);
     }
   },
@@ -148,8 +144,7 @@ export const chatService = {
    * Start AI advisor streaming response
    */
   async startAIAdvisorStream(
-    request: AdvisorStreamRequest,
-    t?: TranslationFunction
+    request: AdvisorStreamRequest
   ): Promise<ReadableStream<Uint8Array>> {
     try {
       const response = await fetch("/api/chat/advisor-stream", {
@@ -170,7 +165,7 @@ export const chatService = {
 
       return response.body;
     } catch (error) {
-      const appError = handleError(error, t);
+      const appError = handleError(error);
       throw new Error(appError.message);
     }
   }

@@ -4,6 +4,12 @@ export const chatEn = {
   
   // Error Messages
   dismissError: "Dismiss",
+  connectionError: "Connection error. Please try again.",
+  messageEmpty: "Message content cannot be empty",
+  messageTooLong: "Message content cannot exceed 10,000 characters",
+  conversationCreateFailed: "Failed to create conversation",
+  messageSendFailed: "Failed to send message",
+  aiStreamFailed: "Failed to process AI stream",
   
   // Welcome Screen
   welcomeTitle: "Welcome to your AI Financial Advisor",

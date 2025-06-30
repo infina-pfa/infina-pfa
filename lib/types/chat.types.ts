@@ -28,15 +28,6 @@ export interface ComponentData {
   description?: string;
 }
 
-// Chat session management
-export interface ChatSession {
-  conversationId: string;
-  messages: ChatMessage[];
-  isAiTyping: boolean;
-  currentStreamingMessageId?: string;
-  componentState?: ComponentState;
-}
-
 export interface ComponentState {
   isOpen: boolean;
   currentComponent?: ComponentData;
@@ -148,57 +139,7 @@ export interface ChatError {
   details?: Record<string, unknown>;
 }
 
-// Chat state management
-export interface ChatState {
-  // Session
-  session: ChatSession | null;
-  
-  // UI State
-  isLoading: boolean;
-  error: ChatError | null;
-  showSuggestions: boolean;
-  
-  // Component state
-  componentPanel: {
-    isOpen: boolean;
-    currentComponent?: ComponentData;
-    isMobile: boolean;
-  };
-  
-  // Input state
-  inputValue: string;
-  isSubmitting: boolean;
-}
 
-// Hook return types
-export interface UseChatReturn {
-  // State
-  session: ChatSession | null;
-  messages: ChatMessage[];
-  isLoading: boolean;
-  error: ChatError | null;
-  isAiTyping: boolean;
-  showSuggestions: boolean;
-  
-  // Actions
-  sendMessage: (content: string) => Promise<void>;
-  createNewSession: () => Promise<void>;
-  clearError: () => void;
-  
-  // Component actions
-  openComponent: (component: ComponentData) => void;
-  closeComponent: () => void;
-  
-  // Input handling
-  inputValue: string;
-  setInputValue: (value: string) => void;
-  handleSubmit: () => Promise<void>;
-  isSubmitting: boolean;
-  
-  // Suggestion handling
-  suggestions: ChatSuggestion[];
-  onSuggestionClick: (suggestion: string) => Promise<void>;
-}
 
 // Legacy UseStreamingChatReturn interface - replaced by AI Advisor streaming
 // This interface is deprecated
@@ -233,13 +174,7 @@ export type SendMessageServiceResponse = ChatServiceResponse<{
   streamUrl: string;
 }>;
 
-// API endpoints
-export const CHAT_API_ENDPOINTS = {
-  CONVERSATIONS: '/api/conversations',
-  MESSAGES: '/api/messages',
-  ADVISOR_STREAM: '/api/chat/advisor-stream',
-  USER_PROFILE: '/api/users/profile',
-} as const;
+
 
 // UI Action Types for AI Advisor
 export enum UIActionType {

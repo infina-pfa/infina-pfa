@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useSimpleChatSession } from "@/hooks/use-chat-session-v2";
+import { useSimpleChatSession } from "@/hooks/use-chat-session";
 import { useChatMessages } from "@/hooks/use-chat-messages";
 import { useAIStreaming } from "@/hooks/use-ai-streaming";
 import { 
@@ -56,8 +56,6 @@ export const useChatFlow = (): UseChatFlowReturn => {
     conversationId: session.conversation?.id || "",
     userId: user?.id || "",
     onMessageComplete: async (message) => {
-      console.log("✅ AI message complete, saving to database:", message.id);
-      
       // Save the completed AI message to database
       if (session.conversation) {
         await messages.saveAIMessage(
@@ -71,15 +69,11 @@ export const useChatFlow = (): UseChatFlowReturn => {
       messages.updateMessage(message.id, { isStreaming: false });
     },
     onMessageStreaming: (message) => {
-      console.log("🌊 AI message streaming:", message.id, "content length:", message.content.length);
-      
       // Add streaming message to local state if it doesn't exist
       const existingMessage = messages.messages.find(m => m.id === message.id);
       if (!existingMessage) {
-        console.log("➕ Adding new streaming message:", message.id);
         messages.addMessage(message);
       } else {
-        console.log("📝 Updating existing streaming message:", message.id);
         // Update existing streaming message with new content
         messages.updateMessage(message.id, {
           content: message.content,
@@ -91,8 +85,6 @@ export const useChatFlow = (): UseChatFlowReturn => {
       }
     },
     onMessageUpdate: (messageId, message) => {
-      console.log("🔄 Updating message in state:", messageId, "content length:", message.content.length);
-      
       // Update the message in messages state with the new content
       messages.updateMessage(messageId, {
         content: message.content,
@@ -103,7 +95,6 @@ export const useChatFlow = (): UseChatFlowReturn => {
       });
     },
     onFunctionToolComplete: (action) => {
-      console.log("🔧 Function tool complete:", action.type);
       handleUIAction(action);
     },
   });
@@ -121,13 +112,11 @@ export const useChatFlow = (): UseChatFlowReturn => {
   const isSubmitting = messages.isSending || aiStreaming.isStreaming;
 
   const handleUIAction = useCallback((action: UIAction) => {
-    console.log("Handling UI action:", action);
-    
     // TODO: Implement component panel logic
     if (action.type === "show_component") {
-      console.log("Show component:", action.payload.componentId);
+      // Handle component display
     } else if (action.type === "open_tool") {
-      console.log("Open tool:", action.payload.toolId);
+      // Handle tool opening
     }
   }, []);
 
@@ -143,10 +132,7 @@ export const useChatFlow = (): UseChatFlowReturn => {
    * Main flow: User message → Create session → Update state → Save to DB → Stream AI
    */
   const sendMessage = useCallback(async (content: string) => {
-    console.log("🚀 Starting chat flow with message:", content);
-    
     if (!user) {
-      console.log("❌ No user authenticated");
       return;
     }
 
@@ -156,27 +142,21 @@ export const useChatFlow = (): UseChatFlowReturn => {
     try {
       let conversationId = session.conversation?.id;
 
-             // Step 1: Create session if it doesn't exist
-       if (!conversationId) {
-         console.log("🆕 Creating new conversation...");
-         conversationId = await session.createConversation() || undefined;
-         
-         if (!conversationId) {
-           console.error("❌ Failed to create conversation");
-           return;
-         }
-         console.log("✅ Conversation created:", conversationId);
-       }
+      // Step 1: Create session if it doesn't exist
+      if (!conversationId) {
+        conversationId = await session.createConversation() || undefined;
+        
+        if (!conversationId) {
+          return;
+        }
+      }
 
       // Step 2: Send user message and update state
-      console.log("📤 Sending user message...");
       const userMessage = await messages.sendUserMessage(content, conversationId);
       
       if (!userMessage) {
-        console.log("❌ Failed to send user message");
         return;
       }
-      console.log("✅ User message sent and added to state:", userMessage.id);
 
       // Step 3: Prepare conversation history for AI
       const conversationHistory = messages.messages
@@ -195,8 +175,6 @@ export const useChatFlow = (): UseChatFlowReturn => {
         sender: "user" as const,
         timestamp: userMessage.created_at,
       });
-
-      console.log("📚 Conversation history prepared:", conversationHistory.length, "messages");
 
       // TODO: Get actual user context from API
       const userContext = {
@@ -220,11 +198,10 @@ export const useChatFlow = (): UseChatFlowReturn => {
         userContext,
       };
 
-      console.log("🤖 Starting AI advisor stream...");
       await aiStreaming.startStreaming(advisorRequest);
 
-    } catch (error) {
-      console.error("💥 Error in chat flow:", error);
+    } catch {
+      // Error handling will be done by individual hooks
     }
   }, [user, session, messages, aiStreaming]);
 
@@ -248,13 +225,12 @@ export const useChatFlow = (): UseChatFlowReturn => {
     aiStreaming.clearError();
   }, [session, messages, aiStreaming]);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const openComponent = useCallback((component: ComponentData) => {
-    console.log("Opening component:", component);
     // TODO: Implement component panel functionality
   }, []);
 
   const closeComponent = useCallback(() => {
-    console.log("Closing component");
     // TODO: Implement component panel functionality  
   }, []);
 
