@@ -16,6 +16,8 @@ The AI Advisor Chat is an intelligent conversational interface that combines tra
   - AI messages: White background with subtle shadow/border
 - Scrollable message history
 - Typing indicators when AI is responding
+- **Streaming AI responses**: AI messages appear word-by-word in real-time as they're generated
+- Smooth text streaming animation that feels natural and responsive
 
 ### 2. Fresh Conversation Experience
 
@@ -57,11 +59,13 @@ The AI Advisor Chat is an intelligent conversational interface that combines tra
 ### Core Chat Functionality
 
 - [x] Real-time message exchange
+- [x] **Streaming AI responses**: Token-by-token message rendering
 - [x] Message persistence during session (not between sessions)
 - [x] Typing indicators and status updates
 - [x] Message timestamp display
-- [x] Auto-scroll to latest message
+- [x] Auto-scroll to latest message during streaming
 - [x] Input validation and error handling
+- [x] Stream interruption handling (user sends new message while AI streaming)
 
 ### AI Integration
 
@@ -79,25 +83,6 @@ The AI Advisor Chat is an intelligent conversational interface that combines tra
 - [x] Real-time UI updates based on user actions
 
 ## Technical Requirements
-
-### Frontend Architecture
-
-```typescript
-// Core chat types
-interface ChatMessage {
-  id: string;
-  content: string;
-  sender: "user" | "ai";
-  timestamp: Date;
-  componentData?: ComponentRenderData;
-}
-
-interface ComponentRenderData {
-  type: "budget-form" | "expense-tracker" | "goal-planner" | "calculator";
-  props: Record<string, any>;
-  onInteraction?: (action: string, data: any) => void;
-}
-```
 
 ### Backend Integration
 
