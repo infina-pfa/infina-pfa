@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { userService } from "@/lib/services/user.service";
 import { CreateUserRequest } from "@/lib/types/user.types";
 
-export type OnboardingStep = "welcome" | "introduction" | "name" | "loading" | "success";
+export type OnboardingStep = "welcome" | "name" | "loading";
 
 interface OnboardingState {
   step: OnboardingStep;
@@ -27,12 +27,10 @@ export const useOnboarding = (userId: string) => {
   const router = useRouter();
 
   const nextStep = () => {
-    const steps: OnboardingStep[] = ["welcome", "introduction", "name", "loading", "success"];
-    const currentIndex = steps.indexOf(state.step);
-    if (currentIndex < steps.length - 1) {
+    if (state.step === "welcome") {
       setState(prev => ({
         ...prev,
-        step: steps[currentIndex + 1],
+        step: "name",
         error: null,
       }));
     }
@@ -92,20 +90,11 @@ export const useOnboarding = (userId: string) => {
         return;
       }
 
-      // Success - show success step briefly then navigate
-      setState(prev => ({
-        ...prev,
-        step: "success",
-        loading: false,
-        error: null,
-      }));
-
+      // Success - show success message and navigate
       success(t("successTitle"), t("successSubtitle"));
       
-      // Wait a moment to show success message, then navigate
-      setTimeout(() => {
-        router.push("/chat");
-      }, 2000);
+      // Navigate to chat immediately
+      router.push("/chat");
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : t("unexpectedError");

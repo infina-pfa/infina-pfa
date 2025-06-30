@@ -4,8 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// Note: Using simple label element instead of Label component
-import { ArrowRight, User } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface NameStepProps {
   name: string;
@@ -39,31 +38,16 @@ export function NameStep({
 
   return (
     <div className="max-w-lg mx-auto space-y-8">
-      {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="w-16 h-16 mx-auto bg-[#F0F2F5] rounded-full flex items-center justify-center">
-          <User className="w-8 h-8 text-[#0055FF]" />
-        </div>
-        <h1 className="text-3xl font-bold text-[#111827] font-nunito">
+      {/* Header - following landing page design */}
+      <div className="text-center space-y-6">
+        <h1 className="text-3xl lg:text-4xl font-bold text-[#111827] leading-tight">
           {t("nameStepTitle")}
         </h1>
-        <p className="text-xl text-[#6B7280] font-nunito">
-          {t("nameStepSubtitle")}
-        </p>
-        <p className="text-[#6B7280] leading-relaxed font-nunito">
-          {t("nameStepDescription")}
-        </p>
       </div>
 
       {/* Name Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <label
-            htmlFor="name"
-            className="text-base font-medium text-[#111827] block font-nunito"
-          >
-            {t("nameLabel")}
-          </label>
           <Input
             id="name"
             type="text"
@@ -71,19 +55,17 @@ export function NameStep({
             onChange={(e) => onNameChange(e.target.value)}
             onBlur={handleBlur}
             placeholder={t("namePlaceholder")}
-            className="h-12 text-base font-nunito"
+            className="h-12 text-base"
             disabled={loading}
             autoFocus
           />
-          {showError && (
-            <p className="text-[#F44336] text-sm mt-1 font-nunito">{error}</p>
-          )}
+          {showError && <p className="text-[#F44336] text-sm mt-1">{error}</p>}
         </div>
 
         <Button
           type="submit"
           size="lg"
-          className="w-full py-6 text-base cursor-pointer font-nunito"
+          className="w-full py-6 text-base cursor-pointer"
           disabled={loading || !name.trim()}
         >
           {loading ? t("creatingProfile") : t("getStartedButton")}

@@ -2,7 +2,7 @@
 
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 interface WelcomeStepProps {
   onNext: () => void;
@@ -12,31 +12,23 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="max-w-2xl mx-auto text-center space-y-8">
-      {/* Welcome Icon */}
-      <div className="w-24 h-24 mx-auto bg-blue-50 rounded-full flex items-center justify-center">
-        <Sparkles className="w-12 h-12 text-blue-500" />
-      </div>
-
-      {/* Welcome Content */}
-      <div className="space-y-4">
-        <h1 className="text-4xl font-bold text-gray-900">
+    <div className="text-center space-y-8">
+      {/* Welcome Content - following hero section design */}
+      <div className="space-y-6">
+        <h1 className="text-4xl lg:text-5xl font-bold text-[#111827] leading-tight">
           {t("welcomeTitle")}
         </h1>
-        <p className="text-xl text-blue-500 font-medium">
+        <p className="text-xl text-[#0055FF] font-medium">
           {t("welcomeSubtitle")}
-        </p>
-        <p className="text-lg text-gray-600 leading-relaxed max-w-xl mx-auto">
-          {t("welcomeDescription")}
         </p>
       </div>
 
-      {/* Continue Button */}
-      <div className="pt-4">
+      {/* Continue Button - following landing page style */}
+      <div className="pt-8">
         <Button
           onClick={onNext}
           size="lg"
-          className="px-8 py-6 text-base cursor-pointer"
+          className="text-base px-8 py-6 cursor-pointer"
         >
           {t("continueButton")}
           <ArrowRight className="w-5 h-5 ml-2" />

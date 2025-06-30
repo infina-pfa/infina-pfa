@@ -17,7 +17,7 @@ export const onboardingVi = {
   introFeature4Description: "Đặt mục tiêu tài chính và theo dõi tiến độ với các cột mốc và thành tích trực quan",
   
   // Name Collection Step
-  nameStepTitle: "Hãy bắt đầu",
+  nameStepTitle: "Bạn tên là",
   nameStepSubtitle: "Cho chúng tôi biết tên của bạn",
   nameStepDescription: "Chúng tôi muốn biết nên gọi bạn như thế nào khi giúp bạn trong hành trình tài chính.",
   nameLabel: "Tên của bạn",
