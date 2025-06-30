@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { AuthFormFields } from "./auth-form-fields";
+import { EmailVerification } from "./email-verification";
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up";
@@ -20,6 +21,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formError, setFormError] = useState("");
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
 
   const { signIn, signUp, loading } = useAuth();
   const { t } = useTranslation();
@@ -53,12 +55,31 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
       if (result.error) {
         setFormError(result.error);
       } else {
-        router.push("/chat");
+        if (mode === "sign-up") {
+          // Show email verification for sign up
+          setShowEmailVerification(true);
+        } else {
+          // Redirect to chat for sign in
+          router.push("/chat");
+        }
       }
     } catch {
       setFormError(t("unexpectedError"));
     }
   };
+
+  // Show email verification screen after signup
+  if (showEmailVerification) {
+    return (
+      <EmailVerification
+        email={email}
+        onBackToSignIn={() => {
+          setShowEmailVerification(false);
+          onToggleMode();
+        }}
+      />
+    );
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto bg-white p-8">

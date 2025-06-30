@@ -80,9 +80,7 @@ export const authEn = {
   emailPlaceholder: "Enter your email address",
   pleaseEnterValidEmail: "Please enter a valid email address",
   sendingResetEmail: "Sending reset email...",
-  checkYourEmail: "Check your email",
   passwordResetEmailSent: "We've sent password reset instructions to",
-  didntReceiveEmail: "Didn't receive the email? Check your spam folder or",
   tryAgain: "try again",
   backToSignIn: "Back to sign in",
   
@@ -135,6 +133,24 @@ export const authEn = {
   errorTimeout: "Request timed out. Please try again",
   errorUnknownError: "An unexpected error occurred",
 
+  // Email Verification
+  checkYourEmail: "Check your email",
+  verificationEmailSent: "We've sent a verification email to",
+  verificationEmailDescription: "Please click the verification link in your email to complete your account setup.",
+  didntReceiveEmail: "Didn't receive the email?", 
+  resendVerification: "Resend verification email",
+  verificationEmailResent: "Verification email sent again",
+  
+  // Email Verification Page
+  verifyingEmail: "Verifying your email",
+  pleaseWaitWhileVerifying: "Please wait while we verify your email address...",
+  emailVerified: "Email verified successfully!",
+  emailVerifiedDescription: "Your email has been confirmed. You can now continue setting up your account.",
+  redirectingToOnboarding: "Redirecting you to complete your profile setup...",
+  continueToOnboarding: "Continue to setup",
+  verificationFailed: "Verification failed",
+  verificationFailedDescription: "We couldn't verify your email address. The link may be expired or invalid.",
+  
   // Toast Messages
   signInFailed: "Sign in failed",
   signInSuccess: "Successfully signed in",

@@ -165,6 +165,26 @@ export const useAuth = () => {
     }
   };
 
+  const resendEmailVerification = async (email: string) => {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+
+    const result = await authService.resendEmailVerification(email, t);
+    
+    setState(prev => ({
+      ...prev,
+      loading: false,
+      error: result.error,
+    }));
+
+    if (result.error) {
+      showError(t('signUpFailed'), result.error);
+      return { success: false, error: result.error };
+    }
+
+    success(t('verificationEmailResent'), t('checkYourEmail'));
+    return { success: true, error: null };
+  };
+
   return {
     user: state.user,
     loading: state.loading,
@@ -174,5 +194,6 @@ export const useAuth = () => {
     signOut,
     forgotPassword,
     resetPassword,
+    resendEmailVerification,
   };
 };

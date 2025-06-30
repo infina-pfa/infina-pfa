@@ -130,7 +130,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<MessageRe
     }
 
     // Validate required fields
-    const { content, conversation_id, sender_type, meta_data } = requestBody;
+    const { content, conversation_id, sender_type } = requestBody;
     
     if (!content || typeof content !== "string" || content.trim().length === 0) {
       return NextResponse.json(

@@ -8,6 +8,7 @@ import { ctaVi } from "./cta";
 import { footerVi } from "./footer";
 import { authVi } from "./auth";
 import { chatVi } from "./chat";
+import { onboardingVi } from "./onboarding";
 
 export const viTranslations = {
   ...commonVi,
@@ -20,4 +21,5 @@ export const viTranslations = {
   ...footerVi,
   ...authVi,
   ...chatVi,
+  ...onboardingVi,
 };

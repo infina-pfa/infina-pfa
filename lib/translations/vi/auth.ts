@@ -80,9 +80,7 @@ export const authVi = {
   emailPlaceholder: "Nhập địa chỉ email của bạn",
   pleaseEnterValidEmail: "Vui lòng nhập địa chỉ email hợp lệ",
   sendingResetEmail: "Đang gửi email đặt lại...",
-  checkYourEmail: "Kiểm tra email của bạn",
   passwordResetEmailSent: "Chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến",
-  didntReceiveEmail: "Không nhận được email? Kiểm tra thư mục spam hoặc",
   tryAgain: "thử lại",
   backToSignIn: "Quay lại đăng nhập",
   
@@ -134,6 +132,24 @@ export const authVi = {
   errorServerError: "Đã xảy ra lỗi ở phía chúng tôi. Vui lòng thử lại",
   errorTimeout: "Yêu cầu hết thời gian. Vui lòng thử lại",
   errorUnknownError: "Đã xảy ra lỗi không mong muốn",
+
+  // Email Verification
+  checkYourEmail: "Kiểm tra email của bạn",
+  verificationEmailSent: "Chúng tôi đã gửi email xác thực tới",
+  verificationEmailDescription: "Vui lòng nhấn vào liên kết xác thực trong email để hoàn tất thiết lập tài khoản.",
+  didntReceiveEmail: "Không nhận được email?",
+  resendVerification: "Gửi lại email xác thực",
+  verificationEmailResent: "Email xác thực đã được gửi lại",
+  
+  // Email Verification Page
+  verifyingEmail: "Đang xác thực email",
+  pleaseWaitWhileVerifying: "Vui lòng đợi trong khi chúng tôi xác thực địa chỉ email của bạn...",
+  emailVerified: "Email đã được xác thực!",
+  emailVerifiedDescription: "Email của bạn đã được xác nhận. Bây giờ bạn có thể tiếp tục thiết lập tài khoản.",
+  redirectingToOnboarding: "Đang chuyển hướng để hoàn tất thiết lập hồ sơ...",
+  continueToOnboarding: "Tiếp tục thiết lập",
+  verificationFailed: "Xác thực thất bại",
+  verificationFailedDescription: "Chúng tôi không thể xác thực địa chỉ email của bạn. Liên kết có thể đã hết hạn hoặc không hợp lệ.",
 
   // Toast Messages
   signInFailed: "Đăng nhập thất bại",

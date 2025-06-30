@@ -7,7 +7,7 @@ type MessageUpdate = TablesUpdate<"user_messages">;
 
 interface UpdateMessageRequest {
   content?: string;
-  meta_data?: any;
+  meta_data?: Record<string, unknown>;
 }
 
 interface MessageResponse {

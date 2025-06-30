@@ -37,30 +37,60 @@ export const updateSession = async (request: NextRequest) => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If user is authenticated and trying to access landing, auth pages, redirect to chat
+  const pathname = request.nextUrl.pathname;
+
+  // If user is authenticated
   if (user) {
-    const pathname = request.nextUrl.pathname;
-    if (
-      pathname === "/" ||
-      pathname.startsWith("/auth/sign-in") ||
-      pathname.startsWith("/auth/sign-up") ||
-      pathname.startsWith("/auth/forgot-password")
-    ) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/chat";
-      return NextResponse.redirect(url);
+    // Allow access to onboarding page without checking profile
+    if (pathname.startsWith("/onboarding")) {
+      return supabaseResponse;
+    }
+
+    // Check if user has completed onboarding (has a profile in public.users)
+    try {
+      const { data: userProfile, error } = await supabase
+        .from("users")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      // If user doesn't have a profile, redirect to onboarding
+      if (error && error.code === 'PGRST116') {
+        // User profile doesn't exist - redirect to onboarding
+        if (pathname !== "/onboarding") {
+          const url = request.nextUrl.clone();
+          url.pathname = "/onboarding";
+          return NextResponse.redirect(url);
+        }
+      }
+
+      // If user has a profile and trying to access landing/auth/onboarding pages, redirect to chat
+      if (userProfile && (
+        pathname === "/" ||
+        pathname.startsWith("/auth/sign-in") ||
+        pathname.startsWith("/auth/sign-up") ||
+        pathname.startsWith("/auth/forgot-password") ||
+        pathname.startsWith("/onboarding")
+      )) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/chat";
+        return NextResponse.redirect(url);
+      }
+    } catch (error) {
+      // If there's an error checking the profile, allow access but log the error
+      console.error("Error checking user profile in middleware:", error);
     }
   }
 
   // If user is not authenticated and trying to access protected pages, redirect to sign-in
   if (!user) {
-    const pathname = request.nextUrl.pathname;
     const isPublicPage = 
       pathname === "/" ||
       pathname.startsWith("/auth/sign-in") ||
       pathname.startsWith("/auth/sign-up") ||
       pathname.startsWith("/auth/forgot-password") ||
-      pathname.startsWith("/auth/reset-password");
+      pathname.startsWith("/auth/reset-password") ||
+      pathname.startsWith("/auth/verify");
     
     if (!isPublicPage) {
       // Redirect unauthenticated users to sign-in page

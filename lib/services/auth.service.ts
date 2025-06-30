@@ -47,7 +47,12 @@ export const authService = {
    */
   async signUp(credentials: SignUpRequest, t?: TranslationFunction): Promise<AuthResponse> {
     try {
-      const { data, error } = await supabase.auth.signUp(credentials);
+      const { data, error } = await supabase.auth.signUp({
+        ...credentials,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/verify`
+        }
+      });
       
       if (error) throw error;
       
@@ -71,6 +76,25 @@ export const authService = {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(request.email, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+      
+      if (error) throw error;
+      
+      return { error: null };
+    } catch (error) {
+      const appError = handleError(error, t);
+      return { error: appError.message };
+    }
+  },
+
+  /**
+   * Resend email verification
+   */
+  async resendEmailVerification(email: string, t?: TranslationFunction): Promise<{ error: string | null }> {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
       });
       
       if (error) throw error;
