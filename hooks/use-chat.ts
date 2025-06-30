@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useChatSession } from "@/hooks/use-chat-session";
 import { useMessageSender } from "@/hooks/use-message-sender";
-import { useStreamingChat } from "@/hooks/use-streaming-chat";
 import { useAIAdvisorStreamProcessor } from "@/hooks/use-ai-advisor-stream";
 import { 
   UseChatReturn,
@@ -16,7 +15,6 @@ export const useChat = (): UseChatReturn => {
   const { user } = useAuth();
   const { session, isLoading: sessionLoading, error: sessionError, createSession, clearError: clearSessionError } = useChatSession();
   const { sendMessage: sendUserMessage, isSubmitting, error: sendError, clearError: clearSendError } = useMessageSender();
-  const { streamingMessage, isStreaming } = useStreamingChat();
   
   // Input state
   const [inputValue, setInputValue] = useState("");
@@ -77,14 +75,11 @@ export const useChat = (): UseChatReturn => {
   // Combine all loading states
   const isLoading = sessionLoading;
 
-  // Get all messages including streaming
+  // Get all messages from session
   const messages = session ? [...session.messages] : [];
-  if (streamingMessage && !messages.find(m => m.id === streamingMessage.id)) {
-    messages.push(streamingMessage);
-  }
 
   // Check if AI is typing
-  const isAiTyping = session?.isAiTyping || isStreaming || aiAdvisorProcessor.isStreaming;
+  const isAiTyping = session?.isAiTyping || aiAdvisorProcessor.isStreaming;
 
   const handleUIAction = useCallback((action: UIAction) => {
     console.log("Handling UI action:", action);

@@ -72,20 +72,8 @@ export interface SendMessageResponse {
   message?: string;
 }
 
-// Streaming types
-export interface StreamingMessageChunk {
-  type: 'content' | 'component' | 'complete' | 'error';
-  content?: string;
-  component?: ComponentData;
-  messageId?: string;
-  error?: string;
-}
-
-export interface StreamingResponse {
-  messageId: string;
-  conversationId: string;
-  stream: ReadableStream<Uint8Array>;
-}
+// Legacy streaming types - replaced by AI Advisor streaming
+// Keeping for compatibility but these are deprecated
 
 // Chat suggestions
 export interface ChatSuggestion {
@@ -212,20 +200,8 @@ export interface UseChatReturn {
   onSuggestionClick: (suggestion: string) => Promise<void>;
 }
 
-export interface UseStreamingChatReturn {
-  // Streaming state
-  streamingMessage: ChatMessage | null;
-  isStreaming: boolean;
-  
-  // Actions
-  startStream: (messageId: string, conversationId: string) => Promise<void>;
-  stopStream: () => void;
-  
-  // Stream handlers
-  onStreamChunk: (chunk: StreamingMessageChunk) => void;
-  onStreamComplete: () => void;
-  onStreamError: (error: ChatError) => void;
-}
+// Legacy UseStreamingChatReturn interface - replaced by AI Advisor streaming
+// This interface is deprecated
 
 // WebSocket message types
 export interface WebSocketMessage {
@@ -261,8 +237,8 @@ export type SendMessageServiceResponse = ChatServiceResponse<{
 export const CHAT_API_ENDPOINTS = {
   CONVERSATIONS: '/api/conversations',
   MESSAGES: '/api/messages',
-  CHAT_STREAM: '/api/chat/stream',
-  CHAT_SEND: '/api/chat/send',
+  ADVISOR_STREAM: '/api/chat/advisor-stream',
+  USER_PROFILE: '/api/users/profile',
 } as const;
 
 // UI Action Types for AI Advisor
