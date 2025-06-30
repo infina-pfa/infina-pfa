@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { authService } from "@/lib/services/auth.service";
 import { AuthState, AuthUser } from "@/lib/types/auth.types";
 
@@ -11,6 +12,7 @@ export const useAuth = () => {
     error: null,
   });
   const { success, error: showError } = useToast();
+  const { t } = useTranslation();
   const router = useRouter();
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export const useAuth = () => {
         setState({
           user: null,
           loading: false,
-          error: error instanceof Error ? error.message : 'Failed to get user',
+          error: error instanceof Error ? error.message : t('errorUnknownError'),
         });
       }
     };
@@ -44,12 +46,12 @@ export const useAuth = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [t]);
 
   const signIn = async (email: string, password: string) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
-    const result = await authService.signIn({ email, password });
+    const result = await authService.signIn({ email, password }, t);
     
     if (result.error) {
       setState(prev => ({
@@ -57,7 +59,7 @@ export const useAuth = () => {
         loading: false,
         error: result.error,
       }));
-      showError('Sign in failed', result.error);
+      showError(t('signInFailed'), result.error);
       return { user: null, error: result.error };
     }
 
@@ -67,14 +69,14 @@ export const useAuth = () => {
       error: null,
     });
 
-    success('Welcome back!', 'Successfully signed in');
+    success(t('welcomeBack'), t('signInSuccess'));
     return { user: result.user, error: null };
   };
 
   const signUp = async (email: string, password: string) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
-    const result = await authService.signUp({ email, password });
+    const result = await authService.signUp({ email, password }, t);
     
     if (result.error) {
       setState(prev => ({
@@ -82,7 +84,7 @@ export const useAuth = () => {
         loading: false,
         error: result.error,
       }));
-      showError('Sign up failed', result.error);
+      showError(t('signUpFailed'), result.error);
       return { user: null, error: result.error };
     }
 
@@ -92,14 +94,14 @@ export const useAuth = () => {
       error: null,
     });
 
-    success('Account created!', 'Welcome to Infina PFA');
+    success(t('accountCreated'), t('welcomeToInfina'));
     return { user: result.user, error: null };
   };
 
   const forgotPassword = async (email: string) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
-    const result = await authService.forgotPassword({ email });
+    const result = await authService.forgotPassword({ email }, t);
     
     setState(prev => ({
       ...prev,
@@ -108,18 +110,18 @@ export const useAuth = () => {
     }));
 
     if (result.error) {
-      showError('Failed to send reset email', result.error);
+      showError(t('resetEmailFailed'), result.error);
       return { success: false, error: result.error };
     }
 
-    success('Reset email sent!', 'Check your email for password reset instructions');
+    success(t('resetEmailSent'), t('checkEmailForInstructions'));
     return { success: true, error: null };
   };
 
   const resetPassword = async (password: string, confirmPassword: string) => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
-    const result = await authService.resetPassword({ password, confirmPassword });
+    const result = await authService.resetPassword({ password, confirmPassword }, t);
     
     setState(prev => ({
       ...prev,
@@ -128,11 +130,11 @@ export const useAuth = () => {
     }));
 
     if (result.error) {
-      showError('Failed to reset password', result.error);
+      showError(t('resetPasswordFailed'), result.error);
       return { success: false, error: result.error };
     }
 
-    success('Password reset successful!', 'You can now sign in with your new password');
+    success(t('passwordResetSuccess'), t('signInWithNewPassword'));
     return { success: true, error: null };
   };
 
@@ -140,7 +142,7 @@ export const useAuth = () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      await authService.signOut();
+      await authService.signOut(t);
       
       setState({
         user: null,
@@ -148,18 +150,18 @@ export const useAuth = () => {
         error: null,
       });
       
-      success('Signed out successfully', 'See you next time!');
+      success(t('signOutSuccess'), t('seeYouNextTime'));
       
       // Redirect to sign-in page after successful sign out
       router.push('/auth/sign-in');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to sign out';
+      const errorMessage = error instanceof Error ? error.message : t('errorUnknownError');
       setState(prev => ({
         ...prev,
         loading: false,
         error: errorMessage,
       }));
-      showError('Sign out failed', errorMessage);
+      showError(t('signOutFailed'), errorMessage);
     }
   };
 

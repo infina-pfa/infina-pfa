@@ -52,6 +52,53 @@ export enum ErrorCode {
   UNKNOWN_ERROR = 'UNKNOWN_ERROR'
 }
 
+// Translation key mapping for error codes
+export const ERROR_TRANSLATION_KEYS: Record<ErrorCode, string> = {
+  [ErrorCode.UNAUTHORIZED]: 'errorUnauthorized',
+  [ErrorCode.INVALID_CREDENTIALS]: 'errorInvalidCredentials',
+  [ErrorCode.EMAIL_NOT_CONFIRMED]: 'errorEmailNotConfirmed',
+  [ErrorCode.TOKEN_EXPIRED]: 'errorTokenExpired',
+  [ErrorCode.EMAIL_NOT_FOUND]: 'errorEmailNotFound',
+  [ErrorCode.PASSWORD_RESET_FAILED]: 'errorPasswordResetFailed',
+  
+  [ErrorCode.VALIDATION_ERROR]: 'errorValidation',
+  [ErrorCode.REQUIRED_FIELD]: 'errorRequiredField',
+  [ErrorCode.INVALID_FORMAT]: 'errorInvalidFormat',
+  
+  [ErrorCode.BUDGET_NOT_FOUND]: 'errorBudgetNotFound',
+  [ErrorCode.DUPLICATE_BUDGET_NAME]: 'errorDuplicateBudgetName',
+  [ErrorCode.BUDGET_LIMIT_EXCEEDED]: 'errorBudgetLimitExceeded',
+  [ErrorCode.INVALID_DATE_RANGE]: 'errorInvalidDateRange',
+  
+  [ErrorCode.EXPENSE_NOT_FOUND]: 'errorExpenseNotFound',
+  [ErrorCode.INVALID_EXPENSE_AMOUNT]: 'errorInvalidExpenseAmount',
+  [ErrorCode.FUTURE_EXPENSE_DATE]: 'errorFutureExpenseDate',
+  [ErrorCode.INVALID_RECURRING_MONTH]: 'errorInvalidRecurringMonth',
+  [ErrorCode.EXPENSE_DESCRIPTION_TOO_LONG]: 'errorExpenseDescriptionTooLong',
+  
+  [ErrorCode.INCOME_NOT_FOUND]: 'errorIncomeNotFound',
+  [ErrorCode.INVALID_INCOME_AMOUNT]: 'errorInvalidIncomeAmount',
+  [ErrorCode.INCOME_DESCRIPTION_REQUIRED]: 'errorIncomeDescriptionRequired',
+  [ErrorCode.INCOME_DESCRIPTION_TOO_LONG]: 'errorIncomeDescriptionTooLong',
+  [ErrorCode.INVALID_PAY_YOURSELF_PERCENT]: 'errorInvalidPayYourselfPercent',
+  
+  [ErrorCode.CONVERSATION_NOT_FOUND]: 'errorConversationNotFound',
+  [ErrorCode.CONVERSATION_TITLE_REQUIRED]: 'errorConversationTitleRequired',
+  [ErrorCode.CONVERSATION_TITLE_TOO_LONG]: 'errorConversationTitleTooLong',
+  
+  [ErrorCode.MESSAGE_NOT_FOUND]: 'errorMessageNotFound',
+  [ErrorCode.MESSAGE_CONTENT_REQUIRED]: 'errorMessageContentRequired',
+  [ErrorCode.MESSAGE_CONTENT_TOO_LONG]: 'errorMessageContentTooLong',
+  [ErrorCode.INVALID_SENDER_TYPE]: 'errorInvalidSenderType',
+  
+  [ErrorCode.NETWORK_ERROR]: 'errorNetworkError',
+  [ErrorCode.SERVER_ERROR]: 'errorServerError',
+  [ErrorCode.TIMEOUT]: 'errorTimeout',
+  
+  [ErrorCode.UNKNOWN_ERROR]: 'errorUnknownError'
+};
+
+// Fallback error messages for when translation is not available
 export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.UNAUTHORIZED]: 'Please sign in to continue',
   [ErrorCode.INVALID_CREDENTIALS]: 'Invalid email or password',
