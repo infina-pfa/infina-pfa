@@ -2,8 +2,6 @@ import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { 
   ChatMessage, 
-  SendMessageRequest, 
-  SendMessageResponse,
   ChatError 
 } from "@/lib/types/chat.types";
 
@@ -54,13 +52,14 @@ export const useMessageSender = (): UseMessageSenderReturn => {
     setError(null);
 
     try {
-      const requestData: SendMessageRequest = {
+      const requestData = {
         content: content.trim(),
-        conversationId,
+        conversation_id: conversationId,
+        sender_type: "USER",
         type: "text"
       };
 
-      const response = await fetch("/api/chat/send", {
+      const response = await fetch("/api/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +71,7 @@ export const useMessageSender = (): UseMessageSenderReturn => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: SendMessageResponse = await response.json();
+      const data = await response.json();
 
       if (!data.success || !data.data) {
         throw new Error(data.error || "Failed to send message");
@@ -80,7 +79,7 @@ export const useMessageSender = (): UseMessageSenderReturn => {
 
       // Transform the message to include client-side properties
       const userMessage: ChatMessage = {
-        ...data.data.userMessage,
+        ...data.data,
         isStreaming: false,
         component: null
       };

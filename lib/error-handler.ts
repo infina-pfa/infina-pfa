@@ -222,149 +222,65 @@ export const ERROR_CODES = {
   UNKNOWN_ERROR: "UNKNOWN_ERROR"
 } as const;
 
-// User-friendly error messages
-export const ERROR_MESSAGES = {
-  [ERROR_CODES.UNAUTHORIZED]: "You need to be signed in to perform this action",
-  [ERROR_CODES.FORBIDDEN]: "You don't have permission to perform this action",
-  [ERROR_CODES.VALIDATION_ERROR]: "Please check your input and try again",
-  [ERROR_CODES.INVALID_INPUT]: "The information provided is not valid",
-  [ERROR_CODES.API_ERROR]: "Something went wrong. Please try again",
-  [ERROR_CODES.NETWORK_ERROR]: "Network connection failed. Please check your internet connection",
-  [ERROR_CODES.TIMEOUT_ERROR]: "Request timed out. Please try again",
-  [ERROR_CODES.SESSION_CREATE_FAILED]: "Failed to start chat session. Please try again",
-  [ERROR_CODES.MESSAGE_SEND_FAILED]: "Failed to send message. Please try again",
-  [ERROR_CODES.STREAMING_ERROR]: "Connection lost while receiving response",
-  [ERROR_CODES.DATABASE_ERROR]: "Database operation failed. Please try again",
-  [ERROR_CODES.RECORD_NOT_FOUND]: "The requested information was not found",
-  [ERROR_CODES.INTERNAL_ERROR]: "An internal error occurred. Please try again",
-  [ERROR_CODES.UNKNOWN_ERROR]: "An unexpected error occurred. Please try again"
-} as const;
-
-// Error classification
-interface AppError {
-  code: string;
-  message: string;
-  userMessage: string;
-  originalError?: unknown;
-}
-
-/**
- * Transform any error into a consistent AppError format
- */
-export function handleError(error: unknown): AppError {
-  // If it's already an AppError or ChatError, return as is
-  if (isAppError(error)) {
-    return {
-      code: error.code,
-      message: error.message,
-      userMessage: ERROR_MESSAGES[error.code as keyof typeof ERROR_MESSAGES] || error.message,
-      originalError: error
-    };
-  }
-
-  // Handle standard Error objects
-  if (error instanceof Error) {
-    const code = classifyError(error);
-    return {
-      code,
-      message: error.message,
-      userMessage: ERROR_MESSAGES[code as keyof typeof ERROR_MESSAGES] || error.message,
-      originalError: error
-    };
-  }
-
-  // Handle string errors
-  if (typeof error === 'string') {
-    return {
-      code: ERROR_CODES.UNKNOWN_ERROR,
-      message: error,
-      userMessage: error,
-      originalError: error
-    };
-  }
-
-  // Handle unknown errors
-  return {
-    code: ERROR_CODES.UNKNOWN_ERROR,
-    message: "An unexpected error occurred",
-    userMessage: ERROR_MESSAGES[ERROR_CODES.UNKNOWN_ERROR],
-    originalError: error
-  };
-}
-
-/**
- * Check if an error is already an AppError or ChatError
- */
-function isAppError(error: unknown): error is ChatError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    'message' in error &&
-    typeof (error as ChatError).code === 'string' &&
-    typeof (error as ChatError).message === 'string'
-  );
-}
-
 /**
  * Classify error type based on the error message and properties
  */
-function classifyError(error: Error): string {
-  const message = error.message.toLowerCase();
+// function classifyError(error: Error): string {
+//   const message = error.message.toLowerCase();
 
-  // Network errors
-  if (message.includes('fetch') || message.includes('network') || message.includes('connection')) {
-    return ERROR_CODES.NETWORK_ERROR;
-  }
+//   // Network errors
+//   if (message.includes('fetch') || message.includes('network') || message.includes('connection')) {
+//     return ERROR_CODES.NETWORK_ERROR;
+//   }
 
-  // Timeout errors
-  if (message.includes('timeout') || message.includes('timed out')) {
-    return ERROR_CODES.TIMEOUT_ERROR;
-  }
+//   // Timeout errors
+//   if (message.includes('timeout') || message.includes('timed out')) {
+//     return ERROR_CODES.TIMEOUT_ERROR;
+//   }
 
-  // Authentication errors
-  if (message.includes('unauthorized') || message.includes('401')) {
-    return ERROR_CODES.UNAUTHORIZED;
-  }
+//   // Authentication errors
+//   if (message.includes('unauthorized') || message.includes('401')) {
+//     return ERROR_CODES.UNAUTHORIZED;
+//   }
 
-  // Permission errors
-  if (message.includes('forbidden') || message.includes('403')) {
-    return ERROR_CODES.FORBIDDEN;
-  }
+//   // Permission errors
+//   if (message.includes('forbidden') || message.includes('403')) {
+//     return ERROR_CODES.FORBIDDEN;
+//   }
 
-  // Validation errors
-  if (message.includes('validation') || message.includes('invalid') || message.includes('400')) {
-    return ERROR_CODES.VALIDATION_ERROR;
-  }
+//   // Validation errors
+//   if (message.includes('validation') || message.includes('invalid') || message.includes('400')) {
+//     return ERROR_CODES.VALIDATION_ERROR;
+//   }
 
-  // Not found errors
-  if (message.includes('not found') || message.includes('404')) {
-    return ERROR_CODES.RECORD_NOT_FOUND;
-  }
+//   // Not found errors
+//   if (message.includes('not found') || message.includes('404')) {
+//     return ERROR_CODES.RECORD_NOT_FOUND;
+//   }
 
-  // Database errors
-  if (message.includes('database') || message.includes('sql') || message.includes('postgres')) {
-    return ERROR_CODES.DATABASE_ERROR;
-  }
+//   // Database errors
+//   if (message.includes('database') || message.includes('sql') || message.includes('postgres')) {
+//     return ERROR_CODES.DATABASE_ERROR;
+//   }
 
-  // Chat specific errors
-  if (message.includes('conversation') || message.includes('message') || message.includes('chat')) {
-    if (message.includes('send') || message.includes('create')) {
-      return ERROR_CODES.MESSAGE_SEND_FAILED;
-    }
-    if (message.includes('session')) {
-      return ERROR_CODES.SESSION_CREATE_FAILED;
-    }
-  }
+//   // Chat specific errors
+//   if (message.includes('conversation') || message.includes('message') || message.includes('chat')) {
+//     if (message.includes('send') || message.includes('create')) {
+//       return ERROR_CODES.MESSAGE_SEND_FAILED;
+//     }
+//     if (message.includes('session')) {
+//       return ERROR_CODES.SESSION_CREATE_FAILED;
+//     }
+//   }
 
-  // Server errors
-  if (message.includes('500') || message.includes('internal')) {
-    return ERROR_CODES.INTERNAL_ERROR;
-  }
+//   // Server errors
+//   if (message.includes('500') || message.includes('internal')) {
+//     return ERROR_CODES.INTERNAL_ERROR;
+//   }
 
-  // Default to API error
-  return ERROR_CODES.API_ERROR;
-}
+//   // Default to API error
+//   return ERROR_CODES.API_ERROR;
+// }
 
 /**
  * Create a standardized error for API responses
@@ -386,7 +302,6 @@ export function logError(error: unknown, context?: string): void {
   console.error(`[ERROR${context ? ` - ${context}` : ''}]:`, {
     code: appError.code,
     message: appError.message,
-    userMessage: appError.userMessage,
     originalError: appError.originalError,
     timestamp: new Date().toISOString()
   });
