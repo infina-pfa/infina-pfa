@@ -2,7 +2,6 @@ import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { 
   ChatSession, 
-  ChatMessage, 
   CreateConversationResponse,
   ChatError 
 } from "@/lib/types/chat.types";
@@ -14,7 +13,7 @@ interface UseChatSessionReturn {
   error: ChatError | null;
   
   // Actions
-  createSession: () => Promise<void>;
+  createSession: () => Promise<string | null>;
   clearSession: () => void;
   clearError: () => void;
 }
@@ -25,13 +24,13 @@ export const useChatSession = (): UseChatSessionReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ChatError | null>(null);
 
-  const createSession = useCallback(async () => {
+  const createSession = useCallback(async (): Promise<string | null> => {
     if (!user) {
       setError({
         code: "UNAUTHORIZED",
         message: "User must be authenticated to create a chat session"
       });
-      return;
+      return null;
     }
 
     setIsLoading(true);
@@ -59,24 +58,10 @@ export const useChatSession = (): UseChatSessionReturn => {
         throw new Error(data.error || "Failed to create conversation");
       }
 
-      // Create welcome message
-      const welcomeMessage: ChatMessage = {
-        id: `welcome-${Date.now()}`,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        user_id: user.id,
-        conversation_id: data.data.id,
-        content: `Hi, ${user.user_metadata?.name || user.email}! I'm your AI financial advisor. How can I help you today?`,
-        sender: "ai",
-        type: "text",
-        metadata: null,
-        isStreaming: false
-      };
-
-      // Create new session
+      // Create new session without any messages
       const newSession: ChatSession = {
         conversationId: data.data.id,
-        messages: [welcomeMessage],
+        messages: [],
         isAiTyping: false,
         componentState: {
           isOpen: false,
@@ -85,6 +70,7 @@ export const useChatSession = (): UseChatSessionReturn => {
       };
 
       setSession(newSession);
+      return data.data.id;
 
     } catch (err) {
       console.error("Error creating chat session:", err);
@@ -92,6 +78,7 @@ export const useChatSession = (): UseChatSessionReturn => {
         code: "SESSION_CREATE_FAILED",
         message: err instanceof Error ? err.message : "Failed to create chat session"
       });
+      return null;
     } finally {
       setIsLoading(false);
     }

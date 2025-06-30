@@ -64,7 +64,6 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             {message.isStreaming && message.streamingContent ? (
               <div className="relative">
                 <span>{message.streamingContent}</span>
-                <span className="inline-block w-2 h-5 bg-current animate-pulse ml-1" />
               </div>
             ) : (
               <div className="whitespace-pre-wrap break-words">

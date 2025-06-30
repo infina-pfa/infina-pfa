@@ -1,0 +1,177 @@
+import { handleError } from "@/lib/error-handler";
+import { 
+  Conversation, 
+  ChatMessage, 
+  CreateConversationResponse,
+  AdvisorStreamRequest 
+} from "@/lib/types/chat.types";
+
+type TranslationFunction = (key: string) => string;
+
+export const chatService = {
+  /**
+   * Create a new conversation
+   */
+  async createConversation(title?: string, t?: TranslationFunction): Promise<Conversation> {
+    try {
+      const response = await fetch("/api/conversations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title || `Chat Session - ${new Date().toLocaleString()}`
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data: CreateConversationResponse = await response.json();
+
+      if (!data.success || !data.data) {
+        throw new Error(data.error || "Failed to create conversation");
+      }
+
+      return data.data;
+    } catch (error) {
+      const appError = handleError(error, t);
+      throw new Error(appError.message);
+    }
+  },
+
+  /**
+   * Send a user message to a conversation
+   */
+  async sendUserMessage(
+    content: string, 
+    conversationId: string, 
+    t?: TranslationFunction
+  ): Promise<ChatMessage> {
+    try {
+      if (!content.trim()) {
+        throw new Error("Message content cannot be empty");
+      }
+
+      if (content.length > 10000) {
+        throw new Error("Message content cannot exceed 10,000 characters");
+      }
+
+      const requestData = {
+        content: content.trim(),
+        conversation_id: conversationId,
+        sender_type: "USER",
+        type: "text"
+      };
+
+      const response = await fetch("/api/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success || !data.data) {
+        throw new Error(data.error || "Failed to send message");
+      }
+
+      // Transform the message to include client-side properties
+      const userMessage: ChatMessage = {
+        ...data.data,
+        isStreaming: false,
+        component: null
+      };
+
+      return userMessage;
+    } catch (error) {
+      const appError = handleError(error, t);
+      throw new Error(appError.message);
+    }
+  },
+
+  /**
+   * Save an AI message to the database
+   */
+  async saveAIMessage(
+    content: string,
+    conversationId: string,
+    metadata?: Record<string, unknown>,
+    t?: TranslationFunction
+  ): Promise<ChatMessage> {
+    try {
+      const requestData = {
+        content,
+        conversation_id: conversationId,
+        sender_type: "AI",
+        type: "text",
+        metadata
+      };
+
+      const response = await fetch("/api/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success || !data.data) {
+        throw new Error(data.error || "Failed to save AI message");
+      }
+
+      return {
+        ...data.data,
+        isStreaming: false,
+        component: null
+      };
+    } catch (error) {
+      const appError = handleError(error, t);
+      throw new Error(appError.message);
+    }
+  },
+
+  /**
+   * Start AI advisor streaming response
+   */
+  async startAIAdvisorStream(
+    request: AdvisorStreamRequest,
+    t?: TranslationFunction
+  ): Promise<ReadableStream<Uint8Array>> {
+    try {
+      const response = await fetch("/api/chat/advisor-stream", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        throw new Error(`AI advisor request failed: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error("No response body from AI advisor");
+      }
+
+      return response.body;
+    } catch (error) {
+      const appError = handleError(error, t);
+      throw new Error(appError.message);
+    }
+  }
+}; 

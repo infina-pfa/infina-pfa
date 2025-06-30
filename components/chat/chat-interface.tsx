@@ -1,6 +1,6 @@
 "use client";
 
-import { useChat } from "@/hooks/use-chat";
+import { useChatFlow } from "@/hooks/use-chat-flow";
 import { MessageList } from "./message-list";
 import { ChatInput } from "./chat-input";
 import { TypingIndicator } from "./typing-indicator";
@@ -16,6 +16,7 @@ export function ChatInterface() {
     error,
     isAiTyping,
     showSuggestions,
+    conversationId,
     clearError,
     closeComponent,
     inputValue,
@@ -24,8 +25,7 @@ export function ChatInterface() {
     isSubmitting,
     suggestions,
     onSuggestionClick,
-    session,
-  } = useChat();
+  } = useChatFlow();
 
   if (isLoading) {
     return (
@@ -47,9 +47,7 @@ export function ChatInterface() {
           <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
             <div className="flex">
               <div className="ml-3">
-                <p className="text-sm text-red-700 font-nunito">
-                  {error.message}
-                </p>
+                <p className="text-sm text-red-700 font-nunito">{error}</p>
                 <button
                   onClick={clearError}
                   className="text-red-600 hover:text-red-800 text-sm underline mt-1"
@@ -63,7 +61,7 @@ export function ChatInterface() {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-hidden">
-          {!session ? (
+          {!conversationId ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center max-w-md mx-auto p-6">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
