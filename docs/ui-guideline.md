@@ -97,20 +97,39 @@ This guideline establishes a unified visual language for Infina's financial web 
 - Padding: 12px 24px
 - Icon spacing: 8px to left/right of label
 
-### Inputs
+### ✍️ Input
 
-- Radius: Full rounded (9999px)
-- Padding: 12px 24px
-- Background: `#F9FAFB`
-- Focus state: Background `#FFFFFF`
-- Placeholder: `#9CA3AF`
-- Text color: `#111827`
+- **Label**: Top-aligned, **#111827**, 14px, **Bold**
+- **Label Spacing**: 4px gap between label and input box
+- **Placeholder**: Optional
+- **Background**: `transparent`
+- **Border**: `1px solid transparent` (default)
+- **Border Bottom**: `1px solid #E5E7EB`
+- **Focus State**: `2px solid #0055FF` (primary color) (bottom border)
+- **Error**: `#F44336` bottom border + message
+- **Disabled**: Text color `#9CA3AF`, border `#E5E7EB`
+- **Padding**: 16px top & bottom, 0 left & right
+- **Font**: Nunito Regular, 16px
+- **Input Box Height**: 48px (content + padding only, not including label)
+- **Radius**: None
 
 ### Cards
 
 - Use `#FFFFFF` background
 - Drop shadow: ❌ None
 - Separate content via padding and headers
+
+### 📦 Card (Clickable)
+
+- Background: #FFFFFF
+- Radius: 12px
+- Padding: 16px (mobile), 24px (desktop)
+- No border, no shadow
+- Entire card clickable
+- Hover: #F9FAFF bg or subtle border
+- Active: `1px solid #0055FF`
+- No button inside
+- Use `tabindex="0"` & `aria-label` for accessibility
 
 ### Modals
 
@@ -154,6 +173,25 @@ This guideline establishes a unified visual language for Infina's financial web 
 
 - **Skeleton loaders:** use light grey blocks (`#E5E7EB`)
 - **Progress indicators:** thin linear bar or spinning icon
+
+### 🧭 Tabs / Segmented Control
+
+- **Variants**: Tab or segmented toggle
+
+**Tab**
+
+- Font: 14px semi-bold
+- Active: #0055FF, underline 2px
+- Inactive: #6B7280
+- Padding: 8px 16px
+
+**Segmented**
+
+- Background: #F3F4F6
+- Radius: 9999px
+- Active: #0055FF bg, white text
+- Inactive: Transparent bg, #6B7280 text
+- Padding: 6px 16px
 
 ---
 
