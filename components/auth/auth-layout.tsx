@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { Shield, TrendingUp, Target, Brain } from "lucide-react";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -43,65 +42,6 @@ export function AuthLayout({ children }: AuthLayoutProps) {
               <p className="text-xl text-blue-100 mb-10 leading-relaxed">
                 {t("financialJourneyDescription")}
               </p>
-
-              {/* Enhanced Features with Icons */}
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-infina-green/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
-                    <Brain className="w-5 h-5 text-infina-green" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-1">
-                      {t("personalizedAdvice")}
-                    </h3>
-                    <p className="text-blue-100 text-sm">
-                      {t("personalizedAdviceDescription")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-infina-green/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
-                    <TrendingUp className="w-5 h-5 text-infina-green" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-1">
-                      {t("smartRecommendations")}
-                    </h3>
-                    <p className="text-blue-100 text-sm">
-                      {t("smartRecommendationsDescription")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-infina-green/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
-                    <Target className="w-5 h-5 text-infina-green" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-1">
-                      {t("planningTools")}
-                    </h3>
-                    <p className="text-blue-100 text-sm">
-                      {t("planningToolsDescription")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-infina-green/20 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
-                    <Shield className="w-5 h-5 text-infina-green" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-1">
-                      {t("securePlatform")}
-                    </h3>
-                    <p className="text-blue-100 text-sm">
-                      {t("securePlatformDescription")}
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
