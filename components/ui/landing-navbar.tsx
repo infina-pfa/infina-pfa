@@ -33,7 +33,7 @@ export function LandingNavbar() {
   };
 
   return (
-    <nav className="flex items-center justify-between w-full">
+    <nav className="flex items-center justify-between w-full h-full">
       {/* Logo */}
       <Link href="/" className="flex items-center space-x-2">
         <Image
@@ -56,7 +56,7 @@ export function LandingNavbar() {
               key={item.key}
               href={item.href}
               className={`
-                text-sm font-medium transition-colors duration-200
+                text-sm font-medium transition-colors duration-200 cursor-pointer
                 ${
                   isActive
                     ? "text-infina-blue"
@@ -76,7 +76,7 @@ export function LandingNavbar() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-gray-700 hover:text-infina-blue hover:bg-blue-50 font-medium"
+            className="text-gray-700 hover:text-infina-blue hover:bg-blue-50 font-medium cursor-pointer"
           >
             {t("signIn")}
           </Button>
@@ -84,7 +84,7 @@ export function LandingNavbar() {
         <Link href="/auth/sign-up">
           <Button
             size="sm"
-            className="bg-infina-blue hover:bg-blue-700 text-white font-medium"
+            className="bg-infina-blue hover:bg-blue-700 text-white font-medium cursor-pointer"
           >
             {t("getStarted")}
           </Button>

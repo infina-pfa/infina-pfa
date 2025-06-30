@@ -99,9 +99,12 @@ This guideline establishes a unified visual language for Infina's financial web 
 
 ### Inputs
 
-- Borderless with 1px solid `#E5E7EB` on focus
+- Radius: Full rounded (9999px)
+- Padding: 12px 24px
+- Background: `#F9FAFB`
+- Focus state: Background `#FFFFFF`
 - Placeholder: `#9CA3AF`
-- Radius: 8px; Padding: 12px
+- Text color: `#111827`
 
 ### Cards
 

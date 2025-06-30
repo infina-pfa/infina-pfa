@@ -23,22 +23,24 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
     };
 
     return (
-      <div className="space-y-1">
-        <label className="block text-sm font-medium text-gray-700">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-[#111827]">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-infina-red ml-1">*</span>}
         </label>
 
         <input
           ref={ref}
           className={cn(
-            "w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-            "transition-colors duration-200",
+            "flex h-auto w-full rounded-full border bg-[#F9FAFB] px-6 py-3 text-base text-[#111827]",
+            "placeholder:text-[#9CA3AF]",
+            hasError ? "border-infina-red" : "border-gray-300",
             hasError
-              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-              : "border-gray-300",
-            "disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed",
+              ? "focus:outline-none focus:bg-white focus:border-infina-red focus:ring-0"
+              : "focus:outline-none focus:bg-white focus:border-infina-blue focus:ring-0",
+            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
+            "transition-all duration-200",
+            "shadow-none",
             className
           )}
           onChange={handleChange}
@@ -47,7 +49,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
         />
 
         {hasError && (
-          <p className="text-sm text-red-500 flex items-center">
+          <p className="text-sm text-infina-red flex items-center">
             <span className="mr-1">⚠</span>
             {error}
           </p>
@@ -94,29 +96,34 @@ export const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
     };
 
     return (
-      <div className="space-y-1">
-        <label className="block text-sm font-medium text-gray-700">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-[#111827]">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-infina-red ml-1">*</span>}
         </label>
 
         <select
           ref={ref}
           className={cn(
-            "w-full px-3 py-2 border rounded-md shadow-sm",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-            "transition-colors duration-200",
+            "flex h-auto w-full rounded-full border bg-[#F9FAFB] px-6 py-3 text-base text-[#111827] cursor-pointer",
+            hasError ? "border-infina-red" : "border-gray-300",
             hasError
-              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-              : "border-gray-300",
-            "disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed",
+              ? "focus:outline-none focus:bg-white focus:border-infina-red focus:ring-0"
+              : "focus:outline-none focus:bg-white focus:border-infina-blue focus:ring-0",
+            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
+            "transition-all duration-200",
+            "shadow-none",
             className
           )}
           onChange={handleChange}
           onBlur={onBlur}
           {...props}
         >
-          {placeholder && <option value="">{placeholder}</option>}
+          {placeholder && (
+            <option value="" className="text-[#9CA3AF]">
+              {placeholder}
+            </option>
+          )}
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -125,7 +132,7 @@ export const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
         </select>
 
         {hasError && (
-          <p className="text-sm text-red-500 flex items-center">
+          <p className="text-sm text-infina-red flex items-center">
             <span className="mr-1">⚠</span>
             {error}
           </p>
@@ -162,22 +169,25 @@ export const FormTextarea = React.forwardRef<
     };
 
     return (
-      <div className="space-y-1">
-        <label className="block text-sm font-medium text-gray-700">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-[#111827]">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-infina-red ml-1">*</span>}
         </label>
 
         <textarea
           ref={ref}
           className={cn(
-            "w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-            "transition-colors duration-200 resize-vertical",
+            "flex w-full rounded-2xl border bg-[#F9FAFB] px-6 py-3 text-base text-[#111827]",
+            "placeholder:text-[#9CA3AF]",
+            hasError ? "border-infina-red" : "border-gray-300",
             hasError
-              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-              : "border-gray-300",
-            "disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed",
+              ? "focus:outline-none focus:bg-white focus:border-infina-red focus:ring-0"
+              : "focus:outline-none focus:bg-white focus:border-infina-blue focus:ring-0",
+            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
+            "transition-all duration-200",
+            "resize-vertical",
+            "shadow-none",
             className
           )}
           onChange={handleChange}
@@ -186,7 +196,7 @@ export const FormTextarea = React.forwardRef<
         />
 
         {hasError && (
-          <p className="text-sm text-red-500 flex items-center">
+          <p className="text-sm text-infina-red flex items-center">
             <span className="mr-1">⚠</span>
             {error}
           </p>

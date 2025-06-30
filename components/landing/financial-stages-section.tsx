@@ -21,8 +21,8 @@ export function FinancialStagesSection() {
     <ReactLenis root>
       <main ref={container} className="relative">
         {/* Section Header */}
-        <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-          <h2 className="text-4xl font-bold text-foreground mb-4">
+        <div className="max-w-6xl mx-auto px-6 py-16 text-center">
+          <h2 className="text-section text-foreground mb-4">
             {t("financialStagesTitle")}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">

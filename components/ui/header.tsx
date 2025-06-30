@@ -5,15 +5,15 @@ import { LandingNavbar } from "@/components/ui/landing-navbar";
 
 export function Header() {
   return (
-    <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-        <div className="flex items-center justify-between">
+    <header className="bg-white sticky top-0 z-50 border-b border-divider h-16">
+      <div className="max-w-6xl mx-auto px-6 h-full">
+        <div className="flex items-center justify-between h-full">
           {/* Mobile Menu - Show on mobile for all users */}
           <div className="md:hidden">
             <MobileMenu />
           </div>
 
-          <div className="hidden md:flex w-full">
+          <div className="hidden md:flex w-full h-full">
             <LandingNavbar />
           </div>
         </div>

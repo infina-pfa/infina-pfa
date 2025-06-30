@@ -39,9 +39,13 @@ export const authVi = {
   financialJourneyDescription:
     "Kiểm soát tương lai tài chính với lời khuyên cá nhân hóa, đầu tư thông minh và công cụ quy hoạch toàn diện.",
   personalizedAdvice: "Lời khuyên tài chính cá nhân hóa",
+  personalizedAdviceDescription: "Thông tin chi tiết được hỗ trợ bởi AI phù hợp với mục tiêu tài chính của bạn",
   smartRecommendations: "Khuyến nghị đầu tư thông minh",
+  smartRecommendationsDescription: "Gợi ý dựa trên dữ liệu để tối ưu hóa tài chính của bạn",
   planningTools: "Công cụ quy hoạch toàn diện",
+  planningToolsDescription: "Công cụ toàn diện cho việc lập ngân sách và theo dõi mục tiêu",
   securePlatform: "Nền tảng an toàn và đáng tin cậy",
+  securePlatformDescription: "Bảo mật cấp ngân hàng để bảo vệ dữ liệu tài chính của bạn",
   personalFinanceAssistant: "Trợ lý Tài chính Cá nhân",
 
   // Dashboard
@@ -73,6 +77,14 @@ export const authVi = {
   forgotPasswordTitle: "Đặt lại mật khẩu",
   forgotPasswordDescription: "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu.",
   forgotPasswordButton: "Gửi hướng dẫn đặt lại",
+  emailPlaceholder: "Nhập địa chỉ email của bạn",
+  pleaseEnterValidEmail: "Vui lòng nhập địa chỉ email hợp lệ",
+  sendingResetEmail: "Đang gửi email đặt lại...",
+  checkYourEmail: "Kiểm tra email của bạn",
+  passwordResetEmailSent: "Chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến",
+  didntReceiveEmail: "Không nhận được email? Kiểm tra thư mục spam hoặc",
+  tryAgain: "thử lại",
+  backToSignIn: "Quay lại đăng nhập",
   
   // Reset Password
   resetPasswordTitle: "Tạo mật khẩu mới",

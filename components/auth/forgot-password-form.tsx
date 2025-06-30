@@ -33,55 +33,57 @@ export function ForgotPasswordForm({
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setFormError(t("invalidEmailAddress"));
+      setFormError(t("pleaseEnterValidEmail"));
       return;
     }
 
-    const result = await forgotPassword(email);
+    try {
+      const result = await forgotPassword(email);
 
-    if (result.error) {
-      setFormError(result.error);
-    } else {
-      setIsSubmitted(true);
+      if (result.error) {
+        setFormError(result.error);
+      } else {
+        setIsSubmitted(true);
+      }
+    } catch {
+      setFormError(t("unexpectedError"));
     }
   };
 
+  // Show success message after successful submission
   if (isSubmitted) {
     return (
       <Card className="w-full max-w-md mx-auto bg-white p-8">
         <div className="text-center">
-          <div className="w-16 h-16 bg-emerald-green bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Mail className="w-8 h-8 text-emerald-green" />
+          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Mail className="w-8 h-8 text-emerald-600" />
           </div>
-
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Check your email
+            {t("checkYourEmail")}
           </h1>
-
           <p className="text-gray-600 mb-6">
-            We&apos;ve sent password reset instructions to{" "}
-            <span className="font-semibold text-gray-900">{email}</span>
+            {t("passwordResetEmailSent")}{" "}
+            <span className="font-medium">{email}</span>
           </p>
-
           <div className="space-y-4">
-            <Button
-              onClick={() => setIsSubmitted(false)}
-              variant="outline"
-              className="w-full"
-            >
-              Send another email
-            </Button>
-
-            <div className="text-center">
+            <p className="text-sm text-gray-500">
+              {t("didntReceiveEmail")}{" "}
               <button
-                type="button"
+                onClick={() => setIsSubmitted(false)}
+                className="text-infina-blue hover:text-blue-700 font-medium cursor-pointer"
+              >
+                {t("tryAgain")}
+              </button>
+            </p>
+            {onBackToSignIn && (
+              <button
                 onClick={onBackToSignIn}
-                className="inline-flex items-center text-infina-blue hover:text-blue-700 font-semibold transition-colors duration-200"
+                className="flex items-center justify-center w-full text-gray-600 hover:text-gray-800 transition-colors duration-200 cursor-pointer"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to sign in
+                {t("backToSignIn")}
               </button>
-            </div>
+            )}
           </div>
         </div>
       </Card>
@@ -92,12 +94,9 @@ export function ForgotPasswordForm({
     <Card className="w-full max-w-md mx-auto bg-white p-8">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Forgot password?
+          {t("forgotPasswordTitle")}
         </h1>
-        <p className="text-gray-600">
-          Enter your email address and we&apos;ll send you instructions to reset
-          your password
-        </p>
+        <p className="text-gray-600">{t("forgotPasswordDescription")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -107,17 +106,17 @@ export function ForgotPasswordForm({
             htmlFor="email"
             className="block text-sm font-medium text-gray-700"
           >
-            Email address
+            {t("emailAddress")}
           </label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 bg-gray-50 border-0 focus:bg-white focus:ring-2 focus:ring-infina-blue"
-              placeholder="Enter your email address"
+              className="pl-12"
+              placeholder={t("emailPlaceholder")}
               required
             />
           </div>
@@ -133,13 +132,13 @@ export function ForgotPasswordForm({
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-full bg-infina-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+          className="w-full bg-infina-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full transition-colors duration-200 cursor-pointer"
           disabled={loading}
         >
           {loading ? (
             <div className="flex items-center justify-center">
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Sending reset email...
+              {t("sendingResetEmail")}
             </div>
           ) : (
             t("forgotPasswordButton")
@@ -147,16 +146,16 @@ export function ForgotPasswordForm({
         </Button>
 
         {/* Back to Sign In */}
-        <div className="text-center">
+        {onBackToSignIn && (
           <button
             type="button"
             onClick={onBackToSignIn}
-            className="inline-flex items-center text-infina-blue hover:text-blue-700 font-semibold transition-colors duration-200"
+            className="flex items-center justify-center w-full text-gray-600 hover:text-gray-800 transition-colors duration-200 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to sign in
+            {t("backToSignIn")}
           </button>
-        </div>
+        )}
       </form>
     </Card>
   );

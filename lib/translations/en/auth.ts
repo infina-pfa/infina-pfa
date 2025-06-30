@@ -39,9 +39,13 @@ export const authEn = {
   financialJourneyDescription:
     "Take control of your financial future with personalized advice, smart investing, and comprehensive planning tools.",
   personalizedAdvice: "Personalized financial advice",
+  personalizedAdviceDescription: "AI-powered insights tailored to your financial goals",
   smartRecommendations: "Smart investment recommendations",
+  smartRecommendationsDescription: "Data-driven suggestions to optimize your finances",
   planningTools: "Comprehensive planning tools",
+  planningToolsDescription: "Comprehensive tools for budgeting and goal tracking",
   securePlatform: "Secure and trusted platform",
+  securePlatformDescription: "Bank-level security to protect your financial data",
   personalFinanceAssistant: "Personal Finance Assistant",
 
   // Dashboard
@@ -73,6 +77,14 @@ export const authEn = {
   forgotPasswordTitle: "Reset your password",
   forgotPasswordDescription: "Enter your email address and we'll send you instructions to reset your password.",
   forgotPasswordButton: "Send reset instructions",
+  emailPlaceholder: "Enter your email address",
+  pleaseEnterValidEmail: "Please enter a valid email address",
+  sendingResetEmail: "Sending reset email...",
+  checkYourEmail: "Check your email",
+  passwordResetEmailSent: "We've sent password reset instructions to",
+  didntReceiveEmail: "Didn't receive the email? Check your spam folder or",
+  tryAgain: "try again",
+  backToSignIn: "Back to sign in",
   
   // Reset Password
   resetPasswordTitle: "Create new password",

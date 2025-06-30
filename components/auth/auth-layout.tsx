@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { Shield, TrendingUp, Target, Brain } from "lucide-react";
 
@@ -54,7 +55,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                       {t("personalizedAdvice")}
                     </h3>
                     <p className="text-blue-100 text-sm">
-                      AI-powered insights tailored to your financial goals
+                      {t("personalizedAdviceDescription")}
                     </p>
                   </div>
                 </div>
@@ -68,7 +69,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                       {t("smartRecommendations")}
                     </h3>
                     <p className="text-blue-100 text-sm">
-                      Data-driven suggestions to optimize your finances
+                      {t("smartRecommendationsDescription")}
                     </p>
                   </div>
                 </div>
@@ -82,7 +83,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                       {t("planningTools")}
                     </h3>
                     <p className="text-blue-100 text-sm">
-                      Comprehensive tools for budgeting and goal tracking
+                      {t("planningToolsDescription")}
                     </p>
                   </div>
                 </div>
@@ -96,7 +97,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                       {t("securePlatform")}
                     </h3>
                     <p className="text-blue-100 text-sm">
-                      Bank-level security to protect your financial data
+                      {t("securePlatformDescription")}
                     </p>
                   </div>
                 </div>
@@ -114,7 +115,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="w-full max-w-md">
             {/* Logo - Now visible on all screen sizes */}
-            <div className="text-center mb-8">
+            <Link
+              href="/"
+              className="block text-center mb-8 cursor-pointer hover:opacity-80 transition-opacity"
+            >
               <Image
                 src="/infina-logo.png"
                 alt="Infina"
@@ -124,7 +128,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                 priority
               />
               <p className="text-gray-600">{t("personalFinanceAssistant")}</p>
-            </div>
+            </Link>
 
             {children}
           </div>

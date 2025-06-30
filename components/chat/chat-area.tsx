@@ -210,16 +210,16 @@ export const ChatArea = ({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder={t("typeYourMessage")}
-              className="w-full px-3 md:px-4 py-2 md:py-3 pr-10 md:pr-12 bg-[#F0F2F5] rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-[#0055FF]/20 text-sm min-h-[44px] md:min-h-[48px] max-h-[120px]"
+              className="w-full px-6 py-3 pr-12 bg-[#F9FAFB] rounded-2xl resize-none focus:outline-none focus:bg-white focus:border-infina-blue border border-gray-300 text-base text-[#111827] placeholder:text-[#9CA3AF] transition-all duration-200 min-h-[48px] max-h-[120px] shadow-none"
               rows={1}
               disabled={isSending}
             />
             <button
               type="submit"
               disabled={!inputValue.trim() || isSending}
-              className="absolute right-1 md:right-2 bottom-1 md:bottom-2 p-2 bg-[#0055FF] text-white rounded-full hover:bg-[#0055FF]/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="absolute right-2 bottom-2 p-2 bg-[#0055FF] text-white rounded-full hover:bg-[#0041CC] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150 cursor-pointer"
             >
-              <Send size={14} className="md:w-4 md:h-4" />
+              <Send size={16} className="w-4 h-4" />
             </button>
           </div>
         </form>

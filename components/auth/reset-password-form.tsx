@@ -72,20 +72,20 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
             New password
           </label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-10 bg-gray-50 border-0 focus:bg-white focus:ring-2 focus:ring-infina-blue"
+              className="pl-12 pr-12"
               placeholder="Enter new password"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -105,20 +105,20 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
             Confirm new password
           </label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pl-10 pr-10 bg-gray-50 border-0 focus:bg-white focus:ring-2 focus:ring-infina-blue"
+              className="pl-12 pr-12"
               placeholder="Confirm new password"
               required
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
             >
               {showConfirmPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -135,7 +135,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
           <ul className="text-xs space-y-1">
             <li
               className={
-                password.length >= 6 ? "text-emerald-green" : "text-gray-500"
+                password.length >= 6 ? "text-infina-green" : "text-gray-500"
               }
             >
               • At least 6 characters
@@ -143,7 +143,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
             <li
               className={
                 password === confirmPassword && password.length > 0
-                  ? "text-emerald-green"
+                  ? "text-infina-green"
                   : "text-gray-500"
               }
             >
@@ -162,7 +162,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-full bg-infina-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+          className="w-full bg-infina-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 cursor-pointer"
           disabled={loading}
         >
           {loading ? (
@@ -176,16 +176,16 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
         </Button>
 
         {/* Back to Sign In */}
-        <div className="text-center">
+        {onBackToSignIn && (
           <button
             type="button"
             onClick={onBackToSignIn}
-            className="inline-flex items-center text-infina-blue hover:text-blue-700 font-semibold transition-colors duration-200"
+            className="flex items-center justify-center w-full text-gray-600 hover:text-gray-800 transition-colors duration-200 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to sign in
           </button>
-        </div>
+        )}
       </form>
     </Card>
   );

@@ -111,7 +111,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-full bg-infina-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+          className="w-full bg-infina-blue hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-full transition-colors duration-200"
           disabled={loading}
         >
           {loading ? (

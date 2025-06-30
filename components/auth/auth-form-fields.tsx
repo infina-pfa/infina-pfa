@@ -44,13 +44,13 @@ export function AuthFormFields({
           {t("emailAddress")}
         </label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
             id="email"
             type="email"
             value={email}
             onChange={(e) => onEmailChange(e.target.value)}
-            className="pl-10 bg-gray-50 border-0 focus:bg-white focus:ring-2 focus:ring-infina-blue"
+            className="pl-12"
             placeholder={t("enterEmail")}
             required
           />
@@ -66,20 +66,20 @@ export function AuthFormFields({
           {t("password")}
         </label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
             id="password"
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => onPasswordChange(e.target.value)}
-            className="pl-10 pr-10 bg-gray-50 border-0 focus:bg-white focus:ring-2 focus:ring-infina-blue"
+            className="pl-12 pr-12"
             placeholder={t("enterPassword")}
             required
           />
           <button
             type="button"
             onClick={onToggleShowPassword}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
           >
             {showPassword ? (
               <EyeOff className="w-5 h-5" />
@@ -100,20 +100,20 @@ export function AuthFormFields({
             {t("confirmPassword")}
           </label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <Input
               id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => onConfirmPasswordChange(e.target.value)}
-              className="pl-10 pr-10 bg-gray-50 border-0 focus:bg-white focus:ring-2 focus:ring-infina-blue"
+              className="pl-12 pr-12"
               placeholder={t("confirmPasswordPlaceholder")}
               required
             />
             <button
               type="button"
               onClick={onToggleShowConfirmPassword}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
             >
               {showConfirmPassword ? (
                 <EyeOff className="w-5 h-5" />
