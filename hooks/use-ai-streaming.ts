@@ -30,7 +30,7 @@ interface UseAIStreamingOptions {
 }
 
 export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingReturn => {
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation();
   const [isStreaming, setIsStreaming] = useState(false);
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState<ChatMessage | null>(null);
   const [error, setError] = useState<string | null>(null);

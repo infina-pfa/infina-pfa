@@ -12,8 +12,8 @@ export const chatEn = {
   aiStreamFailed: "Failed to process AI stream",
   
   // Welcome Screen
-  welcomeTitle: "Welcome to your AI Financial Advisor",
-  welcomeDescription: "I'm here to help you with budgeting, financial planning, investment advice, and achieving your financial goals. Ask me anything!",
+  "chat.welcomeTitle": "Welcome to your AI Financial Advisor",
+  "chat.welcomeDescription": "I'm here to help you with budgeting, financial planning, investment advice, and achieving your financial goals. Ask me anything!",
   
   // Chat Interface
   chatWithAI: "Chat with AI",
@@ -25,6 +25,8 @@ export const chatEn = {
   inputPlaceholder: "Ask about budgets, investments, savings goals...",
   inputHint: "Press Enter to send, Shift+Enter for new line",
   aiTyping: "AI is thinking...",
+  attachFile: "Attach file",
+  voiceInput: "Voice input",
   
   // Suggestions
   suggestionsTitle: "Try asking about:",

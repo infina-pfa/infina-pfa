@@ -5,6 +5,7 @@ export const commonVi = {
   pricing: "Bảng giá",
   about: "Giới thiệu",
   contact: "Liên hệ",
+  fina: "Fina",
   advisor: "Tư vấn",
   budgeting: "Ngân sách",
   tools: "Công cụ",

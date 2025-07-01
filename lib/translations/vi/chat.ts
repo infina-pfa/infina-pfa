@@ -12,8 +12,8 @@ export const chatVi = {
   aiStreamFailed: "Không thể xử lý phản hồi từ AI",
   
   // Welcome Screen
-  welcomeTitle: "Chào mừng đến với Cố vấn Tài chính AI",
-  welcomeDescription: "Tôi ở đây để giúp bạn lập ngân sách, lập kế hoạch tài chính, tư vấn đầu tư và đạt được mục tiêu tài chính. Hãy hỏi tôi bất cứ điều gì!",
+  "chat.welcomeTitle": "Chào {{name}}",
+  "chat.welcomeDescription": "Fina rất vui được hỗ trợ bạn",
   
   // Chat Interface
   chatWithAI: "Trò chuyện với AI",
@@ -25,6 +25,8 @@ export const chatVi = {
   inputPlaceholder: "Hỏi về ngân sách, đầu tư, mục tiêu tiết kiệm...",
   inputHint: "Nhấn Enter để gửi, Shift+Enter để xuống dòng",
   aiTyping: "AI đang suy nghĩ...",
+  attachFile: "Đính kèm tệp",
+  voiceInput: "Nhập bằng giọng nói",
   
   // Suggestions
   suggestionsTitle: "Thử hỏi về:",

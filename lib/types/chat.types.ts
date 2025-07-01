@@ -78,26 +78,26 @@ export interface ChatSuggestion {
 export const DEFAULT_CHAT_SUGGESTIONS: ChatSuggestion[] = [
   {
     id: 'create_budget',
-    text: 'Help me create a budget',
-    description: 'Set up a monthly budget plan',
+    text: 'Giúp tôi tạo ngân sách',
+    description: 'Thiết lập kế hoạch ngân sách hàng tháng',
     icon: 'calculator'
   },
   {
     id: 'analyze_spending',
-    text: 'Analyze my spending patterns',
-    description: 'Review your recent transactions',
+    text: 'Phân tích thói quen chi tiêu của tôi',
+    description: 'Xem xét các giao dịch gần đây',
     icon: 'trending-down'
   },
   {
     id: 'plan_goals',
-    text: 'Plan my financial goals',
-    description: 'Set and track financial objectives',
+    text: 'Lập kế hoạch mục tiêu tài chính',
+    description: 'Đặt và theo dõi các mục tiêu tài chính',
     icon: 'target'
   },
   {
     id: 'review_investments',
-    text: 'Review my investments',
-    description: 'Portfolio analysis and recommendations',
+    text: 'Xem xét các khoản đầu tư',
+    description: 'Phân tích danh mục và đưa ra khuyến nghị',
     icon: 'trending-up'
   }
 ];

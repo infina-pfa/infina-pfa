@@ -5,6 +5,7 @@ export const commonEn = {
   pricing: "Pricing",
   about: "About",
   contact: "Contact",
+  fina: "Fina",
   advisor: "Advisor",
   budgeting: "Budgeting",
   tools: "Tools",

@@ -18,7 +18,7 @@ interface UseSimpleChatSessionReturn {
 
 export const useSimpleChatSession = (): UseSimpleChatSessionReturn => {
   const { user } = useAuth();
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation();
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);

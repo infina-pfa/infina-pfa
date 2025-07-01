@@ -19,7 +19,7 @@ interface UseChatMessagesReturn {
 }
 
 export const useChatMessages = (): UseChatMessagesReturn => {
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);

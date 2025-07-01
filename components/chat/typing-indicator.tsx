@@ -3,16 +3,16 @@
 import { useTranslation } from "react-i18next";
 
 export function TypingIndicator() {
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation();
 
   return (
-    <div className="flex justify-start mb-4 px-4">
-      <div className="flex items-start gap-3 max-w-[80%]">
+    <div className="flex justify-start mb-6 px-6">
+      <div className="flex items-start gap-4 max-w-[80%]">
         {/* AI Avatar */}
         <div className="flex-shrink-0">
-          <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center">
             <svg
-              className="w-5 h-5 text-white"
+              className="w-6 h-6 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -30,8 +30,8 @@ export function TypingIndicator() {
         {/* Typing Animation */}
         <div className="flex flex-col items-start">
           <div className="bg-gray-100 rounded-2xl rounded-bl-sm px-4 py-3">
-            <div className="flex items-center gap-1">
-              <span className="text-gray-600 text-sm font-nunito mr-2">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-600 text-base font-nunito mr-3">
                 {t("aiTyping")}
               </span>
               <div className="flex gap-1">
@@ -52,7 +52,7 @@ export function TypingIndicator() {
           </div>
 
           {/* Timestamp */}
-          <div className="text-xs text-gray-500 mt-1 font-nunito">
+          <div className="text-sm text-gray-500 mt-2 font-nunito">
             {new Date().toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",

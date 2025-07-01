@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Plus, Mic, Send } from "lucide-react";
 
 interface ChatInputProps {
   value: string;
@@ -9,6 +10,8 @@ interface ChatInputProps {
   onSubmit: () => Promise<void>;
   isSubmitting: boolean;
   disabled?: boolean;
+  onAttachFile?: () => void;
+  onVoiceInput?: () => void;
 }
 
 export function ChatInput({
@@ -17,19 +20,18 @@ export function ChatInput({
   onSubmit,
   isSubmitting,
   disabled = false,
+  onAttachFile,
+  onVoiceInput,
 }: ChatInputProps) {
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [rows, setRows] = useState(1);
 
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       const scrollHeight = textareaRef.current.scrollHeight;
-      const newRows = Math.min(Math.max(Math.ceil(scrollHeight / 24), 1), 4);
-      setRows(newRows);
-      textareaRef.current.style.height = `${scrollHeight}px`;
+      textareaRef.current.style.height = `${Math.min(scrollHeight, 120)}px`;
     }
   }, [value]);
 
@@ -49,71 +51,76 @@ export function ChatInput({
   };
 
   return (
-    <div className="p-4">
-      <div className="relative flex items-end gap-3 bg-gray-50 rounded-xl p-3">
-        {/* Textarea */}
+    <div className="bg-white rounded-xl mx-4">
+      {/* Text Input Row */}
+      <div className="px-4 pt-4 pb-3">
         <textarea
           ref={textareaRef}
-          rows={rows}
+          rows={1}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={t("inputPlaceholder")}
+          placeholder={t("inputPlaceholder") || "Message"}
           disabled={disabled || isSubmitting}
           className={`
-            flex-1 resize-none bg-transparent border-none outline-none font-nunito text-sm
-            placeholder-gray-500 text-gray-900 min-h-[24px] max-h-[96px]
+            w-full resize-none bg-transparent outline-none font-nunito text-base
+            placeholder-gray-400 text-gray-900 min-h-[24px] max-h-[120px]
             ${disabled ? "opacity-50 cursor-not-allowed" : ""}
           `}
         />
-
-        {/* Send Button */}
-        <button
-          onClick={handleSubmit}
-          disabled={!value.trim() || isSubmitting || disabled}
-          className={`
-            flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
-            transition-colors font-nunito
-            ${
-              !value.trim() || isSubmitting || disabled
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-            }
-          `}
-          aria-label={t("sendMessage")}
-        >
-          {isSubmitting ? (
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <svg
-              className={`w-4 h-4 ${
-                !value.trim() || disabled ? "text-gray-500" : "text-white"
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              />
-            </svg>
-          )}
-        </button>
       </div>
 
-      {/* Input Hint */}
-      <div className="flex items-center justify-between mt-2 px-1">
-        <span className="text-xs text-gray-500 font-nunito">
-          {t("inputHint")}
-        </span>
-        {disabled && (
-          <span className="text-xs text-amber-600 font-nunito">
-            {t("aiTyping")}
-          </span>
-        )}
+      {/* Tools Row */}
+      <div className="flex items-center justify-between px-4 pb-4">
+        {/* Add/Attach Button */}
+        <button
+          onClick={onAttachFile}
+          disabled={disabled || isSubmitting}
+          className={`
+            flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
+            transition-colors font-nunito
+            ${
+              disabled || isSubmitting
+                ? "bg-gray-200 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }
+          `}
+          aria-label={t("attachFile")}
+        >
+          <Plus
+            className={`w-5 h-5 ${
+              disabled || isSubmitting ? "text-gray-400" : "text-white"
+            }`}
+          />
+        </button>
+
+        {/* Voice/Send Button */}
+        <button
+          onClick={value.trim() ? handleSubmit : onVoiceInput}
+          disabled={disabled || isSubmitting}
+          className={`
+            flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
+            transition-colors font-nunito
+            ${
+              disabled || isSubmitting
+                ? "bg-gray-200 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }
+          `}
+          aria-label={value.trim() ? t("sendMessage") : t("voiceInput")}
+        >
+          {isSubmitting ? (
+            <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
+          ) : value.trim() ? (
+            <Send
+              className={`w-5 h-5 ${disabled ? "text-gray-400" : "text-white"}`}
+            />
+          ) : (
+            <Mic
+              className={`w-5 h-5 ${disabled ? "text-gray-400" : "text-white"}`}
+            />
+          )}
+        </button>
       </div>
     </div>
   );

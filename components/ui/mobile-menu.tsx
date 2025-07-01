@@ -14,22 +14,23 @@ import {
   User,
   LogOut,
   Home,
-  MessageSquare,
+  Sparkles,
   Calculator,
   Wrench,
 } from "lucide-react";
+import { FinaIcon } from "@/components/ui/fina-icon";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
 
 const navigationItems = [
   {
-    key: "advisor",
+    key: "fina",
     href: "/chat",
-    icon: MessageSquare,
+    icon: Sparkles,
   },
   {
     key: "budgeting",
-    href: "/dashboard",
+    href: "/budgeting",
     icon: Calculator,
   },
   {
@@ -148,7 +149,11 @@ export function MobileMenu() {
                             }
                           `}
                         >
-                          <Icon className="w-5 h-5" />
+                          {item.key === "fina" ? (
+                            <FinaIcon className="w-5 h-5" />
+                          ) : (
+                            <Icon className="w-5 h-5" />
+                          )}
                           <span>{t(item.key)}</span>
                         </Link>
                       );

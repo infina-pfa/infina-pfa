@@ -8,25 +8,26 @@ import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  MessageSquare,
+  Sparkles,
   Calculator,
   Wrench,
   LogOut,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { FinaIcon } from "@/components/ui/fina-icon";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
 
 const navigationItems = [
   {
-    key: "advisor",
+    key: "fina",
     href: "/chat",
-    icon: MessageSquare,
+    icon: Sparkles,
   },
   {
     key: "budgeting",
-    href: "/dashboard",
+    href: "/budgeting",
     icon: Calculator,
   },
   {
@@ -142,11 +143,19 @@ export function Sidebar() {
                 `}
                 title={isCollapsed ? t(item.key) : undefined}
               >
-                <Icon
-                  className={`flex-shrink-0 ${
-                    isCollapsed ? "w-4 h-4" : "w-5 h-5"
-                  }`}
-                />
+                {item.key === "fina" ? (
+                  <FinaIcon
+                    className={`flex-shrink-0 ${
+                      isCollapsed ? "w-4 h-4" : "w-5 h-5"
+                    }`}
+                  />
+                ) : (
+                  <Icon
+                    className={`flex-shrink-0 ${
+                      isCollapsed ? "w-4 h-4" : "w-5 h-5"
+                    }`}
+                  />
+                )}
                 {!isCollapsed && <span>{t(item.key)}</span>}
               </Link>
             );

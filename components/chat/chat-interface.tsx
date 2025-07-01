@@ -9,7 +9,7 @@ import { SuggestionList } from "./suggestion-list";
 import { useTranslation } from "react-i18next";
 
 export function ChatInterface() {
-  const { t } = useTranslation("chat");
+  const { t } = useTranslation();
   const {
     messages,
     isLoading,
@@ -31,26 +31,45 @@ export function ChatInterface() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-nunito">{t("loading")}</p>
+          <div className="w-8 h-8 mx-auto mb-6">
+            <div className="w-full h-full bg-blue-600 rounded-full animate-pulse"></div>
+          </div>
+          <p className="text-gray-600 font-nunito font-medium">
+            {t("loading")}
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full bg-white">
+    <div className="flex h-full bg-gray-50">
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
-            <div className="flex">
+          <div className="bg-red-50 p-6 mb-6">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg
+                  className="w-5 h-5 text-red-400 mt-0.5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700 font-nunito">{error}</p>
+                <p className="text-sm text-red-700 font-nunito font-medium">
+                  {error}
+                </p>
                 <button
                   onClick={clearError}
-                  className="text-red-600 hover:text-red-800 text-sm underline mt-1"
+                  className="text-red-600 hover:text-red-800 text-sm font-nunito font-medium mt-2 cursor-pointer"
                 >
                   {t("dismissError")}
                 </button>
@@ -63,35 +82,13 @@ export function ChatInterface() {
         <div className="flex-1 overflow-hidden">
           {!conversationId ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-center max-w-md mx-auto p-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-4.906-1.436L3 21l2.436-5.094A8.959 8.959 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"
-                    />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 font-nunito mb-2">
-                  {t("welcomeTitle")}
+              <div className="text-center w-full p-6">
+                <h2 className="text-4xl font-bold text-blue-600 font-nunito mb-4">
+                  {t("chat.welcomeTitle", { name: "Khang" })}
                 </h2>
-                <p className="text-gray-600 font-nunito text-sm mb-6">
-                  {t("welcomeDescription")}
+                <p className="text-gray-600 font-nunito text-base mb-8">
+                  {t("chat.welcomeDescription")}
                 </p>
-                {showSuggestions && suggestions.length > 0 && (
-                  <SuggestionList
-                    suggestions={suggestions}
-                    onSuggestionClick={onSuggestionClick}
-                    isSubmitting={isSubmitting}
-                  />
-                )}
               </div>
             </div>
           ) : (
@@ -103,7 +100,16 @@ export function ChatInterface() {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-gray-100 bg-white">
+        <div className="p-8">
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="mb-2 p-4">
+              <SuggestionList
+                suggestions={suggestions}
+                onSuggestionClick={onSuggestionClick}
+                isSubmitting={isSubmitting}
+              />
+            </div>
+          )}
           <ChatInput
             value={inputValue}
             onChange={setInputValue}

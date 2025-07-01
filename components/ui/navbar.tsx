@@ -9,22 +9,23 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   LogOut,
   ChevronDown,
-  MessageSquare,
+  Sparkles,
   Calculator,
   Wrench,
 } from "lucide-react";
+import { FinaIcon } from "@/components/ui/fina-icon";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
 
 const navigationItems = [
   {
-    key: "advisor",
+    key: "fina",
     href: "/chat",
-    icon: MessageSquare,
+    icon: Sparkles,
   },
   {
     key: "budgeting",
-    href: "/dashboard",
+    href: "/budgeting",
     icon: Calculator,
   },
   {
@@ -97,7 +98,11 @@ export function Navbar() {
                   }
                 `}
               >
-                <Icon className="w-4 h-4" />
+                {item.key === "fina" ? (
+                  <FinaIcon className="w-4 h-4" />
+                ) : (
+                  <Icon className="w-4 h-4" />
+                )}
                 <span>{t(item.key)}</span>
               </Link>
             );
