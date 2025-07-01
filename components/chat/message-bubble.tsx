@@ -2,6 +2,7 @@
 
 import { ChatMessage } from "@/lib/types/chat.types";
 import { useTranslation } from "react-i18next";
+import { MarkdownMessage } from "./markdown-message";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -18,33 +19,6 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           isUser ? "flex-row-reverse" : "flex-row"
         } items-start gap-4`}
       >
-        {/* Avatar */}
-        <div className="flex-shrink-0">
-          {isUser ? (
-            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-bold font-nunito">
-                {message.user_id?.charAt(0).toUpperCase() || "U"}
-              </span>
-            </div>
-          ) : (
-            <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                />
-              </svg>
-            </div>
-          )}
-        </div>
-
         {/* Message Content */}
         <div
           className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
@@ -63,11 +37,28 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             {/* Streaming indicator */}
             {message.isStreaming && message.streamingContent ? (
               <div className="relative">
-                <span>{message.streamingContent}</span>
+                {isUser ? (
+                  <span>{message.streamingContent}</span>
+                ) : (
+                  <MarkdownMessage
+                    content={message.streamingContent}
+                    isUser={isUser}
+                  />
+                )}
               </div>
             ) : (
-              <div className="whitespace-pre-wrap break-words">
-                {message.content}
+              <div>
+                {isUser ? (
+                  <div className="whitespace-pre-wrap break-words">
+                    {message.content}
+                  </div>
+                ) : (
+                  <MarkdownMessage
+                    content={message.content}
+                    isUser={isUser}
+                    className="[&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&>h1]:mb-2 [&>h2]:mb-2 [&>h3]:mb-2 [&>h4]:mb-2 [&>h5]:mb-2 [&>h6]:mb-2 [&>blockquote]:mb-2 [&>pre]:mb-2"
+                  />
+                )}
               </div>
             )}
           </div>

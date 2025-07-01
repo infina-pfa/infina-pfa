@@ -16,7 +16,8 @@ interface UseChatFlowReturn {
   messages: ChatMessage[];
   isLoading: boolean;
   error: string | null;
-  isAiTyping: boolean;
+  isThinking: boolean;
+  isStreaming: boolean;
   showSuggestions: boolean;
   conversationId: string | null;
   
@@ -104,9 +105,6 @@ export const useChatFlow = (): UseChatFlowReturn => {
   
   // Combined loading state
   const isLoading = session.isCreating;
-  
-  // AI typing state
-  const isAiTyping = aiStreaming.isStreaming;
 
   // Submitting state
   const isSubmitting = messages.isSending || aiStreaming.isStreaming;
@@ -239,7 +237,8 @@ export const useChatFlow = (): UseChatFlowReturn => {
     messages: messages.messages,
     isLoading,
     error,
-    isAiTyping,
+    isThinking: aiStreaming.isThinking,
+    isStreaming: aiStreaming.isStreaming,
     showSuggestions,
     conversationId: session.conversation?.id || null,
     

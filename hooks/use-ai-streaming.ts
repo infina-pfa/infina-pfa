@@ -11,6 +11,7 @@ import {
 interface UseAIStreamingReturn {
   // State
   isStreaming: boolean;
+  isThinking: boolean;
   currentStreamingMessage: ChatMessage | null;
   error: string | null;
   
@@ -31,6 +32,7 @@ interface UseAIStreamingOptions {
 
 export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingReturn => {
   const { t } = useTranslation();
+  const [isThinking, setIsThinking] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState<ChatMessage | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
       // Clear streaming state
       setCurrentStreamingMessage(null);
       setIsStreaming(false);
-      
+      setIsThinking(false);
       // Call external callback
       options.onMessageComplete?.(message);
     },
@@ -51,6 +53,8 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
       options.onFunctionToolComplete?.(action);
     },
     onMessageStreaming: (message) => {
+      setIsStreaming(true);
+      setIsThinking(false);    
       // Update current streaming message
       setCurrentStreamingMessage(message);
       
@@ -58,6 +62,8 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
       options.onMessageStreaming?.(message);
     },
     onMessageUpdate: (messageId, message) => {
+      setIsStreaming(true);
+      setIsThinking(false);
       // Update current streaming message if it matches
       if (currentStreamingMessage?.id === messageId) {
         setCurrentStreamingMessage(message);
@@ -69,7 +75,8 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
   });
 
   const startStreaming = useCallback(async (request: AdvisorStreamRequest) => {
-    setIsStreaming(true);
+    setIsStreaming(false);
+    setIsThinking(true);
     setError(null);
     setCurrentStreamingMessage(null);
 
@@ -83,12 +90,14 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
       const errorMessage = err instanceof Error ? err.message : t("aiStreamFailed");
       setError(errorMessage);
       setIsStreaming(false);
+      setIsThinking(false);
       setCurrentStreamingMessage(null);
     }
   }, [aiAdvisorProcessor, t]);
 
   const stopStreaming = useCallback(() => {
     setIsStreaming(false);
+    setIsThinking(false);
     setCurrentStreamingMessage(null);
     setError(null);
   }, []);
@@ -98,7 +107,8 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
   }, []);
 
   return {
-    isStreaming: isStreaming || aiAdvisorProcessor.isStreaming,
+    isStreaming,
+    isThinking,
     currentStreamingMessage,
     error,
     startStreaming,

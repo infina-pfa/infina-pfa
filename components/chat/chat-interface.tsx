@@ -14,7 +14,8 @@ export function ChatInterface() {
     messages,
     isLoading,
     error,
-    isAiTyping,
+    isThinking,
+    isStreaming,
     showSuggestions,
     conversationId,
     clearError,
@@ -43,7 +44,7 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="flex h-full bg-gray-50">
+    <div className="flex h-full bg-gray-50 p-0 md:p-8">
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Error Display */}
@@ -79,7 +80,7 @@ export function ChatInterface() {
         )}
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
           {!conversationId ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center w-full p-6">
@@ -94,30 +95,28 @@ export function ChatInterface() {
           ) : (
             <>
               <MessageList messages={messages} />
-              {isAiTyping && <TypingIndicator />}
+              {isThinking && <TypingIndicator />}
             </>
           )}
         </div>
 
         {/* Input Area */}
-        <div className="p-8">
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="mb-2 p-4">
-              <SuggestionList
-                suggestions={suggestions}
-                onSuggestionClick={onSuggestionClick}
-                isSubmitting={isSubmitting}
-              />
-            </div>
-          )}
-          <ChatInput
-            value={inputValue}
-            onChange={setInputValue}
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-            disabled={isAiTyping}
-          />
-        </div>
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="mb-2 p-4">
+            <SuggestionList
+              suggestions={suggestions}
+              onSuggestionClick={onSuggestionClick}
+              isSubmitting={isSubmitting}
+            />
+          </div>
+        )}
+        <ChatInput
+          value={inputValue}
+          onChange={setInputValue}
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+          disabled={isThinking || isStreaming}
+        />
       </div>
 
       {/* Component Panel */}
