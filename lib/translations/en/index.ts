@@ -9,6 +9,7 @@ import { footerEn } from "./footer";
 import { authEn } from "./auth";
 import { chatEn } from "./chat";
 import { onboardingEn } from "./onboarding";
+import { budgetingEn } from "./budgeting";
 
 export const enTranslations = {
   ...commonEn,
@@ -22,4 +23,5 @@ export const enTranslations = {
   ...authEn,
   ...chatEn,
   ...onboardingEn,
+  ...budgetingEn,
 };

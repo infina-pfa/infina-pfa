@@ -9,6 +9,7 @@ import { footerVi } from "./footer";
 import { authVi } from "./auth";
 import { chatVi } from "./chat";
 import { onboardingVi } from "./onboarding";
+import { budgetingVi } from "./budgeting";
 
 export const viTranslations = {
   ...commonVi,
@@ -22,4 +23,5 @@ export const viTranslations = {
   ...authVi,
   ...chatVi,
   ...onboardingVi,
+  ...budgetingVi,
 };
