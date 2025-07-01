@@ -13,12 +13,10 @@ export function OnboardingProgress({ currentStep }: OnboardingProgressProps) {
   const getStepNumber = (step: OnboardingStep): number => {
     switch (step) {
       case "welcome":
-      case "introduction":
         return 1;
       case "name":
         return 2;
       case "loading":
-      case "success":
         return 3;
       default:
         return 1;
