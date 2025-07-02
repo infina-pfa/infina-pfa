@@ -29,4 +29,26 @@ export const commonEn = {
   getStarted: "Get Started",
   learnMore: "Learn More",
   startFreeJourney: "Start your free journey",
+  
+  // Common UI Actions
+  loading: "Loading...",
+  retry: "Retry",
+  saving: "Saving...",
+  creating: "Creating...",
+  create: "Create",
+  update: "Update",
+  cancel: "Cancel",
+  delete: "Delete",
+  edit: "Edit",
+  save: "Save",
+  back: "Back",
+  next: "Next",
+  previous: "Previous",
+  close: "Close",
+  ok: "OK",
+  yes: "Yes",
+  no: "No",
+  
+  // Error Messages
+  unknownError: "An unknown error occurred",
 };

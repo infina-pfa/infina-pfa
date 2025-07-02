@@ -31,7 +31,7 @@ const mockExpenses = [
 ];
 
 export const RecentExpensesList = () => {
-  const { t } = useAppTranslation();
+  const { t } = useAppTranslation("budgeting");
 
   return (
     <section className="mx-6">

@@ -17,7 +17,7 @@ export const ExpenseItem = ({
   date,
   category,
 }: ExpenseItemProps) => {
-  const { t } = useAppTranslation();
+  const { t } = useAppTranslation("budgeting");
 
   return (
     <div

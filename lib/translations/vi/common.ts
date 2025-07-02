@@ -29,4 +29,26 @@ export const commonVi = {
   getStarted: "Bắt đầu",
   learnMore: "Tìm hiểu thêm",
   startFreeJourney: "Bắt đầu hành trình miễn phí",
+  
+  // Common UI Actions
+  loading: "Đang tải...",
+  retry: "Thử lại",
+  saving: "Đang lưu...",
+  creating: "Đang tạo...",
+  create: "Tạo",
+  update: "Cập nhật",
+  cancel: "Hủy",
+  delete: "Xóa",
+  edit: "Sửa",
+  save: "Lưu",
+  back: "Quay lại",
+  next: "Tiếp theo",
+  previous: "Trước đó",
+  close: "Đóng",
+  ok: "OK",
+  yes: "Có",
+  no: "Không",
+  
+  // Error Messages
+  unknownError: "Đã xảy ra lỗi không xác định",
 };

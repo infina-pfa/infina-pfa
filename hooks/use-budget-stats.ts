@@ -11,7 +11,7 @@ export interface UseBudgetStatsReturn {
 }
 
 export const useBudgetStats = (): UseBudgetStatsReturn => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['budgeting', 'common']);
   const [stats, setStats] = useState<BudgetStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export const useBudgetStats = (): UseBudgetStatsReturn => {
         setStats(response.stats);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.unknownError'));
+      setError(err instanceof Error ? err.message : t('unknownError', { ns: 'common' }));
       setStats(null);
     } finally {
       setLoading(false);

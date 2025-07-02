@@ -10,7 +10,7 @@ import {
 } from "@/lib/types/budget.types";
 
 // Type for translation function
-type TranslationFunction = (key: string) => string;
+type TranslationFunction = (key: string, options?: { ns?: string | string[] }) => string;
 
 export const budgetService = {
   /**

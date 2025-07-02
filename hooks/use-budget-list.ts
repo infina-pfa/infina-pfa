@@ -4,7 +4,7 @@ import { UseBudgetListReturn, BudgetFilters, Budget } from '@/lib/types/budget.t
 import { useTranslation } from 'react-i18next';
 
 export const useBudgetList = (filters?: BudgetFilters): UseBudgetListReturn => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['budgeting', 'common']);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export const useBudgetList = (filters?: BudgetFilters): UseBudgetListReturn => {
         setBudgets(response.budgets);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.unknownError'));
+      setError(err instanceof Error ? err.message : t('unknownError', { ns: 'common' }));
       setBudgets([]);
     } finally {
       setLoading(false);

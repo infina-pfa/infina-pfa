@@ -37,6 +37,7 @@ export const budgetingEn = {
 
   // Actions
   createBudget: "Create Budget",
+  createBudgetDesc: "Set up a new budget to track your expenses and manage your finances better",
   addExpense: "Add Expense",
   editBudget: "Edit Budget",
   deleteBudget: "Delete Budget",
@@ -51,6 +52,7 @@ export const budgetingEn = {
   // Error Messages
   budgetNotFound: "Budget not found",
   budgetNameRequired: "Budget name is required",
+  budgetingNameRequired: "Budget name is required",
   budgetNameEmpty: "Budget name cannot be empty",
   duplicateBudgetName: "Budget with this name already exists for this month",
   validMonthRequired: "Valid month is required",

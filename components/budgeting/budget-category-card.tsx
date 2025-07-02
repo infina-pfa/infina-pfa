@@ -20,7 +20,7 @@ export const BudgetCategoryCard = ({
   budget,
   remaining,
 }: BudgetCategoryCardProps) => {
-  const { t } = useAppTranslation();
+  const { t } = useAppTranslation("budgeting");
   const spentPercentage = budget > 0 ? (spent / budget) * 100 : 0;
 
   return (

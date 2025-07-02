@@ -4,7 +4,7 @@ import { UseBudgetCreateReturn, CreateBudgetRequest, Budget } from '@/lib/types/
 import { useTranslation } from 'react-i18next';
 
 export const useBudgetCreate = (): UseBudgetCreateReturn => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['budgeting', 'common']);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +22,7 @@ export const useBudgetCreate = (): UseBudgetCreateReturn => {
       
       return response.budget;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t('errors.unknownError');
+      const errorMessage = err instanceof Error ? err.message : t('unknownError', { ns: 'common' });
       setError(errorMessage);
       return null;
     } finally {

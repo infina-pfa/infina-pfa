@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
  * Custom hook wrapper for react-i18next's useTranslation
  * Provides type safety and consistent usage across the app
  */
-export const useAppTranslation = () => {
-  const { t, i18n } = useTranslation();
+export const useAppTranslation = (ns?: string | string[]) => {
+  const { t, i18n } = useTranslation(ns);
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);

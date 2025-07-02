@@ -5,6 +5,10 @@ import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { BudgetCategoryCard } from "./budget-category-card";
 
+interface BudgetCategoriesListProps {
+  onCreateBudget?: () => void;
+}
+
 // Mock data based on the UI documentation
 const mockCategories = [
   {
@@ -25,8 +29,10 @@ const mockCategories = [
   },
 ];
 
-export const BudgetCategoriesList = () => {
-  const { t } = useAppTranslation();
+export const BudgetCategoriesList = ({
+  onCreateBudget,
+}: BudgetCategoriesListProps) => {
+  const { t } = useAppTranslation("budgeting");
 
   return (
     <section className="mx-6">
@@ -38,6 +44,7 @@ export const BudgetCategoriesList = () => {
         <Button
           variant="link"
           size="sm"
+          onClick={onCreateBudget}
           className="text-[#0055FF] font-nunito hover:text-[#0041CC] cursor-pointer"
         >
           <Plus className="h-4 w-4 mr-2" />

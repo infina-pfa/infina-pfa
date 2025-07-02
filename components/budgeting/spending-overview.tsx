@@ -12,7 +12,7 @@ export const SpendingOverview = ({
   totalSpent,
   totalBudget,
 }: SpendingOverviewProps) => {
-  const { t } = useAppTranslation();
+  const { t } = useAppTranslation("budgeting");
 
   return (
     <section className="px-6 py-6 bg-[#FFFFFF] rounded-xl mx-6 mt-6">

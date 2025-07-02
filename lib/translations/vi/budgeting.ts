@@ -37,10 +37,14 @@ export const budgetingVi = {
 
   // Actions
   createBudget: "Tạo ngân sách",
+  createBudgetDesc: "Thiết lập ngân sách mới để theo dõi chi tiêu và quản lý tài chính tốt hơn",
   addExpense: "Thêm chi tiêu",
   editBudget: "Sửa ngân sách",
   deleteBudget: "Xóa ngân sách",
   viewDetails: "Xem chi tiết",
+  budgetList: "Danh sách ngân sách",
+  statistics: "Thống kê",
+  confirmDelete: "Bạn có chắc chắn muốn xóa ngân sách này?",
 
   // Notifications
   budgetCreated: "Tạo ngân sách thành công",
@@ -51,6 +55,7 @@ export const budgetingVi = {
   // Error Messages
   budgetNotFound: "Không tìm thấy ngân sách",
   budgetNameRequired: "Tên ngân sách là bắt buộc",
+  budgetingNameRequired: "Tên ngân sách là bắt buộc",
   budgetNameEmpty: "Tên ngân sách không được để trống",
   duplicateBudgetName: "Ngân sách có tên này đã tồn tại trong tháng này",
   validMonthRequired: "Tháng hợp lệ là bắt buộc",
