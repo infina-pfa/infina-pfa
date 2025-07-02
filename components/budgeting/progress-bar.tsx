@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 
 interface ProgressBarProps {
   value: number; // 0-100 percentage
+  color?: string;
   className?: string;
   trackClassName?: string;
   fillClassName?: string;
@@ -11,6 +12,7 @@ interface ProgressBarProps {
 
 export const ProgressBar = ({
   value,
+  color = "#0055FF",
   className,
   trackClassName,
   fillClassName,
@@ -27,10 +29,13 @@ export const ProgressBar = ({
       >
         <div
           className={cn(
-            "h-full bg-[#0055FF] transition-all duration-150 ease-in-out rounded-full",
+            "h-full transition-all duration-150 ease-in-out rounded-full",
             fillClassName
           )}
-          style={{ width: `${clampedValue}%` }}
+          style={{
+            width: `${clampedValue}%`,
+            backgroundColor: color,
+          }}
         />
       </div>
     </div>

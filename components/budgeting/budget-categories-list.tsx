@@ -29,12 +29,7 @@ export const BudgetCategoriesList = ({
           {t("expenseCategories")}
         </h2>
 
-        <Button
-          variant="link"
-          size="sm"
-          onClick={onCreateBudget}
-          className="text-[#0055FF] font-nunito hover:text-[#0041CC] cursor-pointer"
-        >
+        <Button size="sm" onClick={onCreateBudget}>
           <Plus className="h-4 w-4 mr-2" />
           {t("addNew")}
         </Button>
@@ -61,12 +56,11 @@ export const BudgetCategoriesList = ({
                 spent={budget.spent}
                 budget={budget.amount}
                 remaining={budget.remaining}
+                color={budget.color}
                 onEdit={onEditBudget}
                 onAddExpense={onAddExpense}
               />
-              {index < budgets.length - 1 && (
-                <div className="h-px bg-[#E5E7EB] mx-6" />
-              )}
+              {index < budgets.length - 1 && <div className="h-4" />}
             </div>
           );
         })}

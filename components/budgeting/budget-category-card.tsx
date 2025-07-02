@@ -14,6 +14,7 @@ interface BudgetCategoryCardProps {
   spent: number;
   budget: number;
   remaining: number;
+  color?: string;
   onEdit?: (id: string) => void;
   onAddExpense?: (id: string) => void;
 }
@@ -25,6 +26,7 @@ export const BudgetCategoryCard = ({
   spent,
   budget,
   remaining,
+  color = "#0055FF",
   onEdit,
   onAddExpense,
 }: BudgetCategoryCardProps) => {
@@ -32,10 +34,16 @@ export const BudgetCategoryCard = ({
   const spentPercentage = budget > 0 ? (spent / budget) * 100 : 0;
 
   return (
-    <Card className="cursor-pointer duration-150 p-0" tabIndex={0}>
+    <Card
+      className="cursor-pointer duration-150 p-0 transition-colors"
+      tabIndex={0}
+    >
       <CardContent className="flex items-center gap-4 p-6">
-        <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
-          {icon}
+        <div
+          className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full"
+          style={{ backgroundColor: `${color}20` }}
+        >
+          <div style={{ color: color }}>{icon}</div>
         </div>
 
         <div className="flex-1 min-w-0">
@@ -52,7 +60,21 @@ export const BudgetCategoryCard = ({
                     e.stopPropagation();
                     onAddExpense(id);
                   }}
-                  className="h-8 w-8 p-0 text-[#6B7280] hover:text-[#2ECC71] hover:bg-[#F0F2F5]"
+                  className="h-8 w-8 p-0 text-[#6B7280] transition-colors"
+                  style={
+                    {
+                      "--hover-color": color,
+                      "--hover-bg": `${color}20`,
+                    } as React.CSSProperties
+                  }
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.color = color;
+                    e.currentTarget.style.backgroundColor = `${color}20`;
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.color = "#6B7280";
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
                   title={t("addExpense")}
                 >
                   <Plus className="h-4 w-4" />
@@ -66,7 +88,21 @@ export const BudgetCategoryCard = ({
                     e.stopPropagation();
                     onEdit(id);
                   }}
-                  className="h-8 w-8 p-0 text-[#6B7280] hover:text-[#0055FF] hover:bg-[#F0F2F5]"
+                  className="h-8 w-8 p-0 text-[#6B7280] transition-colors"
+                  style={
+                    {
+                      "--hover-color": color,
+                      "--hover-bg": `${color}20`,
+                    } as React.CSSProperties
+                  }
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.color = color;
+                    e.currentTarget.style.backgroundColor = `${color}20`;
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.color = "#6B7280";
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
                   title={t("editBudget")}
                 >
                   <Edit className="h-4 w-4" />
@@ -75,15 +111,17 @@ export const BudgetCategoryCard = ({
             </div>
           </div>
 
-          <p className="text-[14px] font-regular text-[#6B7280] mb-2 font-nunito leading-[20px]">
-            {t("spent")} {formatCurrency(spent)}/{formatCurrency(budget)}
-          </p>
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-[14px] font-bold text-[#6B7280] font-nunito leading-[20px]">
+              {t("spent")}: {formatCurrency(spent)}
+            </p>
 
-          <p className="text-[14px] font-regular text-[#6B7280] mb-4 font-nunito leading-[20px]">
-            {t("remaining")} {formatCurrency(remaining)}
-          </p>
+            <p className="text-[14px] font-bold text-[#6B7280] font-nunito leading-[20px]">
+              {t("remaining")}: {formatCurrency(remaining)}
+            </p>
+          </div>
 
-          <ProgressBar value={spentPercentage} />
+          <ProgressBar value={spentPercentage} color={color} />
         </div>
       </CardContent>
     </Card>
