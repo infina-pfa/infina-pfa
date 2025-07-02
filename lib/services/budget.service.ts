@@ -6,7 +6,8 @@ import {
   BudgetResponse,
   BudgetListResponse,
   BudgetFilters,
-  BudgetStats
+  BudgetStats,
+  BudgetWithSpending
 } from "@/lib/types/budget.types";
 
 // Type for translation function
@@ -52,6 +53,83 @@ export const budgetService = {
       const appError = handleError(error, t);
       return {
         budgets: [],
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Get budgets with spending data for the current user
+   */
+  async getAllWithSpending(filters?: BudgetFilters, t?: TranslationFunction): Promise<{ budgets: BudgetWithSpending[]; totalBudget: number; totalSpent: number; error: string | null }> {
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        throw new Error('Authentication required');
+      }
+
+      let query = supabase
+        .from('budgets')
+        .select(`
+          *,
+          budget_transactions (
+            transaction_id,
+            transactions (
+              amount,
+              type
+            )
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      // Apply filters
+      if (filters?.month) {
+        query = query.eq('month', filters.month);
+      }
+      if (filters?.year) {
+        query = query.eq('year', filters.year);
+      }
+      if (filters?.category) {
+        query = query.eq('category', filters.category);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      // Calculate spending for each budget
+      const budgetsWithSpending: BudgetWithSpending[] = (data || []).map(budget => {
+        const spent = budget.budget_transactions?.reduce((total: number, bt: { transactions: { amount: number; type: string } | null }) => {
+          if (bt.transactions && bt.transactions.type === 'outcome') {
+            return total + bt.transactions.amount;
+          }
+          return total;
+        }, 0) || 0;
+
+        return {
+          ...budget,
+          spent,
+          remaining: budget.amount - spent
+        };
+      });
+
+      // Calculate totals
+      const totalBudget = budgetsWithSpending.reduce((sum, budget) => sum + budget.amount, 0);
+      const totalSpent = budgetsWithSpending.reduce((sum, budget) => sum + budget.spent, 0);
+
+      return {
+        budgets: budgetsWithSpending,
+        totalBudget,
+        totalSpent,
+        error: null,
+      };
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        budgets: [],
+        totalBudget: 0,
+        totalSpent: 0,
         error: appError.message,
       };
     }
@@ -309,6 +387,65 @@ export const budgetService = {
       const appError = handleError(error, t);
       return {
         stats: null,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Get recent transactions for all budgets
+   */
+  async getRecentTransactions(limit: number = 10, t?: TranslationFunction): Promise<{ transactions: Array<{
+    id: string;
+    name: string;
+    amount: number;
+    date: string;
+    category: string;
+    type: string;
+    description: string | null;
+  }>; error: string | null }> {
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        throw new Error('Authentication required');
+      }
+
+      const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+          *,
+          budget_transactions (
+            budget_id,
+            budgets (
+              name,
+              category
+            )
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      const formattedTransactions = (data || []).map(transaction => ({
+        id: transaction.id,
+        name: transaction.name,
+        amount: transaction.amount,
+        date: new Date(transaction.created_at).toLocaleDateString('en-GB'),
+        category: transaction.budget_transactions?.[0]?.budgets?.category || 'general',
+        type: transaction.type,
+        description: transaction.description
+      }));
+
+      return {
+        transactions: formattedTransactions,
+        error: null,
+      };
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        transactions: [],
         error: appError.message,
       };
     }

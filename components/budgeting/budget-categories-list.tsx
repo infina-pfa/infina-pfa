@@ -5,32 +5,15 @@ import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { BudgetCategoryCard } from "./budget-category-card";
 import { BUDGET_ICONS } from "@/lib/utils/budget-constants";
+import { BudgetWithSpending } from "@/lib/types/budget.types";
 
 interface BudgetCategoriesListProps {
+  budgets: BudgetWithSpending[];
   onCreateBudget?: () => void;
 }
 
-// Mock data based on the UI documentation
-const mockCategories = [
-  {
-    id: "1",
-    name: "electricity",
-    iconName: "electricity",
-    spent: 0,
-    budget: 200000,
-    remaining: 200000,
-  },
-  {
-    id: "2",
-    name: "home",
-    iconName: "home",
-    spent: 0,
-    budget: 3500000,
-    remaining: 3500000,
-  },
-];
-
 export const BudgetCategoriesList = ({
+  budgets,
   onCreateBudget,
 }: BudgetCategoriesListProps) => {
   const { t } = useAppTranslation("budgeting");
@@ -54,28 +37,28 @@ export const BudgetCategoriesList = ({
       </div>
 
       <div className="bg-[#FFFFFF] rounded-b-xl overflow-hidden">
-        {mockCategories.map((category, index) => {
+        {budgets.map((budget, index) => {
           const iconInfo =
-            BUDGET_ICONS.find((icon) => icon.name === category.iconName) ||
+            BUDGET_ICONS.find((icon) => icon.name === budget.icon) ||
             BUDGET_ICONS[0];
           const IconComponent = iconInfo.icon;
 
           return (
-            <div key={category.id}>
+            <div key={budget.id}>
               <BudgetCategoryCard
-                id={category.id}
-                name={t(category.name)}
+                id={budget.id}
+                name={budget.name}
                 icon={
                   <IconComponent
                     className="h-6 w-6"
-                    style={{ color: iconInfo.color }}
+                    style={{ color: budget.color || iconInfo.color }}
                   />
                 }
-                spent={category.spent}
-                budget={category.budget}
-                remaining={category.remaining}
+                spent={budget.spent}
+                budget={budget.amount}
+                remaining={budget.remaining}
               />
-              {index < mockCategories.length - 1 && (
+              {index < budgets.length - 1 && (
                 <div className="h-px bg-[#E5E7EB] mx-6" />
               )}
             </div>
@@ -83,7 +66,7 @@ export const BudgetCategoriesList = ({
         })}
       </div>
 
-      {mockCategories.length === 0 && (
+      {budgets.length === 0 && (
         <div className="px-6 py-8 text-center bg-[#FFFFFF] rounded-xl">
           <p className="text-[#6B7280] font-nunito text-[16px] leading-[24px]">
             {t("noBudgetsYet")}

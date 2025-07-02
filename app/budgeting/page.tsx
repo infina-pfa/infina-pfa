@@ -6,7 +6,10 @@ import { SpendingOverview } from "@/components/budgeting/spending-overview";
 import { BudgetCategoriesList } from "@/components/budgeting/budget-categories-list";
 import { RecentExpensesList } from "@/components/budgeting/recent-expenses-list";
 import { CreateBudgetModal } from "@/components/budgeting/create-budget-modal";
-import { useBudgetList } from "@/hooks/use-budget-list";
+import {
+  useBudgetListWithSpending,
+  useRecentTransactions,
+} from "@/hooks/use-budget-list";
 import { useBudgetStats } from "@/hooks/use-budget-stats";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useMemo, useState } from "react";
@@ -33,22 +36,29 @@ export default function BudgetingPage() {
     [currentMonth, currentYear]
   );
 
-  // Use memoized filter
+  // Use real data hooks
   const {
+    budgets,
+    totalBudget,
+    totalSpent,
     loading: budgetsLoading,
     error: budgetsError,
     refetch: refetchBudgets,
-  } = useBudgetList(filter);
+  } = useBudgetListWithSpending(filter);
+
+  const {
+    transactions: recentTransactions,
+    loading: transactionsLoading,
+    error: transactionsError,
+  } = useRecentTransactions(10);
 
   // Fetch budget statistics for future use
   const { loading: statsLoading, error: statsError } = useBudgetStats();
 
-  // Calculate totals for spending overview
-  // Note: This is simplified - using mock data until full integration
-  const totalBudget = 20000000; // This would come from budget allocations per category
-  const totalSpent = 4000000; // This would come from actual transaction data
+  const isLoading = budgetsLoading || statsLoading || transactionsLoading;
+  const hasError = budgetsError || statsError || transactionsError;
 
-  if (budgetsLoading || statsLoading) {
+  if (isLoading) {
     return (
       <AppLayout>
         <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
@@ -63,13 +73,13 @@ export default function BudgetingPage() {
     );
   }
 
-  if (budgetsError || statsError) {
+  if (hasError) {
     return (
       <AppLayout>
         <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
           <div className="text-center">
             <div className="text-[#F44336] font-nunito text-lg mb-4">
-              {t("fetchBudgetsError", { ns: "budgeting" })}
+              {budgetsError || statsError || transactionsError}
             </div>
             <button
               onClick={() => {
@@ -93,12 +103,13 @@ export default function BudgetingPage() {
 
           <div className="mt-8">
             <BudgetCategoriesList
+              budgets={budgets}
               onCreateBudget={() => setIsCreateModalOpen(true)}
             />
           </div>
 
           <div className="mt-8">
-            <RecentExpensesList />
+            <RecentExpensesList transactions={recentTransactions} />
           </div>
         </main>
       </div>

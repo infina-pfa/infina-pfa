@@ -5,6 +5,12 @@ export type Budget = Database["public"]["Tables"]["budgets"]["Row"];
 export type BudgetInsert = Database["public"]["Tables"]["budgets"]["Insert"];
 export type BudgetUpdate = Database["public"]["Tables"]["budgets"]["Update"];
 
+// Extended types for budget with spending data
+export type BudgetWithSpending = Budget & {
+  spent: number;
+  remaining: number;
+};
+
 // API Request/Response types
 export interface CreateBudgetRequest {
   month: number;
