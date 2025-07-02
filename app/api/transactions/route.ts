@@ -1,39 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { Database } from "@/database";
-
-const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export async function GET(request: NextRequest) {
   try {
-    // Get the authorization header
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({
-        success: false,
-        error: "Missing or invalid authorization header"
-      }, { status: 401 });
-    }
+    // Create Supabase client
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+        },
+      }
+    );
 
-    // Extract the token
-    const token = authHeader.split('Bearer ')[1];
-    
-    // Verify the token and get user
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    // Get current user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return NextResponse.json({
         success: false,
-        error: "Unauthorized"
+        error: "Authentication required"
       }, { status: 401 });
     }
 
     // Get query parameters
-    const url = new URL(request.url);
-    const limit = url.searchParams.get('limit');
-    const budgetId = url.searchParams.get('budgetId');
+    const { searchParams } = new URL(request.url);
+    const limit = searchParams.get('limit');
+    const budgetId = searchParams.get('budgetId');
 
     let data, error;
 
@@ -106,24 +115,38 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get the authorization header
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({
-        success: false,
-        error: "Missing or invalid authorization header"
-      }, { status: 401 });
-    }
+    // Create Supabase client
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // The `setAll` method was called from a Server Component.
+              // This can be ignored if you have middleware refreshing
+              // user sessions.
+            }
+          },
+        },
+      }
+    );
 
-    // Extract the token
-    const token = authHeader.split('Bearer ')[1];
-    
-    // Verify the token and get user
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    // Get current user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return NextResponse.json({
         success: false,
-        error: "Unauthorized"
+        error: "Authentication required"
       }, { status: 401 });
     }
 
@@ -224,14 +247,20 @@ export async function POST(request: NextRequest) {
       }
 
       budgetTransaction = bt;
+
+      // Return both transaction and budget transaction for expense creation
+      return NextResponse.json({
+        success: true,
+        data: {
+          transaction,
+          budgetTransaction
+        }
+      }, { status: 201 });
     }
 
     return NextResponse.json({
       success: true,
-      data: {
-        transaction,
-        budgetTransaction
-      }
+      data: transaction
     }, { status: 201 });
 
   } catch (error) {

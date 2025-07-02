@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { apiClient } from "@/lib/api-client";
 import { handleError } from "@/lib/error-handler";
 import { CreateUserRequest, UserProfile, UserResponse, UserCheckResponse } from "@/lib/types/user.types";
 
@@ -9,28 +9,21 @@ export const userService = {
   /**
    * Check if user profile exists for authenticated user
    */
-  async checkUserExists(userId: string): Promise<UserCheckResponse> {
+  async checkUserExists(): Promise<UserCheckResponse> {
     try {
-      const { data: user, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("user_id", userId)
-        .single();
-
-      if (error && error.code === 'PGRST116') {
-        // No rows found - user doesn't exist
+      const response = await apiClient.get<UserProfile>(`/users/profile`);
+      
+      if (response.success && response.data) {
         return {
-          exists: false,
-          user: null,
+          exists: true,
+          user: response.data,
           error: null,
         };
       }
 
-      if (error) throw error;
-
       return {
-        exists: true,
-        user: user as UserProfile,
+        exists: false,
+        user: null,
         error: null,
       };
     } catch (error) {
@@ -46,26 +39,21 @@ export const userService = {
   /**
    * Create a new user profile
    */
-  async createUser(userId: string, request: CreateUserRequest, t?: TranslationFunction): Promise<UserResponse> {
+  async createUser(request: CreateUserRequest, t?: TranslationFunction): Promise<UserResponse> {
     try {
-      const { data: user, error } = await supabase
-        .from("users")
-        .insert([
-          {
-            user_id: userId,
-            name: request.name,
-            total_asset_value: 0,
-          },
-        ])
-        .select()
-        .single();
+      const response = await apiClient.post<UserProfile>('/users/profile', {
+        name: request.name,
+        total_asset_value: 0,
+      });
 
-      if (error) throw error;
+      if (response.success && response.data) {
+        return {
+          user: response.data,
+          error: null,
+        };
+      }
 
-      return {
-        user: user as UserProfile,
-        error: null,
-      };
+      throw new Error(response.error || 'Failed to create user');
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -78,20 +66,18 @@ export const userService = {
   /**
    * Get user profile by auth user ID
    */
-  async getUserProfile(userId: string, t?: TranslationFunction): Promise<UserResponse> {
+  async getUserProfile(t?: TranslationFunction): Promise<UserResponse> {
     try {
-      const { data: user, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("user_id", userId)
-        .single();
+      const response = await apiClient.get<UserProfile>('/users/profile');
 
-      if (error) throw error;
+      if (response.success && response.data) {
+        return {
+          user: response.data,
+          error: null,
+        };
+      }
 
-      return {
-        user: user as UserProfile,
-        error: null,
-      };
+      throw new Error(response.error || 'Failed to get user profile');
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -104,24 +90,21 @@ export const userService = {
   /**
    * Update user profile
    */
-  async updateUserProfile(userId: string, updates: Partial<CreateUserRequest>, t?: TranslationFunction): Promise<UserResponse> {
+  async updateUserProfile(updates: Partial<CreateUserRequest>, t?: TranslationFunction): Promise<UserResponse> {
     try {
-      const { data: user, error } = await supabase
-        .from("users")
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", userId)
-        .select()
-        .single();
+      const response = await apiClient.patch<UserProfile>('/users/profile', {
+        ...updates,
+        updated_at: new Date().toISOString(),
+      });
 
-      if (error) throw error;
+      if (response.success && response.data) {
+        return {
+          user: response.data,
+          error: null,
+        };
+      }
 
-      return {
-        user: user as UserProfile,
-        error: null,
-      };
+      throw new Error(response.error || 'Failed to update user profile');
     } catch (error) {
       const appError = handleError(error, t);
       return {

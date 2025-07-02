@@ -15,9 +15,9 @@ export default function OnboardingPage() {
   const { user, loading: authLoading } = useAuthContext();
   const router = useRouter();
 
-  // Initialize onboarding hook only when we have a user
+  // Initialize onboarding hook
   const { step, name, loading, error, nextStep, updateName, createUser } =
-    useOnboarding(user?.id || "");
+    useOnboarding();
 
   // Check if user already has a profile
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function OnboardingPage() {
       if (!user?.id) return;
 
       try {
-        const result = await userService.checkUserExists(user.id);
+        const result = await userService.checkUserExists();
 
         if (result.exists && result.user) {
           // User already has a profile, redirect to chat

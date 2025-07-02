@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { apiClient } from "@/lib/api-client";
 import { handleError } from "@/lib/error-handler";
 import { 
   CreateTransactionRequest, 
@@ -17,41 +17,32 @@ export const transactionService = {
    */
   async create(data: CreateTransactionRequest, t?: TranslationFunction): Promise<TransactionResponse> {
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        throw new Error('Authentication required');
+      const response = await apiClient.post<{
+        id: string;
+        name: string;
+        amount: number;
+        description: string | null;
+        type: "income" | "outcome" | "transfer";
+        recurring: number;
+        created_at: string;
+        updated_at: string;
+        user_id: string | null;
+      }>('/transactions', {
+        name: data.name,
+        amount: data.amount,
+        description: data.description,
+        type: data.type,
+        recurring: data.recurring || 0,
+      });
+
+      if (response.success && response.data) {
+        return {
+          transaction: response.data,
+          error: null,
+        };
       }
 
-      // Validate required fields
-      if (!data.name?.trim()) {
-        throw new Error('Transaction name is required');
-      }
-      if (!data.amount || data.amount <= 0) {
-        throw new Error('Transaction amount must be greater than 0');
-      }
-      if (!data.type) {
-        throw new Error('Transaction type is required');
-      }
-
-      const { data: transaction, error } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          name: data.name.trim(),
-          amount: data.amount,
-          description: data.description?.trim() || null,
-          type: data.type,
-          recurring: data.recurring || 0,
-        })
-        .select('*')
-        .single();
-
-      if (error) throw error;
-
-      return {
-        transaction,
-        error: null,
-      };
+      throw new Error(response.error || 'Failed to create transaction');
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -66,77 +57,44 @@ export const transactionService = {
    */
   async createExpense(data: CreateExpenseRequest, t?: TranslationFunction): Promise<CreateExpenseResponse> {
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        throw new Error('Authentication required');
+      const response = await apiClient.post<{
+        transaction: {
+          id: string;
+          name: string;
+          amount: number;
+          description: string | null;
+          type: "income" | "outcome" | "transfer";
+          recurring: number;
+          created_at: string;
+          updated_at: string;
+          user_id: string | null;
+        };
+        budgetTransaction: {
+          id: string;
+          budget_id: string;
+          transaction_id: string;
+          user_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+      }>('/transactions', {
+        name: data.name,
+        amount: data.amount,
+        description: data.description,
+        type: 'outcome',
+        budgetId: data.budgetId,
+        date: data.date,
+      });
+
+      if (response.success && response.data) {
+        return {
+          transaction: response.data.transaction,
+          budgetTransaction: response.data.budgetTransaction,
+          error: null,
+        };
       }
 
-      // Validate required fields
-      if (!data.name?.trim()) {
-        throw new Error('Expense name is required');
-      }
-      if (!data.amount || data.amount <= 0) {
-        throw new Error('Expense amount must be greater than 0');
-      }
-      if (!data.budgetId) {
-        throw new Error('Budget ID is required');
-      }
-
-      // Verify budget exists and belongs to user
-      const { data: budget, error: budgetError } = await supabase
-        .from('budgets')
-        .select('id')
-        .eq('id', data.budgetId)
-        .eq('user_id', user.id)
-        .single();
-
-      if (budgetError || !budget) {
-        throw new Error('Budget not found');
-      }
-
-      // Start a transaction to ensure both records are created
-      // First create the transaction
-      const { data: transaction, error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          name: data.name.trim(),
-          amount: data.amount,
-          description: data.description?.trim() || null,
-          type: 'outcome',
-          recurring: 0,
-          created_at: data.date ? new Date(data.date).toISOString() : undefined,
-        })
-        .select('*')
-        .single();
-
-      if (transactionError) throw transactionError;
-
-      // Then link it to the budget
-      const { data: budgetTransaction, error: linkError } = await supabase
-        .from('budget_transactions')
-        .insert({
-          user_id: user.id,
-          budget_id: data.budgetId,
-          transaction_id: transaction.id,
-        })
-        .select('*')
-        .single();
-
-      if (linkError) {
-        // If linking fails, delete the transaction to maintain consistency
-        await supabase
-          .from('transactions')
-          .delete()
-          .eq('id', transaction.id);
-        throw linkError;
-      }
-
-      return {
-        transaction,
-        budgetTransaction,
-        error: null,
-      };
+      throw new Error(response.error || 'Failed to create expense');
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -152,29 +110,29 @@ export const transactionService = {
    */
   async getAll(limit?: number, t?: TranslationFunction): Promise<TransactionListResponse> {
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        throw new Error('Authentication required');
+      const params: Record<string, string | number> = {};
+      if (limit) params.limit = limit;
+
+      const response = await apiClient.get<Array<{
+        id: string;
+        name: string;
+        amount: number;
+        description: string | null;
+        type: "income" | "outcome" | "transfer";
+        recurring: number;
+        created_at: string;
+        updated_at: string;
+        user_id: string | null;
+      }>>('/transactions', params);
+
+      if (response.success && response.data) {
+        return {
+          transactions: response.data,
+          error: null,
+        };
       }
 
-      let query = supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (limit) {
-        query = query.limit(limit);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      return {
-        transactions: data || [],
-        error: null,
-      };
+      throw new Error(response.error || 'Failed to fetch transactions');
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -189,29 +147,26 @@ export const transactionService = {
    */
   async getByBudget(budgetId: string, t?: TranslationFunction): Promise<TransactionListResponse> {
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        throw new Error('Authentication required');
+      const response = await apiClient.get<Array<{
+        id: string;
+        name: string;
+        amount: number;
+        description: string | null;
+        type: "income" | "outcome" | "transfer";
+        recurring: number;
+        created_at: string;
+        updated_at: string;
+        user_id: string | null;
+      }>>('/transactions', { budgetId });
+
+      if (response.success && response.data) {
+        return {
+          transactions: response.data,
+          error: null,
+        };
       }
 
-      const { data, error } = await supabase
-        .from('transactions')
-        .select(`
-          *,
-          budget_transactions!inner (
-            budget_id
-          )
-        `)
-        .eq('user_id', user.id)
-        .eq('budget_transactions.budget_id', budgetId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      return {
-        transactions: data || [],
-        error: null,
-      };
+      throw new Error(response.error || 'Failed to fetch budget transactions');
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -226,42 +181,16 @@ export const transactionService = {
    */
   async delete(id: string, t?: TranslationFunction): Promise<{ success: boolean; error: string | null }> {
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) {
-        throw new Error('Authentication required');
+      const response = await apiClient.delete<{ success: boolean }>(`/transactions/${id}`);
+
+      if (response.success) {
+        return {
+          success: true,
+          error: null,
+        };
       }
 
-      // Check if transaction exists and belongs to user
-      const { data: existingTransaction, error: checkError } = await supabase
-        .from('transactions')
-        .select('id')
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .single();
-
-      if (checkError || !existingTransaction) {
-        throw new Error('Transaction not found');
-      }
-
-      // Delete budget_transactions first (if any)
-      await supabase
-        .from('budget_transactions')
-        .delete()
-        .eq('transaction_id', id);
-
-      // Then delete the transaction
-      const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      return {
-        success: true,
-        error: null,
-      };
+      throw new Error(response.error || 'Failed to delete transaction');
     } catch (error) {
       const appError = handleError(error, t);
       return {

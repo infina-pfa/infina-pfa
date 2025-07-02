@@ -14,7 +14,7 @@ interface OnboardingState {
   error: string | null;
 }
 
-export const useOnboarding = (userId: string) => {
+export const useOnboarding = () => {
   const [state, setState] = useState<OnboardingState>({
     step: "welcome",
     name: "",
@@ -77,7 +77,7 @@ export const useOnboarding = (userId: string) => {
         name: state.name.trim(),
       };
 
-      const result = await userService.createUser(userId, request, t);
+      const result = await userService.createUser(request, t);
 
       if (result.error) {
         setState(prev => ({

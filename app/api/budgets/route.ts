@@ -44,11 +44,26 @@ export async function GET(request: NextRequest) {
     const month = searchParams.get('month');
     const year = searchParams.get('year');
     const category = searchParams.get('category');
+    const withSpending = searchParams.get('withSpending') === 'true';
 
-    // Build query
+    // Build query - include spending data if requested
+    let selectClause = "*";
+    if (withSpending) {
+      selectClause = `
+        *,
+        budget_transactions (
+          transaction_id,
+          transactions (
+            amount,
+            type
+          )
+        )
+      `;
+    }
+
     let query = supabase
       .from("budgets")
-      .select("*")
+      .select(selectClause)
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
@@ -79,6 +94,40 @@ export async function GET(request: NextRequest) {
         success: false,
         error: "Failed to fetch budgets"
       }, { status: 500 });
+    }
+
+    // If withSpending is requested, calculate spending data and totals
+    if (withSpending && budgets) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const budgetsWithSpending = budgets.map((budget: any) => {
+        const spent = budget.budget_transactions?.reduce((total: number, bt: { transactions: { amount: number; type: string } | null }) => {
+          if (bt.transactions && bt.transactions.type === 'outcome') {
+            return total + bt.transactions.amount;
+          }
+          return total;
+        }, 0) || 0;
+
+        return {
+          ...budget,
+          spent,
+          remaining: budget.amount - spent
+        };
+      });
+
+      // Calculate totals
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const totalBudget = budgetsWithSpending.reduce((sum: number, budget: any) => sum + budget.amount, 0);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const totalSpent = budgetsWithSpending.reduce((sum: number, budget: any) => sum + budget.spent, 0);
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          budgets: budgetsWithSpending,
+          totalBudget,
+          totalSpent
+        }
+      });
     }
 
     return NextResponse.json({
