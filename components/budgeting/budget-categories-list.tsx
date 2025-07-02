@@ -11,12 +11,14 @@ interface BudgetCategoriesListProps {
   budgets: BudgetWithSpending[];
   onCreateBudget?: () => void;
   onEditBudget?: (budgetId: string) => void;
+  onAddExpense?: (budgetId: string) => void;
 }
 
 export const BudgetCategoriesList = ({
   budgets,
   onCreateBudget,
   onEditBudget,
+  onAddExpense,
 }: BudgetCategoriesListProps) => {
   const { t } = useAppTranslation("budgeting");
 
@@ -60,6 +62,7 @@ export const BudgetCategoriesList = ({
                 budget={budget.amount}
                 remaining={budget.remaining}
                 onEdit={onEditBudget}
+                onAddExpense={onAddExpense}
               />
               {index < budgets.length - 1 && (
                 <div className="h-px bg-[#E5E7EB] mx-6" />

@@ -41,8 +41,19 @@ export const budgetingEn = {
   editBudget: "Edit Budget",
   editBudgetDesc: "Update your budget details to better manage your finances",
   addExpense: "Add Expense",
+  addExpenseFor: "Add expense for",
   deleteBudget: "Delete Budget",
   viewDetails: "View Details",
+
+  // Expense Form
+  expenseName: "Expense name",
+  enterExpenseName: "Enter expense name",
+  amount: "Amount",
+  enterAmount: "Enter amount",
+  date: "Date",
+  description: "Description",
+  optional: "optional",
+  enterDescription: "Enter description",
 
   // Notifications
   budgetCreated: "Budget created successfully",

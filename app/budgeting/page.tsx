@@ -7,6 +7,7 @@ import { BudgetCategoriesList } from "@/components/budgeting/budget-categories-l
 import { RecentExpensesList } from "@/components/budgeting/recent-expenses-list";
 import { CreateBudgetModal } from "@/components/budgeting/create-budget-modal";
 import { EditBudgetModal } from "@/components/budgeting/edit-budget-modal";
+import { CreateExpenseModal } from "@/components/budgeting/create-expense-modal";
 import {
   useBudgetListWithSpending,
   useRecentTransactions,
@@ -22,6 +23,8 @@ export default function BudgetingPage() {
   // Modal state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateExpenseModalOpen, setIsCreateExpenseModalOpen] =
+    useState(false);
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
 
   console.log("RENDERING BUDGETING PAGE");
@@ -65,6 +68,15 @@ export default function BudgetingPage() {
     if (budget) {
       setSelectedBudget(budget);
       setIsEditModalOpen(true);
+    }
+  };
+
+  // Handle add expense
+  const handleAddExpense = (budgetId: string) => {
+    const budget = budgets.find((b) => b.id === budgetId);
+    if (budget) {
+      setSelectedBudget(budget);
+      setIsCreateExpenseModalOpen(true);
     }
   };
 
@@ -119,6 +131,7 @@ export default function BudgetingPage() {
               budgets={budgets}
               onCreateBudget={() => setIsCreateModalOpen(true)}
               onEditBudget={handleEditBudget}
+              onAddExpense={handleAddExpense}
             />
           </div>
 
@@ -144,6 +157,26 @@ export default function BudgetingPage() {
           refetchBudgets();
         }}
         budget={selectedBudget}
+      />
+
+      <CreateExpenseModal
+        isOpen={isCreateExpenseModalOpen}
+        onClose={() => {
+          setIsCreateExpenseModalOpen(false);
+          setSelectedBudget(null);
+        }}
+        onSuccess={() => {
+          refetchBudgets();
+        }}
+        budget={
+          selectedBudget
+            ? {
+                id: selectedBudget.id,
+                name: selectedBudget.name,
+                color: selectedBudget.color,
+              }
+            : null
+        }
       />
     </AppLayout>
   );
