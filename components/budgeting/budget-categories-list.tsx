@@ -1,9 +1,10 @@
 "use client";
 
-import { Plus, Zap, Home } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { BudgetCategoryCard } from "./budget-category-card";
+import { BUDGET_ICONS } from "@/lib/utils/budget-constants";
 
 interface BudgetCategoriesListProps {
   onCreateBudget?: () => void;
@@ -14,15 +15,15 @@ const mockCategories = [
   {
     id: "1",
     name: "electricity",
-    icon: <Zap className="h-6 w-6 text-[#FFC107]" />,
+    iconName: "electricity",
     spent: 0,
     budget: 200000,
     remaining: 200000,
   },
   {
     id: "2",
-    name: "housing",
-    icon: <Home className="h-6 w-6 text-[#0055FF]" />,
+    name: "home",
+    iconName: "home",
     spent: 0,
     budget: 3500000,
     remaining: 3500000,
@@ -53,21 +54,33 @@ export const BudgetCategoriesList = ({
       </div>
 
       <div className="bg-[#FFFFFF] rounded-b-xl overflow-hidden">
-        {mockCategories.map((category, index) => (
-          <div key={category.id}>
-            <BudgetCategoryCard
-              id={category.id}
-              name={t(category.name)}
-              icon={category.icon}
-              spent={category.spent}
-              budget={category.budget}
-              remaining={category.remaining}
-            />
-            {index < mockCategories.length - 1 && (
-              <div className="h-px bg-[#E5E7EB] mx-6" />
-            )}
-          </div>
-        ))}
+        {mockCategories.map((category, index) => {
+          const iconInfo =
+            BUDGET_ICONS.find((icon) => icon.name === category.iconName) ||
+            BUDGET_ICONS[0];
+          const IconComponent = iconInfo.icon;
+
+          return (
+            <div key={category.id}>
+              <BudgetCategoryCard
+                id={category.id}
+                name={t(category.name)}
+                icon={
+                  <IconComponent
+                    className="h-6 w-6"
+                    style={{ color: iconInfo.color }}
+                  />
+                }
+                spent={category.spent}
+                budget={category.budget}
+                remaining={category.remaining}
+              />
+              {index < mockCategories.length - 1 && (
+                <div className="h-px bg-[#E5E7EB] mx-6" />
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {mockCategories.length === 0 && (

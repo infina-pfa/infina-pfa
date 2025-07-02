@@ -13,50 +13,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Wallet,
-  Car,
-  ShoppingCart,
-  Utensils,
-  Zap,
-  Home,
-  Gamepad2,
-  Heart,
-  Plane,
-  GraduationCap,
-  MoreHorizontal,
-} from "lucide-react";
+import { BUDGET_ICONS, BUDGET_COLORS } from "@/lib/utils/budget-constants";
 
 interface CreateBudgetModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
-
-// Available icons for budget categories
-const BUDGET_ICONS = [
-  { name: "wallet", icon: Wallet, color: "#0055FF" },
-  { name: "car", icon: Car, color: "#2ECC71" },
-  { name: "shopping", icon: ShoppingCart, color: "#FF9800" },
-  { name: "food", icon: Utensils, color: "#FFC107" },
-  { name: "electricity", icon: Zap, color: "#FFC107" },
-  { name: "home", icon: Home, color: "#0055FF" },
-  { name: "entertainment", icon: Gamepad2, color: "#F44336" },
-  { name: "health", icon: Heart, color: "#2ECC71" },
-  { name: "travel", icon: Plane, color: "#FF9800" },
-  { name: "education", icon: GraduationCap, color: "#0055FF" },
-  { name: "other", icon: MoreHorizontal, color: "#6B7280" },
-];
-
-// Available color options
-const COLOR_OPTIONS = [
-  "#0055FF", // Primary Blue
-  "#2ECC71", // Success Green
-  "#FFC107", // Warning Yellow
-  "#FF9800", // Highlight Orange
-  "#F44336", // Error Red
-  "#6B7280", // Muted Gray
-];
 
 export const CreateBudgetModal = ({
   isOpen,
@@ -71,7 +34,7 @@ export const CreateBudgetModal = ({
     name: "",
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear(),
-    color: "#0055FF",
+    color: BUDGET_COLORS[0],
     icon: "wallet",
     category: "general",
   });
@@ -117,7 +80,7 @@ export const CreateBudgetModal = ({
         name: "",
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
-        color: "#0055FF",
+        color: BUDGET_COLORS[0],
         icon: "wallet",
         category: "general",
       });
@@ -147,7 +110,7 @@ export const CreateBudgetModal = ({
       name: "",
       month: new Date().getMonth() + 1,
       year: new Date().getFullYear(),
-      color: "#0055FF",
+      color: BUDGET_COLORS[0],
       icon: "wallet",
       category: "general",
     });
@@ -230,7 +193,7 @@ export const CreateBudgetModal = ({
                 {t("budgetColor", { ns: "budgeting" })}
               </label>
               <div className="flex gap-2 mt-1">
-                {COLOR_OPTIONS.map((color) => {
+                {BUDGET_COLORS.map((color) => {
                   const isSelected = formData.color === color;
                   return (
                     <button

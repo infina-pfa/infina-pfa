@@ -12,6 +12,11 @@ import {
   Budget,
 } from "@/lib/types/budget.types";
 import { useTranslation } from "react-i18next";
+import {
+  BUDGET_COLORS,
+  BUDGET_ICONS,
+  getBudgetIconByName,
+} from "@/lib/utils/budget-constants";
 
 /**
  * Example component demonstrating budget CRUD operations
@@ -38,7 +43,7 @@ export const BudgetCrudExample: React.FC = () => {
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear(),
     category: "general",
-    color: "#0055FF",
+    color: BUDGET_COLORS[0],
     icon: "wallet",
   });
 
@@ -53,7 +58,7 @@ export const BudgetCrudExample: React.FC = () => {
         month: new Date().getMonth() + 1,
         year: new Date().getFullYear(),
         category: "general",
-        color: "#0055FF",
+        color: BUDGET_COLORS[0],
         icon: "wallet",
       });
       refetch(); // Refresh the list
@@ -94,7 +99,7 @@ export const BudgetCrudExample: React.FC = () => {
       month: budget.month,
       year: budget.year,
       category: budget.category || "general",
-      color: budget.color || "#0055FF",
+      color: budget.color || BUDGET_COLORS[0],
       icon: budget.icon || "wallet",
     });
   };
@@ -102,6 +107,15 @@ export const BudgetCrudExample: React.FC = () => {
   if (listLoading) {
     return <div className="text-center py-8">{t("common.loading")}</div>;
   }
+
+  // Helper function to render budget icon
+  const renderBudgetIcon = (iconName: string) => {
+    const iconInfo = getBudgetIconByName(iconName);
+    const IconComponent = iconInfo.icon;
+    return (
+      <IconComponent className="h-5 w-5" style={{ color: iconInfo.color }} />
+    );
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -210,14 +224,58 @@ export const BudgetCrudExample: React.FC = () => {
               <label className="block text-sm font-medium mb-1">
                 {t("budgeting.budgetColor")}
               </label>
-              <input
-                type="color"
-                value={formData.color}
-                onChange={(e) =>
-                  setFormData({ ...formData, color: e.target.value })
-                }
-                className="w-full h-10 border border-gray-300 rounded-lg"
-              />
+              <div className="flex gap-2 mt-1">
+                {BUDGET_COLORS.map((color) => {
+                  const isSelected = formData.color === color;
+                  return (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, color })}
+                      className={`
+                        h-8 w-8 rounded-full transition-transform
+                        ${
+                          isSelected
+                            ? "ring-2 ring-[#0055FF] ring-offset-2"
+                            : ""
+                        }
+                      `}
+                      style={{ backgroundColor: color }}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("budgeting.budgetIcon")}
+            </label>
+            <div className="grid grid-cols-6 gap-2 mt-1">
+              {BUDGET_ICONS.map((iconItem) => {
+                const IconComponent = iconItem.icon;
+                const isSelected = formData.icon === iconItem.name;
+                return (
+                  <button
+                    key={iconItem.name}
+                    type="button"
+                    onClick={() =>
+                      setFormData({ ...formData, icon: iconItem.name })
+                    }
+                    className={`
+                      h-10 w-10 rounded-lg flex items-center justify-center transition-colors
+                      ${
+                        isSelected
+                          ? "bg-[#0055FF] text-white"
+                          : "bg-[#F9FAFB] text-[#6B7280] hover:bg-[#F0F2F5]"
+                      }
+                    `}
+                  >
+                    <IconComponent className="h-5 w-5" />
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -321,9 +379,13 @@ export const BudgetCrudExample: React.FC = () => {
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: budget.color }}
-                    />
+                      className="flex items-center justify-center w-8 h-8 rounded-lg"
+                      style={{
+                        backgroundColor: budget.color || BUDGET_COLORS[0],
+                      }}
+                    >
+                      {budget.icon && renderBudgetIcon(budget.icon)}
+                    </div>
                     <div>
                       <h3 className="font-semibold">{budget.name}</h3>
                       <p className="text-sm text-gray-600">
