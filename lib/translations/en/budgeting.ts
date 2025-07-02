@@ -47,4 +47,50 @@ export const budgetingEn = {
   budgetUpdated: "Budget updated successfully",
   budgetDeleted: "Budget deleted successfully",
   expenseAdded: "Expense added successfully",
+
+  // Error Messages
+  budgetNotFound: "Budget not found",
+  budgetNameRequired: "Budget name is required",
+  budgetNameEmpty: "Budget name cannot be empty",
+  duplicateBudgetName: "Budget with this name already exists for this month",
+  validMonthRequired: "Valid month is required",
+  validYearRequired: "Valid year is required",
+  authenticationRequired: "Authentication required",
+  fetchBudgetsError: "Failed to fetch budgets",
+  createBudgetError: "Failed to create budget",
+  updateBudgetError: "Failed to update budget",
+  deleteBudgetError: "Failed to delete budget",
+  fetchStatsError: "Failed to fetch budget statistics",
+
+  // Form Labels
+  budgetName: "Budget name",
+  budgetCategory: "Category",
+  budgetColor: "Color",
+  budgetIcon: "Icon",
+  budgetMonth: "Month",
+  budgetYear: "Year",
+
+  // Form Placeholders
+  enterBudgetName: "Enter budget name",
+  selectCategory: "Select category",
+  selectMonth: "Select month",
+  selectYear: "Select year",
+
+  // Statistics
+  totalBudgets: "Total budgets",
+  categoriesCount: "Categories",
+  monthlyBudgets: "This month",
+  yearlyBudgets: "This year",
+
+  // Categories
+  general: "General",
+  food: "Food & Dining",
+  transportation: "Transportation",
+  shopping: "Shopping",
+  entertainment: "Entertainment",
+  health: "Health & Fitness",
+  travel: "Travel",
+  utilities: "Utilities",
+  education: "Education",
+  other: "Other",
 }; 

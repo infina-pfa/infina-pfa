@@ -47,4 +47,50 @@ export const budgetingVi = {
   budgetUpdated: "Cập nhật ngân sách thành công",
   budgetDeleted: "Xóa ngân sách thành công",
   expenseAdded: "Thêm chi tiêu thành công",
+
+  // Error Messages
+  budgetNotFound: "Không tìm thấy ngân sách",
+  budgetNameRequired: "Tên ngân sách là bắt buộc",
+  budgetNameEmpty: "Tên ngân sách không được để trống",
+  duplicateBudgetName: "Ngân sách có tên này đã tồn tại trong tháng này",
+  validMonthRequired: "Tháng hợp lệ là bắt buộc",
+  validYearRequired: "Năm hợp lệ là bắt buộc",
+  authenticationRequired: "Yêu cầu xác thực",
+  fetchBudgetsError: "Không thể tải danh sách ngân sách",
+  createBudgetError: "Không thể tạo ngân sách",
+  updateBudgetError: "Không thể cập nhật ngân sách",
+  deleteBudgetError: "Không thể xóa ngân sách",
+  fetchStatsError: "Không thể tải thống kê ngân sách",
+
+  // Form Labels
+  budgetName: "Tên ngân sách",
+  budgetCategory: "Danh mục",
+  budgetColor: "Màu sắc",
+  budgetIcon: "Biểu tượng",
+  budgetMonth: "Tháng",
+  budgetYear: "Năm",
+
+  // Form Placeholders
+  enterBudgetName: "Nhập tên ngân sách",
+  selectCategory: "Chọn danh mục",
+  selectMonth: "Chọn tháng",
+  selectYear: "Chọn năm",
+
+  // Statistics
+  totalBudgets: "Tổng ngân sách",
+  categoriesCount: "Danh mục",
+  monthlyBudgets: "Tháng này",
+  yearlyBudgets: "Năm này",
+
+  // Categories
+  general: "Tổng quát",
+  food: "Ăn uống",
+  transportation: "Di chuyển",
+  shopping: "Mua sắm",
+  entertainment: "Giải trí",
+  health: "Sức khỏe",
+  travel: "Du lịch",
+  utilities: "Tiện ích",
+  education: "Giáo dục",
+  other: "Khác",
 }; 
