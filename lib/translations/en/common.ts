@@ -35,6 +35,7 @@ export const commonEn = {
   retry: "Retry",
   saving: "Saving...",
   creating: "Creating...",
+  updating: "Updating...",
   create: "Create",
   update: "Update",
   cancel: "Cancel",

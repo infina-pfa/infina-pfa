@@ -38,8 +38,9 @@ export const budgetingVi = {
   // Actions
   createBudget: "Tạo ngân sách",
   createBudgetDesc: "Thiết lập ngân sách mới để theo dõi chi tiêu và quản lý tài chính tốt hơn",
-  addExpense: "Thêm chi tiêu",
   editBudget: "Sửa ngân sách",
+  editBudgetDesc: "Cập nhật thông tin ngân sách để quản lý tài chính tốt hơn",
+  addExpense: "Thêm chi tiêu",
   deleteBudget: "Xóa ngân sách",
   viewDetails: "Xem chi tiết",
   budgetList: "Danh sách ngân sách",

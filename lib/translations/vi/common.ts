@@ -35,6 +35,7 @@ export const commonVi = {
   retry: "Thử lại",
   saving: "Đang lưu...",
   creating: "Đang tạo...",
+  updating: "Đang cập nhật...",
   create: "Tạo",
   update: "Cập nhật",
   cancel: "Hủy",

@@ -38,8 +38,9 @@ export const budgetingEn = {
   // Actions
   createBudget: "Create Budget",
   createBudgetDesc: "Set up a new budget to track your expenses and manage your finances better",
-  addExpense: "Add Expense",
   editBudget: "Edit Budget",
+  editBudgetDesc: "Update your budget details to better manage your finances",
+  addExpense: "Add Expense",
   deleteBudget: "Delete Budget",
   viewDetails: "View Details",
 

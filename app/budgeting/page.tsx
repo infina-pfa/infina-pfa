@@ -6,6 +6,7 @@ import { SpendingOverview } from "@/components/budgeting/spending-overview";
 import { BudgetCategoriesList } from "@/components/budgeting/budget-categories-list";
 import { RecentExpensesList } from "@/components/budgeting/recent-expenses-list";
 import { CreateBudgetModal } from "@/components/budgeting/create-budget-modal";
+import { EditBudgetModal } from "@/components/budgeting/edit-budget-modal";
 import {
   useBudgetListWithSpending,
   useRecentTransactions,
@@ -13,12 +14,15 @@ import {
 import { useBudgetStats } from "@/hooks/use-budget-stats";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useMemo, useState } from "react";
+import { Budget } from "@/lib/types/budget.types";
 
 export default function BudgetingPage() {
   const { t } = useAppTranslation(["budgeting", "common"]);
 
   // Modal state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
 
   console.log("RENDERING BUDGETING PAGE");
 
@@ -54,6 +58,15 @@ export default function BudgetingPage() {
 
   // Fetch budget statistics for future use
   const { loading: statsLoading, error: statsError } = useBudgetStats();
+
+  // Handle edit budget
+  const handleEditBudget = (budgetId: string) => {
+    const budget = budgets.find((b) => b.id === budgetId);
+    if (budget) {
+      setSelectedBudget(budget);
+      setIsEditModalOpen(true);
+    }
+  };
 
   const isLoading = budgetsLoading || statsLoading || transactionsLoading;
   const hasError = budgetsError || statsError || transactionsError;
@@ -105,6 +118,7 @@ export default function BudgetingPage() {
             <BudgetCategoriesList
               budgets={budgets}
               onCreateBudget={() => setIsCreateModalOpen(true)}
+              onEditBudget={handleEditBudget}
             />
           </div>
 
@@ -118,6 +132,18 @@ export default function BudgetingPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={refetchBudgets}
+      />
+
+      <EditBudgetModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedBudget(null);
+        }}
+        onSuccess={() => {
+          refetchBudgets();
+        }}
+        budget={selectedBudget}
       />
     </AppLayout>
   );
