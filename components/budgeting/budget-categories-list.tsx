@@ -20,7 +20,7 @@ export const BudgetCategoriesList = ({
 
   return (
     <section className="mx-6">
-      <div className="flex items-center justify-between px-6 py-4 bg-[#FFFFFF] rounded-t-xl">
+      <div className="flex items-center justify-between px-6 pt-4 bg-[#FFFFFF] rounded-t-xl">
         <h2 className="text-[18px] font-semibold text-[#111827] font-nunito leading-[24px]">
           {t("expenseCategories")}
         </h2>
@@ -36,7 +36,7 @@ export const BudgetCategoriesList = ({
         </Button>
       </div>
 
-      <div className="bg-[#FFFFFF] rounded-b-xl overflow-hidden">
+      <div className="bg-[#FFFFFF] rounded-b-xl overflow-hidden p-6">
         {budgets.map((budget, index) => {
           const iconInfo =
             BUDGET_ICONS.find((icon) => icon.name === budget.icon) ||
