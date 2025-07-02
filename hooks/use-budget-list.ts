@@ -117,6 +117,7 @@ export interface UseRecentTransactionsReturn {
     category: string;
     type: string;
     description: string | null;
+    budgetName?: string;
   }>;
   loading: boolean;
   error: string | null;
@@ -133,6 +134,7 @@ export const useRecentTransactions = (limit: number = 10): UseRecentTransactions
     category: string;
     type: string;
     description: string | null;
+    budgetName?: string;
   }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

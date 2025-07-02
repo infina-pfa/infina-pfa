@@ -53,7 +53,10 @@ export async function GET(request: NextRequest) {
         .select(`
           *,
           budget_transactions!inner (
-            budget_id
+            budget_id,
+            budgets (
+              name
+            )
           )
         `)
         .eq("user_id", user.id)
@@ -74,7 +77,15 @@ export async function GET(request: NextRequest) {
     } else {
       let query = supabase
         .from("transactions")
-        .select("*")
+        .select(`
+          *,
+          budget_transactions (
+            budget_id,
+            budgets (
+              name
+            )
+          )
+        `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -99,9 +110,40 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
 
+    // Transform data to include budget name
+    const transformedData = data?.map(transaction => {
+      // For transactions with budget info
+      if (transaction.budget_transactions && transaction.budget_transactions.length > 0) {
+        const budgetInfo = transaction.budget_transactions[0];
+        return {
+          id: transaction.id,
+          name: transaction.name,
+          amount: transaction.amount,
+          description: transaction.description,
+          type: transaction.type,
+          recurring: transaction.recurring,
+          date: new Date(transaction.created_at).toLocaleDateString(),
+          category: transaction.category || "",
+          budgetName: budgetInfo.budgets?.name || "",
+        };
+      } 
+      // For transactions without budget info
+      return {
+        id: transaction.id,
+        name: transaction.name,
+        amount: transaction.amount,
+        description: transaction.description,
+        type: transaction.type,
+        recurring: transaction.recurring,
+        date: new Date(transaction.created_at).toLocaleDateString(),
+        category: transaction.category || "",
+        budgetName: "",
+      };
+    });
+
     return NextResponse.json({
       success: true,
-      data: data || []
+      data: transformedData || []
     });
 
   } catch (error) {

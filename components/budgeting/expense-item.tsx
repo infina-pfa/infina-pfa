@@ -1,7 +1,6 @@
 "use client";
 
 import { formatCurrency } from "@/lib/utils";
-import { useAppTranslation } from "@/hooks/use-translation";
 
 interface ExpenseItemProps {
   id: string;
@@ -9,19 +8,18 @@ interface ExpenseItemProps {
   amount: number;
   date: string;
   category?: string;
+  budgetName?: string;
 }
 
 export const ExpenseItem = ({
   name,
   amount,
   date,
-  category,
+  budgetName,
 }: ExpenseItemProps) => {
-  const { t } = useAppTranslation("budgeting");
-
   return (
     <div
-      className="flex items-center justify-between p-6 bg-[#FFFFFF] cursor-pointer hover:bg-[#F9FAFF] transition-colors duration-150"
+      className="flex items-center justify-between p-6 bg-[#FFFFFF] cursor-pointer"
       tabIndex={0}
     >
       <div className="flex-1">
@@ -29,20 +27,19 @@ export const ExpenseItem = ({
           {name}
         </h3>
 
-        {category && (
+        {budgetName && (
           <p className="text-[14px] text-[#6B7280] font-nunito leading-[20px]">
-            {t("note")}
+            {budgetName}
           </p>
         )}
-
-        <p className="text-[14px] text-[#6B7280] font-nunito leading-[20px] mt-1">
-          {date}
-        </p>
       </div>
 
       <div className="text-right">
         <p className="text-[20px] font-semibold text-[#111827] font-nunito leading-[28px]">
           {formatCurrency(amount)}
+        </p>
+        <p className="text-[14px] text-[#6B7280] font-nunito leading-[20px] mt-1">
+          {date}
         </p>
       </div>
     </div>

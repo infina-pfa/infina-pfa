@@ -13,6 +13,7 @@ interface Transaction {
   category: string;
   type: string;
   description: string | null;
+  budgetName?: string;
 }
 
 interface RecentExpensesListProps {
@@ -55,6 +56,7 @@ export const RecentExpensesList = ({
               amount={expense.amount}
               date={expense.date}
               category={expense.category}
+              budgetName={expense.budgetName}
             />
             {index < expenses.length - 1 && (
               <div className="h-px bg-[#E5E7EB] mx-6" />
