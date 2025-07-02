@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { useRouter } from "next/navigation";
 import { AuthFormFields } from "./auth-form-fields";
 import { EmailVerification } from "./email-verification";
@@ -24,7 +24,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
 
   const { signIn, signUp, loading } = useAuth();
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["auth", "common"]);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {

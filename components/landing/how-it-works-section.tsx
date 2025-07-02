@@ -1,13 +1,13 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
 import { HowItWorksStep } from "./how-it-works/how-it-works-step";
 import { getHowItWorksSteps } from "./how-it-works/steps-data";
 
 export function HowItWorksSection() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["howItWorks", "common"]);
   const titleRef = useRef(null);
   const isTitleInView = useInView(titleRef, { once: true, margin: "-100px" });
 

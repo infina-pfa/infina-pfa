@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { ReactLenis } from "lenis/react";
 import { useScroll } from "motion/react";
 import { useRef } from "react";
@@ -8,7 +8,7 @@ import { StageCard } from "./financial-stages/stage-card";
 import { getFinancialStages } from "./financial-stages/stages-data";
 
 export function FinancialStagesSection() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["financialStages", "common"]);
   const container = useRef(null);
   const { scrollYProgress } = useScroll({
     target: container,

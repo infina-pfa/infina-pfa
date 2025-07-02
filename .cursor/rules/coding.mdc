@@ -78,15 +78,15 @@ const createBudget = async (data) => {
 
 ```typescript
 // ✅ Good - Using translations
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 const WelcomeMessage = () => {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["namespace","common"]);
   
   return (
     <div>
       <h1>{t("welcome")}</h1>
-      <p>{t("getStartedMessage")}</p>
+      <p>{t("getStartedMessage", {ns: "namespace"})}</p>
       <button>{t("getStarted")}</button>
     </div>
   );
@@ -147,7 +147,7 @@ export const authEn = {
 
 ```typescript
 // ✅ Good - Dynamic translations with interpolation
-const { t } = useTranslation();
+const { t } = useAppTranslation();
 
 const BudgetSummary = ({ amount, budgetName }: { amount: number; budgetName: string }) => {
   return (

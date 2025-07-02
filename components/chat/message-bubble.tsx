@@ -1,7 +1,7 @@
 "use client";
 
 import { ChatMessage } from "@/lib/types/chat.types";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { MarkdownMessage } from "./markdown-message";
 
 interface MessageBubbleProps {
@@ -9,7 +9,7 @@ interface MessageBubbleProps {
 }
 
 export function MessageBubble({ message }: MessageBubbleProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["chat", "common"]);
   const isUser = message.sender === "user";
 
   return (

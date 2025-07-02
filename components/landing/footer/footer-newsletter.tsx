@@ -8,10 +8,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function FooterNewsletter() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["footer", "common"]);
 
   return (
     <Card className="mb-6 sm:mb-8 bg-section-bg border-0">

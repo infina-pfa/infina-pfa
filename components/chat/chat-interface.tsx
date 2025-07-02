@@ -6,10 +6,10 @@ import { ChatInput } from "./chat-input";
 import { TypingIndicator } from "./typing-indicator";
 import { ComponentPanel } from "./component-panel";
 import { SuggestionList } from "./suggestion-list";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function ChatInterface() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["chat", "common"]);
   const {
     messages,
     isLoading,

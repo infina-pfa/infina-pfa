@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { Plus, Mic, Send } from "lucide-react";
 
 interface ChatInputProps {
@@ -23,7 +23,7 @@ export function ChatInput({
   onAttachFile,
   onVoiceInput,
 }: ChatInputProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["chat", "common"]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [charCount, setCharCount] = useState<number>(0);
   const maxLength = 500;

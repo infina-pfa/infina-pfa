@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { usePathname } from "next/navigation";
 
 const navigationItems = [
@@ -22,7 +22,7 @@ const navigationItems = [
 ];
 
 export function LandingNavbar() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["common"]);
   const pathname = usePathname();
 
   const isActiveRoute = (href: string) => {

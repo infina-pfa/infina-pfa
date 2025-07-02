@@ -1,9 +1,9 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function FooterBottom() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["footer", "common"]);
 
   return (
     <div className="border-t border-divider pt-6 sm:pt-8">

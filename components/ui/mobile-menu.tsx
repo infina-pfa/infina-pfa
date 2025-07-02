@@ -19,7 +19,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { FinaIcon } from "@/components/ui/fina-icon";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { usePathname } from "next/navigation";
 
 const navigationItems = [
@@ -44,7 +44,7 @@ export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, loading } = useAuthContext();
   const { signOut } = useAuth();
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["common"]);
   const pathname = usePathname();
 
   const closeMenu = () => setIsOpen(false);

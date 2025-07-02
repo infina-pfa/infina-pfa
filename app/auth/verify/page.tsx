@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Loader } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { supabase } from "@/lib/supabase";
 
 type VerificationState = "loading" | "success" | "error";
@@ -16,7 +16,7 @@ export default function VerifyEmailPage() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["auth", "common"]);
 
   useEffect(() => {
     const verifyEmail = async () => {

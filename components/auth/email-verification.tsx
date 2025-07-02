@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, ArrowLeft } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,7 +18,7 @@ export function EmailVerification({
   onBackToSignIn,
 }: EmailVerificationProps) {
   const [isResending, setIsResending] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["auth", "common"]);
   const { success, error } = useToast();
   const { resendEmailVerification } = useAuth();
 

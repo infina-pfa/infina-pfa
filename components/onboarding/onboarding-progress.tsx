@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { OnboardingStep } from "@/hooks/use-onboarding";
 
 interface OnboardingProgressProps {
@@ -8,7 +8,7 @@ interface OnboardingProgressProps {
 }
 
 export function OnboardingProgress({ currentStep }: OnboardingProgressProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["onboarding", "common"]);
 
   const getStepNumber = (step: OnboardingStep): number => {
     switch (step) {

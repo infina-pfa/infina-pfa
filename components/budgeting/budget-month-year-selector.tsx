@@ -1,6 +1,5 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
 import { useAppTranslation } from "@/hooks/use-translation";
 
 interface BudgetMonthYearSelectorProps {
@@ -20,8 +19,7 @@ export const BudgetMonthYearSelector = ({
   validationErrors,
   touched,
 }: BudgetMonthYearSelectorProps) => {
-  const { t } = useAppTranslation("budgeting");
-  const { i18n } = useTranslation();
+  const { t, i18n } = useAppTranslation(["budgeting", "common"]);
 
   // Generate month options with current language
   const monthOptions = Array.from({ length: 12 }, (_, i) => {

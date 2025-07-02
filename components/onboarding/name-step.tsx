@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight } from "lucide-react";
@@ -21,7 +21,7 @@ export function NameStep({
   loading,
   error,
 }: NameStepProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["onboarding", "common"]);
   const [touched, setTouched] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
