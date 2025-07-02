@@ -192,7 +192,7 @@ export const CreateBudgetModal = ({
               <label className="block text-[14px] font-bold text-[#111827] font-nunito mb-1">
                 {t("budgetColor", { ns: "budgeting" })}
               </label>
-              <div className="flex gap-2 mt-1">
+              <div className="flex flex-wrap gap-3 mt-2">
                 {BUDGET_COLORS.map((color) => {
                   const isSelected = formData.color === color;
                   return (
@@ -201,18 +201,37 @@ export const CreateBudgetModal = ({
                       type="button"
                       onClick={() => handleInputChange("color", color)}
                       className={`
-                        h-8 w-8 rounded-full transition-transform
+                        h-10 w-10 rounded-lg flex items-center justify-center transition-all
                         ${
                           isSelected
-                            ? "ring-2 ring-[#0055FF] ring-offset-2"
-                            : ""
+                            ? "ring-2 ring-[#0055FF] ring-offset-2 scale-110 shadow-md"
+                            : "hover:scale-105"
                         }
                       `}
                       style={{ backgroundColor: color }}
-                    />
+                    >
+                      {isSelected && (
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M13.3334 4.66667L6.00002 12L2.66669 8.66667"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )}
+                    </button>
                   );
                 })}
               </div>
+              <input type="hidden" name="color" value={formData.color} />
             </div>
 
             {/* Month and Year Selection */}
