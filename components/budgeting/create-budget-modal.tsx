@@ -6,6 +6,12 @@ import { useBudgetCreate } from "@/hooks/use-budget-create";
 import { CreateBudgetRequest } from "@/lib/types/budget.types";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/ui/form-input";
+import { MoneyInput } from "@/components/ui/money-input";
+import {
+  inputValidationRules,
+  parseFormattedNumber,
+} from "@/lib/validation/input-validation";
+import { validateField } from "@/lib/validation/form-validation";
 import {
   Dialog,
   DialogContent,
@@ -45,11 +51,27 @@ export const CreateBudgetModal = ({
     [key: string]: string;
   }>({});
 
+  // Form touched state
+  const [touched, setTouched] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   const validateForm = (): boolean => {
     const errors: { [key: string]: string } = {};
 
-    if (!formData.name.trim()) {
-      errors.name = t("budgetNameRequired", { ns: "budgeting" });
+    // Validate name using the name validation rule
+    const nameError = validateField(formData.name, inputValidationRules.name);
+    if (nameError) {
+      errors.name = nameError;
+    }
+
+    // Validate amount using the money validation rule
+    const amountError = validateField(
+      formData.amount,
+      inputValidationRules.money
+    );
+    if (amountError) {
+      errors.amount = amountError;
     }
 
     if (formData.month < 1 || formData.month > 12) {
@@ -66,6 +88,13 @@ export const CreateBudgetModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Mark all fields as touched
+    const allTouched = Object.keys(formData).reduce((acc, key) => {
+      acc[key] = true;
+      return acc;
+    }, {} as { [key: string]: boolean });
+    setTouched(allTouched);
 
     if (!validateForm()) {
       return;
@@ -87,6 +116,7 @@ export const CreateBudgetModal = ({
         amount: 0,
       });
       setValidationErrors({});
+      setTouched({});
     }
   };
 
@@ -105,6 +135,26 @@ export const CreateBudgetModal = ({
     }
   };
 
+  const handleFieldBlur = (field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+
+    // Validate the field on blur
+    if (field === "name") {
+      const nameError = validateField(formData.name, inputValidationRules.name);
+      if (nameError) {
+        setValidationErrors((prev) => ({ ...prev, name: nameError }));
+      }
+    } else if (field === "amount") {
+      const amountError = validateField(
+        formData.amount,
+        inputValidationRules.money
+      );
+      if (amountError) {
+        setValidationErrors((prev) => ({ ...prev, amount: amountError }));
+      }
+    }
+  };
+
   const handleClose = () => {
     onClose();
     // Reset form state
@@ -118,6 +168,7 @@ export const CreateBudgetModal = ({
       amount: 0,
     });
     setValidationErrors({});
+    setTouched({});
   };
 
   // Generate month options
@@ -155,14 +206,30 @@ export const CreateBudgetModal = ({
               label={t("budgetName", { ns: "budgeting" })}
               value={formData.name}
               onChange={(value) => handleInputChange("name", value)}
+              onBlur={() => handleFieldBlur("name")}
               placeholder={t("enterBudgetName", { ns: "budgeting" })}
               error={validationErrors.name}
+              touched={touched.name}
+              required
+            />
+
+            {/* Budget Amount */}
+            <MoneyInput
+              label={t("budgetAmount", { ns: "budgeting" })}
+              value={formData.amount || 0}
+              onChange={(value) =>
+                handleInputChange("amount", parseFormattedNumber(value))
+              }
+              onBlur={() => handleFieldBlur("amount")}
+              placeholder={t("enterBudgetAmount", { ns: "budgeting" })}
+              error={validationErrors.amount}
+              touched={touched.amount}
               required
             />
 
             {/* Icon Selection */}
             <div>
-              <label className="block text-[14px] font-bold text-[#111827] font-nunito mb-1">
+              <label className="block text-sm font-medium text-[#111827]">
                 {t("budgetIcon", { ns: "budgeting" })}
               </label>
               <div className="grid grid-cols-6 gap-2 mt-1">
@@ -192,7 +259,7 @@ export const CreateBudgetModal = ({
 
             {/* Color Selection */}
             <div>
-              <label className="block text-[14px] font-bold text-[#111827] font-nunito mb-1">
+              <label className="block text-sm font-medium text-[#111827]">
                 {t("budgetColor", { ns: "budgeting" })}
               </label>
               <div className="flex flex-wrap gap-3 mt-2">
@@ -240,7 +307,7 @@ export const CreateBudgetModal = ({
             {/* Month and Year Selection */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[14px] font-bold text-[#111827] font-nunito mb-1">
+                <label className="block text-sm font-medium text-[#111827]">
                   {t("budgetMonth", { ns: "budgeting" })}
                 </label>
                 <select
@@ -256,15 +323,16 @@ export const CreateBudgetModal = ({
                     </option>
                   ))}
                 </select>
-                {validationErrors.month && (
-                  <p className="text-[#F44336] text-[14px] font-nunito mt-1">
+                {validationErrors.month && touched.month && (
+                  <p className="text-sm text-[#F44336] flex items-center mt-1">
+                    <span className="mr-1">⚠</span>
                     {validationErrors.month}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-[14px] font-bold text-[#111827] font-nunito mb-1">
+                <label className="block text-sm font-medium text-[#111827]">
                   {t("budgetYear", { ns: "budgeting" })}
                 </label>
                 <select
@@ -280,25 +348,14 @@ export const CreateBudgetModal = ({
                     </option>
                   ))}
                 </select>
-                {validationErrors.year && (
-                  <p className="text-[#F44336] text-[14px] font-nunito mt-1">
+                {validationErrors.year && touched.year && (
+                  <p className="text-sm text-[#F44336] flex items-center mt-1">
+                    <span className="mr-1">⚠</span>
                     {validationErrors.year}
                   </p>
                 )}
               </div>
             </div>
-
-            {/* Budget Amount */}
-            <FormInput
-              label={t("budgetAmount", { ns: "budgeting" })}
-              value={formData.amount?.toString() || "0"}
-              onChange={(value) =>
-                handleInputChange("amount", parseFloat(value) || 0)
-              }
-              placeholder={t("enterBudgetAmount", { ns: "budgeting" })}
-              type="number"
-              error={validationErrors.amount}
-            />
 
             {/* Error Display */}
             {error && (
