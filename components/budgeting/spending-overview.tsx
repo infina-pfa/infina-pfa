@@ -24,7 +24,7 @@ export const SpendingOverview = ({
         <span className="text-[32px] font-bold text-[#111827] font-nunito leading-[40px]">
           {formatCurrency(totalSpent)}
         </span>
-        <span className="text-[20px] font-medium text-[#6B7280] font-nunito leading-[28px]">
+        <span className="text-[24px] font-medium text-[#6B7280] font-nunito leading-[32px]">
           /{formatCurrency(totalBudget)}
         </span>
       </div>

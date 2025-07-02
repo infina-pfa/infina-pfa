@@ -138,7 +138,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     // Parse request body
     const body = await request.json();
-    const { name, month, year, color, icon, category } = body;
+    const { name, month, year, color, icon, category, amount } = body;
 
     // Validate name if provided
     if (name !== undefined && !name?.trim()) {
@@ -176,6 +176,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (category !== undefined) updateData.category = category;
     if (month !== undefined) updateData.month = month;
     if (year !== undefined) updateData.year = year;
+    if (amount !== undefined) updateData.amount = amount;
 
     // Update budget
     const { data: budget, error } = await supabase

@@ -74,9 +74,11 @@ export const budgetingVi = {
   budgetIcon: "Biểu tượng",
   budgetMonth: "Tháng",
   budgetYear: "Năm",
+  budgetAmount: "Số tiền ngân sách",
 
   // Form Placeholders
   enterBudgetName: "Nhập tên ngân sách",
+  enterBudgetAmount: "Nhập số tiền ngân sách",
   selectCategory: "Chọn danh mục",
   selectMonth: "Chọn tháng",
   selectYear: "Chọn năm",

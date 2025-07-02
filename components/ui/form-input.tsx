@@ -26,19 +26,21 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[#111827]">
           {label}
-          {required && <span className="text-infina-red ml-1">*</span>}
+          {required && <span className="text-[#F44336] ml-1">*</span>}
         </label>
 
         <input
           ref={ref}
           className={cn(
-            "flex h-auto w-full rounded-full border bg-[#F9FAFB] px-6 py-3 text-base text-[#111827]",
+            "flex h-12 w-full bg-transparent px-4 py-4 text-base font-normal text-[#111827]",
+            "font-[Nunito] leading-6",
+            "border border-transparent border-b-[#E5E7EB] border-b",
+            "rounded-none",
             "placeholder:text-[#9CA3AF]",
-            hasError ? "border-infina-red" : "border-gray-300",
             hasError
-              ? "focus:outline-none focus:bg-white focus:border-infina-red focus:ring-0"
-              : "focus:outline-none focus:bg-white focus:border-infina-blue focus:ring-0",
-            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
+              ? "border-b-[#F44336] focus:border-b-[#F44336]"
+              : "focus:outline-none focus:border-b-2 focus:border-b-[#0055FF]",
+            "disabled:cursor-not-allowed disabled:text-[#9CA3AF] disabled:border-b-[#E5E7EB]",
             "transition-all duration-200",
             "shadow-none",
             className
@@ -49,7 +51,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
         />
 
         {hasError && (
-          <p className="text-sm text-infina-red flex items-center">
+          <p className="text-sm text-[#F44336] flex items-center mt-1">
             <span className="mr-1">⚠</span>
             {error}
           </p>
@@ -99,18 +101,21 @@ export const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[#111827]">
           {label}
-          {required && <span className="text-infina-red ml-1">*</span>}
+          {required && <span className="text-[#F44336] ml-1">*</span>}
         </label>
 
         <select
           ref={ref}
           className={cn(
-            "flex h-auto w-full rounded-full border bg-[#F9FAFB] px-6 py-3 text-base text-[#111827] cursor-pointer",
-            hasError ? "border-infina-red" : "border-gray-300",
+            "flex h-12 w-full bg-transparent px-4 py-3 text-base font-normal text-[#111827]",
+            "font-[Nunito] leading-6",
+            "border border-transparent border-b-[#E5E7EB] border-b",
+            "rounded-none",
+            "cursor-pointer",
             hasError
-              ? "focus:outline-none focus:bg-white focus:border-infina-red focus:ring-0"
-              : "focus:outline-none focus:bg-white focus:border-infina-blue focus:ring-0",
-            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
+              ? "border-b-[#F44336] focus:border-b-[#F44336]"
+              : "focus:outline-none focus:border-b-2 focus:border-b-[#0055FF]",
+            "disabled:cursor-not-allowed disabled:text-[#9CA3AF] disabled:border-b-[#E5E7EB]",
             "transition-all duration-200",
             "shadow-none",
             className
@@ -132,7 +137,7 @@ export const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
         </select>
 
         {hasError && (
-          <p className="text-sm text-infina-red flex items-center">
+          <p className="text-sm text-[#F44336] flex items-center mt-1">
             <span className="mr-1">⚠</span>
             {error}
           </p>
@@ -172,19 +177,21 @@ export const FormTextarea = React.forwardRef<
       <div className="space-y-2">
         <label className="block text-sm font-medium text-[#111827]">
           {label}
-          {required && <span className="text-infina-red ml-1">*</span>}
+          {required && <span className="text-[#F44336] ml-1">*</span>}
         </label>
 
         <textarea
           ref={ref}
           className={cn(
-            "flex w-full rounded-2xl border bg-[#F9FAFB] px-6 py-3 text-base text-[#111827]",
+            "flex w-full bg-transparent px-4 py-3 text-base font-normal text-[#111827]",
+            "font-[Nunito] leading-6",
+            "border border-transparent border-b-[#E5E7EB] border-b",
+            "rounded-none",
             "placeholder:text-[#9CA3AF]",
-            hasError ? "border-infina-red" : "border-gray-300",
             hasError
-              ? "focus:outline-none focus:bg-white focus:border-infina-red focus:ring-0"
-              : "focus:outline-none focus:bg-white focus:border-infina-blue focus:ring-0",
-            "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
+              ? "border-b-[#F44336] focus:border-b-[#F44336]"
+              : "focus:outline-none focus:border-b-2 focus:border-b-[#0055FF]",
+            "disabled:cursor-not-allowed disabled:text-[#9CA3AF] disabled:border-b-[#E5E7EB]",
             "transition-all duration-200",
             "resize-vertical",
             "shadow-none",
@@ -196,7 +203,7 @@ export const FormTextarea = React.forwardRef<
         />
 
         {hasError && (
-          <p className="text-sm text-infina-red flex items-center">
+          <p className="text-sm text-[#F44336] flex items-center mt-1">
             <span className="mr-1">⚠</span>
             {error}
           </p>

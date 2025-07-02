@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { name, month, year, color, icon, category } = body;
+    const { name, month, year, color, icon, category, amount } = body;
 
     // Validate required fields
     if (!name?.trim()) {
@@ -186,6 +186,7 @@ export async function POST(request: NextRequest) {
         color: color || "#0055FF",
         icon: icon || "wallet",
         category: category || "general",
+        amount: amount || 0,
       })
       .select("*")
       .single();

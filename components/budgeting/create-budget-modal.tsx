@@ -37,6 +37,7 @@ export const CreateBudgetModal = ({
     color: BUDGET_COLORS[0],
     icon: "wallet",
     category: "general",
+    amount: 0,
   });
 
   // Form validation errors
@@ -83,6 +84,7 @@ export const CreateBudgetModal = ({
         color: BUDGET_COLORS[0],
         icon: "wallet",
         category: "general",
+        amount: 0,
       });
       setValidationErrors({});
     }
@@ -113,6 +115,7 @@ export const CreateBudgetModal = ({
       color: BUDGET_COLORS[0],
       icon: "wallet",
       category: "general",
+      amount: 0,
     });
     setValidationErrors({});
   };
@@ -284,6 +287,18 @@ export const CreateBudgetModal = ({
                 )}
               </div>
             </div>
+
+            {/* Budget Amount */}
+            <FormInput
+              label={t("budgetAmount", { ns: "budgeting" })}
+              value={formData.amount?.toString() || "0"}
+              onChange={(value) =>
+                handleInputChange("amount", parseFloat(value) || 0)
+              }
+              placeholder={t("enterBudgetAmount", { ns: "budgeting" })}
+              type="number"
+              error={validationErrors.amount}
+            />
 
             {/* Error Display */}
             {error && (

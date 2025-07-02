@@ -134,6 +134,7 @@ export const budgetService = {
           color: data.color || '#0055FF',
           icon: data.icon || 'wallet',
           category: data.category || 'general',
+          amount: data.amount || 0,
         })
         .select('*')
         .single();
@@ -204,6 +205,7 @@ export const budgetService = {
       if (data.category !== undefined) updateData.category = data.category;
       if (data.month !== undefined) updateData.month = data.month;
       if (data.year !== undefined) updateData.year = data.year;
+      if (data.amount !== undefined) updateData.amount = data.amount;
 
       const { data: budget, error } = await supabase
         .from('budgets')

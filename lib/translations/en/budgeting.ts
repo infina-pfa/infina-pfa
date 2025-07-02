@@ -71,9 +71,11 @@ export const budgetingEn = {
   budgetIcon: "Icon",
   budgetMonth: "Month",
   budgetYear: "Year",
+  budgetAmount: "Budget amount",
 
   // Form Placeholders
   enterBudgetName: "Enter budget name",
+  enterBudgetAmount: "Enter budget amount",
   selectCategory: "Select category",
   selectMonth: "Select month",
   selectYear: "Select year",

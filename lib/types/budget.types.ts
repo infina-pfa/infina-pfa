@@ -13,6 +13,7 @@ export interface CreateBudgetRequest {
   color?: string;
   icon?: string;
   category?: string;
+  amount?: number;
 }
 
 export interface UpdateBudgetRequest {
@@ -22,6 +23,7 @@ export interface UpdateBudgetRequest {
   category?: string;
   month?: number;
   year?: number;
+  amount?: number;
 }
 
 export interface BudgetResponse {
