@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAppTranslation } from "@/hooks/use-translation";
+import { useTranslation } from "react-i18next";
 import { useBudgetCreate } from "@/hooks/use-budget-create";
 import { useBudgetUpdate } from "@/hooks/use-budget-update";
 import {
@@ -54,6 +55,7 @@ export const BudgetModal = ({
   budget,
 }: BudgetModalProps) => {
   const { t } = useAppTranslation(["budgeting", "common"]);
+  const { i18n } = useTranslation();
 
   // Hooks for both modes
   const { createBudget, isCreating, error: createError } = useBudgetCreate();
@@ -225,10 +227,12 @@ export const BudgetModal = ({
     }
   };
 
-  // Generate month options
+  // Generate month options with current language
   const monthOptions = Array.from({ length: 12 }, (_, i) => {
     const monthNum = i + 1;
-    const monthName = new Date(2024, i, 1).toLocaleDateString("en", {
+    // Use current language from i18n, fallback to 'en' if not available
+    const locale = i18n.language === "vi" ? "vi-VN" : "en-US";
+    const monthName = new Date(2024, i, 1).toLocaleDateString(locale, {
       month: "long",
     });
     return { value: monthNum, label: monthName };
