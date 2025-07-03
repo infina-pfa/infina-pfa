@@ -5,8 +5,6 @@ import { I18nProvider } from "@/components/providers/i18n-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { SWRProvider } from "@/lib/swr-config";
 import { Toaster } from "sonner";
-import { StagewiseToolbar } from "@stagewise/toolbar-next";
-import { ReactPlugin } from "@stagewise-plugins/react";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -43,11 +41,11 @@ export default function RootLayout({
             },
           }}
         />
-        <StagewiseToolbar
+        {/* <StagewiseToolbar
           config={{
             plugins: [ReactPlugin],
           }}
-        />
+        /> */}
       </body>
     </html>
   );

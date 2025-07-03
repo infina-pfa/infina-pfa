@@ -141,4 +141,10 @@ export const budgetingEn = {
   utilities: "Utilities",
   education: "Education",
   other: "Other",
+
+  // Add new translations for the transactions page
+  allTransactions: "All Transactions",
+  filterByBudget: "Filter by Budget",
+  allBudgets: "All Budgets",
+  noTransactionsFound: "No transactions found",
 }; 

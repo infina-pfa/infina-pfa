@@ -50,8 +50,8 @@ export default function BudgetingPage() {
   } = useBudgetManagementSWR(filter);
 
   const {
-    transactions: recentTransactions,
-    loading: transactionsLoading,
+    data: recentTransactions,
+    isLoading: transactionsLoading,
     error: transactionsError,
   } = useRecentTransactionsSWR(10);
 
@@ -91,10 +91,10 @@ export default function BudgetingPage() {
   };
 
   const isLoading = budgetsLoading || statsLoading || transactionsLoading;
-  const hasError = budgetsError || statsError || transactionsError;
+  const hasError = budgetsError || statsError || transactionsError?.message;
 
   // Display the first error that occurs
-  const errorMessage = budgetsError || statsError || transactionsError;
+  const errorMessage = budgetsError || statsError || transactionsError?.message;
 
   if (isLoading) {
     return (
@@ -116,7 +116,9 @@ export default function BudgetingPage() {
       <AppLayout>
         <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center px-4">
           <div className="text-center">
-            <p className="text-[#F44336] font-nunito mb-4">{errorMessage}</p>
+            <p className="text-[#F44336] font-nunito mb-4">
+              {errorMessage || t("error", { ns: "common" })}
+            </p>
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-[#0055FF] text-white rounded-lg font-nunito hover:bg-[#0041CC]"
@@ -147,7 +149,7 @@ export default function BudgetingPage() {
 
           <div className="mt-6 md:mt-8">
             {/* ✨ No need to pass onExpenseUpdated - SWR handles automatic updates */}
-            <RecentExpensesList transactions={recentTransactions} />
+            <RecentExpensesList transactions={recentTransactions || []} />
           </div>
         </main>
       </div>

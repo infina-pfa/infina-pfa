@@ -144,4 +144,10 @@ export const budgetingVi = {
   utilities: "Tiện ích",
   education: "Giáo dục",
   other: "Khác",
+
+  // Add new translations for the transactions page
+  allTransactions: "Tất Cả Giao Dịch",
+  filterByBudget: "Lọc Theo Ngân Sách",
+  allBudgets: "Tất Cả Ngân Sách",
+  noTransactionsFound: "Không tìm thấy giao dịch nào",
 }; 

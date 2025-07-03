@@ -253,6 +253,55 @@ export const transactionService = {
   },
 
   /**
+   * Get transactions from the last N months
+   */
+  async getRecentTransactions(months: number = 6, t?: TranslationFunction): Promise<TransactionListResponse> {
+    try {
+      // Calculate date from N months ago
+      const today = new Date();
+      const fromDate = new Date(today.getFullYear(), today.getMonth() - months, today.getDate());
+      
+      const response = await apiClient.get<Array<{
+        id: string;
+        name: string;
+        amount: number;
+        description: string | null;
+        type: "income" | "outcome" | "transfer";
+        recurring: number;
+        created_at: string;
+        updated_at: string;
+        user_id: string | null;
+        budgetName?: string;
+        budgetColor?: string;
+      }>>('/transactions', { 
+        fromDate: fromDate.toISOString().split('T')[0],
+        includeDetails: "1" 
+      });
+
+      if (response.success && response.data) {
+        return {
+          transactions: response.data.map(tx => {
+            return {
+              ...tx,
+              budgetName: tx.budgetName,
+              budgetColor: tx.budgetColor,
+            }
+          }),
+          error: null,
+        };
+      }
+
+      throw new Error(response.error || 'Failed to fetch recent transactions');
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        transactions: [],
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
    * Delete a transaction
    */
   async delete(id: string, t?: TranslationFunction): Promise<{ success: boolean; error: string | null }> {

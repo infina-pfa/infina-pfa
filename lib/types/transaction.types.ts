@@ -46,7 +46,10 @@ export interface TransactionResponse {
 }
 
 export interface TransactionListResponse {
-  transactions: Transaction[];
+  transactions: Array<Transaction & { 
+    budgetName?: string; 
+    budgetColor?: string;
+  }>;
   error: string | null;
 }
 

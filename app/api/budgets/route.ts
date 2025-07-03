@@ -1,34 +1,11 @@
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
 
 export async function GET(request: NextRequest) {
+  const startTime = Date.now(); // Start time
   try {
-    // Create Supabase client
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
-      }
-    );
-
+      const supabase = await createClient()
+      
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -141,35 +118,16 @@ export async function GET(request: NextRequest) {
       success: false,
       error: "Internal server error"
     }, { status: 500 });
+  } finally {
+    const duration = Date.now() - startTime; // Calculate duration
+    console.log(`GET /api/budgets duration: ${duration}ms`); // Log duration
   }
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now(); // Start time
   try {
-    // Create Supabase client
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
-      }
-    );
+    const supabase = await createClient()
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -259,5 +217,8 @@ export async function POST(request: NextRequest) {
       success: false,
       error: "Internal server error"
     }, { status: 500 });
+  } finally {
+    const duration = Date.now() - startTime; // Calculate duration
+    console.log(`POST /api/budgets duration: ${duration}ms`); // Log duration
   }
 } 

@@ -7,6 +7,7 @@ import { ExpenseItem } from "./expense-item";
 import { EditExpenseModal } from "./edit-expense-modal";
 import { useState } from "react";
 import { BUDGET_COLORS } from "@/lib/utils/budget-constants";
+import Link from "next/link";
 
 interface Transaction {
   id: string;
@@ -78,15 +79,16 @@ export const RecentExpensesList = ({
             {t("recentExpenses")}
           </h2>
 
-          <Button
-            variant="link"
-            size="sm"
-            className="text-[#0055FF] font-nunito hover:text-[#0041CC] cursor-pointer p-0 h-auto text-sm md:text-base"
-          >
-            <span className="hidden xs:inline">{t("viewAllHistory")}</span>
-            <span className="xs:hidden">{t("viewAll", { ns: "common" })}</span>
-            <ChevronRight className="h-4 w-4 ml-1 md:ml-2" />
-          </Button>
+          <Link href="/budgeting/transactions">
+            <Button
+              variant="link"
+              size="sm"
+              className="text-[#0055FF] font-nunito hover:text-[#0041CC] cursor-pointer p-0 h-auto text-sm md:text-base"
+            >
+              {t("viewAll", { ns: "common" })}
+              <ChevronRight className="h-4 w-4 ml-1 md:ml-2" />
+            </Button>
+          </Link>
         </div>
 
         <div className="bg-[#FFFFFF] rounded-b-xl overflow-hidden">

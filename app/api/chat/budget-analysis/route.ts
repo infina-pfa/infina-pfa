@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
 // Initialize OpenAI client
@@ -52,8 +52,6 @@ export async function POST(request: NextRequest) {
 
     const currentDate = new Date();
     const currentDay = currentDate.getDate();
-    const isEarlyMonth = currentDay <= 10;
-    const isLateMonth = currentDay >= 25;
 
     // Create a contextual system prompt for budget analysis
     const systemPrompt = `You are Fina, a friendly Vietnamese financial advisor AI. 

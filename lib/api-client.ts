@@ -1,3 +1,4 @@
+import { supabase } from "./supabase";
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -11,8 +12,6 @@ class ApiClient {
 
   private async getAuthToken(): Promise<string | null> {
     try {
-      // Import supabase dynamically to avoid circular dependencies
-      const { supabase } = await import('@/lib/supabase');
       const { data: { session } } = await supabase.auth.getSession();
       return session?.access_token || null;
     } catch (error) {
