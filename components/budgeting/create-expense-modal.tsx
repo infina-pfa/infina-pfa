@@ -156,15 +156,6 @@ export const CreateExpenseModal = ({
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              className="flex-1 h-10 md:h-12 text-[14px] md:text-[16px] font-nunito"
-              disabled={isCreating}
-            >
-              {t("cancel", { ns: "common" })}
-            </Button>
-            <Button
               type="submit"
               className="flex-1 h-10 md:h-12 text-[14px] md:text-[16px] font-nunito bg-[#0055FF] hover:bg-[#0041CC]"
               disabled={
@@ -172,6 +163,15 @@ export const CreateExpenseModal = ({
               }
             >
               {isCreating ? t("creating", { ns: "common" }) : t("addExpense")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              className="flex-1 h-10 md:h-12 text-[14px] md:text-[16px] font-nunito"
+              disabled={isCreating}
+            >
+              {t("cancel", { ns: "common" })}
             </Button>
           </div>
         </form>

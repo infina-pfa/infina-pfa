@@ -45,6 +45,7 @@ export const budgetingVi = {
   analyzingFinances: "Đang phân tích tài chính của bạn...",
 
   // Actions
+  actions: "Thao tác",
   createBudget: "Tạo ngân sách",
   createBudgetDesc: "Thiết lập ngân sách mới để theo dõi chi tiêu và quản lý tài chính tốt hơn",
   editBudget: "Chỉnh sửa ngân sách",
@@ -54,6 +55,7 @@ export const budgetingVi = {
   editExpense: "Chỉnh sửa chi tiêu",
   editExpenseFor: "Chỉnh sửa chi tiêu cho",
   deleteBudget: "Xóa ngân sách",
+  removeBudget: "Xóa ngân sách",
   viewDetails: "Xem chi tiết",
 
   // Expense Form

@@ -20,7 +20,7 @@ export const BudgetIconSelector = ({
         {t("budgetIcon")}
       </label>
       {/* Responsive grid: 4 columns on mobile, 6 on tablet/desktop */}
-      <div className="grid grid-cols-4 md:grid-cols-6 gap-2 md:gap-3">
+      <div className="grid grid-cols-4 md:grid-cols-10 gap-2 md:gap-3">
         {BUDGET_ICONS.map((iconItem) => {
           const IconComponent = iconItem.icon;
           const isSelected = selectedIcon === iconItem.name;

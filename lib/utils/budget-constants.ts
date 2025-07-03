@@ -1,20 +1,18 @@
 import {
-  Wallet,
   Car,
+  Gamepad2,
+  GraduationCap,
+  Heart,
+  Home,
+  MoreHorizontal,
+  Plane,
   ShoppingCart,
   Utensils,
-  Zap,
-  Home,
-  Gamepad2,
-  Heart,
-  Plane,
-  GraduationCap,
-  MoreHorizontal,
+  Zap
 } from "lucide-react";
 
 // Available icons for budget categories
 export const BUDGET_ICONS = [
-  { name: "wallet", icon: Wallet, color: "#0055FF" },
   { name: "car", icon: Car, color: "#2ECC71" },
   { name: "shopping", icon: ShoppingCart, color: "#FF9800" },
   { name: "food", icon: Utensils, color: "#FFC107" },

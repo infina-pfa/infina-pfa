@@ -8,13 +8,16 @@ import { CreateBudgetModal } from "@/components/budgeting/create-budget-modal";
 import { EditBudgetModal } from "@/components/budgeting/edit-budget-modal";
 import { CreateExpenseModal } from "@/components/budgeting/create-expense-modal";
 import { useBudgetManagementSWR, useRecentTransactionsSWR } from "@/hooks/swr";
+import { useBudgetDeleteSWR } from "@/hooks/swr/use-budget-delete";
 import { useBudgetStats } from "@/hooks/use-budget-stats";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useMemo, useState } from "react";
 import { Budget } from "@/lib/types/budget.types";
+import { useToast } from "@/hooks/use-toast";
 
 export default function BudgetingPage() {
   const { t } = useAppTranslation(["budgeting", "common"]);
+  const toast = useToast();
 
   // Modal state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -52,6 +55,9 @@ export default function BudgetingPage() {
     error: transactionsError,
   } = useRecentTransactionsSWR(10);
 
+  // Use the budget delete hook
+  const { deleteBudget, error: deleteError } = useBudgetDeleteSWR();
+
   // Keep budget statistics for future use
   const { loading: statsLoading, error: statsError } = useBudgetStats();
 
@@ -70,6 +76,17 @@ export default function BudgetingPage() {
     if (budget) {
       setSelectedBudget(budget);
       setIsCreateExpenseModalOpen(true);
+    }
+  };
+
+  // Handle delete budget
+  const handleDeleteBudget = async (budgetId: string) => {
+    const success = await deleteBudget(budgetId);
+
+    if (success) {
+      toast.success(t("budgetDeleted", { ns: "budgeting" }));
+    } else if (deleteError) {
+      toast.error(t("failedToDeleteBudget", { ns: "budgeting" }), deleteError);
     }
   };
 
@@ -124,6 +141,7 @@ export default function BudgetingPage() {
               onCreateBudget={() => setIsCreateModalOpen(true)}
               onEditBudget={handleEditBudget}
               onAddExpense={handleAddExpense}
+              onDeleteBudget={handleDeleteBudget}
             />
           </div>
 

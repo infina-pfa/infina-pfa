@@ -1,11 +1,10 @@
 "use client";
 
-import { Plus } from "lucide-react";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { formatCurrency } from "@/lib/utils";
 import { ProgressBar } from "./progress-bar";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { BudgetActionsMenu } from "./budget-actions-menu";
 
 interface BudgetCategoryCardProps {
   id: string;
@@ -17,6 +16,7 @@ interface BudgetCategoryCardProps {
   color?: string;
   onEdit?: (id: string) => void;
   onAddExpense?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 export const BudgetCategoryCard = ({
@@ -29,6 +29,7 @@ export const BudgetCategoryCard = ({
   color = "#0055FF",
   onEdit,
   onAddExpense,
+  onDelete,
 }: BudgetCategoryCardProps) => {
   const { t } = useAppTranslation("budgeting");
   const spentPercentage = budget > 0 ? (spent / budget) * 100 : 0;
@@ -41,7 +42,7 @@ export const BudgetCategoryCard = ({
     >
       <CardContent className="p-4 md:p-6">
         {/* Mobile: Stack layout, Desktop: Side-by-side */}
-        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+        <div className="flex flex-col gap-3 md:gap-4">
           {/* Icon and Title Row */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -59,23 +60,13 @@ export const BudgetCategoryCard = ({
               </div>
             </div>
 
-            {/* Add Expense Button - Always visible on mobile for better UX */}
-            {onAddExpense && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAddExpense(id);
-                }}
-                className="flex-shrink-0 h-8 md:h-9 px-2 md:px-3 text-xs md:text-sm border border-[#E5E7EB] hover:bg-[#F9FAFB]"
-              >
-                <Plus className="h-3 w-3 md:h-4 md:w-4" />
-                <span className="ml-1 md:ml-2 hidden xs:inline">
-                  {t("addExpense")}
-                </span>
-              </Button>
-            )}
+            {/* Budget Actions Menu */}
+            <BudgetActionsMenu
+              id={id}
+              onAddExpense={onAddExpense}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
           </div>
 
           {/* Budget Information - Full width on mobile */}

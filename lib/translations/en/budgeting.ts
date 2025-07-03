@@ -45,6 +45,7 @@ export const budgetingEn = {
   analyzingFinances: "Analyzing your finances...",
 
   // Actions
+  actions: "Actions",
   createBudget: "Create Budget",
   createBudgetDesc: "Set up a new budget to track your expenses and manage your finances better",
   editBudget: "Edit Budget",
@@ -54,6 +55,7 @@ export const budgetingEn = {
   editExpense: "Edit Expense",
   editExpenseFor: "Edit expense for",
   deleteBudget: "Delete Budget",
+  removeBudget: "Remove Budget",
   viewDetails: "View Details",
 
   // Expense Form

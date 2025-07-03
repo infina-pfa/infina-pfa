@@ -12,6 +12,7 @@ interface BudgetCategoriesListProps {
   onCreateBudget?: () => void;
   onEditBudget?: (budgetId: string) => void;
   onAddExpense?: (budgetId: string) => void;
+  onDeleteBudget?: (budgetId: string) => void;
 }
 
 export const BudgetCategoriesList = ({
@@ -19,6 +20,7 @@ export const BudgetCategoriesList = ({
   onCreateBudget,
   onEditBudget,
   onAddExpense,
+  onDeleteBudget,
 }: BudgetCategoriesListProps) => {
   const { t } = useAppTranslation("budgeting");
 
@@ -63,6 +65,7 @@ export const BudgetCategoriesList = ({
                 color={budget.color}
                 onEdit={onEditBudget}
                 onAddExpense={onAddExpense}
+                onDelete={onDeleteBudget}
               />
               {index < budgets.length - 1 && <div className="h-3 md:h-4" />}
             </div>

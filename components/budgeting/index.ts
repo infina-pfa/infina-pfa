@@ -12,3 +12,4 @@ export { EditExpenseModal } from "./edit-expense-modal";
 export { ExpenseItem } from "./expense-item";
 export { ProgressBar } from "./progress-bar"; 
 export { RecentExpensesList } from "./recent-expenses-list"; 
+export { BudgetActionsMenu } from "./budget-actions-menu"; 
