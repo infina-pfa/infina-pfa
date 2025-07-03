@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useBudgetCreate } from "@/hooks/use-budget-create";
-import { useBudgetUpdate } from "@/hooks/use-budget-update";
+import { useBudgetCreateSWR } from "@/hooks/swr/use-budget-create";
+import { useBudgetUpdateSWR } from "@/hooks/swr/use-budget-update";
 import { CreateBudgetRequest, UpdateBudgetRequest, Budget } from "@/lib/types/budget.types";
 import { inputValidationRules, parseFormattedNumber } from "@/lib/validation/input-validation";
 import { validateField } from "@/lib/validation/form-validation";
@@ -30,9 +30,9 @@ interface UseBudgetFormProps {
 export const useBudgetForm = ({ mode, isOpen, budget, onSuccess, onClose }: UseBudgetFormProps) => {
   const { t } = useTranslation();
   
-  // Hooks for both modes
-  const { createBudget, isCreating, error: createError } = useBudgetCreate();
-  const { updateBudget, isUpdating, error: updateError } = useBudgetUpdate();
+  // ✨ Use SWR hooks instead of regular hooks
+  const { createBudget, isCreating, error: createError } = useBudgetCreateSWR();
+  const { updateBudget, isUpdating, error: updateError } = useBudgetUpdateSWR();
   
   // Determine which hooks to use based on mode
   const isLoading = mode === "create" ? isCreating : isUpdating;

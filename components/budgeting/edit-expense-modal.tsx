@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import { FormInput } from "@/components/ui/form-input";
 import { MoneyInput } from "@/components/ui/money-input";
-import { useExpenseUpdate } from "@/hooks/use-expense-update";
-import { useAppTranslation } from "@/hooks/use-translation";
+import { useExpenseUpdateSWR } from "@/hooks/swr";
 import { useToast } from "@/hooks/use-toast";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { UpdateExpenseRequest } from "@/lib/types/transaction.types";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface EditExpenseModalProps {
   isOpen: boolean;
@@ -36,7 +36,7 @@ export const EditExpenseModal = ({
   expense,
 }: EditExpenseModalProps) => {
   const { t } = useAppTranslation(["budgeting", "common"]);
-  const { updateExpense, isUpdating, error } = useExpenseUpdate();
+  const { updateExpense, isUpdating, error } = useExpenseUpdateSWR();
   const { success: showSuccessToast } = useToast();
 
   const [formData, setFormData] = useState<UpdateExpenseRequest>({

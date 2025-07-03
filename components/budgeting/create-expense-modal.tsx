@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { FormInput } from "@/components/ui/form-input";
 import { MoneyInput } from "@/components/ui/money-input";
-import { useExpenseCreate } from "@/hooks/use-expense-create";
+import { useExpenseCreateSWR } from "@/hooks/swr";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { CreateExpenseRequest } from "@/lib/types/transaction.types";
 import { useState } from "react";
@@ -32,7 +32,7 @@ export const CreateExpenseModal = ({
   budget,
 }: CreateExpenseModalProps) => {
   const { t } = useAppTranslation(["budgeting", "common"]);
-  const { createExpense, isCreating, error } = useExpenseCreate();
+  const { createExpense, isCreating, error } = useExpenseCreateSWR();
 
   const [formData, setFormData] = useState<
     Omit<CreateExpenseRequest, "budgetId">

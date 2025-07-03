@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { formatCurrency } from "@/lib/utils";
 import { ProgressBar } from "./progress-bar";
@@ -35,8 +35,9 @@ export const BudgetCategoryCard = ({
 
   return (
     <Card
-      className="cursor-pointer duration-150 p-0 transition-colors"
+      className="cursor-pointer duration-150 p-0 transition-colors hover:bg-[#F9FAFB]"
       tabIndex={0}
+      onClick={() => onEdit && onEdit(id)}
     >
       <CardContent className="flex items-center gap-4 p-6">
         <div
@@ -51,61 +52,18 @@ export const BudgetCategoryCard = ({
             <h3 className="text-[16px] font-semibold text-[#111827] font-nunito leading-[24px]">
               {name}
             </h3>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               {onAddExpense && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     onAddExpense(id);
                   }}
-                  className="h-8 w-8 p-0 text-[#6B7280] transition-colors"
-                  style={
-                    {
-                      "--hover-color": color,
-                      "--hover-bg": `${color}20`,
-                    } as React.CSSProperties
-                  }
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.color = color;
-                    e.currentTarget.style.backgroundColor = `${color}20`;
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.color = "#6B7280";
-                    e.currentTarget.style.backgroundColor = "transparent";
-                  }}
-                  title={t("addExpense")}
                 >
                   <Plus className="h-4 w-4" />
-                </Button>
-              )}
-              {onEdit && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(id);
-                  }}
-                  className="h-8 w-8 p-0 text-[#6B7280] transition-colors"
-                  style={
-                    {
-                      "--hover-color": color,
-                      "--hover-bg": `${color}20`,
-                    } as React.CSSProperties
-                  }
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.color = color;
-                    e.currentTarget.style.backgroundColor = `${color}20`;
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.color = "#6B7280";
-                    e.currentTarget.style.backgroundColor = "transparent";
-                  }}
-                  title={t("editBudget")}
-                >
-                  <Edit className="h-4 w-4" />
+                  <span className="text-sm font-medium">{t("addExpense")}</span>
                 </Button>
               )}
             </div>

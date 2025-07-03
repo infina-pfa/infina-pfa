@@ -3,6 +3,7 @@ import { Nunito } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { SWRProvider } from "@/lib/swr-config";
 import { Toaster } from "sonner";
 import { StagewiseToolbar } from "@stagewise/toolbar-next";
 import { ReactPlugin } from "@stagewise-plugins/react";
@@ -26,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className={`${nunito.variable} antialiased font-nunito`}>
-        <AuthProvider>
-          <I18nProvider>{children}</I18nProvider>
-        </AuthProvider>
+        <SWRProvider>
+          <AuthProvider>
+            <I18nProvider>{children}</I18nProvider>
+          </AuthProvider>
+        </SWRProvider>
         <Toaster
           position="top-right"
           toastOptions={{

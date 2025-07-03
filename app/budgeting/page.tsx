@@ -1,6 +1,5 @@
 "use client";
 
-// import { useState } from "react"; // TODO: Re-add when CreateBudgetModal is implemented
 import { AppLayout } from "@/components/ui/app-layout";
 import { SpendingOverview } from "@/components/budgeting/spending-overview";
 import { BudgetCategoriesList } from "@/components/budgeting/budget-categories-list";
@@ -8,13 +7,10 @@ import { RecentExpensesList } from "@/components/budgeting/recent-expenses-list"
 import { CreateBudgetModal } from "@/components/budgeting/create-budget-modal";
 import { EditBudgetModal } from "@/components/budgeting/edit-budget-modal";
 import { CreateExpenseModal } from "@/components/budgeting/create-expense-modal";
-import {
-  useBudgetListWithSpending,
-  useRecentTransactions,
-} from "@/hooks/use-budget-list";
+import { useBudgetManagementSWR, useRecentTransactionsSWR } from "@/hooks/swr";
 import { useBudgetStats } from "@/hooks/use-budget-stats";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState } from "react";
 import { Budget } from "@/lib/types/budget.types";
 
 export default function BudgetingPage() {
@@ -26,8 +22,6 @@ export default function BudgetingPage() {
   const [isCreateExpenseModalOpen, setIsCreateExpenseModalOpen] =
     useState(false);
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
-
-  console.log("RENDERING BUDGETING PAGE");
 
   // Get current month and year for filtering
   const currentDate = new Date();
@@ -43,30 +37,23 @@ export default function BudgetingPage() {
     [currentMonth, currentYear]
   );
 
-  // Use real data hooks
+  // ✨ Use the combined SWR hook for budget management
   const {
     budgets,
     totalBudget,
     totalSpent,
     loading: budgetsLoading,
     error: budgetsError,
-    refetch: refetchBudgets,
-  } = useBudgetListWithSpending(filter);
+  } = useBudgetManagementSWR(filter);
 
   const {
     transactions: recentTransactions,
     loading: transactionsLoading,
     error: transactionsError,
-    refetch: refetchTransactions,
-  } = useRecentTransactions(10);
+  } = useRecentTransactionsSWR(10);
 
-  // Fetch budget statistics for future use
+  // Keep budget statistics for future use
   const { loading: statsLoading, error: statsError } = useBudgetStats();
-
-  // Combined refetch function for when data changes
-  const handleDataRefresh = useCallback(async () => {
-    await Promise.all([refetchBudgets(), refetchTransactions()]);
-  }, [refetchBudgets, refetchTransactions]);
 
   // Handle edit budget
   const handleEditBudget = (budgetId: string) => {
@@ -89,6 +76,9 @@ export default function BudgetingPage() {
   const isLoading = budgetsLoading || statsLoading || transactionsLoading;
   const hasError = budgetsError || statsError || transactionsError;
 
+  // Display the first error that occurs
+  const errorMessage = budgetsError || statsError || transactionsError;
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -109,11 +99,9 @@ export default function BudgetingPage() {
       <AppLayout>
         <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
           <div className="text-center">
-            <p className="text-[#F44336] font-nunito mb-4">
-              {budgetsError || statsError || transactionsError}
-            </p>
+            <p className="text-[#F44336] font-nunito mb-4">{errorMessage}</p>
             <button
-              onClick={handleDataRefresh}
+              onClick={() => window.location.reload()}
               className="px-4 py-2 bg-[#0055FF] text-white rounded-lg font-nunito hover:bg-[#0041CC]"
             >
               {t("retry", { ns: "common" })}
@@ -140,10 +128,8 @@ export default function BudgetingPage() {
           </div>
 
           <div className="mt-8">
-            <RecentExpensesList
-              transactions={recentTransactions}
-              onExpenseUpdated={handleDataRefresh}
-            />
+            {/* ✨ No need to pass onExpenseUpdated - SWR handles automatic updates */}
+            <RecentExpensesList transactions={recentTransactions} />
           </div>
         </main>
       </div>
@@ -151,7 +137,12 @@ export default function BudgetingPage() {
       <CreateBudgetModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={handleDataRefresh}
+        onSuccess={() => {
+          // The actual budget creation is handled in the budget-modal.tsx
+          // which calls the createBudget function from useBudgetForm
+          // We'll update useBudgetForm to use our SWR hook instead
+          setIsCreateModalOpen(false);
+        }}
       />
 
       <EditBudgetModal
@@ -160,7 +151,13 @@ export default function BudgetingPage() {
           setIsEditModalOpen(false);
           setSelectedBudget(null);
         }}
-        onSuccess={handleDataRefresh}
+        onSuccess={() => {
+          // The actual budget update is handled in the budget-modal.tsx
+          // which calls the updateBudget function from useBudgetForm
+          // We'll update useBudgetForm to use our SWR hook instead
+          setIsEditModalOpen(false);
+          setSelectedBudget(null);
+        }}
         budget={selectedBudget}
       />
 
@@ -170,7 +167,11 @@ export default function BudgetingPage() {
           setIsCreateExpenseModalOpen(false);
           setSelectedBudget(null);
         }}
-        onSuccess={handleDataRefresh}
+        onSuccess={() => {
+          setIsCreateExpenseModalOpen(false);
+          setSelectedBudget(null);
+          // ✨ SWR automatically updates the data - no manual refetch needed!
+        }}
         budget={
           selectedBudget
             ? {
