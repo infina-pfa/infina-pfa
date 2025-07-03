@@ -118,6 +118,12 @@ export const budgetingVi = {
   monthlyBudgets: "Tháng này",
   yearlyBudgets: "Năm này",
 
+  // Budget Summary
+  monthlySummary: "Tổng quan tháng này",
+  totalBudget: "Tổng ngân sách",
+  totalSpent: "Đã chi tiêu",
+  remaining: "Còn lại",
+
   // Categories
   general: "Tổng quát",
   food: "Ăn uống",

@@ -21,5 +21,5 @@ export * from './select';
 export * from './separator';
 export * from './sheet';
 export * from './sidebar';
-// export * from './skeleton'; // File doesn't exist
+export * from './skeleton';
 export { default as StackingCard } from './stacking-card'; 

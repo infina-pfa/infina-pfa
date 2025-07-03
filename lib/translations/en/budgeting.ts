@@ -115,6 +115,11 @@ export const budgetingEn = {
   monthlyBudgets: "This month",
   yearlyBudgets: "This year",
 
+  // Budget Summary
+  monthlySummary: "This Month's Summary",
+  totalBudget: "Total Budget",
+  totalSpent: "Total Spent",
+
   // Categories
   general: "General",
   food: "Food & Dining",
