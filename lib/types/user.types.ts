@@ -31,6 +31,7 @@ export interface UserProfile {
   name: string;
   user_id: string;
   total_asset_value: number;
+  onboarding_completed: boolean;
   created_at: string;
   updated_at: string;
 }

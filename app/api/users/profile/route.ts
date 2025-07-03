@@ -55,6 +55,7 @@ export async function GET() {
           name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || "User",
           email: user.email,
           total_asset_value: 0,
+          onboarding_completed: false,
           created_at: user.created_at,
           updated_at: user.updated_at
         }

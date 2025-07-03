@@ -1,14 +1,11 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { useAppTranslation } from "@/hooks/use-translation";
 
 export function TestimonialSection() {
-  const { t } = useAppTranslation(["testimonials", "common"]);
-
   return (
-    <section className="py-16 lg:py-20 bg-section-bg">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-20 bg-white">
+      <div className="container mx-auto px-4">
         {/* Main quote */}
         <div className="text-center mb-12">
           <Card className="max-w-4xl mx-auto">

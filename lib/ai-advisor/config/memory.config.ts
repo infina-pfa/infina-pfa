@@ -3,7 +3,7 @@ import { MemoryConfig } from '../types/memory';
 // Memory processing constants
 export const MEMORY_CONSTANTS = {
   EMBEDDING_MODEL: 'text-embedding-3-small',
-  EXTRACTION_MODEL: 'gpt-4o-mini',
+  EXTRACTION_MODEL: 'gpt-4.1-mini-2025-04-14',
   MAX_CONVERSATION_MESSAGES: 5,
   EMBEDDING_DIMENSIONS: 1536,
   SIMILARITY_THRESHOLD: 0.8,

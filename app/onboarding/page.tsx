@@ -6,39 +6,35 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { userService } from "@/lib/services/user.service";
-import { useOnboarding } from "@/hooks/use-onboarding";
-import { WelcomeStep } from "@/components/onboarding/welcome-step";
-import { NameStep } from "@/components/onboarding/name-step";
-import { LoadingStep } from "@/components/onboarding/loading-step";
+import { OnboardingChatInterface } from "@/components/onboarding/chat/onboarding-chat-interface";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export default function OnboardingPage() {
   const { user, loading: authLoading } = useAuthContext();
   const router = useRouter();
+  const { t } = useAppTranslation(["onboarding", "common"]);
 
-  // Initialize onboarding hook
-  const { step, name, loading, error, nextStep, updateName, createUser } =
-    useOnboarding();
-
-  // Check if user already has a profile
+  // Check if user has completed onboarding
   useEffect(() => {
-    const checkUserProfile = async () => {
+    const checkOnboardingStatus = async () => {
       if (!user?.id) return;
 
       try {
         const result = await userService.checkUserExists();
 
-        if (result.exists && result.user) {
-          // User already has a profile, redirect to chat
+        if (result.exists && result.user && result.user.onboarding_completed) {
+          // User has completed onboarding, redirect to chat
           router.push("/chat");
         }
+        // If user exists but hasn't completed onboarding, continue with onboarding
       } catch (error) {
-        console.error("Error checking user profile:", error);
+        console.error("Error checking onboarding status:", error);
         // Continue with onboarding if there's an error
       }
     };
 
     if (user && !authLoading) {
-      checkUserProfile();
+      checkOnboardingStatus();
     }
   }, [user, authLoading, router]);
 
@@ -58,34 +54,15 @@ export default function OnboardingPage() {
     );
   }
 
-  const renderStep = () => {
-    switch (step) {
-      case "welcome":
-        return <WelcomeStep onNext={nextStep} />;
-
-      case "name":
-        return (
-          <NameStep
-            name={name}
-            onNameChange={updateName}
-            onSubmit={createUser}
-            loading={loading}
-            error={error}
-          />
-        );
-
-      case "loading":
-        return <LoadingStep />;
-
-      default:
-        return <WelcomeStep onNext={nextStep} />;
-    }
+  const handleOnboardingComplete = () => {
+    // Navigate to chat after successful onboarding
+    router.push("/chat");
   };
 
   return (
     <div className="min-h-screen bg-[#F6F7F9] font-nunito">
       {/* Header - following landing page design */}
-      <header className="bg-white">
+      <header className="bg-white shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center">
             {/* Logo - same as landing page */}
@@ -103,9 +80,29 @@ export default function OnboardingPage() {
         </div>
       </header>
 
-      {/* Main Content - following landing page layout */}
-      <main className="max-w-6xl mx-auto px-6 py-16 lg:py-20">
-        <div className="max-w-2xl mx-auto">{renderStep()}</div>
+      {/* Main Content - Chat Interface */}
+      <main className="min-h-[calc(100vh-80px)] flex items-center justify-center px-6 py-8">
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-sm p-8 min-h-[600px] flex flex-col">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl lg:text-4xl font-bold text-[#111827] mb-4">
+                {t("onboardingTitle")}
+              </h1>
+              <p className="text-lg text-[#6B7280] max-w-2xl mx-auto">
+                {t("onboardingSubtitle")}
+              </p>
+            </div>
+
+            {/* Chat Interface */}
+            <div className="flex-1">
+              <OnboardingChatInterface
+                userId={user.id}
+                onComplete={handleOnboardingComplete}
+              />
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
