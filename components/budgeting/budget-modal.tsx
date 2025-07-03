@@ -81,18 +81,18 @@ export const BudgetModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-[#FFFFFF] border-0 max-w-[480px] rounded-xl p-0 font-nunito">
-        <div className="p-6">
-          <DialogHeader className="mb-6">
-            <DialogTitle className="text-[20px] font-semibold text-[#111827] font-nunito leading-[28px]">
+      <DialogContent className="bg-[#FFFFFF] border-0 max-w-[90vw] sm:max-w-[480px] rounded-xl p-0 font-nunito max-h-[90vh] overflow-y-auto">
+        <div className="p-4 md:p-6">
+          <DialogHeader className="mb-4 md:mb-6">
+            <DialogTitle className="text-[18px] md:text-[20px] font-semibold text-[#111827] font-nunito leading-[24px] md:leading-[28px]">
               {config.title}
             </DialogTitle>
-            <DialogDescription className="text-[14px] text-[#6B7280] font-nunito leading-[20px] mt-2">
+            <DialogDescription className="text-[12px] md:text-[14px] text-[#6B7280] font-nunito leading-[16px] md:leading-[20px] mt-1 md:mt-2">
               {config.description}
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             {/* Budget Name */}
             <FormInput
               label={t("budgetName", { ns: "budgeting" })}
@@ -143,27 +143,27 @@ export const BudgetModal = ({
 
             {/* Error Display */}
             {error && (
-              <div className="bg-[#FEF2F2] rounded-lg p-4">
-                <p className="text-[#F44336] text-[14px] font-nunito">
+              <div className="bg-[#FEF2F2] rounded-lg p-3 md:p-4">
+                <p className="text-[#F44336] text-[12px] md:text-[14px] font-nunito">
                   {error}
                 </p>
               </div>
             )}
 
             {/* Form Actions */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 pt-3 md:pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleClose}
-                className="flex-1 h-12 border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] font-nunito"
+                className="flex-1 h-10 md:h-12 border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] font-nunito text-sm md:text-base"
                 disabled={isLoading}
               >
                 {t("cancel", { ns: "common" })}
               </Button>
               <Button
                 type="submit"
-                className="flex-1 h-12 bg-[#0055FF] hover:bg-[#0041CC] text-white font-nunito"
+                className="flex-1 h-10 md:h-12 bg-[#0055FF] hover:bg-[#0041CC] text-white font-nunito text-sm md:text-base"
                 disabled={isLoading}
               >
                 {config.submitText}

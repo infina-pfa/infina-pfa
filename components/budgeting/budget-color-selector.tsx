@@ -16,10 +16,10 @@ export const BudgetColorSelector = ({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-[#111827]">
+      <label className="block text-sm font-medium text-[#111827] mb-2">
         {t("budgetColor")}
       </label>
-      <div className="flex flex-wrap gap-3 mt-2">
+      <div className="flex flex-wrap gap-2 md:gap-3">
         {BUDGET_COLORS.map((color) => {
           const isSelected = selectedColor === color;
           return (
@@ -28,22 +28,23 @@ export const BudgetColorSelector = ({
               type="button"
               onClick={() => onColorChange(color)}
               className={`
-                h-10 w-10 rounded-lg flex items-center justify-center transition-all
+                h-9 w-9 md:h-10 md:w-10 rounded-lg flex items-center justify-center transition-all touch-manipulation
                 ${
                   isSelected
-                    ? "ring-2 ring-[#0055FF] ring-offset-2 scale-110 shadow-md"
-                    : "hover:scale-105"
+                    ? "ring-2 ring-[#0055FF] ring-offset-2 scale-110"
+                    : "hover:scale-105 active:scale-95"
                 }
               `}
               style={{ backgroundColor: color }}
             >
               {isSelected && (
                 <svg
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+                  className="md:w-4 md:h-4"
                 >
                   <path
                     d="M13.3334 4.66667L6.00002 12L2.66669 8.66667"

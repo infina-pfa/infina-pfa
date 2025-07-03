@@ -35,6 +35,15 @@ export const budgetingEn = {
   noRecentExpenses: "No recent expenses",
   startTrackingExpenses: "Start tracking your expenses here",
 
+  // Budget Summary
+  monthlySummary: "This Month's Summary",
+  totalBudget: "Total Budget",
+  totalSpent: "Total Spent",
+  topCategories: "Top Categories",
+  viewBudgetSummary: "View budget details",
+  hideBudgetSummary: "Hide budget details",
+  analyzingFinances: "Analyzing your finances...",
+
   // Actions
   createBudget: "Create Budget",
   createBudgetDesc: "Set up a new budget to track your expenses and manage your finances better",
@@ -114,11 +123,6 @@ export const budgetingEn = {
   categoriesCount: "Categories",
   monthlyBudgets: "This month",
   yearlyBudgets: "This year",
-
-  // Budget Summary
-  monthlySummary: "This Month's Summary",
-  totalBudget: "Total Budget",
-  totalSpent: "Total Spent",
 
   // Categories
   general: "General",

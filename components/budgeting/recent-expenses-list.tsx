@@ -72,19 +72,20 @@ export const RecentExpensesList = ({
 
   return (
     <>
-      <section className="mx-6">
-        <div className="flex items-center justify-between px-6 py-4 bg-[#FFFFFF] rounded-t-xl">
-          <h2 className="text-[18px] font-semibold text-[#111827] font-nunito leading-[24px]">
+      <section className="mx-4 md:mx-6">
+        <div className="py-4 flex items-center justify-between px-4 md:px-6 py-3 md:py-4 bg-[#FFFFFF] rounded-t-xl">
+          <h2 className="text-[16px] md:text-[18px] font-semibold text-[#111827] font-nunito leading-[20px] md:leading-[24px]">
             {t("recentExpenses")}
           </h2>
 
           <Button
             variant="link"
             size="sm"
-            className="text-[#0055FF] font-nunito hover:text-[#0041CC] cursor-pointer"
+            className="text-[#0055FF] font-nunito hover:text-[#0041CC] cursor-pointer p-0 h-auto text-sm md:text-base"
           >
-            {t("viewAllHistory")}
-            <ChevronRight className="h-4 w-4 ml-2" />
+            <span className="hidden xs:inline">{t("viewAllHistory")}</span>
+            <span className="xs:hidden">{t("viewAll", { ns: "common" })}</span>
+            <ChevronRight className="h-4 w-4 ml-1 md:ml-2" />
           </Button>
         </div>
 
@@ -103,18 +104,18 @@ export const RecentExpensesList = ({
                 onEdit={handleEditExpense}
               />
               {index < expenses.length - 1 && (
-                <div className="h-px bg-[#E5E7EB] mx-6" />
+                <div className="h-px bg-[#E5E7EB] mx-4 md:mx-6" />
               )}
             </div>
           ))}
         </div>
 
         {expenses.length === 0 && (
-          <div className="px-6 py-8 text-center bg-[#FFFFFF] rounded-xl">
-            <p className="text-[#6B7280] font-nunito text-[16px] leading-[24px]">
+          <div className="px-4 md:px-6 py-6 md:py-8 text-center bg-[#FFFFFF] rounded-xl">
+            <p className="text-[#6B7280] font-nunito text-[14px] md:text-[16px] leading-[20px] md:leading-[24px]">
               {t("noRecentExpenses")}
             </p>
-            <p className="text-[14px] text-[#6B7280] mt-2 font-nunito leading-[20px]">
+            <p className="text-[12px] md:text-[14px] text-[#6B7280] mt-2 font-nunito leading-[16px] md:leading-[20px]">
               {t("startTrackingExpenses")}
             </p>
           </div>

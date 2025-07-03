@@ -83,21 +83,24 @@ export const CreateExpenseModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[400px] p-0 border-none bg-white rounded-xl">
+      <DialogContent className="max-w-[90vw] sm:max-w-[400px] p-0 border-none bg-white rounded-xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <DialogHeader className="px-6 pt-6 pb-4">
+        <DialogHeader className="px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-[20px] font-semibold text-[#111827] font-nunito leading-[28px]">
+            <DialogTitle className="text-[18px] md:text-[20px] font-semibold text-[#111827] font-nunito leading-[24px] md:leading-[28px]">
               {t("addExpense")}
             </DialogTitle>
           </div>
-          <p className="text-[14px] text-[#6B7280] font-nunito leading-[20px]">
+          <p className="text-[12px] md:text-[14px] text-[#6B7280] font-nunito leading-[16px] md:leading-[20px] mt-1">
             {t("addExpenseFor")} &ldquo;{budget.name}&rdquo;
           </p>
         </DialogHeader>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="px-4 md:px-6 pb-4 md:pb-6 space-y-4 md:space-y-6"
+        >
           {/* Expense Name */}
           <FormInput
             label={t("expenseName")}
@@ -145,25 +148,25 @@ export const CreateExpenseModal = ({
 
           {/* Error Message */}
           {error && (
-            <div className="text-[#F44336] text-[14px] font-nunito leading-[20px]">
+            <div className="text-[#F44336] text-[12px] md:text-[14px] font-nunito leading-[16px] md:leading-[20px]">
               {error}
             </div>
           )}
 
           {/* Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Button
               type="button"
               variant="outline"
               onClick={handleClose}
-              className="flex-1 h-12 text-[16px] font-nunito"
+              className="flex-1 h-10 md:h-12 text-[14px] md:text-[16px] font-nunito"
               disabled={isCreating}
             >
               {t("cancel", { ns: "common" })}
             </Button>
             <Button
               type="submit"
-              className="flex-1 h-12 text-[16px] font-nunito bg-[#0055FF] hover:bg-[#0041CC]"
+              className="flex-1 h-10 md:h-12 text-[14px] md:text-[16px] font-nunito bg-[#0055FF] hover:bg-[#0041CC]"
               disabled={
                 isCreating || !formData.name.trim() || formData.amount <= 0
               }

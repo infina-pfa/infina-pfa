@@ -82,7 +82,7 @@ export default function BudgetingPage() {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
+        <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center px-4">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0055FF] mx-auto mb-4"></div>
             <p className="text-[#6B7280] font-nunito">
@@ -97,7 +97,7 @@ export default function BudgetingPage() {
   if (hasError) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
+        <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center px-4">
           <div className="text-center">
             <p className="text-[#F44336] font-nunito mb-4">{errorMessage}</p>
             <button
@@ -115,10 +115,10 @@ export default function BudgetingPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-[#F9FAFB]">
-        <main className="pb-8">
+        <main className="pb-6 md:pb-8">
           <SpendingOverview totalSpent={totalSpent} totalBudget={totalBudget} />
 
-          <div className="mt-8">
+          <div className="mt-6 md:mt-8">
             <BudgetCategoriesList
               budgets={budgets}
               onCreateBudget={() => setIsCreateModalOpen(true)}
@@ -127,7 +127,7 @@ export default function BudgetingPage() {
             />
           </div>
 
-          <div className="mt-8">
+          <div className="mt-6 md:mt-8">
             {/* ✨ No need to pass onExpenseUpdated - SWR handles automatic updates */}
             <RecentExpensesList transactions={recentTransactions} />
           </div>

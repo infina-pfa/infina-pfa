@@ -1,5 +1,6 @@
 export { ChatInterface } from "./chat-interface";
 export { BudgetSummary } from "./budget-summary";
+export { BudgetAnalysisMessage } from "./budget-analysis-message";
 export { MessageList } from "./message-list";
 export { ChatInput } from "./chat-input";
 export { ComponentPanel } from "./component-panel";

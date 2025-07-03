@@ -40,15 +40,15 @@ export const BudgetMonthYearSelector = ({
   });
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
       <div>
-        <label className="block text-sm font-medium text-[#111827]">
+        <label className="block text-sm font-medium text-[#111827] mb-1">
           {t("budgetMonth")}
         </label>
         <select
           value={selectedMonth}
           onChange={(e) => onMonthChange(parseInt(e.target.value))}
-          className="w-full h-12 px-3 bg-transparent border-0 border-b border-[#E5E7EB] focus:border-[#0055FF] focus:border-b-2 outline-none font-nunito text-[16px] text-[#111827]"
+          className="w-full h-10 md:h-12 px-3 bg-transparent border-0 border-b border-[#E5E7EB] focus:border-[#0055FF] focus:border-b-2 outline-none font-nunito text-[14px] md:text-[16px] text-[#111827]"
         >
           {monthOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -57,7 +57,7 @@ export const BudgetMonthYearSelector = ({
           ))}
         </select>
         {validationErrors.month && touched.month && (
-          <p className="text-sm text-[#F44336] flex items-center mt-1">
+          <p className="text-xs md:text-sm text-[#F44336] flex items-center mt-1">
             <span className="mr-1">⚠</span>
             {validationErrors.month}
           </p>
@@ -65,13 +65,13 @@ export const BudgetMonthYearSelector = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-[#111827]">
+        <label className="block text-sm font-medium text-[#111827] mb-1">
           {t("budgetYear")}
         </label>
         <select
           value={selectedYear}
           onChange={(e) => onYearChange(parseInt(e.target.value))}
-          className="w-full h-12 px-3 bg-transparent border-0 border-b border-[#E5E7EB] focus:border-[#0055FF] focus:border-b-2 outline-none font-nunito text-[16px] text-[#111827]"
+          className="w-full h-10 md:h-12 px-3 bg-transparent border-0 border-b border-[#E5E7EB] focus:border-[#0055FF] focus:border-b-2 outline-none font-nunito text-[14px] md:text-[16px] text-[#111827]"
         >
           {yearOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -80,7 +80,7 @@ export const BudgetMonthYearSelector = ({
           ))}
         </select>
         {validationErrors.year && touched.year && (
-          <p className="text-sm text-[#F44336] flex items-center mt-1">
+          <p className="text-xs md:text-sm text-[#F44336] flex items-center mt-1">
             <span className="mr-1">⚠</span>
             {validationErrors.year}
           </p>

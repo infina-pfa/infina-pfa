@@ -35,6 +35,15 @@ export const budgetingVi = {
   noRecentExpenses: "Không có chi tiêu gần đây",
   startTrackingExpenses: "Bắt đầu theo dõi chi tiêu của bạn tại đây",
 
+  // Budget Summary
+  monthlySummary: "Tổng quan tháng này",
+  totalBudget: "Tổng ngân sách",
+  totalSpent: "Đã chi tiêu",
+  topCategories: "Danh mục hàng đầu",
+  viewBudgetSummary: "Xem chi tiết ngân sách",
+  hideBudgetSummary: "Ẩn chi tiết ngân sách",
+  analyzingFinances: "Đang phân tích tài chính của bạn...",
+
   // Actions
   createBudget: "Tạo ngân sách",
   createBudgetDesc: "Thiết lập ngân sách mới để theo dõi chi tiêu và quản lý tài chính tốt hơn",
@@ -58,7 +67,7 @@ export const budgetingVi = {
   enterDescription: "Nhập mô tả",
   budgetList: "Danh sách ngân sách",
   statistics: "Thống kê",
-  confirmDelete: "Bạn có chắc chắn muốn xóa ngân sách này?",
+  confirmDelete: "Bạn có chắc chắn muốn xóa ngân sách này không?",
 
   // Notifications
   budgetCreated: "Tạo ngân sách thành công",
@@ -117,12 +126,6 @@ export const budgetingVi = {
   categoriesCount: "Danh mục",
   monthlyBudgets: "Tháng này",
   yearlyBudgets: "Năm này",
-
-  // Budget Summary
-  monthlySummary: "Tổng quan tháng này",
-  totalBudget: "Tổng ngân sách",
-  totalSpent: "Đã chi tiêu",
-  remaining: "Còn lại",
 
   // Categories
   general: "Tổng quát",

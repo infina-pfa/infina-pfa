@@ -50,6 +50,8 @@ export const commonEn = {
   ok: "OK",
   yes: "Yes",
   no: "No",
+  view: "View",
+  viewAll: "View All",
   
   // Error Messages
   unknownError: "An unknown error occurred",
@@ -62,7 +64,6 @@ export const commonEn = {
   skip: "Skip",
   refresh: "Refresh",
   open: "Open",
-  view: "View",
 
   // Status
   deleting: "Deleting...",

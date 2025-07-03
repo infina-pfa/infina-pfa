@@ -4,36 +4,7 @@ import { useMemo } from "react";
 import { useBudgetListSWR } from "@/hooks/swr/use-budget-list";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FinaIcon } from "@/components/ui/fina-icon";
-
-interface StatCardProps {
-  icon: string;
-  label: string;
-  value: string;
-  loading: boolean;
-  color: string;
-}
-
-const StatCard = ({ icon, label, value, loading, color }: StatCardProps) => (
-  <div className="flex-1 p-4 bg-white rounded-lg flex items-center">
-    {loading ? (
-      <Skeleton className="w-full h-16" />
-    ) : (
-      <>
-        <div
-          className="p-3 rounded-full mr-4"
-          style={{ backgroundColor: `${color}20` }}
-        >
-          <FinaIcon name={icon} className="w-6 h-6" style={{ color: color }} />
-        </div>
-        <div>
-          <p className="text-sm text-gray-500 font-nunito">{label}</p>
-          <p className="text-xl font-bold text-gray-800 font-nunito">{value}</p>
-        </div>
-      </>
-    )}
-  </div>
-);
+import { ProgressBar } from "@/components/budgeting/progress-bar";
 
 interface BudgetSummaryProps {
   onDataReady?: (data: {
@@ -89,7 +60,7 @@ export const BudgetSummary = ({ onDataReady }: BudgetSummaryProps) => {
 
   if (error) {
     return (
-      <div className="text-center text-red-500 p-4">
+      <div className="text-center text-red-500 p-3">
         {t("failedToLoadBudgets", { ns: "budgeting" })}
       </div>
     );
@@ -101,34 +72,42 @@ export const BudgetSummary = ({ onDataReady }: BudgetSummaryProps) => {
     return null;
   }
 
+  const monthName = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  ).toLocaleString("vi", { month: "long" });
+
   return (
-    <div className="mb-8">
-      <h3 className="text-lg font-bold text-gray-800 font-nunito mb-4">
-        {t("monthlySummary", { ns: "budgeting" })}
-      </h3>
-      <div className="flex gap-4">
-        <StatCard
-          icon="Wallet"
-          label={t("totalBudget", { ns: "budgeting" })}
-          value={formatCurrency(totalBudget)}
-          loading={loading}
-          color="#0055FF"
-        />
-        <StatCard
-          icon="TrendingDown"
-          label={t("totalSpent", { ns: "budgeting" })}
-          value={formatCurrency(totalSpent)}
-          loading={loading}
-          color="#F44336"
-        />
-        <StatCard
-          icon="CheckCircle"
-          label={t("remaining", { ns: "budgeting" })}
-          value={formatCurrency(remaining)}
-          loading={loading}
-          color="#2ECC71"
-        />
-      </div>
+    <div className="mt-4 mb-2 w-[50%]">
+      {loading ? (
+        <Skeleton className="w-full h-20" />
+      ) : (
+        <div className="p-4 bg-white rounded-lg">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-base font-bold text-gray-800 font-nunito">
+              {t("monthlySummary", { ns: "budgeting" })} - {monthName}
+            </h3>
+          </div>
+
+          <div className="mb-2">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="font-medium">{formatCurrency(totalSpent)}</span>
+              <span className="font-medium">{formatCurrency(totalBudget)}</span>
+            </div>
+            <ProgressBar
+              value={spendingPercentage}
+              color={spendingPercentage > 90 ? "#F44336" : "#0055FF"}
+              className="h-2"
+            />
+          </div>
+
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>{t("totalSpent", { ns: "budgeting" })}</span>
+            <span>{t("totalBudget", { ns: "budgeting" })}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

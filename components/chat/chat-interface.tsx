@@ -1,19 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { useChatFlow } from "@/hooks/use-chat-flow";
-import { useBudgetAnalysis } from "@/hooks/use-budget-analysis";
 import { MessageList } from "./message-list";
 import { ChatInput } from "./chat-input";
 import { TypingIndicator } from "./typing-indicator";
 import { ComponentPanel } from "./component-panel";
 import { SuggestionList } from "./suggestion-list";
-import { BudgetSummary } from "./budget-summary";
+import { BudgetAnalysisMessage } from "./budget-analysis-message";
 import { useAppTranslation } from "@/hooks/use-translation";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
-  const [aiWelcomeMessage, setAiWelcomeMessage] = useState<string | null>(null);
 
   const {
     messages,
@@ -32,23 +29,6 @@ export function ChatInterface() {
     suggestions,
     onSuggestionClick,
   } = useChatFlow();
-
-  const {
-    analysis,
-    loading: analysisLoading,
-    analyzeBudget,
-  } = useBudgetAnalysis();
-
-  const handleBudgetDataReady = async (budgetData: {
-    totalBudget: number;
-    totalSpent: number;
-    remaining: number;
-    spendingPercentage: number;
-  }) => {
-    if (!analysis && !analysisLoading) {
-      await analyzeBudget(budgetData);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -106,35 +86,8 @@ export function ChatInterface() {
           {!conversationId ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center w-full p-6">
-                {/* Budget Summary */}
-                <BudgetSummary onDataReady={handleBudgetDataReady} />
-
-                {/* AI Welcome Message */}
-                {analysisLoading ? (
-                  <div className="mb-6">
-                    <div className="w-6 h-6 mx-auto mb-2">
-                      <div className="w-full h-full bg-blue-600 rounded-full animate-pulse"></div>
-                    </div>
-                    <p className="text-gray-500 font-nunito text-sm">
-                      Đang phân tích tình hình tài chính...
-                    </p>
-                  </div>
-                ) : analysis ? (
-                  <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                    <p className="text-blue-800 font-nunito text-base">
-                      {analysis.message}
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <h2 className="text-4xl font-bold text-blue-600 font-nunito mb-4">
-                      {t("chat.welcomeTitle", { name: "Khang" })}
-                    </h2>
-                    <p className="text-gray-600 font-nunito text-base mb-8">
-                      {t("chat.welcomeDescription")}
-                    </p>
-                  </>
-                )}
+                {/* AI Budget Analysis Message */}
+                <BudgetAnalysisMessage />
               </div>
             </div>
           ) : (
