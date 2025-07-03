@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 interface AuthFormFieldsProps {
   mode: "sign-in" | "sign-up";
@@ -31,7 +31,7 @@ export function AuthFormFields({
   onToggleShowPassword,
   onToggleShowConfirmPassword,
 }: AuthFormFieldsProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["auth", "common"]);
 
   return (
     <>

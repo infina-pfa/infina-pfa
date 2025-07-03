@@ -8,10 +8,10 @@ import {
   Target,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function KeyFeaturesSection() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["keyFeatures", "common"]);
   return (
     <section className="bg-white py-12 sm:py-16 lg:py-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">

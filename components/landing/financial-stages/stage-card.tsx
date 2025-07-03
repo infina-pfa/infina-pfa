@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle, ArrowRight } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { useTransform, motion, MotionValue, useScroll } from "motion/react";
 import { useRef } from "react";
 import { FinancialStage } from "./stages-data";
@@ -21,7 +21,7 @@ export const StageCard = ({
   range,
   targetScale,
 }: StageCardProps) => {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["financialStages", "common"]);
   const container = useRef(null);
   const { scrollYProgress } = useScroll({
     target: container,
@@ -100,7 +100,7 @@ export const StageCard = ({
             {/* Action Button */}
             <div className="pt-4">
               <button className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 font-semibold rounded-xl hover:bg-white/90 transition-colors">
-                <span>{t("exploreStage")}</span>
+                <span>{t("exploreStage", { ns: "financialStages" })}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

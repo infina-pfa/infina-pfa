@@ -1,9 +1,9 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function TypingIndicator() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["chat", "common"]);
 
   return (
     <div className="flex justify-start mb-6 px-6">

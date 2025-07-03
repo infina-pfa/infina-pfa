@@ -1,7 +1,10 @@
 export { ChatInterface } from "./chat-interface";
+export { BudgetSummary } from "./budget-summary";
+export { BudgetAnalysisMessage } from "./budget-analysis-message";
 export { MessageList } from "./message-list";
-export { MessageBubble } from "./message-bubble";
 export { ChatInput } from "./chat-input";
-export { TypingIndicator } from "./typing-indicator";
+export { ComponentPanel } from "./component-panel";
 export { SuggestionList } from "./suggestion-list";
-export { ComponentPanel } from "./component-panel"; 
+export { TypingIndicator } from "./typing-indicator";
+export { MessageBubble } from "./message-bubble";
+export { MarkdownMessage } from "./markdown-message"; 

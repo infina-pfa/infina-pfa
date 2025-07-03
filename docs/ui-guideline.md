@@ -113,6 +113,15 @@ This guideline establishes a unified visual language for Infina's financial web 
 - **Input Box Height**: 48px (content + padding only, not including label)
 - **Radius**: None
 
+### Input Validation Rules
+
+- **Name/Title**: Min 3 characters, max 40 characters
+- **Description**: Max 100 characters
+- **Chat Message**: Max 500 characters
+- **Money**: Max value 999,999,999,999,999 VND with proper formatting
+- **Number**: Max value 999,999,999,999 with proper formatting
+- **See full documentation**: [Input Validation Rules](/docs/ui-input-rules.md)
+
 ### Cards
 
 - Use `#FFFFFF` background

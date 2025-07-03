@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 interface ResetPasswordFormProps {
   onBackToSignIn?: () => void;
@@ -22,7 +22,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
 
   const { resetPassword, loading } = useAuth();
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["auth", "common"]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

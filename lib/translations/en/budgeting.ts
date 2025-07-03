@@ -19,6 +19,7 @@ export const budgetingEn = {
   recentExpenses: "Recent Expenses",
   viewAllHistory: "View All History",
   note: "Note",
+  expenseItemAriaLabel: "Expense: {{name}}, Amount: {{amount}}",
 
   // Transaction Types
   homeSavings: "Home Savings",
@@ -35,16 +36,115 @@ export const budgetingEn = {
   noRecentExpenses: "No recent expenses",
   startTrackingExpenses: "Start tracking your expenses here",
 
+  // Budget Summary
+  monthlySummary: "This Month's Summary",
+  totalBudget: "Total Budget",
+  totalSpent: "Total Spent",
+  topCategories: "Top Categories",
+  viewBudgetSummary: "View budget details",
+  hideBudgetSummary: "Hide budget details",
+  analyzingFinances: "Analyzing your finances...",
+
   // Actions
+  actions: "Actions",
   createBudget: "Create Budget",
-  addExpense: "Add Expense",
+  createBudgetDesc: "Set up a new budget to track your expenses and manage your finances better",
   editBudget: "Edit Budget",
+  editBudgetDesc: "Update your budget details to better manage your finances better",
+  addExpense: "Add Expense",
+  addExpenseFor: "Add expense for",
+  editExpense: "Edit Expense",
+  editExpenseFor: "Edit expense for",
   deleteBudget: "Delete Budget",
+  removeBudget: "Remove Budget",
+  removeExpense: "Remove Expense",
   viewDetails: "View Details",
+
+  // Expense Form
+  expenseName: "Expense name",
+  enterExpenseName: "Enter expense name",
+  amount: "Amount",
+  enterAmount: "Enter amount",
+  date: "Date",
+  description: "Description",
+  optional: "optional",
+  enterDescription: "Enter description",
 
   // Notifications
   budgetCreated: "Budget created successfully",
   budgetUpdated: "Budget updated successfully",
   budgetDeleted: "Budget deleted successfully",
   expenseAdded: "Expense added successfully",
+  expenseUpdated: "Expense updated successfully",
+  expenseDeleted: "Expense deleted successfully",
+
+  // Error Messages
+  budgetNotFound: "Budget not found",
+  budgetNameRequired: "Budget name is required",
+  budgetingNameRequired: "Budget name is required",
+  budgetNameEmpty: "Budget name cannot be empty",
+  budgetNameExists: "Budget with this name already exists for this month",
+  budgetAmountRequired: "Budget amount is required",
+  budgetAmountPositive: "Budget amount must be greater than 0",
+  budgetMonthRequired: "Budget month is required",
+  budgetYearRequired: "Budget year is required",
+  budgetColorRequired: "Budget color is required",
+  budgetIconRequired: "Budget icon is required",
+  budgetCategoryRequired: "Budget category is required",
+  expenseNameRequired: "Expense name is required",
+  expenseAmountRequired: "Expense amount is required",
+  expenseAmountPositive: "Expense amount must be greater than 0",
+  expenseDateRequired: "Expense date is required",
+  budgetIdRequired: "Budget ID is required",
+  failedToCreateBudget: "Failed to create budget",
+  failedToUpdateBudget: "Failed to update budget",
+  failedToDeleteBudget: "Failed to delete budget",
+  failedToAddExpense: "Failed to add expense",
+  failedToUpdateExpense: "Failed to update expense",
+  failedToDeleteExpense: "Failed to delete expense",
+  failedToLoadBudgets: "Failed to load budgets",
+  failedToLoadExpenses: "Failed to load expenses",
+  unknownError: "An unknown error occurred",
+  networkError: "Network error. Please check your connection",
+  serverError: "Server error. Please try again later",
+
+  // Form Labels
+  budgetName: "Budget name",
+  budgetCategory: "Category",
+  budgetColor: "Color",
+  budgetIcon: "Icon",
+  budgetMonth: "Month",
+  budgetYear: "Year",
+  budgetAmount: "Budget amount",
+
+  // Form Placeholders
+  enterBudgetName: "Enter budget name",
+  enterBudgetAmount: "Enter budget amount",
+  selectCategory: "Select category",
+  selectMonth: "Select month",
+  selectYear: "Select year",
+
+  // Statistics
+  totalBudgets: "Total budgets",
+  categoriesCount: "Categories",
+  monthlyBudgets: "This month",
+  yearlyBudgets: "This year",
+
+  // Categories
+  general: "General",
+  food: "Food & Dining",
+  transportation: "Transportation",
+  shopping: "Shopping",
+  entertainment: "Entertainment",
+  health: "Health & Fitness",
+  travel: "Travel",
+  utilities: "Utilities",
+  education: "Education",
+  other: "Other",
+
+  // Add new translations for the transactions page
+  allTransactions: "All Transactions",
+  filterByBudget: "Filter by Budget",
+  allBudgets: "All Budgets",
+  noTransactionsFound: "No transactions found",
 }; 

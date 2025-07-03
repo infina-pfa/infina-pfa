@@ -1,6 +1,16 @@
 export { SpendingOverview } from "./spending-overview";
 export { BudgetCategoriesList } from "./budget-categories-list";
 export { BudgetCategoryCard } from "./budget-category-card";
-export { RecentExpensesList } from "./recent-expenses-list";
+export { BudgetModal } from "./budget-modal";
+export { BudgetIconSelector } from "./budget-icon-selector";
+export { BudgetColorSelector } from "./budget-color-selector";
+export { BudgetMonthYearSelector } from "./budget-month-year-selector";
+export { CreateBudgetModal } from "./create-budget-modal";
+export { CreateExpenseModal } from "./create-expense-modal";
+export { EditBudgetModal } from "./edit-budget-modal";
+export { EditExpenseModal } from "./edit-expense-modal";
 export { ExpenseItem } from "./expense-item";
 export { ProgressBar } from "./progress-bar"; 
+export { RecentExpensesList } from "./recent-expenses-list"; 
+export { BudgetActionsMenu } from "./budget-actions-menu";
+export * from "./expense-actions-menu"; 

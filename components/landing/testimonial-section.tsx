@@ -1,63 +1,10 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { useTranslation } from "react-i18next";
-import { useState, useEffect, useCallback } from "react";
-
-interface Testimonial {
-  name: string;
-  role: string;
-  text: string;
-  image: string;
-}
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function TestimonialSection() {
-  const { t } = useTranslation();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  
-  // Get testimonials array from translations
-  const testimonials = (t("testimonials", { returnObjects: true }) as Testimonial[]) || [];
-  const testimonialQuote = t("testimonialQuote");
-
-  // Auto-slide functionality
-  const nextSlide = useCallback(() => {
-    if (testimonials.length > 0) {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-    }
-  }, [testimonials.length]);
-
-  useEffect(() => {
-    if (!isHovered && testimonials.length > 1) {
-      const timer = setInterval(nextSlide, 4000); // Auto-slide every 4 seconds
-      return () => clearInterval(timer);
-    }
-  }, [isHovered, nextSlide, testimonials.length]);
-
-  // Get visible testimonials based on screen size
-  const getVisibleTestimonials = () => {
-    if (testimonials.length === 0) return [];
-    
-    const visibleCount = 3; // Show 3 cards on desktop
-    const visibleTestimonials = [];
-    
-    for (let i = 0; i < visibleCount; i++) {
-      const index = (currentIndex + i) % testimonials.length;
-      visibleTestimonials.push(testimonials[index]);
-    }
-    
-    return visibleTestimonials;
-  };
-
-  const visibleTestimonials = getVisibleTestimonials();
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  if (testimonials.length === 0) {
-    return null;
-  }
+  const { t } = useAppTranslation(["testimonials", "common"]);
 
   return (
     <section className="py-16 lg:py-20 bg-section-bg">

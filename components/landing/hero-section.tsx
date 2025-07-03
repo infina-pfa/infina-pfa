@@ -2,11 +2,11 @@
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { useRouter } from "next/navigation";
 
 export function HeroSection() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["hero", "common"]);
   const router = useRouter();
 
   const handleSignUp = () => {
@@ -17,12 +17,14 @@ export function HeroSection() {
     <section className="max-w-6xl mx-auto px-6 py-16 lg:py-20">
       <div className="text-center">
         <h1 className="text-hero text-foreground mb-6 leading-tight">
-          {t("heroMainTitle")}
+          {t("heroMainTitle", { ns: "hero" })}
           <br />
-          <span className="text-primary">{t("heroSubTitle")}</span>
+          <span className="text-primary">
+            {t("heroSubTitle", { ns: "hero" })}
+          </span>
         </h1>
         <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-          {t("heroDescription")}
+          {t("heroDescription", { ns: "hero" })}
         </p>
 
         <Button
@@ -30,7 +32,7 @@ export function HeroSection() {
           onClick={handleSignUp}
           className="text-base px-8 py-6 mb-12 cursor-pointer"
         >
-          {t("startFreeJourney")}
+          {t("startFreeJourney", { ns: "common" })}
           <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
 

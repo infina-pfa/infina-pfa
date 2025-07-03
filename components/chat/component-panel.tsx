@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { ComponentData } from "@/lib/types/chat.types";
 
 interface ComponentPanelProps {
@@ -14,7 +14,7 @@ export function ComponentPanel({
   component,
   isOpen = false,
 }: ComponentPanelProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["chat", "common"]);
 
   if (!isOpen || !component) {
     return null;

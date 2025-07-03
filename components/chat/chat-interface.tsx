@@ -6,10 +6,12 @@ import { ChatInput } from "./chat-input";
 import { TypingIndicator } from "./typing-indicator";
 import { ComponentPanel } from "./component-panel";
 import { SuggestionList } from "./suggestion-list";
-import { useTranslation } from "react-i18next";
+import { BudgetAnalysisMessage } from "./budget-analysis-message";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function ChatInterface() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["chat", "common"]);
+
   const {
     messages,
     isLoading,
@@ -84,12 +86,8 @@ export function ChatInterface() {
           {!conversationId ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center w-full p-6">
-                <h2 className="text-4xl font-bold text-blue-600 font-nunito mb-4">
-                  {t("chat.welcomeTitle", { name: "Khang" })}
-                </h2>
-                <p className="text-gray-600 font-nunito text-base mb-8">
-                  {t("chat.welcomeDescription")}
-                </p>
+                {/* AI Budget Analysis Message */}
+                <BudgetAnalysisMessage />
               </div>
             </div>
           ) : (

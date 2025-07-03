@@ -22,6 +22,13 @@
   --color-section-bg: #f0f2f5;
   --color-divider: #e0e0e0;
 
+  /* Custom Breakpoints */
+  --breakpoint-xs: 475px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
   /* UI Colors */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -277,5 +284,33 @@
   }
   .spacing-xl {
     padding: 40px;
+  }
+
+  /* Mobile-first responsive utilities */
+  @media (min-width: 475px) {
+    .xs\:hidden {
+      display: none;
+    }
+    .xs\:inline {
+      display: inline;
+    }
+    .xs\:block {
+      display: block;
+    }
+    .xs\:flex {
+      display: flex;
+    }
+    .xs\:flex-row {
+      flex-direction: row;
+    }
+    .xs\:justify-between {
+      justify-content: space-between;
+    }
+    .xs\:items-center {
+      align-items: center;
+    }
+    .xs\:gap-2 {
+      gap: 0.5rem;
+    }
   }
 }

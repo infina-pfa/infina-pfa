@@ -16,7 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { FinaIcon } from "@/components/ui/fina-icon";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { usePathname } from "next/navigation";
 
 const navigationItems = [
@@ -42,7 +42,7 @@ export function Sidebar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user, loading } = useAuthContext();
   const { signOut } = useAuth();
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["common"]);
   const pathname = usePathname();
 
   const handleSignOut = async () => {

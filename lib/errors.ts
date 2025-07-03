@@ -17,6 +17,10 @@ export enum ErrorCode {
   DUPLICATE_BUDGET_NAME = 'DUPLICATE_BUDGET_NAME',
   BUDGET_LIMIT_EXCEEDED = 'BUDGET_LIMIT_EXCEEDED',
   INVALID_DATE_RANGE = 'INVALID_DATE_RANGE',
+  BUDGET_NAME_REQUIRED = 'BUDGET_NAME_REQUIRED',
+  BUDGET_NAME_TOO_LONG = 'BUDGET_NAME_TOO_LONG',
+  INVALID_BUDGET_MONTH = 'INVALID_BUDGET_MONTH',
+  INVALID_BUDGET_YEAR = 'INVALID_BUDGET_YEAR',
   
   // Business Logic - Expenses
   EXPENSE_NOT_FOUND = 'EXPENSE_NOT_FOUND',
@@ -69,6 +73,10 @@ export const ERROR_TRANSLATION_KEYS: Record<ErrorCode, string> = {
   [ErrorCode.DUPLICATE_BUDGET_NAME]: 'errorDuplicateBudgetName',
   [ErrorCode.BUDGET_LIMIT_EXCEEDED]: 'errorBudgetLimitExceeded',
   [ErrorCode.INVALID_DATE_RANGE]: 'errorInvalidDateRange',
+  [ErrorCode.BUDGET_NAME_REQUIRED]: 'errorBudgetNameRequired',
+  [ErrorCode.BUDGET_NAME_TOO_LONG]: 'errorBudgetNameTooLong',
+  [ErrorCode.INVALID_BUDGET_MONTH]: 'errorInvalidBudgetMonth',
+  [ErrorCode.INVALID_BUDGET_YEAR]: 'errorInvalidBudgetYear',
   
   [ErrorCode.EXPENSE_NOT_FOUND]: 'errorExpenseNotFound',
   [ErrorCode.INVALID_EXPENSE_AMOUNT]: 'errorInvalidExpenseAmount',
@@ -115,6 +123,10 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.DUPLICATE_BUDGET_NAME]: 'A budget with this name already exists',
   [ErrorCode.BUDGET_LIMIT_EXCEEDED]: 'You have reached the maximum number of budgets',
   [ErrorCode.INVALID_DATE_RANGE]: 'End date must be after start date',
+  [ErrorCode.BUDGET_NAME_REQUIRED]: 'Budget name is required',
+  [ErrorCode.BUDGET_NAME_TOO_LONG]: 'Budget name cannot exceed 100 characters',
+  [ErrorCode.INVALID_BUDGET_MONTH]: 'Month must be between 1 and 12',
+  [ErrorCode.INVALID_BUDGET_YEAR]: 'Please enter a valid year',
   
   [ErrorCode.EXPENSE_NOT_FOUND]: 'Expense not found',
   [ErrorCode.INVALID_EXPENSE_AMOUNT]: 'Expense amount must be greater than 0',

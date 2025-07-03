@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -38,7 +38,7 @@ const features = [
 ];
 
 export function IntroductionStep({ onNext }: IntroductionStepProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["onboarding", "common"]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
