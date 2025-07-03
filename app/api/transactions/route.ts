@@ -82,7 +82,8 @@ export async function GET(request: NextRequest) {
           budget_transactions (
             budget_id,
             budgets (
-              name
+              name,
+              color
             )
           )
         `)
@@ -110,7 +111,7 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // Transform data to include budget name
+    // Transform data to include budget name and color
     const transformedData = data?.map(transaction => {
       // For transactions with budget info
       if (transaction.budget_transactions && transaction.budget_transactions.length > 0) {
@@ -125,6 +126,7 @@ export async function GET(request: NextRequest) {
           date: new Date(transaction.created_at).toLocaleDateString(),
           category: transaction.category || "",
           budgetName: budgetInfo.budgets?.name || "",
+          budgetColor: budgetInfo.budgets?.color || "#0055FF",
         };
       } 
       // For transactions without budget info
@@ -138,6 +140,7 @@ export async function GET(request: NextRequest) {
         date: new Date(transaction.created_at).toLocaleDateString(),
         category: transaction.category || "",
         budgetName: "",
+        budgetColor: "#0055FF",
       };
     });
 

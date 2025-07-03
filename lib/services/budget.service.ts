@@ -213,6 +213,7 @@ export const budgetService = {
     type: string;
     description: string | null;
     budgetName?: string;
+    budgetColor?: string;
   }>; error: string | null }> {
     try {
       const response = await apiClient.get<Array<{
@@ -224,6 +225,7 @@ export const budgetService = {
         type: string;
         description: string | null;
         budgetName?: string;
+        budgetColor?: string;
       }>>('/transactions', { limit });
 
       if (response.success && response.data) {

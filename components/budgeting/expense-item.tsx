@@ -3,6 +3,7 @@
 import { formatCurrency } from "@/lib/utils";
 import { Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BUDGET_COLORS } from "@/lib/utils/budget-constants";
 
 interface ExpenseItemProps {
   id: string;
@@ -11,6 +12,7 @@ interface ExpenseItemProps {
   date: string;
   category?: string;
   budgetName?: string;
+  budgetColor?: string;
   description?: string | null;
   onEdit?: (expense: {
     id: string;
@@ -28,6 +30,7 @@ export const ExpenseItem = ({
   amount,
   date,
   budgetName,
+  budgetColor = BUDGET_COLORS[0],
   description,
   onEdit,
 }: ExpenseItemProps) => {
@@ -45,7 +48,7 @@ export const ExpenseItem = ({
 
   return (
     <div
-      className="flex items-center justify-between p-6 bg-[#FFFFFF] cursor-pointer hover:bg-[#F9FAFB] transition-colors"
+      className="flex items-center justify-between p-6 bg-[#FFFFFF] cursor-pointer"
       tabIndex={0}
     >
       <div className="flex-1">
@@ -54,7 +57,13 @@ export const ExpenseItem = ({
         </h3>
 
         {budgetName && (
-          <p className="text-[14px] text-[#6B7280] font-nunito leading-[20px]">
+          <p
+            className="text-[14px] font-medium font-nunito leading-[20px] inline-block px-2 py-0.5 rounded-md"
+            style={{
+              color: budgetColor,
+              backgroundColor: `${budgetColor}20`, // 20% opacity
+            }}
+          >
             {budgetName}
           </p>
         )}

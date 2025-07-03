@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ExpenseItem } from "./expense-item";
 import { EditExpenseModal } from "./edit-expense-modal";
 import { useState } from "react";
+import { BUDGET_COLORS } from "@/lib/utils/budget-constants";
 
 interface Transaction {
   id: string;
@@ -16,6 +17,7 @@ interface Transaction {
   type: string;
   description: string | null;
   budgetName?: string;
+  budgetColor?: string;
 }
 
 interface RecentExpensesListProps {
@@ -28,6 +30,7 @@ export const RecentExpensesList = ({
   onExpenseUpdated,
 }: RecentExpensesListProps) => {
   const { t } = useAppTranslation("budgeting");
+  const defaultColor = BUDGET_COLORS[0];
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<{
@@ -95,6 +98,7 @@ export const RecentExpensesList = ({
                 date={expense.date}
                 category={expense.category}
                 budgetName={expense.budgetName}
+                budgetColor={expense.budgetColor || defaultColor}
                 description={expense.description}
                 onEdit={handleEditExpense}
               />
