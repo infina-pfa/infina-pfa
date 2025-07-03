@@ -19,6 +19,7 @@ export const budgetingEn = {
   recentExpenses: "Recent Expenses",
   viewAllHistory: "View All History",
   note: "Note",
+  expenseItemAriaLabel: "Expense: {{name}}, Amount: {{amount}}",
 
   // Transaction Types
   homeSavings: "Home Savings",
@@ -49,7 +50,7 @@ export const budgetingEn = {
   createBudget: "Create Budget",
   createBudgetDesc: "Set up a new budget to track your expenses and manage your finances better",
   editBudget: "Edit Budget",
-  editBudgetDesc: "Update your budget details to better manage your finances",
+  editBudgetDesc: "Update your budget details to better manage your finances better",
   addExpense: "Add Expense",
   addExpenseFor: "Add expense for",
   editExpense: "Edit Expense",

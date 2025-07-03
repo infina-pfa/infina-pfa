@@ -19,6 +19,7 @@ export const budgetingVi = {
   recentExpenses: "Chi tiêu gần đây",
   viewAllHistory: "Xem tất cả lịch sử",
   note: "Ghi chú",
+  expenseItemAriaLabel: "Chi tiêu: {{name}}, Số tiền: {{amount}}",
 
   // Transaction Types
   homeSavings: "Tiết kiệm mua nhà",
