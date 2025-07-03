@@ -56,6 +56,7 @@ export const budgetingVi = {
   editExpenseFor: "Chỉnh sửa chi tiêu cho",
   deleteBudget: "Xóa ngân sách",
   removeBudget: "Xóa ngân sách",
+  removeExpense: "Xóa chi tiêu",
   viewDetails: "Xem chi tiết",
 
   // Expense Form
@@ -75,8 +76,9 @@ export const budgetingVi = {
   budgetCreated: "Tạo ngân sách thành công",
   budgetUpdated: "Cập nhật ngân sách thành công",
   budgetDeleted: "Xóa ngân sách thành công",
-  expenseAdded: "Thêm chi tiêu thành công",
-  expenseUpdated: "Cập nhật chi tiêu thành công",
+  expenseAdded: "Đã thêm chi tiêu thành công",
+  expenseUpdated: "Đã cập nhật chi tiêu thành công",
+  expenseDeleted: "Đã xóa chi tiêu thành công",
 
   // Error Messages
   budgetNotFound: "Không tìm thấy ngân sách",
@@ -101,6 +103,7 @@ export const budgetingVi = {
   failedToDeleteBudget: "Không thể xóa ngân sách",
   failedToAddExpense: "Không thể thêm chi tiêu",
   failedToUpdateExpense: "Không thể cập nhật chi tiêu",
+  failedToDeleteExpense: "Không thể xóa chi tiêu",
   failedToLoadBudgets: "Không thể tải ngân sách",
   failedToLoadExpenses: "Không thể tải chi tiêu",
   unknownError: "Đã xảy ra lỗi không xác định",

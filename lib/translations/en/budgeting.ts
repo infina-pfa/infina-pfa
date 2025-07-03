@@ -56,6 +56,7 @@ export const budgetingEn = {
   editExpenseFor: "Edit expense for",
   deleteBudget: "Delete Budget",
   removeBudget: "Remove Budget",
+  removeExpense: "Remove Expense",
   viewDetails: "View Details",
 
   // Expense Form
@@ -74,6 +75,7 @@ export const budgetingEn = {
   budgetDeleted: "Budget deleted successfully",
   expenseAdded: "Expense added successfully",
   expenseUpdated: "Expense updated successfully",
+  expenseDeleted: "Expense deleted successfully",
 
   // Error Messages
   budgetNotFound: "Budget not found",
@@ -98,6 +100,7 @@ export const budgetingEn = {
   failedToDeleteBudget: "Failed to delete budget",
   failedToAddExpense: "Failed to add expense",
   failedToUpdateExpense: "Failed to update expense",
+  failedToDeleteExpense: "Failed to delete expense",
   failedToLoadBudgets: "Failed to load budgets",
   failedToLoadExpenses: "Failed to load expenses",
   unknownError: "An unknown error occurred",
