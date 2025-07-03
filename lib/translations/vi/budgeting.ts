@@ -13,7 +13,7 @@ export const budgetingVi = {
 
   // Category Names
   electricity: "Tiền điện",
-  housing: "Tiền nhà",
+  housing: "Nhà ở",
 
   // Recent Expenses
   recentExpenses: "Chi tiêu gần đây",
@@ -21,8 +21,8 @@ export const budgetingVi = {
   note: "Ghi chú",
 
   // Transaction Types
-  homeSavings: "Tích lũy Mua nhà",
-  emergencyFund: "Tích lũy Quỹ dự phòng",
+  homeSavings: "Tiết kiệm mua nhà",
+  emergencyFund: "Quỹ khẩn cấp",
   debtPayment: "Trả nợ",
 
   // Currency & Formatting
@@ -32,16 +32,18 @@ export const budgetingVi = {
   // Status Messages
   noBudgetsYet: "Chưa có ngân sách nào",
   createFirstBudget: "Tạo ngân sách đầu tiên để bắt đầu theo dõi chi tiêu",
-  noRecentExpenses: "Chưa có chi tiêu gần đây",
+  noRecentExpenses: "Không có chi tiêu gần đây",
   startTrackingExpenses: "Bắt đầu theo dõi chi tiêu của bạn tại đây",
 
   // Actions
   createBudget: "Tạo ngân sách",
   createBudgetDesc: "Thiết lập ngân sách mới để theo dõi chi tiêu và quản lý tài chính tốt hơn",
-  editBudget: "Sửa ngân sách",
-  editBudgetDesc: "Cập nhật thông tin ngân sách để quản lý tài chính tốt hơn",
+  editBudget: "Chỉnh sửa ngân sách",
+  editBudgetDesc: "Cập nhật chi tiết ngân sách để quản lý tài chính tốt hơn",
   addExpense: "Thêm chi tiêu",
   addExpenseFor: "Thêm chi tiêu cho",
+  editExpense: "Chỉnh sửa chi tiêu",
+  editExpenseFor: "Chỉnh sửa chi tiêu cho",
   deleteBudget: "Xóa ngân sách",
   viewDetails: "Xem chi tiết",
 
@@ -63,21 +65,36 @@ export const budgetingVi = {
   budgetUpdated: "Cập nhật ngân sách thành công",
   budgetDeleted: "Xóa ngân sách thành công",
   expenseAdded: "Thêm chi tiêu thành công",
+  expenseUpdated: "Cập nhật chi tiêu thành công",
 
   // Error Messages
   budgetNotFound: "Không tìm thấy ngân sách",
   budgetNameRequired: "Tên ngân sách là bắt buộc",
   budgetingNameRequired: "Tên ngân sách là bắt buộc",
   budgetNameEmpty: "Tên ngân sách không được để trống",
-  duplicateBudgetName: "Ngân sách có tên này đã tồn tại trong tháng này",
-  validMonthRequired: "Tháng hợp lệ là bắt buộc",
-  validYearRequired: "Năm hợp lệ là bắt buộc",
-  authenticationRequired: "Yêu cầu xác thực",
-  fetchBudgetsError: "Không thể tải danh sách ngân sách",
-  createBudgetError: "Không thể tạo ngân sách",
-  updateBudgetError: "Không thể cập nhật ngân sách",
-  deleteBudgetError: "Không thể xóa ngân sách",
-  fetchStatsError: "Không thể tải thống kê ngân sách",
+  budgetNameExists: "Ngân sách với tên này đã tồn tại trong tháng này",
+  budgetAmountRequired: "Số tiền ngân sách là bắt buộc",
+  budgetAmountPositive: "Số tiền ngân sách phải lớn hơn 0",
+  budgetMonthRequired: "Tháng ngân sách là bắt buộc",
+  budgetYearRequired: "Năm ngân sách là bắt buộc",
+  budgetColorRequired: "Màu ngân sách là bắt buộc",
+  budgetIconRequired: "Biểu tượng ngân sách là bắt buộc",
+  budgetCategoryRequired: "Danh mục ngân sách là bắt buộc",
+  expenseNameRequired: "Tên chi tiêu là bắt buộc",
+  expenseAmountRequired: "Số tiền chi tiêu là bắt buộc",
+  expenseAmountPositive: "Số tiền chi tiêu phải lớn hơn 0",
+  expenseDateRequired: "Ngày chi tiêu là bắt buộc",
+  budgetIdRequired: "ID ngân sách là bắt buộc",
+  failedToCreateBudget: "Không thể tạo ngân sách",
+  failedToUpdateBudget: "Không thể cập nhật ngân sách",
+  failedToDeleteBudget: "Không thể xóa ngân sách",
+  failedToAddExpense: "Không thể thêm chi tiêu",
+  failedToUpdateExpense: "Không thể cập nhật chi tiêu",
+  failedToLoadBudgets: "Không thể tải ngân sách",
+  failedToLoadExpenses: "Không thể tải chi tiêu",
+  unknownError: "Đã xảy ra lỗi không xác định",
+  networkError: "Lỗi mạng. Vui lòng kiểm tra kết nối",
+  serverError: "Lỗi máy chủ. Vui lòng thử lại sau",
 
   // Form Labels
   budgetName: "Tên ngân sách",

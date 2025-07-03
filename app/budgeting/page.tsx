@@ -14,7 +14,7 @@ import {
 } from "@/hooks/use-budget-list";
 import { useBudgetStats } from "@/hooks/use-budget-stats";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { Budget } from "@/lib/types/budget.types";
 
 export default function BudgetingPage() {
@@ -57,10 +57,16 @@ export default function BudgetingPage() {
     transactions: recentTransactions,
     loading: transactionsLoading,
     error: transactionsError,
+    refetch: refetchTransactions,
   } = useRecentTransactions(10);
 
   // Fetch budget statistics for future use
   const { loading: statsLoading, error: statsError } = useBudgetStats();
+
+  // Combined refetch function for when data changes
+  const handleDataRefresh = useCallback(async () => {
+    await Promise.all([refetchBudgets(), refetchTransactions()]);
+  }, [refetchBudgets, refetchTransactions]);
 
   // Handle edit budget
   const handleEditBudget = (budgetId: string) => {
@@ -88,7 +94,7 @@ export default function BudgetingPage() {
       <AppLayout>
         <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0055FF] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0055FF] mx-auto mb-4"></div>
             <p className="text-[#6B7280] font-nunito">
               {t("loading", { ns: "common" })}
             </p>
@@ -103,14 +109,12 @@ export default function BudgetingPage() {
       <AppLayout>
         <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
           <div className="text-center">
-            <div className="text-[#F44336] font-nunito text-lg mb-4">
+            <p className="text-[#F44336] font-nunito mb-4">
               {budgetsError || statsError || transactionsError}
-            </div>
+            </p>
             <button
-              onClick={() => {
-                refetchBudgets();
-              }}
-              className="px-4 py-2 bg-[#0055FF] text-white rounded-lg hover:bg-blue-600 font-nunito"
+              onClick={handleDataRefresh}
+              className="px-4 py-2 bg-[#0055FF] text-white rounded-lg font-nunito hover:bg-[#0041CC]"
             >
               {t("retry", { ns: "common" })}
             </button>
@@ -136,7 +140,10 @@ export default function BudgetingPage() {
           </div>
 
           <div className="mt-8">
-            <RecentExpensesList transactions={recentTransactions} />
+            <RecentExpensesList
+              transactions={recentTransactions}
+              onExpenseUpdated={handleDataRefresh}
+            />
           </div>
         </main>
       </div>
@@ -144,7 +151,7 @@ export default function BudgetingPage() {
       <CreateBudgetModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={refetchBudgets}
+        onSuccess={handleDataRefresh}
       />
 
       <EditBudgetModal
@@ -153,9 +160,7 @@ export default function BudgetingPage() {
           setIsEditModalOpen(false);
           setSelectedBudget(null);
         }}
-        onSuccess={() => {
-          refetchBudgets();
-        }}
+        onSuccess={handleDataRefresh}
         budget={selectedBudget}
       />
 
@@ -165,9 +170,7 @@ export default function BudgetingPage() {
           setIsCreateExpenseModalOpen(false);
           setSelectedBudget(null);
         }}
-        onSuccess={() => {
-          refetchBudgets();
-        }}
+        onSuccess={handleDataRefresh}
         budget={
           selectedBudget
             ? {

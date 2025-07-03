@@ -18,12 +18,26 @@ export interface CreateExpenseRequest {
   date?: string;
 }
 
+export interface UpdateExpenseRequest {
+  name?: string;
+  amount?: number;
+  description?: string;
+  date?: string;
+}
+
 export interface CreateTransactionRequest {
   name: string;
   amount: number;
   description?: string;
   type: TransactionType;
   recurring?: number;
+}
+
+export interface UpdateTransactionRequest {
+  name?: string;
+  amount?: number;
+  description?: string;
+  date?: string;
 }
 
 export interface TransactionResponse {
@@ -39,6 +53,11 @@ export interface TransactionListResponse {
 export interface CreateExpenseResponse {
   transaction: Transaction | null;
   budgetTransaction: BudgetTransaction | null;
+  error: string | null;
+}
+
+export interface UpdateExpenseResponse {
+  transaction: Transaction | null;
   error: string | null;
 }
 
@@ -62,6 +81,12 @@ export interface UseTransactionCreateReturn {
 export interface UseExpenseCreateReturn {
   createExpense: (data: CreateExpenseRequest) => Promise<{ transaction: Transaction; budgetTransaction: BudgetTransaction } | null>;
   isCreating: boolean;
+  error: string | null;
+}
+
+export interface UseExpenseUpdateReturn {
+  updateExpense: (id: string, data: UpdateExpenseRequest) => Promise<Transaction | null>;
+  isUpdating: boolean;
   error: string | null;
 }
 

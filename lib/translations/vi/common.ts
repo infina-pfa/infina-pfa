@@ -8,6 +8,7 @@ export const commonVi = {
   fina: "Fina",
   advisor: "Tư vấn",
   budgeting: "Ngân sách",
+  chat: "Trò chuyện",
   tools: "Công cụ",
   dashboard: "Bảng điều khiển",
 

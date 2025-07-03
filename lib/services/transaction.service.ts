@@ -3,9 +3,12 @@ import { handleError } from "@/lib/error-handler";
 import { 
   CreateTransactionRequest, 
   CreateExpenseRequest,
+  UpdateExpenseRequest,
+  UpdateTransactionRequest,
   TransactionResponse,
   TransactionListResponse,
-  CreateExpenseResponse
+  CreateExpenseResponse,
+  UpdateExpenseResponse
 } from "@/lib/types/transaction.types";
 
 // Type for translation function
@@ -100,6 +103,79 @@ export const transactionService = {
       return {
         transaction: null,
         budgetTransaction: null,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Update an existing expense/transaction
+   */
+  async updateExpense(id: string, data: UpdateExpenseRequest, t?: TranslationFunction): Promise<UpdateExpenseResponse> {
+    try {
+      const response = await apiClient.put<{
+        id: string;
+        name: string;
+        amount: number;
+        description: string | null;
+        type: "income" | "outcome" | "transfer";
+        recurring: number;
+        created_at: string;
+        updated_at: string;
+        user_id: string | null;
+      }>(`/transactions/${id}`, {
+        name: data.name,
+        amount: data.amount,
+        description: data.description,
+        date: data.date,
+      });
+
+      if (response.success && response.data) {
+        return {
+          transaction: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(response.error || 'Failed to update expense');
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        transaction: null,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Update an existing transaction
+   */
+  async update(id: string, data: UpdateTransactionRequest, t?: TranslationFunction): Promise<TransactionResponse> {
+    try {
+      const response = await apiClient.put<{
+        id: string;
+        name: string;
+        amount: number;
+        description: string | null;
+        type: "income" | "outcome" | "transfer";
+        recurring: number;
+        created_at: string;
+        updated_at: string;
+        user_id: string | null;
+      }>(`/transactions/${id}`, data);
+
+      if (response.success && response.data) {
+        return {
+          transaction: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(response.error || 'Failed to update transaction');
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        transaction: null,
         error: appError.message,
       };
     }
