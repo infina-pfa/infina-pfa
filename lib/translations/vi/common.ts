@@ -11,6 +11,7 @@ export const commonVi = {
   chat: "Trò chuyện",
   tools: "Công cụ",
   dashboard: "Bảng điều khiển",
+  app: "Infina",
 
   // Language
   language: "Ngôn ngữ",

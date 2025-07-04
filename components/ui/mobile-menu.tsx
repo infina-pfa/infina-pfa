@@ -65,6 +65,21 @@ export function MobileMenu() {
     return pathname.startsWith(href);
   };
 
+  // Get current page title based on pathname
+  const getCurrentPageTitle = () => {
+    // For root path, show Home
+    if (pathname === "/") return t("home");
+
+    // Check if current path matches any navigation item
+    const navItem = navigationItems.find((item) =>
+      pathname.startsWith(item.href)
+    );
+    if (navItem) return t(navItem.key);
+
+    // Default title for other pages
+    return t("app");
+  };
+
   if (loading) {
     return (
       <div className="md:hidden">
@@ -74,17 +89,25 @@ export function MobileMenu() {
   }
 
   return (
-    <div className="md:hidden">
+    <div className="md:hidden w-full">
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="p-2 text-gray-700 hover:text-infina-blue hover:bg-blue-50"
-            aria-label="Toggle menu"
-          >
-            <Menu className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center justify-between gap-2 w-full">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-2 text-gray-700 hover:text-infina-blue hover:bg-blue-50 flex items-center gap-2"
+              aria-label="Toggle menu"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+            <div className="flex-1 flex items-center justify-center">
+              <span className="font-medium text-sm">
+                {getCurrentPageTitle()}
+              </span>
+            </div>
+            <span className="w-10" />
+          </div>
         </SheetTrigger>
 
         <SheetContent side="left" className="w-80 p-0 bg-white">

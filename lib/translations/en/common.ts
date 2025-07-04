@@ -11,6 +11,7 @@ export const commonEn = {
   tools: "Tools",
   dashboard: "Dashboard",
   chat: "Chat",
+  app: "Infina",
 
   // Language
   language: "Language",

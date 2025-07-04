@@ -9,7 +9,7 @@ export function Header() {
       <div className="max-w-6xl mx-auto px-6 h-full">
         <div className="flex items-center justify-between h-full">
           {/* Mobile Menu - Show on mobile for all users */}
-          <div className="md:hidden">
+          <div className="md:hidden w-full">
             <MobileMenu />
           </div>
 
