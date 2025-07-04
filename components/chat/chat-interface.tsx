@@ -3,9 +3,9 @@
 import { useChatFlow } from "@/hooks/use-chat-flow";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { ChatInput } from "./chat-input";
-import { ComponentPanel } from "./component-panel";
 import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
+import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
 
 export function ChatInterface() {
@@ -19,7 +19,8 @@ export function ChatInterface() {
     isStreaming,
     showSuggestions,
     clearError,
-    closeComponent,
+    toolId,
+    setToolId,
     inputValue,
     setInputValue,
     handleSubmit,
@@ -104,8 +105,14 @@ export function ChatInterface() {
         />
       </div>
 
-      {/* Component Panel */}
-      <ComponentPanel onClose={closeComponent} />
+      {/* Tool Panel */}
+      <ToolPanel
+        isOpen={!!toolId}
+        toolId={toolId}
+        onClose={() => {
+          setToolId(null);
+        }}
+      />
     </div>
   );
 }

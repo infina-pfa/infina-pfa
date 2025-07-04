@@ -1,4 +1,10 @@
-import { Tables, TablesInsert, TablesUpdate, Enums } from "@/lib/supabase/database";
+import {
+  Enums,
+  Tables,
+  TablesInsert,
+  TablesUpdate,
+} from "@/lib/supabase/database";
+import { ChatToolId } from "./ai-streaming.types";
 
 // Database types
 export type Conversation = Tables<"conversations">;
@@ -22,7 +28,7 @@ export interface ChatMessage extends Message {
 
 // Component data for interactive UI components
 export interface ComponentData {
-  type: 'budget_form' | 'expense_tracker' | 'goal_planner' | 'investment_calculator' | 'spending_chart';
+  type: ChatToolId;
   props: Record<string, unknown>;
   title?: string;
   description?: string;
@@ -77,29 +83,29 @@ export interface ChatSuggestion {
 // Default chat suggestions
 export const DEFAULT_CHAT_SUGGESTIONS: ChatSuggestion[] = [
   {
-    id: 'create_budget',
-    text: 'Giúp tôi tạo ngân sách',
-    description: 'Thiết lập kế hoạch ngân sách hàng tháng',
-    icon: 'calculator'
+    id: "create_budget",
+    text: "Giúp tôi tạo ngân sách",
+    description: "Thiết lập kế hoạch ngân sách hàng tháng",
+    icon: "calculator",
   },
   {
-    id: 'analyze_spending',
-    text: 'Phân tích thói quen chi tiêu của tôi',
-    description: 'Xem xét các giao dịch gần đây',
-    icon: 'trending-down'
+    id: "analyze_spending",
+    text: "Phân tích thói quen chi tiêu của tôi",
+    description: "Xem xét các giao dịch gần đây",
+    icon: "trending-down",
   },
   {
-    id: 'plan_goals',
-    text: 'Lập kế hoạch mục tiêu tài chính',
-    description: 'Đặt và theo dõi các mục tiêu tài chính',
-    icon: 'target'
+    id: "plan_goals",
+    text: "Lập kế hoạch mục tiêu tài chính",
+    description: "Đặt và theo dõi các mục tiêu tài chính",
+    icon: "target",
   },
   {
-    id: 'review_investments',
-    text: 'Xem xét các khoản đầu tư',
-    description: 'Phân tích danh mục và đưa ra khuyến nghị',
-    icon: 'trending-up'
-  }
+    id: "review_investments",
+    text: "Xem xét các khoản đầu tư",
+    description: "Phân tích danh mục và đưa ra khuyến nghị",
+    icon: "trending-up",
+  },
 ];
 
 // Chat context for AI
@@ -139,14 +145,18 @@ export interface ChatError {
   details?: Record<string, unknown>;
 }
 
-
-
 // Legacy UseStreamingChatReturn interface - replaced by AI Advisor streaming
 // This interface is deprecated
 
 // WebSocket message types
 export interface WebSocketMessage {
-  type: 'user_message' | 'ai_response_start' | 'ai_response_chunk' | 'ai_response_complete' | 'component_render' | 'error';
+  type:
+    | "user_message"
+    | "ai_response_start"
+    | "ai_response_chunk"
+    | "ai_response_complete"
+    | "component_render"
+    | "error";
   payload: {
     conversationId: string;
     messageId?: string;
@@ -174,17 +184,15 @@ export type SendMessageServiceResponse = ChatServiceResponse<{
   streamUrl: string;
 }>;
 
-
-
 // UI Action Types for AI Advisor
 export enum UIActionType {
   OPEN_TOOL = "open_tool",
   SHOW_COMPONENT = "show_component",
 }
 
-export type UITool = 
+export type UITool =
   | "budget-tool"
-  | "loan-calculator" 
+  | "loan-calculator"
   | "interest-calculator"
   | "salary-calculator"
   | "learning-center";
@@ -268,8 +276,10 @@ export interface UseAIAdvisorStreamProcessorOptions {
 export interface UseAIAdvisorStreamProcessorReturn {
   isProcessing: boolean;
   isStreaming: boolean;
-  processStreamData: (readableStream: ReadableStream<Uint8Array>) => Promise<void>;
+  processStreamData: (
+    readableStream: ReadableStream<Uint8Array>
+  ) => Promise<void>;
   processStreamEvent: (event: AdvisorStreamEvent) => void;
   reset: () => void;
   responseId: string;
-} 
+}

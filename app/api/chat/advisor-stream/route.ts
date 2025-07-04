@@ -44,20 +44,6 @@ const chatTools: ChatTool[] = [
       "thuế thu nhập",
     ],
   },
-  {
-    id: ChatToolId.LEARNING_CENTER,
-    name: "Hành trình Học tập",
-    description:
-      "Hiển thị hành trình học tập thực tế của người dùng với milestone và task cụ thể",
-    keywords: [
-      "học",
-      "kiến thức",
-      "tài chính",
-      "learning",
-      "bài học",
-      "hành trình",
-    ],
-  },
 ];
 
 const chatComponents = [

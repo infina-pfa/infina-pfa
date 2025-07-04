@@ -21,7 +21,6 @@ export enum ChatToolId {
   LOAN_CALCULATOR = "loan-calculator",
   INTEREST_CALCULATOR = "interest-calculator",
   SALARY_CALCULATOR = "salary-calculator",
-  LEARNING_CENTER = "learning-center",
 }
 
 export enum ChatComponentId {

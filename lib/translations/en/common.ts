@@ -30,7 +30,7 @@ export const commonEn = {
   getStarted: "Get Started",
   learnMore: "Learn More",
   startFreeJourney: "Start your free journey",
-  
+
   // Common UI Actions
   loading: "Loading...",
   retry: "Retry",
@@ -52,7 +52,7 @@ export const commonEn = {
   no: "No",
   view: "View",
   viewAll: "View All",
-  
+
   // Error Messages
   unknownError: "An unknown error occurred",
 
@@ -79,18 +79,18 @@ export const commonEn = {
   noData: "No data available",
   noResults: "No results found",
   tryAgain: "Please try again",
-  
+
   // Form
   required: "Required",
   optional: "Optional",
   invalidInput: "Invalid input",
   fieldRequired: "This field is required",
-  
+
   // Time
   today: "Today",
   yesterday: "Yesterday",
   tomorrow: "Tomorrow",
-  
+
   // General
   goodbye: "Goodbye",
   hello: "Hello",

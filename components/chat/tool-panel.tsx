@@ -1,35 +1,31 @@
 "use client";
 
 import { useAppTranslation } from "@/hooks/use-translation";
-import { ComponentData } from "@/lib/types/chat.types";
+import { ChatToolId } from "@/lib/types/ai-streaming.types";
 
-interface ComponentPanelProps {
+interface ToolPanelProps {
   onClose: () => void;
-  component?: ComponentData;
+  toolId: ChatToolId | null;
   isOpen?: boolean;
 }
 
-export function ComponentPanel({
-  onClose,
-  component,
-  isOpen = false,
-}: ComponentPanelProps) {
+export function ToolPanel({ onClose, toolId, isOpen = false }: ToolPanelProps) {
   const { t } = useAppTranslation(["chat", "common"]);
 
-  if (!isOpen || !component) {
+  if (!isOpen || !toolId) {
     return null;
   }
 
   const renderComponent = () => {
-    switch (component.type) {
-      case "budget_form":
+    switch (toolId) {
+      case ChatToolId.BUDGET_TOOL:
         return (
           <div className="bg-white p-6 rounded-xl">
             <h3 className="text-xl font-bold font-nunito mb-4 text-gray-900">
-              {component.title || t("budgetFormTitle")}
+              {t("budgetFormTitle")}
             </h3>
             <p className="text-base text-gray-600 font-nunito mb-6">
-              {component.description || t("budgetFormDescription")}
+              {t("budgetFormDescription")}
             </p>
             <div className="text-center py-12 text-gray-500 font-nunito">
               {t("componentPlaceholder")}
@@ -37,14 +33,14 @@ export function ComponentPanel({
           </div>
         );
 
-      case "expense_tracker":
+      case ChatToolId.LOAN_CALCULATOR:
         return (
           <div className="bg-white p-6 rounded-xl">
             <h3 className="text-xl font-bold font-nunito mb-4 text-gray-900">
-              {component.title || t("expenseTrackerTitle")}
+              {t("expenseTrackerTitle")}
             </h3>
             <p className="text-base text-gray-600 font-nunito mb-6">
-              {component.description || t("expenseTrackerDescription")}
+              {t("expenseTrackerDescription")}
             </p>
             <div className="text-center py-12 text-gray-500 font-nunito">
               {t("componentPlaceholder")}
@@ -52,14 +48,14 @@ export function ComponentPanel({
           </div>
         );
 
-      case "goal_planner":
+      case ChatToolId.INTEREST_CALCULATOR:
         return (
           <div className="bg-white p-6 rounded-xl">
             <h3 className="text-xl font-bold font-nunito mb-4 text-gray-900">
-              {component.title || t("goalPlannerTitle")}
+              {t("goalPlannerTitle")}
             </h3>
             <p className="text-base text-gray-600 font-nunito mb-6">
-              {component.description || t("goalPlannerDescription")}
+              {t("goalPlannerDescription")}
             </p>
             <div className="text-center py-12 text-gray-500 font-nunito">
               {t("componentPlaceholder")}
@@ -67,29 +63,14 @@ export function ComponentPanel({
           </div>
         );
 
-      case "investment_calculator":
+      case ChatToolId.SALARY_CALCULATOR:
         return (
           <div className="bg-white p-6 rounded-xl">
             <h3 className="text-xl font-bold font-nunito mb-4 text-gray-900">
-              {component.title || t("investmentCalculatorTitle")}
+              {t("investmentCalculatorTitle")}
             </h3>
             <p className="text-base text-gray-600 font-nunito mb-6">
-              {component.description || t("investmentCalculatorDescription")}
-            </p>
-            <div className="text-center py-12 text-gray-500 font-nunito">
-              {t("componentPlaceholder")}
-            </div>
-          </div>
-        );
-
-      case "spending_chart":
-        return (
-          <div className="bg-white p-6 rounded-xl">
-            <h3 className="text-xl font-bold font-nunito mb-4 text-gray-900">
-              {component.title || t("spendingChartTitle")}
-            </h3>
-            <p className="text-base text-gray-600 font-nunito mb-6">
-              {component.description || t("spendingChartDescription")}
+              {t("investmentCalculatorDescription")}
             </p>
             <div className="text-center py-12 text-gray-500 font-nunito">
               {t("componentPlaceholder")}
@@ -101,10 +82,10 @@ export function ComponentPanel({
         return (
           <div className="bg-white p-6 rounded-xl">
             <h3 className="text-xl font-bold font-nunito mb-4 text-gray-900">
-              {component.title || t("unknownComponentTitle")}
+              {t("unknownComponentTitle")}
             </h3>
             <p className="text-base text-gray-600 font-nunito mb-6">
-              {component.description || t("unknownComponentDescription")}
+              {t("unknownComponentDescription")}
             </p>
             <div className="text-center py-12 text-gray-500 font-nunito">
               {t("componentPlaceholder")}
