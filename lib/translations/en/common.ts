@@ -97,4 +97,10 @@ export const commonEn = {
   hello: "Hello",
   thanks: "Thank you",
   pleaseWait: "Please wait",
+
+  // Tool id
+  "budget-tool": "Budgeting",
+  "loan-calculator": "Loan Calculator",
+  "interest-calculator": "Interest Calculator",
+  "salary-calculator": "Salary Calculator",
 };

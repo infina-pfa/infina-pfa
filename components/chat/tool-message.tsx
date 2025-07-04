@@ -24,7 +24,7 @@ export function ToolMessage({ message, onToolClick }: ToolMessageProps) {
       <div className="flex items-center gap-3 mb-3">
         <ToolIcon />
         <span className="text-base font-semibold text-blue-900 font-nunito">
-          {toolId || t("componentSuggestion")}
+          {toolId ? t(toolId, { ns: "common" }) : t("componentSuggestion")}
         </span>
       </div>
 

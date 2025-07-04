@@ -97,4 +97,10 @@ export const commonVi = {
   hello: "Xin chào",
   thanks: "Cảm ơn",
   pleaseWait: "Vui lòng đợi",
+
+  // Tool id
+  "budget-tool": "Quản lý ngân sách",
+  "loan-calculator": "Tính toán vay",
+  "interest-calculator": "Tính toán lãi suất",
+  "salary-calculator": "Tính toán lương",
 };
