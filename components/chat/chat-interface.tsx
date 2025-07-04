@@ -1,13 +1,12 @@
 "use client";
 
 import { useChatFlow } from "@/hooks/use-chat-flow";
-import { MessageList } from "./message-list";
-import { ChatInput } from "./chat-input";
-import { TypingIndicator } from "./typing-indicator";
-import { ComponentPanel } from "./component-panel";
-import { SuggestionList } from "./suggestion-list";
-import { BudgetAnalysisMessage } from "./budget-analysis-message";
 import { useAppTranslation } from "@/hooks/use-translation";
+import { ChatInput } from "./chat-input";
+import { ComponentPanel } from "./component-panel";
+import { MessageList } from "./message-list";
+import { SuggestionList } from "./suggestion-list";
+import { TypingIndicator } from "./typing-indicator";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
@@ -19,7 +18,6 @@ export function ChatInterface() {
     isThinking,
     isStreaming,
     showSuggestions,
-    conversationId,
     clearError,
     closeComponent,
     inputValue,
