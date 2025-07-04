@@ -21,7 +21,7 @@ export function MultipleChoiceComponent({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const options = component.data.options || [];
+  const options = component.context.options || [];
   const isCompleted = component.isCompleted;
 
   const handleOptionSelect = (optionId: string) => {
@@ -32,10 +32,18 @@ export function MultipleChoiceComponent({
   const handleSubmit = async () => {
     if (!selectedOption || isSubmitting) return;
 
+    // Find the selected option by ID to get its label
+    const selectedOptionData = options.find(option => option.id === selectedOption);
+    if (!selectedOptionData) {
+      console.error("Selected option not found:", selectedOption);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      // Submit the label instead of the ID
       await onResponse({
-        selectedOption,
+        selectedOption: selectedOptionData.label,
         completedAt: new Date(),
       });
     } catch (error) {

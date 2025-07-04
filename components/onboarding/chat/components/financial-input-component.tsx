@@ -23,7 +23,7 @@ export function FinancialInputComponent({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isCompleted = component.isCompleted;
-  const inputType = component.data.inputType || "income";
+  const inputType = component.context.inputType || "income";
 
   const handleSubmit = async () => {
     const numericValue = parseFloat(financialValue);

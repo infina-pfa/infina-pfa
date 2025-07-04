@@ -49,7 +49,7 @@ export function OnboardingChatInput({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex space-x-2 items-end">
+    <form onSubmit={handleSubmit} className="flex space-x-2 sm:space-x-3 items-end">
       <div className="flex-1">
         <Input
           value={inputValue}
@@ -57,16 +57,16 @@ export function OnboardingChatInput({
           onKeyPress={handleKeyPress}
           placeholder={placeholder || t("typeYourMessage")}
           disabled={disabled || isSending}
-          className="h-12 text-base"
+          className="h-11 sm:h-12 text-sm sm:text-base px-3 sm:px-4 rounded-xl border-none bg-[#F0F2F5] focus:bg-white focus:ring-2 focus:ring-[#0055FF] focus:ring-opacity-20 transition-all duration-200"
         />
       </div>
       
       <Button
         type="submit"
         disabled={!inputValue.trim() || disabled || isSending}
-        className="h-12 px-4 bg-[#0055FF] hover:bg-blue-700 text-white"
+        className="h-11 sm:h-12 px-3 sm:px-4 bg-[#0055FF] hover:bg-blue-700 text-white rounded-xl border-none shadow-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[44px] sm:min-w-[48px]"
       >
-        <Send className="w-4 h-4" />
+        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
       </Button>
     </form>
   );

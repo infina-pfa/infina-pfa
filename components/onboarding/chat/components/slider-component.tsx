@@ -17,11 +17,11 @@ export function SliderComponent({
 }: SliderComponentProps) {
   const { t } = useAppTranslation(["onboarding", "common"]);
   const [sliderValue, setSliderValue] = useState<number>(
-    component.response?.sliderValue || component.data.range?.min || 0
+    component.response?.sliderValue || component.context.range?.min || 0
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const range = component.data.range || { min: 0, max: 100, step: 1 };
+  const range = component.context.range || { min: 0, max: 100, step: 1 };
   const isCompleted = component.isCompleted;
 
   const handleSubmit = async () => {

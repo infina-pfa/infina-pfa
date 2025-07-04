@@ -23,7 +23,7 @@ export function TextInputComponent({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isCompleted = component.isCompleted;
-  const validation = component.data.validation || {};
+  const validation = component.context.validation || {};
 
   const handleSubmit = async () => {
     if (!textValue.trim() || isSubmitting) return;
@@ -65,7 +65,7 @@ export function TextInputComponent({
         <Input
           value={textValue}
           onChange={(e) => setTextValue(e.target.value)}
-          placeholder={component.data.placeholder || t("enterYourAnswer")}
+          placeholder={component.context.placeholder || t("enterYourAnswer")}
           disabled={isCompleted}
           className="h-12 text-base"
         />

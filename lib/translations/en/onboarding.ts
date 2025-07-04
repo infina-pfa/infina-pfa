@@ -34,6 +34,29 @@ export const onboardingEn = {
   writeYourIntroduction: "Write your introduction here...",
   characters: "characters",
   
+  // New Template Fields
+  templateFillInBlanks: "Fill in the information in the blanks:",
+  templateText: "My name is {name}, {age} years old, living in {location}. I work as {job} with a monthly income of about {income} dollars. Currently I want to {goal}.",
+  
+  // Template Field Labels
+  nameFieldLabel: "Your name",
+  ageFieldLabel: "Age",
+  locationFieldLabel: "Location",
+  jobFieldLabel: "Job",
+  incomeFieldLabel: "Income (Dollars)",
+  goalFieldLabel: "Financial goal",
+  
+  // Template Field Placeholders
+  templateNamePlaceholder: "Enter your name",
+  templateAgePlaceholder: "Enter your age",
+  templateLocationPlaceholder: "City you live in",
+  templateJobPlaceholder: "Your current job",
+  templateIncomePlaceholder: "Monthly income amount",
+  templateGoalPlaceholder: "Your financial goal",
+  
+  // Preview
+  preview: "Preview",
+  
   // Multiple Choice Components
   selectOption: "Select an option",
   chooseOne: "Please choose one option",

@@ -3,7 +3,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import OpenAI from "openai";
 import { generateOnboardingSystemPrompt } from "@/lib/ai-advisor/prompts/onboarding-system-prompt";
-import { onboardingFunctionTools } from "@/lib/ai-advisor/tools/onboarding-definitions";
+import { onboardingFunctionTools, validateComponentArguments } from "@/lib/ai-advisor/tools/onboarding-definitions";
+import { SystemPromptLogger } from "@/lib/utils/system-prompt-logger";
 
 // Initialize OpenAI client
 const openaiClient = new OpenAI({
@@ -21,6 +22,46 @@ interface OnboardingStreamRequest {
   userProfile?: Record<string, unknown>;
   currentStep?: string;
 }
+
+interface ToolCallData {
+  component_type?: string;
+  title?: string;
+  component_id?: string;
+  context?: Record<string, unknown>;
+  profile_updates?: Record<string, unknown>;
+  profile_data?: Record<string, unknown>;
+  trigger_completion?: boolean;
+}
+
+// Type definitions for OpenAI Responses API events
+interface FunctionCallItem {
+  id: string;
+  name: string;
+  call_id: string;
+  type: "function_call";
+}
+
+interface ResponseOutputItemAddedEvent {
+  type: "response.output_item.added";
+  item: FunctionCallItem;
+}
+
+interface FunctionCallArgumentsDoneEvent {
+  type: "response.function_call_arguments.done";
+  item_id: string;
+  arguments: string;
+}
+
+// Convert function tools to Responses API format (flatten structure)
+const convertToolsForResponsesAPI = (tools: typeof onboardingFunctionTools) => {
+  return tools.map(tool => ({
+    type: "function" as const,
+    name: tool.function.name,
+    description: tool.function.description,
+    parameters: tool.function.parameters,
+    strict: false
+  }));
+};
 
 export async function POST(request: NextRequest) {
   console.log("🚀 POST /api/onboarding/ai-stream called");
@@ -88,16 +129,39 @@ export async function POST(request: NextRequest) {
 
     console.log("📝 Generated onboarding system prompt");
 
-    // Prepare messages for Chat Completions API
-    const messages = [
+    // Log system prompt to file for debugging
+    const requestId = await SystemPromptLogger.logSystemPrompt({
+      userId: user.id,
+      currentStep: requestBody.currentStep || "ai_welcome",
+      userProfile: requestBody.userProfile,
+      conversationHistory,
+      systemPrompt,
+      userMessage: requestBody.message,
+    });
+
+    // Also log summary for daily tracking
+    await SystemPromptLogger.logPromptSummary({
+      userId: user.id,
+      currentStep: requestBody.currentStep || "ai_welcome",
+      promptLength: systemPrompt.length,
+      userMessage: requestBody.message,
+      requestId,
+    });
+
+    // Prepare input for Responses API
+    const input = [
       { role: "system" as const, content: systemPrompt },
       ...conversationHistory.slice(-5), // Keep last 5 messages
       { role: "user" as const, content: requestBody.message }
     ];
 
-    console.log("💬 Prepared messages:", {
-      totalMessages: messages.length,
-      systemPromptLength: systemPrompt.length
+    // Convert tools for Responses API format
+    const responsesApiTools = convertToolsForResponsesAPI(onboardingFunctionTools);
+
+    console.log("💬 Prepared input for Responses API:", {
+      totalMessages: input.length,
+      systemPromptLength: systemPrompt.length,
+      requestId: requestId
     });
 
     // Set up SSE headers
@@ -113,25 +177,24 @@ export async function POST(request: NextRequest) {
     // Create readable stream
     const readable = new ReadableStream({
       async start(controller) {
-        console.log("🌊 Starting onboarding chat completions stream...");
+        console.log("🌊 Starting onboarding responses stream...");
         
         try {
-          // Debug logging for messages and tools
-          console.log("🔧 Available onboarding tools:", onboardingFunctionTools.length);
-          console.log("📝 Final messages for AI:", {
-            count: messages.length,
-            systemPromptLength: messages[0]?.content?.length || 0,
-            lastUserMessage: messages[messages.length - 1]?.content?.substring(0, 100) + "..."
+          // Debug logging for input and tools
+          console.log("🔧 Available onboarding tools:", responsesApiTools.length);
+          console.log("📝 Final input for AI:", {
+            count: input.length,
+            systemPromptLength: input[0]?.content?.length || 0,
+            lastUserMessage: input[input.length - 1]?.content?.substring(0, 100) + "..."
           });
 
-          // Use Chat Completions API with streaming
-          const response = await openaiClient.chat.completions.create({
+          // Use Responses API with streaming
+          const stream = await openaiClient.responses.create({
             model: "gpt-4.1-2025-04-14",
-            messages: messages,
-            tools: onboardingFunctionTools,
-            tool_choice: "auto", // Let AI decide when to use tools
+            input: input,
+            tools: responsesApiTools,
             stream: true,
-            temperature: 0.7
+            temperature: 0.7,
           });
 
           const encoder = new TextEncoder();
@@ -140,6 +203,7 @@ export async function POST(request: NextRequest) {
             id: string;
             name: string;
             arguments: string;
+            call_id: string;
             status?: "new" | "in_progress" | "done";
           }> = {};
 
@@ -154,61 +218,52 @@ export async function POST(request: NextRequest) {
           };
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(responseCreatedData)}\n\n`));
 
-          // Process streaming response
-          for await (const chunk of response) {
-            const choice = chunk.choices[0];
-            if (!choice) continue;
-
-            const delta = choice.delta;
-            
-            // Handle text content
-            if (delta.content) {
-              responseContent += delta.content;
+          // Process streaming response from Responses API
+          for await (const event of stream) {
+            // Handle text streaming
+            if (event.type === "response.output_text.delta") {
+              responseContent += event.delta;
               const data = {
                 type: "response_output_text_streaming",
                 response_id: responseId,
-                content: delta.content,
+                content: event.delta,
                 timestamp: new Date().toISOString(),
               };
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
             }
 
-            // Handle function calls
-            if (delta.tool_calls) {
-              for (const toolCall of delta.tool_calls) {
-                const callId = toolCall.id;
-                
-                if (callId && !functionCalls[callId]) {
-                  functionCalls[callId] = {
-                    id: callId,
-                    name: toolCall.function?.name || "",
-                    arguments: "",
-                    status: "new",
-                  };
-                  if(functionCalls[callId].name){
-                    console.log("🔧 New onboarding function call:", callId, toolCall.function?.name);
-                  }
-                }
-
-                if (callId && toolCall.function?.arguments) {
-                    if(functionCalls[callId].status === "new" && functionCalls[callId].name === ""){
-                        // It's possible the name will arrive in a separate chunk.
-                        // We will update it if we find it.
-                        functionCalls[callId].name = toolCall.function?.name || "";
-                    }
-                    functionCalls[callId].arguments += toolCall.function.arguments;
-                    functionCalls[callId].status = "in_progress";
-                } else if (callId && toolCall.function?.name && functionCalls[callId].name === "") {
-                    functionCalls[callId].name = toolCall.function.name;
-                }
+            // Handle function call item added
+            if (event.type === "response.output_item.added") {
+              const typedEvent = event as ResponseOutputItemAddedEvent;
+              if (typedEvent.item?.type === "function_call") {
+                const functionCall = typedEvent.item;
+                functionCalls[functionCall.id] = {
+                  id: functionCall.id,
+                  name: functionCall.name,
+                  arguments: "",
+                  call_id: functionCall.call_id,
+                  status: "new",
+                };
+                console.log("🔧 New onboarding function call:", functionCall.id, functionCall.name);
               }
             }
 
-            // Check if response is complete
-            if (choice.finish_reason) {
-              console.log("🏁 Onboarding chat completions stream finished:", choice.finish_reason);
+            // Handle function call arguments completion
+            if (event.type === "response.function_call_arguments.done") {
+              const typedEvent = event as FunctionCallArgumentsDoneEvent;
+              const itemId = typedEvent.item_id;
+              if (functionCalls[itemId]) {
+                functionCalls[itemId].arguments = typedEvent.arguments;
+                functionCalls[itemId].status = "done";
+                console.log(`🔧 Function call arguments complete for ${functionCalls[itemId].name} (${itemId}):`, typedEvent.arguments);
+              }
+            }
+
+            // Handle response completion
+            if (event.type === "response.completed") {
+              console.log("🏁 Onboarding responses stream finished");
               
-              // Send text done event
+              // Send final text content if any exists
               if (responseContent) {
                 const textDoneData = {
                   type: "response_output_text_done",
@@ -218,30 +273,79 @@ export async function POST(request: NextRequest) {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify(textDoneData)}\n\n`));
               }
 
-              // Process completed function calls when the model is done calling tools
-              if (choice.finish_reason === "tool_calls") {
-                const successfulCalls: (typeof functionCalls[string])[] = [];
-                const failedCalls: { call: typeof functionCalls[string]; error: string }[] = [];
+              // Process any complete function calls
+              const successfulCalls: (typeof functionCalls[string])[] = [];
+              const failedCalls: { call: typeof functionCalls[string]; error: string }[] = [];
 
-                for (const callId in functionCalls) {
-                  const call = functionCalls[callId];
+              for (const itemId in functionCalls) {
+                const call = functionCalls[itemId];
+                
+                try {
+                  console.log(`🔧 Processing function call ${call.name} (${itemId}):`);
+                  console.log(`🔧 Raw arguments string: "${call.arguments}"`);
+                  console.log(`🔧 Arguments length: ${call.arguments.length}`);
                   
-                  try {
-                    console.log(`🔧 Attempting to parse arguments for ${call.name} (${callId}):`, call.arguments);
-                    const toolData = call.arguments ? JSON.parse(call.arguments) : {};
-                    console.log("✅ Successfully parsed arguments for:", call.name, toolData);
-                    
-                    if (call.name === "show_onboarding_component") {
-                      if (!toolData.component_type || !toolData.title) {
-                        const errorMsg = "Missing required parameters from AI for show_onboarding_component.";
-                        console.error(`❌ ${errorMsg}`, toolData);
-                        const errorData = { type: "tool_error", tool_name: call.name, error: errorMsg, details: toolData };
-                        controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
-                        failedCalls.push({ call, error: errorMsg });
-                        continue;
-                      }
+                  // Handle empty or invalid arguments
+                  let toolData: ToolCallData = {};
+                  let hasValidArguments = false;
+                  
+                  if (call.arguments && call.arguments.trim().length > 0) {
+                    try {
+                      toolData = JSON.parse(call.arguments);
+                      console.log("✅ Successfully parsed arguments for:", call.name, toolData);
                       
-                      const componentId = toolData.component_id || `${toolData.component_type}-${Date.now()}`;
+                      // Validate arguments if this is show_onboarding_component
+                      if (call.name === "show_onboarding_component") {
+                        const validation = validateComponentArguments(toolData);
+                        if (validation.isValid) {
+                          hasValidArguments = true;
+                          console.log("✅ Arguments validation passed for:", call.name);
+                        } else {
+                          console.error(`❌ Argument validation failed for ${call.name}:`, validation.errors);
+                          const errorMsg = `Invalid arguments for ${call.name}: ${validation.errors.join(", ")}`;
+                          const errorData = { 
+                            type: "tool_error", 
+                            tool_name: call.name, 
+                            error: errorMsg,
+                            details: { 
+                              rawArguments: call.arguments,
+                              validationErrors: validation.errors,
+                              hint: "Please provide all required parameters: component_type, title, component_id, context"
+                            }
+                          };
+                          controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
+                          failedCalls.push({ call, error: errorMsg });
+                          continue;
+                        }
+                      } else {
+                        hasValidArguments = true;
+                      }
+                    } catch (parseError) {
+                      console.error(`❌ Failed to parse arguments for ${call.name}:`, parseError);
+                      const errorMsg = `Invalid JSON arguments provided by AI for ${call.name}. Please provide valid JSON.`;
+                      const errorData = { 
+                        type: "tool_error", 
+                        tool_name: call.name, 
+                        error: errorMsg, 
+                        details: { 
+                          rawArguments: call.arguments,
+                          parseError: parseError instanceof Error ? parseError.message : String(parseError),
+                          hint: "Arguments must be valid JSON format"
+                        }
+                      };
+                      controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
+                      failedCalls.push({ call, error: errorMsg });
+                      continue;
+                    }
+                  } else {
+                    console.warn(`⚠️ Empty arguments for ${call.name}, will provide defaults if possible`);
+                  }
+                  
+                  if (call.name === "show_onboarding_component") {
+                    // If we already have valid arguments, use them directly
+                    if (hasValidArguments) {
+                      // Ensure component_id is set
+                      const componentId = toolData.component_id || `${toolData.component_type}_${Date.now()}`;
                       
                       const action = {
                         type: "show_component",
@@ -249,60 +353,74 @@ export async function POST(request: NextRequest) {
                           componentType: toolData.component_type,
                           componentId: componentId,
                           title: toolData.title,
-                          context: toolData.context || {},
+                          context: toolData.context,
                         },
                       };
                       
-                      console.log("📤 Sent onboarding component action:", action.payload.componentType);
+                      console.log("📤 Sent onboarding component action (from valid args):", action.payload.componentType, "with ID:", componentId);
                       controller.enqueue(encoder.encode(`data: ${JSON.stringify(action)}\n\n`));
                       successfulCalls.push(call);
-
-                    } else if (call.name === "update_onboarding_profile") {
-                        const { profile_updates } = toolData;
-                        if (!profile_updates) {
-                          throw new Error("Missing profile_updates in tool call");
-                        }
-                        const { error: updateError } = await supabase.from("users").update(profile_updates).eq('user_id', user.id);
-                        if (updateError) throw new Error(`Supabase error updating profile: ${updateError.message}`);
-                        console.log("✅ Profile updated successfully for user:", user.id);
-                        successfulCalls.push(call);
-
-                    } else if (call.name === "complete_onboarding") {
-                        const { error: updateError } = await supabase.from("users").update({ onboarding_completed: true, onboarding_completed_at: new Date().toISOString() }).eq('user_id', user.id);
-                        if (updateError) throw new Error(`Supabase error completing onboarding: ${updateError.message}`);
-                        console.log("✅ Onboarding completed for user:", user.id);
-                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "onboarding_complete" })}\n\n`));
-                        successfulCalls.push(call);
-                        
-                    } else {
-                      console.log(`✅ Function call ${call.name} not handled explicitly, assuming success.`);
-                      successfulCalls.push(call);
+                      continue;
                     }
-
-                  } catch (error: unknown) {
-                    const errorMessage = error instanceof Error ? error.message : String(error);
-                    console.error(`❌ Error processing tool call ${call.name} (${call.id}):`, errorMessage);
-                    const errorData = { type: "tool_error", tool_name: call.name, error: `Error processing tool call: ${errorMessage}` };
+                    
+                    // If arguments are invalid, don't use fallbacks - just report the error
+                    console.error("🔧 Invalid arguments for show_onboarding_component, not using fallbacks");
+                    const errorMsg = "Component arguments validation failed. Please provide valid component parameters.";
+                    const errorData = { 
+                      type: "tool_error", 
+                      tool_name: call.name, 
+                      error: errorMsg,
+                      details: { 
+                        message: "The AI needs to provide proper component parameters"
+                      }
+                    };
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
-                    failedCalls.push({ call, error: errorMessage });
-                  }
-                }
-                
-                console.log("📊 Function calls summary:", `${successfulCalls.length}/${Object.keys(functionCalls).length} completed successfully`);
-              }
+                    failedCalls.push({ call, error: errorMsg });
+                    continue;
 
-              // After processing, send done event and close
-              const doneData = {
-                type: "response_done",
-                response_id: responseId,
-                reason: choice.finish_reason,
-                timestamp: new Date().toISOString(),
-              };
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify(doneData)}\n\n`));
-              controller.close();
-              break; // Exit loop
+                  } else if (call.name === "update_onboarding_profile") {
+                      const { profile_updates } = toolData;
+                      if (!profile_updates) {
+                        throw new Error("Missing profile_updates in tool call");
+                      }
+                      const { error: updateError } = await supabase.from("users").update(profile_updates).eq('user_id', user.id);
+                      if (updateError) throw new Error(`Supabase error updating profile: ${updateError.message}`);
+                      console.log("✅ Profile updated successfully for user:", user.id);
+                      successfulCalls.push(call);
+
+                  } else if (call.name === "complete_onboarding") {
+                      const { error: updateError } = await supabase.from("users").update({ onboarding_completed: true, onboarding_completed_at: new Date().toISOString() }).eq('user_id', user.id);
+                      if (updateError) throw new Error(`Supabase error completing onboarding: ${updateError.message}`);
+                      console.log("✅ Onboarding completed for user:", user.id);
+                      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "onboarding_complete" })}\n\n`));
+                      successfulCalls.push(call);
+                      
+                  } else {
+                    console.log(`✅ Function call ${call.name} not handled explicitly, assuming success.`);
+                    successfulCalls.push(call);
+                  }
+
+                } catch (error: unknown) {
+                  const errorMessage = error instanceof Error ? error.message : String(error);
+                  console.error(`❌ Error processing tool call ${call.name} (${call.id}):`, errorMessage);
+                  const errorData = { type: "tool_error", tool_name: call.name, error: `Error processing tool call: ${errorMessage}` };
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
+                  failedCalls.push({ call, error: errorMessage });
+                }
+              }
+              
+              console.log("📊 Function calls summary:", `${successfulCalls.length}/${Object.keys(functionCalls).length} completed successfully`);
             }
           }
+
+          // Send done event and close
+          const doneData = {
+            type: "response_done",
+            response_id: responseId,
+            timestamp: new Date().toISOString(),
+          };
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(doneData)}\n\n`));
+          controller.close();
         } catch (error) {
           console.error("❌ Error in onboarding stream:", error);
           // Encoder might not be initialized if error happens before stream starts
@@ -318,15 +436,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log("🚀 Returning onboarding chat completions stream");
+    console.log("🚀 Returning onboarding responses stream");
     return new NextResponse(readable, { headers });
 
   } catch (error) {
-    console.error('❌ Onboarding chat completions stream function error:', error);
+    console.error('❌ Onboarding responses stream function error:', error);
     
     return NextResponse.json({
       error: error instanceof Error ? error.message : 'Unknown error',
-      context: 'onboarding_chat_completions_stream'
+      context: 'onboarding_responses_stream'
     }, { status: 500 });
   }
 }

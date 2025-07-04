@@ -60,10 +60,10 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F7F9] font-nunito">
+    <div className="min-h-screen bg-[#F6F7F9] font-nunito flex flex-col">
       {/* Header - following landing page design */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 py-4">
+      <header className="bg-white shadow-sm flex-shrink-0">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center">
             {/* Logo - same as landing page */}
             <Link href="/" className="flex items-center space-x-2">
@@ -72,7 +72,7 @@ export default function OnboardingPage() {
                 alt="Infina"
                 width={100}
                 height={30}
-                className="h-auto w-auto"
+                className="h-auto w-auto max-h-[24px] sm:max-h-[30px]"
                 priority
               />
             </Link>
@@ -80,22 +80,22 @@ export default function OnboardingPage() {
         </div>
       </header>
 
-      {/* Main Content - Chat Interface */}
-      <main className="min-h-[calc(100vh-80px)] flex items-center justify-center px-6 py-8">
-        <div className="w-full max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-sm p-8 min-h-[600px] flex flex-col">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-3xl lg:text-4xl font-bold text-[#111827] mb-4">
+      {/* Main Content - Full height chat interface */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col max-w-5xl w-full mx-auto">
+          <div className="flex-1 bg-white sm:rounded-t-2xl sm:mt-4 shadow-sm flex flex-col overflow-hidden">
+            {/* Header - Reduced padding on mobile */}
+            <div className="text-center px-4 pt-6 pb-4 sm:px-8 sm:pt-8 sm:pb-6 flex-shrink-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#111827] mb-2 sm:mb-4">
                 {t("onboardingTitle")}
               </h1>
-              <p className="text-lg text-[#6B7280] max-w-2xl mx-auto">
+              <p className="text-base sm:text-lg text-[#6B7280] max-w-2xl mx-auto">
                 {t("onboardingSubtitle")}
               </p>
             </div>
 
-            {/* Chat Interface */}
-            <div className="flex-1">
+            {/* Chat Interface - Takes remaining space */}
+            <div className="flex-1 px-4 pb-4 sm:px-8 sm:pb-6 overflow-hidden">
               <OnboardingChatInterface
                 userId={user.id}
                 onComplete={handleOnboardingComplete}

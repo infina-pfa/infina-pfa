@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import {
   formatVND,
   parseFormattedNumber,
+  formatNumber,
 } from "@/lib/validation/input-validation";
 
 interface MoneyInputProps
@@ -38,16 +39,21 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
     const [displayValue, setDisplayValue] = useState<string>("");
     const [isEditing, setIsEditing] = useState<boolean>(false);
 
-    // Format the value as VND when it changes (but not during editing)
+    // Format the value when it changes (with better formatting during editing)
     useEffect(() => {
-      if (!isEditing) {
-        if (value || value === 0) {
-          const numericValue =
-            typeof value === "string" ? parseFormattedNumber(value) : value;
-          setDisplayValue(numericValue > 0 ? formatVND(numericValue) : "");
+      if (value || value === 0) {
+        const numericValue =
+          typeof value === "string" ? parseFormattedNumber(value) : value;
+        
+        if (isEditing) {
+          // During editing, show formatted number (with thousand separators) but no currency symbol
+          setDisplayValue(numericValue > 0 ? formatNumber(numericValue) : "");
         } else {
-          setDisplayValue("");
+          // When not editing, show full VND formatting
+          setDisplayValue(numericValue > 0 ? formatVND(numericValue) : "");
         }
+      } else {
+        setDisplayValue("");
       }
     }, [value, isEditing]);
 
@@ -67,25 +73,27 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
       // Pass the numeric string to parent component
       onChange?.(numericValue);
 
-      // During editing, show the raw input without formatting
+      // During editing, show formatted number with thousand separators for better readability
       if (isEditing) {
-        setDisplayValue(numericValue);
+        const num = parseInt(numericValue, 10);
+        setDisplayValue(num > 0 ? formatNumber(num) : numericValue);
       }
     };
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       setIsEditing(true);
 
-      // When focused, show only the numeric value without formatting
+      // When focused, show formatted number (with thousand separators) for easier reading
       const numericValue = value
         ? typeof value === "string"
           ? value
           : value.toString()
         : "";
 
-      // Remove any formatting
+      // Remove any currency formatting but keep thousand separators
       const cleanValue = numericValue.replace(/[^\d]/g, "");
-      setDisplayValue(cleanValue);
+      const num = parseInt(cleanValue, 10);
+      setDisplayValue(num > 0 ? formatNumber(num) : cleanValue);
 
       // Select all text for easy editing
       setTimeout(() => e.target.select(), 0);
@@ -94,7 +102,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
     const handleBlur = () => {
       setIsEditing(false);
 
-      // When blurred, format the value as VND if it's not empty
+      // When blurred, format the value as VND currency
       if (value || value === 0) {
         const numericValue =
           typeof value === "string" ? parseFormattedNumber(value) : value;

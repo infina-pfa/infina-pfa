@@ -13,7 +13,7 @@ export const useOnboardingChat = (
   userId: string,
   onComplete: () => void 
 ): UseOnboardingChatReturn => {
-  const { t } = useAppTranslation(["onboarding", "common"]);
+  const { t, i18n } = useAppTranslation(["onboarding", "common"]);
   
   // Core state
   const [state, setState] = useState<OnboardingState>({
@@ -31,6 +31,7 @@ export const useOnboardingChat = (
   const [isAIThinking, setIsAIThinking] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasStartedAI, setHasStartedAI] = useState(false);
 
   // Ref to prevent double initialization in Strict Mode
   const hasInitialized = useRef(false);
@@ -51,8 +52,8 @@ export const useOnboardingChat = (
       const initialState = await onboardingService.initializeOnboarding(userId);
       setState(initialState);
       
-      // Start AI conversation with initial welcome ONLY once
-      await startOnboardingConversation(initialState);
+      // Show initial welcome message and introduction template WITHOUT calling AI
+      showInitialWelcomeFlow();
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t("initializationFailed");
@@ -62,18 +63,151 @@ export const useOnboardingChat = (
     }
   };
 
-  const startOnboardingConversation = async (initialState: OnboardingState) => {
-    console.log("Starting onboarding conversation with state:", initialState);
+  const showInitialWelcomeFlow = () => {
+    // Use Vietnamese as default for now
+    const isVietnamese = i18n.language === 'vi' || true; // Force Vietnamese for testing
     
-    // Start AI conversation with minimal context for initial welcome
-    const startMessage = "start_onboarding";
+    // Start with empty messages to show chat interface immediately
+    setMessages([]);
     
+    // Simulate AI thinking before first message
+    setIsAIThinking(true);
+    
+    // Stream welcome message after a delay
+    setTimeout(() => {
+      setIsAIThinking(false);
+      setIsStreaming(true);
+      
+      const welcomeMessage: OnboardingMessage = {
+        id: `welcome-${Date.now()}`,
+        type: "ai",
+        content: "",
+        timestamp: new Date(),
+      };
+      
+      setMessages([welcomeMessage]);
+      
+      // Stream the welcome content character by character
+      const fullWelcomeContent = isVietnamese 
+        ? "Xin chào! Tôi là Fina, cố vấn tài chính AI của bạn 🤝\n\nTôi ở đây để giúp bạn kiểm soát tương lai tài chính của mình. Tôi có thể:\n• Giúp bạn lập ngân sách và theo dõi chi tiêu\n• Tư vấn chiến lược đầu tư phù hợp\n• Hỗ trợ lập kế hoạch cho các mục tiêu tài chính\n• Phân tích tình hình tài chính và đưa ra lời khuyên cá nhân hóa\n\nĐể bắt đầu, tôi cần tìm hiểu một chút về bạn. Điều này sẽ giúp tôi cung cấp lời khuyên phù hợp nhất với nhu cầu của bạn."
+        : "Hello! I'm Fina, your AI financial advisor 🤝\n\nI'm here to help you take control of your financial future. I can:\n• Help you create budgets and track spending\n• Advise on suitable investment strategies\n• Support planning for financial goals\n• Analyze your financial situation and provide personalized advice\n\nTo get started, I need to learn a bit about you. This will help me provide advice that best suits your needs.";
+      
+      let currentIndex = 0;
+      const streamInterval = setInterval(() => {
+        if (currentIndex < fullWelcomeContent.length) {
+          const chunkSize = Math.floor(Math.random() * 4) + 2; // Random chunk size 2-5 characters
+          currentIndex += chunkSize;
+          
+          setMessages(prev => prev.map(msg => 
+            msg.id === welcomeMessage.id 
+              ? { ...msg, content: fullWelcomeContent.slice(0, currentIndex) }
+              : msg
+          ));
+        } else {
+          clearInterval(streamInterval);
+          setIsStreaming(false);
+          
+          // After welcome message completes, show thinking again before suggestion
+          setTimeout(() => {
+            setIsAIThinking(true);
+            
+            setTimeout(() => {
+              setIsAIThinking(false);
+              setIsStreaming(true);
+              
+              // Add suggestion message with streaming
+              const suggestionMessage: OnboardingMessage = {
+                id: `suggestion-${Date.now()}`,
+                type: "ai",
+                content: "",
+                timestamp: new Date(),
+              };
+              
+              setMessages(prev => [...prev, suggestionMessage]);
+              
+              const fullSuggestionContent = isVietnamese
+                ? "Hãy giới thiệu về bản thân bạn nhé! Bạn có thể chia sẻ về:"
+                : "Please introduce yourself! You can share about:";
+              
+              let suggestionIndex = 0;
+              const suggestionInterval = setInterval(() => {
+                if (suggestionIndex < fullSuggestionContent.length) {
+                  const chunkSize = Math.floor(Math.random() * 4) + 2;
+                  suggestionIndex += chunkSize;
+                  
+                  setMessages(prev => prev.map(msg => 
+                    msg.id === suggestionMessage.id 
+                      ? { ...msg, content: fullSuggestionContent.slice(0, suggestionIndex) }
+                      : msg
+                  ));
+                } else {
+                  clearInterval(suggestionInterval);
+                  setIsStreaming(false);
+                  
+                  // Show component after suggestion completes
+                  setTimeout(() => {
+                    // Add introduction template component with a fade-in effect
+                    const introComponent: OnboardingMessage = {
+                      id: `intro-component-${Date.now()}`,
+                      type: "ai",
+                      content: isVietnamese
+                        ? "Giới thiệu về bản thân bạn"
+                        : "Introduce yourself",
+                      timestamp: new Date(),
+                      component: {
+                        id: `introduction_template_${Date.now()}`,
+                        type: "introduction_template",
+                        title: isVietnamese
+                          ? "Giới thiệu về bản thân bạn"
+                          : "Introduce yourself",
+                        context: {
+                          template: isVietnamese
+                            ? "Tôi tên là Tuấn, 24 tuổi, đang sống tại TPHCM. Tôi làm văn phòng với thu nhập hàng tháng khoảng 10 triệu VND. Hiện tại tôi không biết bắt đầu tư đâu."
+                            : "My name is [Name], I'm [Age] years old, living in [City]. I work as a [Occupation] with a monthly income of about [Income] million VND. Currently, I want to [Financial goal].",
+                          suggestions: isVietnamese
+                            ? [
+                                "Tôi mới bắt đầu tìm hiểu về quản lý tài chính cá nhân",
+                                "Tôi muốn bắt đầu đầu tư nhưng không biết bắt đầu từ đâu",
+                                "Tôi cần giúp đỡ để lập ngân sách hàng tháng hiệu quả"
+                              ]
+                            : [
+                                "I'm just starting to learn about personal finance management",
+                                "I want to start investing but don't know where to begin",
+                                "I need help creating an effective monthly budget"
+                              ]
+                        },
+                        isCompleted: false
+                      }
+                    };
+                    
+                    setMessages(prev => [...prev, introComponent]);
+                  }, 500); // Small delay before showing component
+                }
+              }, 15); // Faster streaming for shorter message
+            }, 800); // Thinking delay before suggestion
+          }, 1000); // Delay after welcome message
+        }
+      }, 20); // Streaming speed for welcome message
+    }, 1500); // Initial delay to show chat interface first
+  };
+
+  const startOnboardingConversation = async (initialMessage: string, initialState: OnboardingState) => {
+    console.log("Starting onboarding conversation with user input:", initialMessage);
+    
+    // Start AI conversation with the user's introduction
     await streamOnboardingAI({
-      message: startMessage,
-      conversationHistory: [],
+      message: initialMessage,
+      conversationHistory: messages.slice(-5).map(msg => ({
+        id: msg.id,
+        content: msg.content || "",
+        sender: msg.type === "user" ? "user" as const : "ai" as const,
+        timestamp: msg.timestamp.toISOString(),
+      })),
       userProfile: initialState.userProfile,
       currentStep: initialState.step
     });
+    
+    setHasStartedAI(true);
   };
 
   const sendMessage = useCallback(async (message: string) => {
@@ -88,14 +222,19 @@ export const useOnboardingChat = (
       
       setMessages(prev => [...prev, userMessage]);
       
-      // Process the message and get AI response
-      await processUserMessage(message);
+      // If this is the first user message, start AI conversation
+      if (!hasStartedAI) {
+        await startOnboardingConversation(message, state);
+      } else {
+        // Process the message normally
+        await processUserMessage(message);
+      }
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t("messageFailed");
       setError(errorMessage);
     }
-  }, [state, messages]);
+  }, [state, messages, hasStartedAI, t]);
 
   const processUserMessage = async (message: string) => {
     // Prepare conversation history - include recent AI and user messages
@@ -227,15 +366,8 @@ export const useOnboardingChat = (
                 setMessages(prev => [...prev, componentMessage]);
               } else if (parsed.type === 'tool_error') {
                 console.error("Tool error from server:", parsed);
-                setError(`AI assistant error: ${parsed.error}`);
-                const errorMessage: OnboardingMessage = {
-                    id: `error-${Date.now()}`,
-                    type: 'ai',
-                    content: `I encountered an issue. Please try again. (Details: ${parsed.error})`,
-                    timestamp: new Date(),
-                    isError: true,
-                };
-                setMessages(prev => [...prev, errorMessage]);
+                // Don't set error or show retry messages - just log it
+                // The AI will continue with text instead of showing component
               } else if (parsed.type === 'onboarding_complete') {
                 console.log("Onboarding complete signal received from server.");
                 onComplete();
@@ -293,15 +425,32 @@ export const useOnboardingChat = (
       // Update user profile based on response
       await updateProfileFromResponse(response);
       
-      // Continue conversation with AI
+      // Get response text for the message
       const responseText = getResponseText(response);
-      await sendMessage(responseText);
+      
+      // Add user message to show what they submitted
+      const userMessage: OnboardingMessage = {
+        id: `user-${Date.now()}`,
+        type: "user",
+        content: responseText,
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
+      
+      // If this is the first component response (introduction), start AI conversation
+      if (!hasStartedAI && componentId.includes('introduction_template')) {
+        await startOnboardingConversation(responseText, state);
+      } else {
+        // Continue conversation with AI for subsequent responses
+        await processUserMessage(responseText);
+      }
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t("responseFailed");
       setError(errorMessage);
     }
-  }, [state, sendMessage]);
+  }, [state, hasStartedAI, t]);
 
   const updateProfileFromResponse = async (response: ComponentResponse) => {
     const profileUpdates: Partial<UserProfile> = {};

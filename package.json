@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "logs": "npx tsx scripts/manage-system-prompt-logs.ts"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.14.2",

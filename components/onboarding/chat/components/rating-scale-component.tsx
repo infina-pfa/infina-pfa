@@ -21,7 +21,7 @@ export function RatingScaleComponent({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const scale = component.data.scale || { min: 1, max: 5, labels: [] };
+  const scale = component.context.scale || { min: 1, max: 5, labels: [] };
   const isCompleted = component.isCompleted;
 
   const handleRatingSelect = (rating: number) => {

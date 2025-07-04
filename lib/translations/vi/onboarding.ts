@@ -34,6 +34,29 @@ export const onboardingVi = {
   writeYourIntroduction: "Viết phần giới thiệu của bạn tại đây...",
   characters: "ký tự",
   
+  // New Template Fields
+  templateFillInBlanks: "Điền thông tin vào các ô trống:",
+  templateText: "Tôi tên là {name}, {age} tuổi, đang sống tại {location}. Tôi đang làm {job} với thu nhập hàng tháng khoảng {income} triệu VND. Hiện tại tôi muốn {goal}.",
+  
+  // Template Field Labels
+  nameFieldLabel: "Tên của bạn",
+  ageFieldLabel: "Tuổi",
+  locationFieldLabel: "Nơi sống",
+  jobFieldLabel: "Nghề nghiệp",
+  incomeFieldLabel: "Thu nhập (triệu VND)",
+  goalFieldLabel: "Mục tiêu tài chính",
+  
+  // Template Field Placeholders
+  templateNamePlaceholder: "Nhập tên của bạn",
+  templateAgePlaceholder: "Nhập tuổi",
+  templateLocationPlaceholder: "Thành phố bạn đang sống",
+  templateJobPlaceholder: "Công việc hiện tại",
+  templateIncomePlaceholder: "Số tiền thu nhập hàng tháng",
+  templateGoalPlaceholder: "Mục tiêu tài chính của bạn",
+  
+  // Preview
+  preview: "Bản xem trước",
+  
   // Multiple Choice Components
   selectOption: "Chọn một tùy chọn",
   chooseOne: "Vui lòng chọn một tùy chọn",
