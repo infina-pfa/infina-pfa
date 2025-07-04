@@ -3,6 +3,8 @@
 import { useAppTranslation } from "@/hooks/use-translation";
 import { ChatToolId } from "@/lib/types/ai-streaming.types";
 import { useEffect, useState } from "react";
+import { BudgetingWidget } from "../budgeting/budgeting-widget";
+import { X } from "lucide-react";
 
 interface ToolPanelProps {
   onClose: () => void;
@@ -39,19 +41,7 @@ export function ToolPanel({ onClose, toolId, isOpen = false }: ToolPanelProps) {
   const renderComponent = () => {
     switch (toolId) {
       case ChatToolId.BUDGET_TOOL:
-        return (
-          <div className="bg-white p-6 rounded-xl">
-            <h3 className="text-xl font-bold font-nunito mb-4 text-gray-900">
-              {t("budgetFormTitle")}
-            </h3>
-            <p className="text-base text-gray-600 font-nunito mb-6">
-              {t("budgetFormDescription")}
-            </p>
-            <div className="text-center py-12 text-gray-500 font-nunito">
-              {t("componentPlaceholder")}
-            </div>
-          </div>
-        );
+        return <BudgetingWidget />;
 
       case ChatToolId.LOAN_CALCULATOR:
         return (
@@ -118,48 +108,25 @@ export function ToolPanel({ onClose, toolId, isOpen = false }: ToolPanelProps) {
   // Mobile: Full screen overlay
   if (isMobile) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-50 rounded-xl w-full h-full max-h-[100vh] overflow-auto">
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="bg-gray-50 rounded-xl w-full h-[100vh] flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 bg-gray-100 rounded-t-xl">
             <h2 className="text-xl font-bold font-nunito text-gray-900">
-              {t("componentPanelTitle")}
+              {t(toolId, { ns: "common" })}
             </h2>
             <button
               onClick={onClose}
               className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
               aria-label={t("closePanel")}
             >
-              <svg
-                className="w-6 h-6 text-gray-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <X className="w-6 h-6 text-gray-600" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="p-4 flex-1">{renderComponent()}</div>
-
-          {/* Footer */}
-          <div className="flex items-center justify-end gap-4 p-4 bg-white rounded-b-xl">
-            <button
-              onClick={onClose}
-              className="px-6 py-2 text-base font-nunito font-medium text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
-            >
-              {t("close")}
-            </button>
-            <button className="px-6 py-2 bg-blue-600 text-white text-base font-nunito font-semibold rounded-full hover:bg-blue-700 transition-colors cursor-pointer">
-              {t("useThisTool")}
-            </button>
+          <div className="flex-1 flex-col h-full overflow-y-auto">
+            {renderComponent()}
           </div>
         </div>
       </div>

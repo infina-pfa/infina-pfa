@@ -103,4 +103,9 @@ export const commonEn = {
   "loan-calculator": "Loan Calculator",
   "interest-calculator": "Interest Calculator",
   "salary-calculator": "Salary Calculator",
+
+  // Financial Tools Page
+  financialTools: "Financial Tools",
+  budgetingWidgetDescription:
+    "Manage your budget and track your expenses with our budgeting widget.",
 };

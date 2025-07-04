@@ -103,4 +103,9 @@ export const commonVi = {
   "loan-calculator": "Tính toán vay",
   "interest-calculator": "Tính toán lãi suất",
   "salary-calculator": "Tính toán lương",
+
+  // Financial Tools Page
+  financialTools: "Công cụ tài chính",
+  budgetingWidgetDescription:
+    "Quản lý ngân sách và theo dõi chi tiêu của bạn với tiện ích ngân sách của chúng tôi.",
 };
