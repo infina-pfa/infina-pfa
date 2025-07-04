@@ -73,7 +73,11 @@ export const useChatFlow = (): UseChatFlowReturn => {
       );
 
       // Update the message in local state to mark as final
-      messages.updateMessage(message.id, { isStreaming: false });
+      messages.updateMessage(message.id, {
+        isStreaming: false,
+        metadata: message.metadata,
+        type: message.type,
+      });
     },
     onMessageStreaming: (message) => {
       // Add streaming message to local state if it doesn't exist

@@ -9,6 +9,7 @@ interface MessageBubbleProps {
 }
 
 export function MessageBubble({ message }: MessageBubbleProps) {
+  console.log("🚀 ~ MessageBubble ~ message:", message);
   const { t } = useAppTranslation(["chat", "common"]);
   const isUser = message.sender === "user";
 
