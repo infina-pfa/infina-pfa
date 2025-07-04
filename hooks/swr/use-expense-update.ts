@@ -38,7 +38,7 @@ export function useExpenseUpdateSWR(): UseExpenseUpdateSWRReturn {
         ),
         // Invalidate all transaction queries (will trigger re-fetch for transaction components)
         mutate(
-          key => Array.isArray(key) && key[0] === 'transactions',
+          key => Array.isArray(key) && key[0].startsWith('transactions'),
           undefined,
           { revalidate: true }
         ),
