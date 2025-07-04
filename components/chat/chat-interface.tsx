@@ -83,19 +83,8 @@ export function ChatInterface() {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          {!conversationId ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center w-full p-6">
-                {/* AI Budget Analysis Message */}
-                <BudgetAnalysisMessage />
-              </div>
-            </div>
-          ) : (
-            <>
-              <MessageList messages={messages} />
-              {isThinking && <TypingIndicator />}
-            </>
-          )}
+          <MessageList messages={messages} />
+          {isThinking && <TypingIndicator />}
         </div>
 
         {/* Input Area */}

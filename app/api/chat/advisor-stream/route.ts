@@ -1,6 +1,12 @@
 import { openai } from "@/lib/openai";
 import { createClient } from "@/lib/supabase/server";
-import { ChatComponentId, ChatTool, ChatToolId, ConversationMessage, UIActionType } from "@/lib/types/ai-streaming.types";
+import {
+  ChatComponentId,
+  ChatTool,
+  ChatToolId,
+  ConversationMessage,
+  UIActionType,
+} from "@/lib/types/ai-streaming.types";
 import { ResponseDataEvent } from "@/lib/types/chat.types";
 import { NextRequest, NextResponse } from "next/server";
 import { Message } from "openai/resources/beta/threads/messages.mjs";
@@ -30,13 +36,27 @@ const chatTools: ChatTool[] = [
     id: ChatToolId.SALARY_CALCULATOR,
     name: "Công cụ tính lương",
     description: "Tính lương gross sang net và các khoản khấu trừ",
-    keywords: ["tính lương", "lương net", "lương gross", "salary", "thuế thu nhập"],
+    keywords: [
+      "tính lương",
+      "lương net",
+      "lương gross",
+      "salary",
+      "thuế thu nhập",
+    ],
   },
   {
     id: ChatToolId.LEARNING_CENTER,
     name: "Hành trình Học tập",
-    description: "Hiển thị hành trình học tập thực tế của người dùng với milestone và task cụ thể",
-    keywords: ["học", "kiến thức", "tài chính", "learning", "bài học", "hành trình"],
+    description:
+      "Hiển thị hành trình học tập thực tế của người dùng với milestone và task cụ thể",
+    keywords: [
+      "học",
+      "kiến thức",
+      "tài chính",
+      "learning",
+      "bài học",
+      "hành trình",
+    ],
   },
 ];
 
@@ -60,53 +80,60 @@ const tools: FunctionTool[] = [
   {
     type: "function",
     strict: false,
-      name: UIActionType.OPEN_TOOL,
-      description: "Open a specific financial tool for the user when they need practical assistance",
-      parameters: {
-        type: "object",
-        properties: {
-          tool_id: {
-            type: "string",
-            description: "ID of the tool to open",
-            enum: ["budget-tool", "loan-calculator", "interest-calculator", "salary-calculator", "learning-center"],
-          },
-          title: {
-            type: "string",
-            description: "Title or reason for opening the tool",
-          },
-          context: {
-            type: "object",
-            description: "Additional context or parameters for the tool",
-          },
-          trigger_reason: {
-            type: "string",
-            description: "Explanation for why this tool should be opened",
-          },
+    name: UIActionType.OPEN_TOOL,
+    description:
+      "Open a specific financial tool for the user when they need practical assistance",
+    parameters: {
+      type: "object",
+      properties: {
+        tool_id: {
+          type: "string",
+          description: "ID of the tool to open",
+          enum: [
+            "budget-tool",
+            "loan-calculator",
+            "interest-calculator",
+            "salary-calculator",
+            "learning-center",
+          ],
         },
-        required: ["tool_id", "title", "trigger_reason"],
-      }
-
+        title: {
+          type: "string",
+          description: "Title or reason for opening the tool",
+        },
+        context: {
+          type: "object",
+          description: "Additional context or parameters for the tool",
+        },
+        trigger_reason: {
+          type: "string",
+          description: "Explanation for why this tool should be opened",
+        },
+      },
+      required: ["tool_id", "title", "trigger_reason"],
+    },
   },
   {
     type: "function",
     strict: false,
-      name: UIActionType.SHOW_COMPONENT,
-      description: "Show a specific component to the user instead of long information",
-      parameters: {
-        type: "object",
-        properties: {
-          component_id: {
-            type: "string", 
-            description: "ID of the component to show",
-            enum: ["budget-overview", "budget-detail"],
-          },
-          title: {
-            type: "string",
-            description: "Title of the component",
-          },
+    name: UIActionType.SHOW_COMPONENT,
+    description:
+      "Show a specific component to the user instead of long information",
+    parameters: {
+      type: "object",
+      properties: {
+        component_id: {
+          type: "string",
+          description: "ID of the component to show",
+          enum: ["budget-overview", "budget-detail"],
         },
-        required: ["component_id", "title"],
-      }
+        title: {
+          type: "string",
+          description: "Title of the component",
+        },
+      },
+      required: ["component_id", "title"],
+    },
   },
 ];
 
@@ -115,17 +142,26 @@ export async function POST(request: NextRequest) {
     const { message, conversationHistory, userContext } = await request.json();
 
     if (!message) {
-      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Message is required" },
+        { status: 400 }
+      );
     }
 
     // Create Supabase client
     const supabase = await createClient();
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
     }
 
     console.log("🚀 AI Advisor Stream Function Called");
@@ -139,16 +175,26 @@ export async function POST(request: NextRequest) {
 Thông tin người dùng:
 - User ID: ${user.id}
 - Thông tin tài chính người dùng:
-- Tổng thu nhập: ${userContext.financial?.totalIncome ? new Intl.NumberFormat("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      }).format(userContext.financial.totalIncome) : "Chưa có dữ liệu"}
-- Tổng chi tiêu: ${userContext.financial?.totalExpenses ? new Intl.NumberFormat("vi-VN", {
-        style: "currency", 
-        currency: "VND",
-      }).format(userContext.financial.totalExpenses) : "Chưa có dữ liệu"}
+- Tổng thu nhập: ${
+          userContext.financial?.totalIncome
+            ? new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(userContext.financial.totalIncome)
+            : "Chưa có dữ liệu"
+        }
+- Tổng chi tiêu: ${
+          userContext.financial?.totalExpenses
+            ? new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(userContext.financial.totalExpenses)
+            : "Chưa có dữ liệu"
+        }
 - Số lượng ngân sách: ${userContext.financial?.currentBudgets || 0}
-- Đã hoàn thành onboarding: ${userContext.financial?.hasCompletedOnboarding ? "Có" : "Không"}
+- Đã hoàn thành onboarding: ${
+          userContext.financial?.hasCompletedOnboarding ? "Có" : "Không"
+        }
 
 Thông tin học tập:
 - Level hiện tại: ${userContext.learning?.currentLevel || 1}
@@ -162,15 +208,26 @@ Thông tin người dùng:
 `;
 
     // Prepare conversation history
-    const historyContext = conversationHistory && conversationHistory.length > 0
-      ? conversationHistory.slice(-15).map((msg: ConversationMessage, index: number) => {
-          return `${index + 1}. ${msg.sender === "user" ? "Người dùng" : "AI"}: ${msg.content}`;
-        }).join("\n")
-      : "Đây là cuộc trò chuyện đầu tiên.";
+    const historyContext =
+      conversationHistory && conversationHistory.length > 0
+        ? conversationHistory
+            .slice(-15)
+            .map((msg: ConversationMessage, index: number) => {
+              return `${index + 1}. ${
+                msg.sender === "user" ? "Người dùng" : "AI"
+              }: ${msg.content}`;
+            })
+            .join("\n")
+        : "Đây là cuộc trò chuyện đầu tiên.";
 
     // Prepare tools information
     const toolsInfo = [...chatTools, ...chatComponents]
-      .map(tool => `Tool ID: "${tool.id}" | Tên: "${tool.name}" | Mô tả: "${tool.description}" | Từ khóa: [${tool.keywords.join(", ")}]`)
+      .map(
+        (tool) =>
+          `Tool ID: "${tool.id}" | Tên: "${tool.name}" | Mô tả: "${
+            tool.description
+          }" | Từ khóa: [${tool.keywords.join(", ")}]`
+      )
       .join("\n");
 
     const systemPrompt = `
@@ -252,7 +309,7 @@ Thông tin người dùng:
     const headers = new Headers({
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
@@ -388,15 +445,19 @@ Thông tin người dùng:
           // End the stream
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
-
         } catch (error) {
           console.error("❌ Streaming error:", error);
           const errorData = {
             type: "error",
-            error: error instanceof Error ? error.message : "Unknown streaming error",
+            error:
+              error instanceof Error
+                ? error.message
+                : "Unknown streaming error",
             timestamp: new Date().toISOString(),
           };
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`)
+          );
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
         }
@@ -404,7 +465,6 @@ Thông tin người dùng:
     });
 
     return new Response(readable, { headers });
-
   } catch (error) {
     console.error("❌ Function error:", error);
     return NextResponse.json(
@@ -423,4 +483,4 @@ export async function OPTIONS() {
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
   });
-} 
+}
