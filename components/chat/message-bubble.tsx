@@ -64,7 +64,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           </div>
 
           {/* Component Display */}
-          {message.component && (
+          {message.type === "tool" && (
             <div className="mt-3 p-4 bg-blue-50 rounded-xl max-w-full">
               <div className="flex items-center gap-3 mb-3">
                 <svg
@@ -81,19 +81,26 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                   />
                 </svg>
                 <span className="text-base font-semibold text-blue-900 font-nunito">
-                  {message.component.title || t("componentSuggestion")}
+                  {(
+                    message.metadata as {
+                      action: { payload: { toolId: string } };
+                    }
+                  )?.action?.payload?.toolId || t("componentSuggestion")}
                 </span>
               </div>
-              {message.component.description && (
-                <p className="text-sm text-blue-700 font-nunito mb-3">
-                  {message.component.description}
-                </p>
-              )}
+
               <button
                 className="text-sm bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors font-nunito font-semibold cursor-pointer"
                 onClick={() => {
                   // This will be handled by the parent component
-                  console.log("Open component:", message.component);
+                  console.log(
+                    "Open component:",
+                    (
+                      message.metadata as {
+                        action: { payload: { toolId: string } };
+                      }
+                    )?.action?.payload?.toolId
+                  );
                 }}
               >
                 {t("openTool")}

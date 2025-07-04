@@ -7,9 +7,11 @@ import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
+import { useEffect, useState } from "react";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
+  const [isMobile, setIsMobile] = useState(false);
 
   const {
     messages,
@@ -29,6 +31,24 @@ export function ChatInterface() {
     onSuggestionClick,
   } = useChatFlow();
 
+  useEffect(() => {
+    // Check if we're on client-side
+    if (typeof window !== "undefined") {
+      const checkIsMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+
+      // Initial check
+      checkIsMobile();
+
+      // Add event listener for resize
+      window.addEventListener("resize", checkIsMobile);
+
+      // Cleanup
+      return () => window.removeEventListener("resize", checkIsMobile);
+    }
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -44,10 +64,18 @@ export function ChatInterface() {
     );
   }
 
+  // Determine if tool panel is open and adjust layout
+  const isToolOpen = !!toolId && !isMobile;
+
   return (
     <div className="flex h-full bg-gray-50 p-0 md:p-8">
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      {/* Main Chat Area - adjust width when tool panel is open on desktop */}
+      <div
+        className={`flex-1 flex flex-col ${
+          isToolOpen ? "md:w-1/2 lg:w-3/5" : "w-full"
+        }`}
+        style={isToolOpen ? { maxWidth: isMobile ? "100%" : "60%" } : {}}
+      >
         {/* Error Display */}
         {error && (
           <div className="bg-red-50 p-6 mb-6">

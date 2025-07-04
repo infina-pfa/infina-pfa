@@ -45,7 +45,12 @@ export const useChatFlow = (): UseChatFlowReturn => {
   const { user } = useAuth();
 
   // Composed hooks
-  const session = useSimpleChatSession();
+  const {
+    conversation,
+    error: sessionError,
+    isCreating,
+    createConversation,
+  } = useSimpleChatSession();
   const messages = useChatMessages();
 
   // Input state
@@ -55,19 +60,17 @@ export const useChatFlow = (): UseChatFlowReturn => {
 
   // AI Streaming
   const aiStreaming = useAIStreaming({
-    conversationId: session.conversation?.id || "",
     userId: user?.id || "",
     onMessageComplete: async (message) => {
       // Save the completed AI message to database
-      if (session.conversation) {
-        await messages.saveAIMessage(
-          message.content,
-          session.conversation.id,
-          message.metadata
-            ? (message.metadata as Record<string, unknown>)
-            : undefined
-        );
-      }
+      await messages.saveAIMessage(
+        message.type,
+        message.content,
+        message.conversation_id,
+        message.metadata
+          ? (message.metadata as Record<string, unknown>)
+          : undefined
+      );
 
       // Update the message in local state to mark as final
       messages.updateMessage(message.id, { isStreaming: false });
@@ -106,10 +109,10 @@ export const useChatFlow = (): UseChatFlowReturn => {
   });
 
   // Combined error state
-  const error = session.error || messages.error || aiStreaming.error;
+  const error = sessionError || messages.error || aiStreaming.error;
 
   // Combined loading state
-  const isLoading = session.isCreating;
+  const isLoading = isCreating;
 
   // Submitting state
   const isSubmitting = messages.isSending || aiStreaming.isStreaming;
@@ -122,117 +125,112 @@ export const useChatFlow = (): UseChatFlowReturn => {
     }
   }, []);
 
-  const createNewSession = useCallback(async () => {
-    await session.createConversation();
+  const createNewSession = async () => {
+    await createConversation();
     messages.clearMessages();
     setShowSuggestions(true);
     setInputValue("");
     clearError();
-  }, [session, messages]);
+  };
 
   /**
    * Main flow: User message → Create session → Update state → Save to DB → Stream AI
    */
-  const sendMessage = useCallback(
-    async (content: string) => {
-      if (!user) {
+  const sendMessage = async (content: string) => {
+    if (!user) {
+      return;
+    }
+
+    // Hide suggestions after first message
+    setShowSuggestions(false);
+
+    try {
+      let conversationId = conversation?.id;
+
+      // Step 1: Create session if it doesn't exist
+      if (!conversationId) {
+        conversationId = (await createConversation()) || undefined;
+        console.log("🚀 ~ conversationId:", conversationId);
+
+        if (!conversationId) {
+          return;
+        }
+      }
+
+      // Step 2: Send user message and update state
+      const userMessage = await messages.sendUserMessage(
+        content,
+        conversationId
+      );
+
+      if (!userMessage) {
         return;
       }
 
-      // Hide suggestions after first message
-      setShowSuggestions(false);
+      // Step 3: Prepare conversation history for AI
+      const conversationHistory = messages.messages
+        .slice(-10) // Last 10 messages for context
+        .map((msg) => ({
+          id: msg.id,
+          content: msg.content,
+          sender: msg.sender === "user" ? ("user" as const) : ("ai" as const),
+          timestamp: msg.created_at,
+        }));
 
-      try {
-        let conversationId = session.conversation?.id;
+      // Add the current user message to history
+      conversationHistory.push({
+        id: userMessage.id,
+        content: userMessage.content,
+        sender: "user" as const,
+        timestamp: userMessage.created_at,
+      });
 
-        // Step 1: Create session if it doesn't exist
-        if (!conversationId) {
-          conversationId = (await session.createConversation()) || undefined;
+      // TODO: Get actual user context from API
+      const userContext = {
+        financial: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          currentBudgets: 0,
+          hasCompletedOnboarding: false,
+        },
+        learning: {
+          currentLevel: 1,
+          xp: 0,
+          currentGoal: "Getting started with financial planning",
+        },
+      };
 
-          if (!conversationId) {
-            return;
-          }
-        }
+      // Step 4: Prepare AI advisor request and start streaming
+      const advisorRequest: AdvisorStreamRequest = {
+        conversationId: conversationId,
+        message: content,
+        conversationHistory,
+        userContext,
+      };
 
-        // Step 2: Send user message and update state
-        const userMessage = await messages.sendUserMessage(
-          content,
-          conversationId
-        );
+      await aiStreaming.startStreaming(advisorRequest);
+    } catch {
+      // Error handling will be done by individual hooks
+    }
+  };
 
-        if (!userMessage) {
-          return;
-        }
-
-        // Step 3: Prepare conversation history for AI
-        const conversationHistory = messages.messages
-          .slice(-10) // Last 10 messages for context
-          .map((msg) => ({
-            id: msg.id,
-            content: msg.content,
-            sender: msg.sender === "user" ? ("user" as const) : ("ai" as const),
-            timestamp: msg.created_at,
-          }));
-
-        // Add the current user message to history
-        conversationHistory.push({
-          id: userMessage.id,
-          content: userMessage.content,
-          sender: "user" as const,
-          timestamp: userMessage.created_at,
-        });
-
-        // TODO: Get actual user context from API
-        const userContext = {
-          financial: {
-            totalIncome: 0,
-            totalExpenses: 0,
-            currentBudgets: 0,
-            hasCompletedOnboarding: false,
-          },
-          learning: {
-            currentLevel: 1,
-            xp: 0,
-            currentGoal: "Getting started with financial planning",
-          },
-        };
-
-        // Step 4: Prepare AI advisor request and start streaming
-        const advisorRequest: AdvisorStreamRequest = {
-          message: content,
-          conversationHistory,
-          userContext,
-        };
-
-        await aiStreaming.startStreaming(advisorRequest);
-      } catch {
-        // Error handling will be done by individual hooks
-      }
-    },
-    [user, session, messages, aiStreaming]
-  );
-
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = async () => {
     if (!inputValue.trim() || isSubmitting) return;
 
     const messageContent = inputValue.trim();
     setInputValue("");
 
     await sendMessage(messageContent);
-  }, [inputValue, isSubmitting, sendMessage]);
+  };
 
-  const handleSuggestionClick = useCallback(
-    async (suggestion: string) => {
-      await sendMessage(suggestion);
-    },
-    [sendMessage]
-  );
+  const handleSuggestionClick = async (suggestion: string) => {
+    await sendMessage(suggestion);
+  };
 
-  const clearError = useCallback(() => {
-    session.clearError();
+  const clearError = () => {
     messages.clearError();
     aiStreaming.clearError();
-  }, [session, messages, aiStreaming]);
+  };
 
   return {
     // State
@@ -242,7 +240,7 @@ export const useChatFlow = (): UseChatFlowReturn => {
     isThinking: aiStreaming.isThinking,
     isStreaming: aiStreaming.isStreaming,
     showSuggestions,
-    conversationId: session.conversation?.id || null,
+    conversationId: conversation?.id || null,
 
     // Actions
     sendMessage,

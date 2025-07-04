@@ -23,7 +23,6 @@ export type MessageType = Enums<"message_type">;
 export interface ChatMessage extends Message {
   isStreaming?: boolean;
   streamingContent?: string;
-  component?: ComponentData | null;
 }
 
 // Component data for interactive UI components
@@ -209,6 +208,7 @@ export interface UIAction {
 
 // AI Advisor Request/Response Types
 export interface AdvisorStreamRequest {
+  conversationId: string;
   message: string;
   conversationHistory: Array<{
     id: string;
@@ -265,7 +265,6 @@ export interface AdvisorStreamEvent {
 
 // Hook Types for AI Advisor Stream Processor
 export interface UseAIAdvisorStreamProcessorOptions {
-  conversationId: string;
   userId: string;
   onMessageComplete?: (message: ChatMessage) => void;
   onFunctionToolComplete?: (action: UIAction) => void;
@@ -277,6 +276,7 @@ export interface UseAIAdvisorStreamProcessorReturn {
   isProcessing: boolean;
   isStreaming: boolean;
   processStreamData: (
+    conversationId: string,
     readableStream: ReadableStream<Uint8Array>
   ) => Promise<void>;
   processStreamEvent: (event: AdvisorStreamEvent) => void;

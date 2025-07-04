@@ -1,17 +1,28 @@
-import { useState, useCallback, useRef } from "react";
-import { 
+import {
+  AdvisorStreamEvent,
+  ChatMessage,
+  MessageType,
+  ResponseDataEvent,
   UIAction,
   UIActionType,
-  ChatMessage,
-  AdvisorStreamEvent,
-  ResponseDataEvent,
   UseAIAdvisorStreamProcessorOptions,
   UseAIAdvisorStreamProcessorReturn,
-  ComponentData
 } from "@/lib/types/chat.types";
+import { useCallback, useRef, useState } from "react";
+
+const getMessageType = (action: UIAction): MessageType => {
+  if (action.type === UIActionType.SHOW_COMPONENT) {
+    return "component";
+  }
+
+  if (action.type === UIActionType.OPEN_TOOL) {
+    return "tool";
+  }
+
+  return "text";
+};
 
 export const useAIAdvisorStreamProcessor = ({
-  conversationId,
   userId,
   onMessageComplete = () => {},
   onFunctionToolComplete = () => {},
@@ -20,57 +31,12 @@ export const useAIAdvisorStreamProcessor = ({
 }: UseAIAdvisorStreamProcessorOptions): UseAIAdvisorStreamProcessorReturn => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const conversationIdRef = useRef<string>("");
 
   // Refs to track current streaming states
   const currentTextMessageRef = useRef<ChatMessage | null>(null);
   const currentToolMessageRef = useRef<ChatMessage | null>(null);
   const responseIdRef = useRef<string>("");
-
-  // Helper function to create ComponentData from UIAction
-  const createComponentData = useCallback((action: UIAction): ComponentData | null => {
-    if (action.type === UIActionType.SHOW_COMPONENT) {
-      const componentId = action.payload.componentId;
-      // Map component IDs to ComponentData types
-      const componentTypeMap: Record<string, ComponentData['type']> = {
-        'budget-overview': 'budget_form',
-        'budget-detail': 'budget_form',
-        'expense-tracker': 'expense_tracker',
-        'goal-planner': 'goal_planner',
-        'investment-calculator': 'investment_calculator',
-        'spending-chart': 'spending_chart',
-      };
-
-      if (componentId && componentTypeMap[componentId]) {
-        return {
-          type: componentTypeMap[componentId],
-          props: action.payload.context || {},
-          title: action.payload.title,
-        };
-      }
-    }
-    
-    if (action.type === UIActionType.OPEN_TOOL) {
-      // Map tool IDs to ComponentData types
-      const toolTypeMap: Record<string, ComponentData['type']> = {
-        'budget-tool': 'budget_form',
-        'loan-calculator': 'investment_calculator',
-        'interest-calculator': 'investment_calculator',
-        'salary-calculator': 'investment_calculator',
-        'learning-center': 'goal_planner',
-      };
-
-      const toolId = action.payload.toolId;
-      if (toolId && toolTypeMap[toolId]) {
-        return {
-          type: toolTypeMap[toolId],
-          props: action.payload.context || {},
-          title: action.payload.title,
-        };
-      }
-    }
-
-    return null;
-  }, []);
 
   const createStreamingMessage = useCallback(
     (
@@ -83,60 +49,60 @@ export const useAIAdvisorStreamProcessor = ({
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         user_id: userId,
-        conversation_id: conversationId,
+        conversation_id: conversationIdRef.current,
         content,
         sender: "ai",
-        type: action ? "component" : "text",
-        metadata: action ? JSON.parse(JSON.stringify({
-          uiActions: [action],
-          isStreaming,
-          isComplete: !isStreaming,
-          action,
-        })) : JSON.parse(JSON.stringify({
-          isStreaming,
-          isComplete: !isStreaming,
-        })),
+        type: action ? getMessageType(action) : "text",
+        metadata: action
+          ? JSON.parse(
+              JSON.stringify({
+                isStreaming,
+                isComplete: !isStreaming,
+                action,
+              })
+            )
+          : null,
         isStreaming,
         streamingContent: isStreaming ? content : undefined,
-        component: action ? createComponentData(action) : undefined,
       };
 
       return message;
     },
-    [conversationId, userId]
+    [userId]
   );
 
   const updateStreamingMessage = useCallback(
     (
       message: ChatMessage,
       updates: {
+        type?: MessageType;
         content?: string;
         isStreaming?: boolean;
         isComplete?: boolean;
         action?: UIAction;
       }
     ): ChatMessage => {
-      const currentMetadata = (message.metadata as Record<string, unknown>) || {};
+      const currentMetadata =
+        (message.metadata as Record<string, unknown>) || {};
 
       const updatedMessage: ChatMessage = {
         ...message,
         content: updates.content ?? message.content,
-        metadata: JSON.parse(JSON.stringify({
-          ...currentMetadata,
-          isStreaming: updates.isStreaming ?? currentMetadata.isStreaming,
-          isComplete: updates.isComplete ?? currentMetadata.isComplete,
-          action: updates.action ?? currentMetadata.action,
-          uiActions: updates.action ? [updates.action] : currentMetadata.uiActions || [],
-        })),
+        metadata: JSON.parse(
+          JSON.stringify({
+            ...currentMetadata,
+            isStreaming: updates.isStreaming ?? currentMetadata.isStreaming,
+            isComplete: updates.isComplete ?? currentMetadata.isComplete,
+            action: updates.action ?? currentMetadata.action,
+          })
+        ),
         isStreaming: updates.isStreaming ?? message.isStreaming,
-        streamingContent: updates.isStreaming ? (updates.content ?? message.content) : undefined,
+        streamingContent: updates.isStreaming
+          ? updates.content ?? message.content
+          : undefined,
+        type: updates.type ?? message.type,
         updated_at: new Date().toISOString(),
       };
-
-      if (updates.action) {
-        updatedMessage.type = "component";
-        updatedMessage.component = createComponentData(updates.action);
-      }
 
       return updatedMessage;
     },
@@ -168,7 +134,8 @@ export const useAIAdvisorStreamProcessor = ({
             onMessageStreaming(newMessage);
           } else {
             // Update existing message with streamed content
-            const updatedContent = (currentTextMessageRef.current.streamingContent || "") + content;
+            const updatedContent =
+              (currentTextMessageRef.current.streamingContent || "") + content;
             const updatedMessage = updateStreamingMessage(
               currentTextMessageRef.current,
               {
@@ -229,6 +196,7 @@ export const useAIAdvisorStreamProcessor = ({
             const completedMessage = updateStreamingMessage(
               currentToolMessageRef.current,
               {
+                type: getMessageType(action),
                 content: finalContent,
                 action,
                 isStreaming: false,
@@ -284,13 +252,15 @@ export const useAIAdvisorStreamProcessor = ({
         case "error": {
           setIsStreaming(false);
           setIsProcessing(false);
-          
+
           // Update any current streaming message with error state
           if (currentTextMessageRef.current) {
             const errorMessage = updateStreamingMessage(
               currentTextMessageRef.current,
               {
-                content: currentTextMessageRef.current.content || "Sorry, I encountered an error while responding.",
+                content:
+                  currentTextMessageRef.current.content ||
+                  "Sorry, I encountered an error while responding.",
                 isStreaming: false,
                 isComplete: true,
               }
@@ -317,7 +287,11 @@ export const useAIAdvisorStreamProcessor = ({
   );
 
   const processStreamData = useCallback(
-    async (readableStream: ReadableStream<Uint8Array>) => {
+    async (
+      conversationId: string,
+      readableStream: ReadableStream<Uint8Array>
+    ) => {
+      conversationIdRef.current = conversationId;
       setIsProcessing(true);
 
       try {
@@ -401,4 +375,4 @@ export const useAIAdvisorStreamProcessor = ({
     reset,
     responseId: responseIdRef.current,
   };
-}; 
+};

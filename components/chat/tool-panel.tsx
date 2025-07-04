@@ -2,6 +2,7 @@
 
 import { useAppTranslation } from "@/hooks/use-translation";
 import { ChatToolId } from "@/lib/types/ai-streaming.types";
+import { useEffect, useState } from "react";
 
 interface ToolPanelProps {
   onClose: () => void;
@@ -11,6 +12,25 @@ interface ToolPanelProps {
 
 export function ToolPanel({ onClose, toolId, isOpen = false }: ToolPanelProps) {
   const { t } = useAppTranslation(["chat", "common"]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Check if we're on client-side
+    if (typeof window !== "undefined") {
+      const checkIsMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+
+      // Initial check
+      checkIsMobile();
+
+      // Add event listener for resize
+      window.addEventListener("resize", checkIsMobile);
+
+      // Cleanup
+      return () => window.removeEventListener("resize", checkIsMobile);
+    }
+  }, []);
 
   if (!isOpen || !toolId) {
     return null;
@@ -95,50 +115,100 @@ export function ToolPanel({ onClose, toolId, isOpen = false }: ToolPanelProps) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-50 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 bg-gray-100 rounded-t-xl">
-          <h2 className="text-xl font-bold font-nunito text-gray-900">
-            {t("componentPanelTitle")}
-          </h2>
-          <button
-            onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
-            aria-label={t("closePanel")}
-          >
-            <svg
-              className="w-6 h-6 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+  // Mobile: Full screen overlay
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-50 rounded-xl w-full h-full max-h-[100vh] overflow-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 bg-gray-100 rounded-t-xl">
+            <h2 className="text-xl font-bold font-nunito text-gray-900">
+              {t("componentPanelTitle")}
+            </h2>
+            <button
+              onClick={onClose}
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
+              aria-label={t("closePanel")}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <svg
+                className="w-6 h-6 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="p-4 flex-1">{renderComponent()}</div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-end gap-4 p-4 bg-white rounded-b-xl">
+            <button
+              onClick={onClose}
+              className="px-6 py-2 text-base font-nunito font-medium text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
+            >
+              {t("close")}
+            </button>
+            <button className="px-6 py-2 bg-blue-600 text-white text-base font-nunito font-semibold rounded-full hover:bg-blue-700 transition-colors cursor-pointer">
+              {t("useThisTool")}
+            </button>
+          </div>
         </div>
+      </div>
+    );
+  }
 
-        {/* Content */}
-        <div className="p-6">{renderComponent()}</div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-4 p-6 bg-white rounded-b-xl">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 text-base font-nunito font-medium text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
+  // Desktop: Split screen
+  return (
+    <div className="fixed md:relative inset-y-0 right-0 w-full md:w-1/2 lg:w-2/5 bg-gray-50 border-l border-gray-200 z-40 h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between p-6 bg-gray-100 border-b border-gray-200">
+        <h2 className="text-xl font-bold font-nunito text-gray-900">
+          {t("componentPanelTitle")}
+        </h2>
+        <button
+          onClick={onClose}
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
+          aria-label={t("closePanel")}
+        >
+          <svg
+            className="w-6 h-6 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            {t("close")}
-          </button>
-          <button className="px-6 py-2 bg-blue-600 text-white text-base font-nunito font-semibold rounded-full hover:bg-blue-700 transition-colors cursor-pointer">
-            {t("useThisTool")}
-          </button>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">{renderComponent()}</div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-end gap-4 p-6 bg-white border-t border-gray-200">
+        <button
+          onClick={onClose}
+          className="px-6 py-2 text-base font-nunito font-medium text-gray-600 hover:text-gray-800 transition-colors cursor-pointer"
+        >
+          {t("close")}
+        </button>
+        <button className="px-6 py-2 bg-blue-600 text-white text-base font-nunito font-semibold rounded-full hover:bg-blue-700 transition-colors cursor-pointer">
+          {t("useThisTool")}
+        </button>
       </div>
     </div>
   );
