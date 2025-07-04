@@ -9,7 +9,7 @@ import { useState } from "react";
 import { BUDGET_COLORS } from "@/lib/utils/budget-constants";
 import Link from "next/link";
 
-interface Transaction {
+export interface Transaction {
   id: string;
   name: string;
   amount: number;

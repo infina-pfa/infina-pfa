@@ -49,11 +49,26 @@ export const EditExpenseModal = ({
   // Populate form when expense changes
   useEffect(() => {
     if (expense) {
+      // Convert date format from MM/DD/YYYY to YYYY-MM-DD
+      let formattedDate = expense.date;
+
+      // Check if the date is in MM/DD/YYYY format
+      if (expense.date && expense.date.includes("/")) {
+        const dateParts = expense.date.split("/");
+        // Assuming MM/DD/YYYY format
+        if (dateParts.length === 3) {
+          formattedDate = `${dateParts[2]}-${dateParts[0].padStart(
+            2,
+            "0"
+          )}-${dateParts[1].padStart(2, "0")}`;
+        }
+      }
+
       setFormData({
         name: expense.name,
         amount: expense.amount,
         description: expense.description || "",
-        date: expense.date,
+        date: formattedDate,
       });
     }
   }, [expense]);

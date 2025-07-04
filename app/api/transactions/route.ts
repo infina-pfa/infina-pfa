@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
         description: transaction.description,
         type: transaction.type,
         recurring: transaction.recurring,
-        date: new Date(transaction.created_at).toLocaleDateString(),
+        date: transaction.created_at,
         category: transaction.category || "",
         budgetName: "",
         budgetColor: "#0055FF",

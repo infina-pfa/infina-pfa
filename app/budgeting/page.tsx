@@ -3,7 +3,10 @@
 import { AppLayout } from "@/components/ui/app-layout";
 import { SpendingOverview } from "@/components/budgeting/spending-overview";
 import { BudgetCategoriesList } from "@/components/budgeting/budget-categories-list";
-import { RecentExpensesList } from "@/components/budgeting/recent-expenses-list";
+import {
+  RecentExpensesList,
+  Transaction,
+} from "@/components/budgeting/recent-expenses-list";
 import { CreateBudgetModal } from "@/components/budgeting/create-budget-modal";
 import { EditBudgetModal } from "@/components/budgeting/edit-budget-modal";
 import { CreateExpenseModal } from "@/components/budgeting/create-expense-modal";
@@ -14,6 +17,7 @@ import { useAppTranslation } from "@/hooks/use-translation";
 import { useMemo, useState } from "react";
 import { Budget } from "@/lib/types/budget.types";
 import { useToast } from "@/hooks/use-toast";
+import { formatDateVN } from "@/lib/utils/date-formatter";
 
 export default function BudgetingPage() {
   const { t } = useAppTranslation(["budgeting", "common"]);
@@ -54,6 +58,23 @@ export default function BudgetingPage() {
     isLoading: transactionsLoading,
     error: transactionsError,
   } = useRecentTransactionsSWR(10);
+
+  // Map API transactions to component's Transaction type
+  const mappedTransactions: Transaction[] = useMemo(() => {
+    if (!recentTransactions) return [];
+
+    return recentTransactions.map((transaction) => ({
+      id: transaction.id,
+      name: transaction.name,
+      amount: transaction.amount,
+      date: formatDateVN(transaction.created_at),
+      category: transaction.budgetName || "Uncategorized",
+      type: transaction.type,
+      description: transaction.description,
+      budgetName: transaction.budgetName,
+      budgetColor: transaction.budgetColor,
+    }));
+  }, [recentTransactions]);
 
   // Use the budget delete hook
   const { deleteBudget, error: deleteError } = useBudgetDeleteSWR();
@@ -149,7 +170,7 @@ export default function BudgetingPage() {
 
           <div className="mt-6 md:mt-8">
             {/* ✨ No need to pass onExpenseUpdated - SWR handles automatic updates */}
-            <RecentExpensesList transactions={recentTransactions || []} />
+            <RecentExpensesList transactions={mappedTransactions} />
           </div>
         </main>
       </div>
