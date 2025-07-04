@@ -8,6 +8,7 @@ import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
 import { useEffect, useState } from "react";
+import { ChatToolId } from "@/lib/types/ai-streaming.types";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
@@ -110,7 +111,10 @@ export function ChatInterface() {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          <MessageList messages={messages} />
+          <MessageList
+            messages={messages}
+            onToolClick={(toolId) => setToolId(toolId as ChatToolId)}
+          />
           {isThinking && <TypingIndicator />}
         </div>
 
