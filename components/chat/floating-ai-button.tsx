@@ -26,7 +26,6 @@ export function FloatingAIButton({
         transition-all duration-200
         flex items-center justify-center
         cursor-pointer
-        animate-pulse
         ${className}
       `}
       aria-label={t("openAIAssistant")}

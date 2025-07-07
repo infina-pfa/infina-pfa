@@ -44,7 +44,7 @@ export function ChatPopup({ isOpen, onClose, chatFlowState }: ChatPopupProps) {
       >
         <SheetHeader className="px-6 py-4 border-b border-gray-100">
           <SheetTitle className="text-lg font-semibold text-gray-900 font-nunito">
-            {t("aiAssistant")}
+            {t("Fina")}
           </SheetTitle>
         </SheetHeader>
 
