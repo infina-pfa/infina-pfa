@@ -108,4 +108,8 @@ export const commonVi = {
   financialTools: "Công cụ tài chính",
   budgetingWidgetDescription:
     "Quản lý ngân sách và theo dõi chi tiêu của bạn với tiện ích ngân sách của chúng tôi.",
+
+  // AI Assistant
+  aiAssistant: "Trợ lý AI",
+  openAIAssistant: "Mở trợ lý AI",
 };

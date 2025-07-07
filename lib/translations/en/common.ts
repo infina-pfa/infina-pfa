@@ -108,4 +108,8 @@ export const commonEn = {
   financialTools: "Financial Tools",
   budgetingWidgetDescription:
     "Manage your budget and track your expenses with our budgeting widget.",
+
+  // AI Assistant
+  aiAssistant: "AI Assistant",
+  openAIAssistant: "Open AI Assistant",
 };

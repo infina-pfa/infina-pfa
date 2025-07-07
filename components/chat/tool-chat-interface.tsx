@@ -5,14 +5,41 @@ import { useAppTranslation } from "@/hooks/use-translation";
 import { ChatInput } from "./chat-input";
 import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
-import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
-import { useEffect, useState } from "react";
-import { ChatToolId } from "@/lib/types/ai-streaming.types";
+import { ChatMessage, DEFAULT_CHAT_SUGGESTIONS } from "@/lib/types/chat.types";
 
-export function ChatInterface() {
+interface ChatFlowState {
+  messages: ChatMessage[];
+  isLoading: boolean;
+  error: string | null;
+  isThinking: boolean;
+  isStreaming: boolean;
+  showSuggestions: boolean;
+  clearError: () => void;
+  inputValue: string;
+  setInputValue: (value: string) => void;
+  handleSubmit: () => Promise<void>;
+  isSubmitting: boolean;
+  suggestions: typeof DEFAULT_CHAT_SUGGESTIONS;
+  onSuggestionClick: (suggestion: string) => Promise<void>;
+  conversationId: string | null;
+}
+
+interface ToolChatInterfaceProps {
+  // Allow passing the entire chat flow state for shared conversation
+  chatFlowState?: ChatFlowState;
+  // Fallback to individual props
+  messages?: ChatMessage[];
+  conversationId?: string | null;
+}
+
+export function ToolChatInterface({ chatFlowState }: ToolChatInterfaceProps) {
   const { t } = useAppTranslation(["chat", "common"]);
-  const [isMobile, setIsMobile] = useState(false);
+
+  const internalChatFlow = useChatFlow();
+
+  // Use external chat flow state if provided, otherwise use internal
+  const chatFlow = chatFlowState || internalChatFlow;
 
   const {
     messages,
@@ -22,34 +49,13 @@ export function ChatInterface() {
     isStreaming,
     showSuggestions,
     clearError,
-    toolId,
-    setToolId,
     inputValue,
     setInputValue,
     handleSubmit,
     isSubmitting,
     suggestions,
     onSuggestionClick,
-    conversationId,
-  } = useChatFlow();
-
-  useEffect(() => {
-    // Check if we're on client-side
-    if (typeof window !== "undefined") {
-      const checkIsMobile = () => {
-        setIsMobile(window.innerWidth < 768);
-      };
-
-      // Initial check
-      checkIsMobile();
-
-      // Add event listener for resize
-      window.addEventListener("resize", checkIsMobile);
-
-      // Cleanup
-      return () => window.removeEventListener("resize", checkIsMobile);
-    }
-  }, []);
+  } = chatFlow;
 
   if (isLoading) {
     return (
@@ -66,18 +72,10 @@ export function ChatInterface() {
     );
   }
 
-  // Determine if tool panel is open and adjust layout
-  const isToolOpen = !!toolId && !isMobile;
-
   return (
-    <div className="flex h-full bg-gray-50 p-0 md:p-8">
-      {/* Main Chat Area - adjust width when tool panel is open on desktop */}
-      <div
-        className={`flex-1 flex flex-col ${
-          isToolOpen ? "md:w-1/2 lg:w-3/5" : "w-full"
-        }`}
-        style={isToolOpen ? { maxWidth: isMobile ? "100%" : "60%" } : {}}
-      >
+    <div className="flex h-full bg-gray-50">
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col w-full">
         {/* Error Display */}
         {error && (
           <div className="bg-red-50 p-6 mb-6">
@@ -114,7 +112,7 @@ export function ChatInterface() {
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <MessageList
             messages={messages}
-            onToolClick={(toolId) => setToolId(toolId as ChatToolId)}
+            // Note: No onToolClick prop passed to prevent tool-in-tool opening
           />
           {isThinking && <TypingIndicator />}
         </div>
@@ -137,31 +135,6 @@ export function ChatInterface() {
           disabled={isThinking || isStreaming}
         />
       </div>
-
-      {/* Tool Panel */}
-      <ToolPanel
-        isOpen={!!toolId}
-        toolId={toolId}
-        onClose={() => {
-          setToolId(null);
-        }}
-        chatFlowState={{
-          messages,
-          isLoading,
-          error,
-          isThinking,
-          isStreaming,
-          showSuggestions,
-          clearError,
-          inputValue,
-          setInputValue,
-          handleSubmit,
-          isSubmitting,
-          suggestions,
-          onSuggestionClick,
-          conversationId,
-        }}
-      />
     </div>
   );
 }
