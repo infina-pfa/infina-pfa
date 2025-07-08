@@ -78,15 +78,15 @@ const createBudget = async (data) => {
 
 ```typescript
 // ✅ Good - Using translations
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 const WelcomeMessage = () => {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["namespace","common"]);
   
   return (
     <div>
       <h1>{t("welcome")}</h1>
-      <p>{t("getStartedMessage")}</p>
+      <p>{t("getStartedMessage", {ns: "namespace"})}</p>
       <button>{t("getStarted")}</button>
     </div>
   );
@@ -147,7 +147,7 @@ export const authEn = {
 
 ```typescript
 // ✅ Good - Dynamic translations with interpolation
-const { t } = useTranslation();
+const { t } = useAppTranslation();
 
 const BudgetSummary = ({ amount, budgetName }: { amount: number; budgetName: string }) => {
   return (
@@ -287,4 +287,30 @@ const useBudgetList = () => {
 - **Types**: `budget.types.ts`, `auth.types.ts`
 - **Errors**: `errors.ts`, `error-handler.ts`
 
-### Directory Structure
+Here's a concise set of SWR principles to add to your coding rules:
+
+## 🔄 SWR DATA FETCHING PRINCIPLES
+
+### Core SWR Principles
+- **Use SWR for all data fetching** - Replace traditional fetch/axios calls
+- **Centralize configuration** in SWRProvider with sensible defaults
+- **Follow service layer pattern** - SWR fetchers must use service methods, never direct API calls
+- **Consistent naming** - Use `useSomethingSWR` pattern for all SWR hooks
+
+### Data Management
+- **Structured cache keys** - Use array format `['entity', id, params]` for better organization
+- **Proper cache invalidation** - Invalidate related data after mutations
+- **Return standardized objects** - Always include `{ data, error, loading, refetch }` pattern
+- **Provide default values** - Never return undefined/null from hooks
+
+### Performance & UX
+- **Implement optimistic updates** for immediate UI feedback
+- **Use conditional fetching** for dependent data
+- **Configure revalidation strategy** based on data freshness requirements
+- **Leverage built-in features** - deduplication, focus revalidation, error retry
+
+### Error Handling
+- **Centralized error handling** through SWRProvider
+- **Transform API errors** to user-friendly messages
+- **Support i18n in error messages** for all languages
+- **Expose error states** consistently in hook returns

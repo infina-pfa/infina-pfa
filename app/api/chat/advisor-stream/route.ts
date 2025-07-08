@@ -1,88 +1,60 @@
+import { openai } from "@/lib/openai";
+import { createClient } from "@/lib/supabase/server";
+import {
+  ChatComponentId,
+  ChatTool,
+  ChatToolId,
+  ConversationMessage,
+  UIActionType,
+} from "@/lib/types/ai-streaming.types";
+import { ResponseDataEvent } from "@/lib/types/chat.types";
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import OpenAI from "openai";
-
-// Response data event types
-enum ResponseDataEvent {
-  RESPONSE_CREATED = "response_created",
-  OUTPUT_TEXT_STREAMING = "response_output_text_streaming",
-  OUTPUT_TEXT_DONE = "response_output_text_done",
-  FUNCTION_CALL_ARGUMENTS_STREAMING = "response_function_call_arguments_streaming",
-  FUNCTION_CALL_ARGUMENTS_DONE = "response_function_call_arguments_done",
-  MCP_TOOL_CALLING = "mcp_tool_calling", 
-  MCP_TOOL_CALL_DONE = "mcp_tool_call_done",
-  MCP_TOOL_CALL_FAILED = "mcp_tool_call_failed",
-  RESPONSE_COMPLETED = "response_completed",
-}
-
-enum UIActionType {
-  OPEN_TOOL = "open_tool",
-  SHOW_COMPONENT = "show_component",
-}
-
-interface ChatTool {
-  id: string;
-  name: string;
-  description: string;
-  keywords: string[];
-}
-
-interface ConversationMessage {
-  id: string;
-  content: string;
-  sender: "user" | "ai";
-  timestamp: string;
-}
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { Message } from "openai/resources/beta/threads/messages.mjs";
+import { FunctionTool } from "openai/resources/responses/responses.mjs";
 
 // Chat tools configuration
 const chatTools: ChatTool[] = [
   {
-    id: "budget-tool",
+    id: ChatToolId.BUDGET_TOOL,
     name: "Công cụ Ngân sách",
     description: "Giúp người dùng tạo và quản lý ngân sách cá nhân",
     keywords: ["ngân sách", "budget", "chi tiêu", "tiết kiệm", "quản lý tiền"],
   },
   {
-    id: "loan-calculator",
+    id: ChatToolId.LOAN_CALCULATOR,
     name: "Công cụ tính lãi vay",
     description: "Tính toán lãi suất và lịch trả nợ cho các khoản vay",
     keywords: ["tính vay", "vay tiền", "lãi vay", "loan", "tín dụng", "trả nợ"],
   },
   {
-    id: "interest-calculator",
+    id: ChatToolId.INTEREST_CALCULATOR,
     name: "Công cụ tính lãi tiết kiệm",
     description: "Tính toán lãi suất tiền gửi tiết kiệm",
     keywords: ["tính lãi", "lãi suất", "tiết kiệm", "interest", "tiền gửi"],
   },
   {
-    id: "salary-calculator",
+    id: ChatToolId.SALARY_CALCULATOR,
     name: "Công cụ tính lương",
     description: "Tính lương gross sang net và các khoản khấu trừ",
-    keywords: ["tính lương", "lương net", "lương gross", "salary", "thuế thu nhập"],
-  },
-  {
-    id: "learning-center",
-    name: "Hành trình Học tập",
-    description: "Hiển thị hành trình học tập thực tế của người dùng với milestone và task cụ thể",
-    keywords: ["học", "kiến thức", "tài chính", "learning", "bài học", "hành trình"],
+    keywords: [
+      "tính lương",
+      "lương net",
+      "lương gross",
+      "salary",
+      "thuế thu nhập",
+    ],
   },
 ];
 
 const chatComponents = [
   {
-    id: "budget-overview",
+    id: ChatComponentId.BUDGET_OVERVIEW,
     name: "Tổng quan Ngân sách",
     description: "Hiển thị tổng quan về ngân sách của người dùng",
     keywords: ["tổng quan", "ngân sách", "chi tiêu", "thu nhập"],
   },
   {
-    id: "budget-detail",
+    id: ChatComponentId.BUDGET_DETAIL,
     name: "Chi tiết một ngân sách",
     description: "Hiển thị chi tiết về một ngân sách của người dùng",
     keywords: ["chi tiết", "ngân sách", "tỷ lệ chi tiêu"],
@@ -90,57 +62,63 @@ const chatComponents = [
 ];
 
 // Tool definitions for function calling
-const tools = [
+const tools: FunctionTool[] = [
   {
-    type: "function" as const,
-    function: {
-      name: UIActionType.OPEN_TOOL,
-      description: "Open a specific financial tool for the user when they need practical assistance",
-      parameters: {
-        type: "object",
-        properties: {
-          tool_id: {
-            type: "string",
-            description: "ID of the tool to open",
-            enum: ["budget-tool", "loan-calculator", "interest-calculator", "salary-calculator", "learning-center"],
-          },
-          title: {
-            type: "string",
-            description: "Title or reason for opening the tool",
-          },
-          context: {
-            type: "object",
-            description: "Additional context or parameters for the tool",
-          },
-          trigger_reason: {
-            type: "string",
-            description: "Explanation for why this tool should be opened",
-          },
+    type: "function",
+    strict: false,
+    name: UIActionType.OPEN_TOOL,
+    description:
+      "Open a specific financial tool for the user when they need practical assistance",
+    parameters: {
+      type: "object",
+      properties: {
+        tool_id: {
+          type: "string",
+          description: "ID of the tool to open",
+          enum: [
+            "budget-tool",
+            "loan-calculator",
+            "interest-calculator",
+            "salary-calculator",
+            "learning-center",
+          ],
         },
-        required: ["tool_id", "title", "trigger_reason"],
+        title: {
+          type: "string",
+          description: "Title or reason for opening the tool",
+        },
+        context: {
+          type: "object",
+          description: "Additional context or parameters for the tool",
+        },
+        trigger_reason: {
+          type: "string",
+          description: "Explanation for why this tool should be opened",
+        },
       },
+      required: ["tool_id", "title", "trigger_reason"],
     },
   },
   {
-    type: "function" as const,
-    function: {
-      name: UIActionType.SHOW_COMPONENT,
-      description: "Show a specific component to the user instead of long information",
-      parameters: {
-        type: "object",
-        properties: {
-          component_id: {
-            type: "string", 
-            description: "ID of the component to show",
-            enum: ["budget-overview", "budget-detail"],
-          },
-          title: {
-            type: "string",
-            description: "Title of the component",
-          },
+    type: "function",
+    strict: false,
+    name: UIActionType.SHOW_COMPONENT,
+    description:
+      "Show a specific component to the user instead of long information",
+    parameters: {
+      type: "object",
+      properties: {
+        component_id: {
+          type: "string",
+          description: "ID of the component to show",
+          enum: ["budget-overview", "budget-detail"],
         },
-        required: ["component_id", "title"],
+        title: {
+          type: "string",
+          description: "Title of the component",
+        },
       },
+      required: ["component_id", "title"],
     },
   },
 ];
@@ -150,37 +128,26 @@ export async function POST(request: NextRequest) {
     const { message, conversationHistory, userContext } = await request.json();
 
     if (!message) {
-      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Message is required" },
+        { status: 400 }
+      );
     }
 
     // Create Supabase client
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // Server Component context
-            }
-          },
-        },
-      }
-    );
+    const supabase = await createClient();
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
     }
 
     console.log("🚀 AI Advisor Stream Function Called");
@@ -194,16 +161,26 @@ export async function POST(request: NextRequest) {
 Thông tin người dùng:
 - User ID: ${user.id}
 - Thông tin tài chính người dùng:
-- Tổng thu nhập: ${userContext.financial?.totalIncome ? new Intl.NumberFormat("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      }).format(userContext.financial.totalIncome) : "Chưa có dữ liệu"}
-- Tổng chi tiêu: ${userContext.financial?.totalExpenses ? new Intl.NumberFormat("vi-VN", {
-        style: "currency", 
-        currency: "VND",
-      }).format(userContext.financial.totalExpenses) : "Chưa có dữ liệu"}
+- Tổng thu nhập: ${
+          userContext.financial?.totalIncome
+            ? new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(userContext.financial.totalIncome)
+            : "Chưa có dữ liệu"
+        }
+- Tổng chi tiêu: ${
+          userContext.financial?.totalExpenses
+            ? new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(userContext.financial.totalExpenses)
+            : "Chưa có dữ liệu"
+        }
 - Số lượng ngân sách: ${userContext.financial?.currentBudgets || 0}
-- Đã hoàn thành onboarding: ${userContext.financial?.hasCompletedOnboarding ? "Có" : "Không"}
+- Đã hoàn thành onboarding: ${
+          userContext.financial?.hasCompletedOnboarding ? "Có" : "Không"
+        }
 
 Thông tin học tập:
 - Level hiện tại: ${userContext.learning?.currentLevel || 1}
@@ -217,15 +194,26 @@ Thông tin người dùng:
 `;
 
     // Prepare conversation history
-    const historyContext = conversationHistory && conversationHistory.length > 0
-      ? conversationHistory.slice(-15).map((msg: ConversationMessage, index: number) => {
-          return `${index + 1}. ${msg.sender === "user" ? "Người dùng" : "AI"}: ${msg.content}`;
-        }).join("\n")
-      : "Đây là cuộc trò chuyện đầu tiên.";
+    const historyContext =
+      conversationHistory && conversationHistory.length > 0
+        ? conversationHistory
+            .slice(-15)
+            .map((msg: ConversationMessage, index: number) => {
+              return `${index + 1}. ${
+                msg.sender === "user" ? "Người dùng" : "AI"
+              }: ${msg.content}`;
+            })
+            .join("\n")
+        : "Đây là cuộc trò chuyện đầu tiên.";
 
     // Prepare tools information
     const toolsInfo = [...chatTools, ...chatComponents]
-      .map(tool => `Tool ID: "${tool.id}" | Tên: "${tool.name}" | Mô tả: "${tool.description}" | Từ khóa: [${tool.keywords.join(", ")}]`)
+      .map(
+        (tool) =>
+          `Tool ID: "${tool.id}" | Tên: "${tool.name}" | Mô tả: "${
+            tool.description
+          }" | Từ khóa: [${tool.keywords.join(", ")}]`
+      )
       .join("\n");
 
     const systemPrompt = `
@@ -284,30 +272,30 @@ Thông tin người dùng:
 </system_prompt>
 `;
 
-    const messages = [
-      { role: "system" as const, content: systemPrompt },
+    const messages: Message[] = [
+      { role: "system", content: systemPrompt },
       ...conversationHistory.slice(-10).map((msg: ConversationMessage) => ({
-        role: msg.sender === "user" ? ("user" as const) : ("assistant" as const),
+        role: msg.sender === "user" ? "user" : "assistant",
         content: msg.content,
       })),
-      { role: "user" as const, content: message },
+      { role: "user", content: message },
     ];
 
     // Create streaming response
-    const stream = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages,
+    const stream = await openai.responses.create({
+      model: "gpt-4.1-2025-04-14",
+      input: messages,
       tools,
       stream: true,
       temperature: 0.7,
-      max_tokens: 1000,
+      max_output_tokens: 1000,
     });
 
     // Set up Server-Sent Events headers
     const headers = new Headers({
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
@@ -326,99 +314,116 @@ Thông tin người dùng:
             arguments: string;
           }
           const functionCalls: Record<string, FunctionCall> = {};
-
-          // Send response created event
-          const responseCreatedData = {
-            type: ResponseDataEvent.RESPONSE_CREATED,
-            response_id: `response-${Date.now()}`,
-            timestamp: new Date().toISOString(),
-          };
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(responseCreatedData)}\n\n`));
-
           for await (const chunk of stream) {
-            const delta = chunk.choices[0]?.delta;
+            // Handle different chunk types properly for responses API
+            if (!chunk || typeof chunk !== "object") {
+              continue;
+            }
 
-            // Handle text content
-            if (delta?.content) {
-              responseContent += delta.content;
+            // Handle response creation to send response_id
+            if (chunk.type === "response.created" && chunk.response?.id) {
               const data = {
-                type: ResponseDataEvent.OUTPUT_TEXT_STREAMING,
-                content: delta.content,
+                type: ResponseDataEvent.RESPONSE_CREATED,
+                response_id: chunk.response.id,
                 timestamp: new Date().toISOString(),
               };
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+              const message = `data: ${JSON.stringify(data)}\n\n`;
+              controller.enqueue(encoder.encode(message));
             }
 
-            // Handle function calls
-            if (delta?.tool_calls) {
-              for (const toolCall of delta.tool_calls) {
-                const callId = toolCall.id || `call_${Date.now()}`;
-                
-                if (!functionCalls[callId]) {
-                  functionCalls[callId] = {
-                    id: callId,
-                    name: toolCall.function?.name || "",
-                    arguments: "",
-                  };
-                }
-
-                if (toolCall.function?.arguments) {
-                  functionCalls[callId].arguments += toolCall.function.arguments;
-                  
-                  const streamingData = {
-                    type: ResponseDataEvent.FUNCTION_CALL_ARGUMENTS_STREAMING,
-                    timestamp: new Date().toISOString(),
-                  };
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify(streamingData)}\n\n`));
-                }
-              }
+            // Handle text content deltas
+            if (chunk.type === "response.output_text.delta" && chunk.delta) {
+              responseContent += chunk.delta;
+              const data = {
+                type: ResponseDataEvent.OUTPUT_TEXT_STREAMING,
+                content: chunk.delta,
+                timestamp: new Date().toISOString(),
+              };
+              const message = `data: ${JSON.stringify(data)}\n\n`;
+              controller.enqueue(encoder.encode(message));
             }
 
-            // Check if streaming is complete
-            if (chunk.choices[0]?.finish_reason) {
-              // Send text done event
-              if (responseContent) {
-                const textDoneData = {
-                  type: ResponseDataEvent.OUTPUT_TEXT_DONE,
-                  content: responseContent,
-                  timestamp: new Date().toISOString(),
-                };
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify(textDoneData)}\n\n`));
-              }
+            if (chunk.type === "response.output_text.done") {
+              const data = {
+                type: ResponseDataEvent.OUTPUT_TEXT_DONE,
+                content: responseContent,
+                timestamp: new Date().toISOString(),
+              };
+              const message = `data: ${JSON.stringify(data)}\n\n`;
+              controller.enqueue(encoder.encode(message));
+            }
 
-              // Process completed function calls
-              for (const callId in functionCalls) {
-                const call = functionCalls[callId];
-                try {
-                  const toolData = JSON.parse(call.arguments || "{}");
-                  const action = {
-                    type: call.name,
-                    payload: {
-                      componentId: toolData.component_id,
-                      toolId: toolData.tool_id,
-                      title: toolData.title,
-                      context: toolData.context || {},
-                    },
-                  };
+            // Handle function call arguments deltas
+            if (chunk.type === "response.function_call_arguments.delta") {
+              const data = {
+                type: ResponseDataEvent.FUNCTION_CALL_ARGUMENTS_STREAMING,
+                timestamp: new Date().toISOString(),
+              };
+              const message = `data: ${JSON.stringify(data)}\n\n`;
+              controller.enqueue(encoder.encode(message));
+            }
 
-                  const functionDoneData = {
-                    type: ResponseDataEvent.FUNCTION_CALL_ARGUMENTS_DONE,
-                    action,
-                    timestamp: new Date().toISOString(),
-                  };
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify(functionDoneData)}\n\n`));
-                } catch (error) {
-                  console.error("Error parsing function arguments:", error);
-                }
-              }
+            if (chunk.type === "response.mcp_call.in_progress") {
+              const data = {
+                type: ResponseDataEvent.MCP_TOOL_CALLING,
+                timestamp: new Date().toISOString(),
+              };
+              const message = `data: ${JSON.stringify(data)}\n\n`;
+              controller.enqueue(encoder.encode(message));
+            }
+
+            if (
+              chunk.type === "response.output_item.done" &&
+              chunk.item.type === "function_call"
+            ) {
+              console.log("🔍 Function call arguments:", chunk);
+              const toolData = JSON.parse(chunk.item.arguments);
+              const action = {
+                type: chunk.item.name,
+                payload: {
+                  componentId: toolData.component_id,
+                  toolId: toolData.tool_id,
+                  title: toolData.title,
+                  context: toolData.context || {},
+                },
+              };
+
+              const data = {
+                type: ResponseDataEvent.FUNCTION_CALL_ARGUMENTS_DONE,
+                action,
+                timestamp: new Date().toISOString(),
+              };
+              const message = `data: ${JSON.stringify(data)}\n\n`;
+              controller.enqueue(encoder.encode(message));
+            }
+
+            if (
+              chunk.type === "response.output_item.done" &&
+              chunk.item.type === "mcp_call"
+            ) {
+              const data = {
+                type: ResponseDataEvent.MCP_TOOL_CALL_DONE,
+                timestamp: new Date().toISOString(),
+              };
+              const message = `data: ${JSON.stringify(data)}\n\n`;
+              controller.enqueue(encoder.encode(message));
+            }
+
+            // Handle response completion - Process all completed function calls
+            if (chunk.type === "response.completed") {
+              console.log(
+                "✅ Response completed - Processing function calls:",
+                Object.keys(functionCalls).length
+              );
 
               // Send completion event
               const completionData = {
                 type: ResponseDataEvent.RESPONSE_COMPLETED,
-                finish_reason: chunk.choices[0].finish_reason,
+                finish_reason: "completed",
                 timestamp: new Date().toISOString(),
               };
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify(completionData)}\n\n`));
+              const message = `data: ${JSON.stringify(completionData)}\n\n`;
+              controller.enqueue(encoder.encode(message));
               break;
             }
           }
@@ -426,15 +431,19 @@ Thông tin người dùng:
           // End the stream
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
-
         } catch (error) {
           console.error("❌ Streaming error:", error);
           const errorData = {
             type: "error",
-            error: error instanceof Error ? error.message : "Unknown streaming error",
+            error:
+              error instanceof Error
+                ? error.message
+                : "Unknown streaming error",
             timestamp: new Date().toISOString(),
           };
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`)
+          );
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
         }
@@ -442,7 +451,6 @@ Thông tin người dùng:
     });
 
     return new Response(readable, { headers });
-
   } catch (error) {
     console.error("❌ Function error:", error);
     return NextResponse.json(
@@ -461,4 +469,4 @@ export async function OPTIONS() {
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
   });
-} 
+}

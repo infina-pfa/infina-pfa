@@ -1,3 +1,4 @@
+import { supabase } from "./supabase";
 interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -9,15 +10,29 @@ interface ApiResponse<T> {
 class ApiClient {
   private baseUrl = '/api';
 
+  private async getAuthToken(): Promise<string | null> {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session?.access_token || null;
+    } catch (error) {
+      console.error('Failed to get auth token:', error);
+      return null;
+    }
+  }
+
   private async request<T>(
     endpoint: string, 
     options?: RequestInit
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     
+    // Get auth token for authenticated requests
+    const token = await this.getAuthToken();
+    
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
         ...options?.headers,
       },
       ...options,
@@ -79,6 +94,13 @@ class ApiClient {
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, {
       method: 'DELETE',
+    });
+  }
+
+  async patch<T>(endpoint: string, data: unknown): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
     });
   }
 }

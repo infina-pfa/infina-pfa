@@ -2,10 +2,10 @@
 
 import { Users, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function FooterBrand() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["footer", "common"]);
 
   return (
     <div className="sm:col-span-2 lg:col-span-1">

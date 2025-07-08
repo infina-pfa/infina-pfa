@@ -21,7 +21,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       )}
 
       {/* Desktop Layout with Sidebar */}
-      <div className="flex h-screen">
+      <div className="flex md:h-screen h-[calc(100vh-64px)]">
         {/* Vertical Sidebar - Only visible on desktop */}
         <Sidebar />
 

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Mail, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 interface ForgotPasswordFormProps {
   onBackToSignIn?: () => void;
@@ -20,7 +20,7 @@ export function ForgotPasswordForm({
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const { forgotPassword, loading } = useAuth();
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["auth", "common"]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

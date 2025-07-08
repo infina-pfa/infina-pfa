@@ -1,15 +1,15 @@
-import { useState, useCallback } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { useSimpleChatSession } from "@/hooks/use-chat-session";
-import { useChatMessages } from "@/hooks/use-chat-messages";
 import { useAIStreaming } from "@/hooks/use-ai-streaming";
-import { 
-  ChatMessage, 
-  AdvisorStreamRequest, 
-  ComponentData, 
+import { useAuth } from "@/hooks/use-auth";
+import { useChatMessages } from "@/hooks/use-chat-messages";
+import { useSimpleChatSession } from "@/hooks/use-chat-session";
+import { ChatToolId } from "@/lib/types/ai-streaming.types";
+import {
+  AdvisorStreamRequest,
+  ChatMessage,
+  DEFAULT_CHAT_SUGGESTIONS,
   UIAction,
-  DEFAULT_CHAT_SUGGESTIONS 
 } from "@/lib/types/chat.types";
+import { useCallback, useState } from "react";
 
 interface UseChatFlowReturn {
   // State
@@ -20,22 +20,22 @@ interface UseChatFlowReturn {
   isStreaming: boolean;
   showSuggestions: boolean;
   conversationId: string | null;
-  
+
   // Actions
   sendMessage: (content: string) => Promise<void>;
   createNewSession: () => Promise<void>;
   clearError: () => void;
-  
-  // Component actions (placeholder for future implementation)
-  openComponent: (component: ComponentData) => void;
-  closeComponent: () => void;
-  
+
+  // Display tool
+  toolId: ChatToolId | null;
+  setToolId: (toolId: ChatToolId | null) => void;
+
   // Input handling
   inputValue: string;
   setInputValue: (value: string) => void;
   handleSubmit: () => Promise<void>;
   isSubmitting: boolean;
-  
+
   // Suggestion handling
   suggestions: typeof DEFAULT_CHAT_SUGGESTIONS;
   onSuggestionClick: (suggestion: string) => Promise<void>;
@@ -43,35 +43,47 @@ interface UseChatFlowReturn {
 
 export const useChatFlow = (): UseChatFlowReturn => {
   const { user } = useAuth();
-  
+
   // Composed hooks
-  const session = useSimpleChatSession();
+  const {
+    conversation,
+    error: sessionError,
+    isCreating,
+    createConversation,
+  } = useSimpleChatSession();
   const messages = useChatMessages();
-  
+
   // Input state
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [toolId, setToolId] = useState<ChatToolId | null>(null);
 
   // AI Streaming
   const aiStreaming = useAIStreaming({
-    conversationId: session.conversation?.id || "",
     userId: user?.id || "",
     onMessageComplete: async (message) => {
       // Save the completed AI message to database
-      if (session.conversation) {
-        await messages.saveAIMessage(
-          message.content, 
-          session.conversation.id, 
-          message.metadata ? message.metadata as Record<string, unknown> : undefined
-        );
-      }
-      
+      await messages.saveAIMessage(
+        message.type,
+        message.content,
+        message.conversation_id,
+        message.metadata
+          ? (message.metadata as Record<string, unknown>)
+          : undefined
+      );
+
       // Update the message in local state to mark as final
-      messages.updateMessage(message.id, { isStreaming: false });
+      messages.updateMessage(message.id, {
+        isStreaming: false,
+        metadata: message.metadata,
+        type: message.type,
+      });
     },
     onMessageStreaming: (message) => {
       // Add streaming message to local state if it doesn't exist
-      const existingMessage = messages.messages.find(m => m.id === message.id);
+      const existingMessage = messages.messages.find(
+        (m) => m.id === message.id
+      );
       if (!existingMessage) {
         messages.addMessage(message);
       } else {
@@ -81,7 +93,7 @@ export const useChatFlow = (): UseChatFlowReturn => {
           streamingContent: message.streamingContent,
           isStreaming: message.isStreaming,
           metadata: message.metadata,
-          updated_at: message.updated_at
+          updated_at: message.updated_at,
         });
       }
     },
@@ -92,7 +104,7 @@ export const useChatFlow = (): UseChatFlowReturn => {
         streamingContent: message.streamingContent,
         isStreaming: message.isStreaming,
         metadata: message.metadata,
-        updated_at: message.updated_at
+        updated_at: message.updated_at,
       });
     },
     onFunctionToolComplete: (action) => {
@@ -101,35 +113,37 @@ export const useChatFlow = (): UseChatFlowReturn => {
   });
 
   // Combined error state
-  const error = session.error || messages.error || aiStreaming.error;
-  
+  const error = sessionError || messages.error || aiStreaming.error;
+
   // Combined loading state
-  const isLoading = session.isCreating;
+  const isLoading = isCreating;
 
   // Submitting state
   const isSubmitting = messages.isSending || aiStreaming.isStreaming;
 
   const handleUIAction = useCallback((action: UIAction) => {
-    // TODO: Implement component panel logic
-    if (action.type === "show_component") {
-      // Handle component display
-    } else if (action.type === "open_tool") {
-      // Handle tool opening
+    if (action.type === "show_component" && action.payload.componentId) {
+      // TODO: Implement component panel logic
+    } else if (action.type === "open_tool" && action.payload.toolId) {
+      setToolId(action.payload.toolId as ChatToolId);
     }
   }, []);
 
-  const createNewSession = useCallback(async () => {
-    await session.createConversation();
+  const createNewSession = async () => {
+    await createConversation();
     messages.clearMessages();
     setShowSuggestions(true);
     setInputValue("");
     clearError();
-  }, [session, messages]);
+  };
 
   /**
    * Main flow: User message → Create session → Update state → Save to DB → Stream AI
    */
-  const sendMessage = useCallback(async (content: string) => {
+  const sendMessage = async (
+    content: string,
+    options?: { isToolMessage?: boolean }
+  ) => {
     if (!user) {
       return;
     }
@@ -138,20 +152,23 @@ export const useChatFlow = (): UseChatFlowReturn => {
     setShowSuggestions(false);
 
     try {
-      let conversationId = session.conversation?.id;
+      let conversationId = conversation?.id;
 
       // Step 1: Create session if it doesn't exist
       if (!conversationId) {
-        conversationId = await session.createConversation() || undefined;
-        
+        conversationId = (await createConversation()) || undefined;
+
         if (!conversationId) {
           return;
         }
       }
 
       // Step 2: Send user message and update state
-      const userMessage = await messages.sendUserMessage(content, conversationId);
-      
+      const userMessage = await messages.sendUserMessage(
+        content,
+        conversationId
+      );
+
       if (!userMessage) {
         return;
       }
@@ -162,7 +179,7 @@ export const useChatFlow = (): UseChatFlowReturn => {
         .map((msg) => ({
           id: msg.id,
           content: msg.content,
-          sender: msg.sender === "user" ? "user" as const : "ai" as const,
+          sender: msg.sender === "user" ? ("user" as const) : ("ai" as const),
           timestamp: msg.created_at,
         }));
 
@@ -191,46 +208,39 @@ export const useChatFlow = (): UseChatFlowReturn => {
 
       // Step 4: Prepare AI advisor request and start streaming
       const advisorRequest: AdvisorStreamRequest = {
+        conversationId: conversationId,
         message: content,
         conversationHistory,
         userContext,
       };
 
-      await aiStreaming.startStreaming(advisorRequest);
-
+      if (options?.isToolMessage) {
+        await aiStreaming.startToolStreaming(advisorRequest);
+      } else {
+        await aiStreaming.startStreaming(advisorRequest);
+      }
     } catch {
       // Error handling will be done by individual hooks
     }
-  }, [user, session, messages, aiStreaming]);
+  };
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = async () => {
     if (!inputValue.trim() || isSubmitting) return;
-    
+
     const messageContent = inputValue.trim();
     setInputValue("");
-    
+
     await sendMessage(messageContent);
-  }, [inputValue, isSubmitting, sendMessage]);
+  };
 
-  const handleSuggestionClick = useCallback(async (suggestion: string) => {
-    setInputValue(suggestion);
+  const handleSuggestionClick = async (suggestion: string) => {
     await sendMessage(suggestion);
-  }, [sendMessage]);
+  };
 
-  const clearError = useCallback(() => {
-    session.clearError();
+  const clearError = () => {
     messages.clearError();
     aiStreaming.clearError();
-  }, [session, messages, aiStreaming]);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const openComponent = useCallback((component: ComponentData) => {
-    // TODO: Implement component panel functionality
-  }, []);
-
-  const closeComponent = useCallback(() => {
-    // TODO: Implement component panel functionality  
-  }, []);
+  };
 
   return {
     // State
@@ -240,25 +250,25 @@ export const useChatFlow = (): UseChatFlowReturn => {
     isThinking: aiStreaming.isThinking,
     isStreaming: aiStreaming.isStreaming,
     showSuggestions,
-    conversationId: session.conversation?.id || null,
-    
+    conversationId: conversation?.id || null,
+
     // Actions
     sendMessage,
     createNewSession,
     clearError,
-    
-    // Component actions
-    openComponent,
-    closeComponent,
-    
+
     // Input handling
     inputValue,
     setInputValue,
     handleSubmit,
     isSubmitting,
-    
+
     // Suggestion handling
     suggestions: DEFAULT_CHAT_SUGGESTIONS,
     onSuggestionClick: handleSuggestionClick,
+
+    // Display component and tool
+    toolId,
+    setToolId,
   };
-}; 
+};

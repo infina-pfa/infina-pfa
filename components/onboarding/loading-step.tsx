@@ -1,13 +1,13 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 interface LoadingStepProps {
   message?: string; // Optional loading message
 }
 
 export function LoadingStep({ message = "" }: LoadingStepProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["onboarding", "common"]);
 
   // Use message if provided, otherwise use default translation
   const loadingMessage = message || t("settingUpAccount");

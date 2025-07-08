@@ -1,10 +1,13 @@
 import { handleError } from "@/lib/error-handler";
-import { 
-  Conversation, 
-  ChatMessage, 
+import {
+  AdvisorStreamRequest,
+  ChatMessage,
+  Conversation,
   CreateConversationResponse,
-  AdvisorStreamRequest 
+  MessageSender,
+  MessageType,
 } from "@/lib/types/chat.types";
+import { Json } from "../supabase/database";
 
 export const chatService = {
   /**
@@ -18,7 +21,7 @@ export const chatService = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: title || `Chat Session - ${new Date().toLocaleString()}`
+          title: title || `Chat Session - ${new Date().toLocaleString()}`,
         }),
       });
 
@@ -43,7 +46,7 @@ export const chatService = {
    * Send a user message to a conversation
    */
   async sendUserMessage(
-    content: string, 
+    content: string,
     conversationId: string
   ): Promise<ChatMessage> {
     try {
@@ -58,8 +61,8 @@ export const chatService = {
       const requestData = {
         content: content.trim(),
         conversation_id: conversationId,
-        sender_type: "USER",
-        type: "text"
+        sender: "user" as MessageSender,
+        type: "text" as MessageType,
       };
 
       const response = await fetch("/api/messages", {
@@ -84,7 +87,7 @@ export const chatService = {
       const userMessage: ChatMessage = {
         ...data.data,
         isStreaming: false,
-        component: null
+        component: null,
       };
 
       return userMessage;
@@ -97,19 +100,21 @@ export const chatService = {
   /**
    * Save an AI message to the database
    */
-  async saveAIMessage(
-    content: string,
-    conversationId: string,
-    metadata?: Record<string, unknown>
-  ): Promise<ChatMessage> {
+  async saveAIMessage(message: {
+    content: string;
+    conversation_id: string;
+    type: MessageType;
+    sender: MessageSender;
+    metadata?: Json | null;
+  }): Promise<ChatMessage> {
     try {
-      const requestData = {
-        content,
-        conversation_id: conversationId,
-        sender_type: "AI",
-        type: "text",
-        metadata
-      };
+      const requestData: {
+        content: string;
+        conversation_id: string;
+        type: MessageType;
+        sender: MessageSender;
+        metadata?: Json;
+      } = message;
 
       const response = await fetch("/api/messages", {
         method: "POST",
@@ -132,7 +137,7 @@ export const chatService = {
       return {
         ...data.data,
         isStreaming: false,
-        component: null
+        component: null,
       };
     } catch (error) {
       const appError = handleError(error);
@@ -168,5 +173,35 @@ export const chatService = {
       const appError = handleError(error);
       throw new Error(appError.message);
     }
-  }
-}; 
+  },
+
+  /**
+   * Start AI advisor streaming response
+   */
+  async startAIAdvisorToolStream(
+    request: AdvisorStreamRequest
+  ): Promise<ReadableStream<Uint8Array>> {
+    try {
+      const response = await fetch("/api/chat/advisor-tool-interact-stream", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        throw new Error(`AI advisor request failed: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error("No response body from AI advisor");
+      }
+
+      return response.body;
+    } catch (error) {
+      const appError = handleError(error);
+      throw new Error(appError.message);
+    }
+  },
+};

@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
 }
 
 export function AuthLayout({ children }: AuthLayoutProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["auth", "common"]);
 
   return (
     <div className="min-h-screen bg-app-bg font-nunito">

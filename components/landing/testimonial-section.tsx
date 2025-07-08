@@ -1,10 +1,10 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function TestimonialSection() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["testimonials", "common"]);
 
   return (
     <section className="py-16 lg:py-20">

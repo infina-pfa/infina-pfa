@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTranslation } from "react-i18next";
 import { chatService } from "@/lib/services/chat.service";
@@ -9,7 +9,7 @@ interface UseSimpleChatSessionReturn {
   conversation: Conversation | null;
   isCreating: boolean;
   error: string | null;
-  
+
   // Actions
   createConversation: (title?: string) => Promise<string | null>;
   clearSession: () => void;
@@ -19,34 +19,38 @@ interface UseSimpleChatSessionReturn {
 export const useSimpleChatSession = (): UseSimpleChatSessionReturn => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const conversation = useRef<Conversation | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createConversation = useCallback(async (title?: string): Promise<string | null> => {
-    if (!user) {
-      setError(t("conversationCreateFailed"));
-      return null;
-    }
+  const createConversation = useCallback(
+    async (title?: string): Promise<string | null> => {
+      if (!user) {
+        setError(t("conversationCreateFailed"));
+        return null;
+      }
 
-    setIsCreating(true);
-    setError(null);
+      setIsCreating(true);
+      setError(null);
 
-    try {
-      const newConversation = await chatService.createConversation(title);
-      setConversation(newConversation);
-      return newConversation.id;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t("conversationCreateFailed");
-      setError(errorMessage);
-      return null;
-    } finally {
-      setIsCreating(false);
-    }
-  }, [user, t]);
+      try {
+        const newConversation = await chatService.createConversation(title);
+        conversation.current = newConversation;
+        return newConversation.id;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : t("conversationCreateFailed");
+        setError(errorMessage);
+        return null;
+      } finally {
+        setIsCreating(false);
+      }
+    },
+    [user, t]
+  );
 
   const clearSession = useCallback(() => {
-    setConversation(null);
+    conversation.current = null;
     setError(null);
   }, []);
 
@@ -55,11 +59,11 @@ export const useSimpleChatSession = (): UseSimpleChatSessionReturn => {
   }, []);
 
   return {
-    conversation,
+    conversation: conversation.current,
     isCreating,
     error,
     createConversation,
     clearSession,
-    clearError
+    clearError,
   };
-}; 
+};

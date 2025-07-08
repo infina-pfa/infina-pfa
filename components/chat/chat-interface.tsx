@@ -1,15 +1,19 @@
 "use client";
 
 import { useChatFlow } from "@/hooks/use-chat-flow";
-import { MessageList } from "./message-list";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { ChatInput } from "./chat-input";
-import { TypingIndicator } from "./typing-indicator";
-import { ComponentPanel } from "./component-panel";
+import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
-import { useTranslation } from "react-i18next";
+import { ToolPanel } from "./tool-panel";
+import { TypingIndicator } from "./typing-indicator";
+import { useEffect, useState } from "react";
+import { ChatToolId } from "@/lib/types/ai-streaming.types";
 
 export function ChatInterface() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["chat", "common"]);
+  const [isMobile, setIsMobile] = useState(false);
+
   const {
     messages,
     isLoading,
@@ -17,16 +21,36 @@ export function ChatInterface() {
     isThinking,
     isStreaming,
     showSuggestions,
-    conversationId,
     clearError,
-    closeComponent,
+    toolId,
+    setToolId,
     inputValue,
     setInputValue,
     handleSubmit,
     isSubmitting,
     suggestions,
     onSuggestionClick,
+    conversationId,
+    sendMessage,
   } = useChatFlow();
+
+  useEffect(() => {
+    // Check if we're on client-side
+    if (typeof window !== "undefined") {
+      const checkIsMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+
+      // Initial check
+      checkIsMobile();
+
+      // Add event listener for resize
+      window.addEventListener("resize", checkIsMobile);
+
+      // Cleanup
+      return () => window.removeEventListener("resize", checkIsMobile);
+    }
+  }, []);
 
   if (isLoading) {
     return (
@@ -43,10 +67,18 @@ export function ChatInterface() {
     );
   }
 
+  // Determine if tool panel is open and adjust layout
+  const isToolOpen = !!toolId && !isMobile;
+
   return (
     <div className="flex h-full bg-gray-50 p-0 md:p-8">
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      {/* Main Chat Area - adjust width when tool panel is open on desktop */}
+      <div
+        className={`flex-1 flex flex-col ${
+          isToolOpen ? "md:w-1/2 lg:w-3/5" : "w-full"
+        }`}
+        style={isToolOpen ? { maxWidth: isMobile ? "100%" : "60%" } : {}}
+      >
         {/* Error Display */}
         {error && (
           <div className="bg-red-50 p-6 mb-6">
@@ -81,23 +113,11 @@ export function ChatInterface() {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          {!conversationId ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center w-full p-6">
-                <h2 className="text-4xl font-bold text-blue-600 font-nunito mb-4">
-                  {t("chat.welcomeTitle", { name: "Khang" })}
-                </h2>
-                <p className="text-gray-600 font-nunito text-base mb-8">
-                  {t("chat.welcomeDescription")}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <MessageList messages={messages} />
-              {isThinking && <TypingIndicator />}
-            </>
-          )}
+          <MessageList
+            messages={messages}
+            onToolClick={(toolId) => setToolId(toolId as ChatToolId)}
+          />
+          {isThinking && <TypingIndicator />}
         </div>
 
         {/* Input Area */}
@@ -119,8 +139,31 @@ export function ChatInterface() {
         />
       </div>
 
-      {/* Component Panel */}
-      <ComponentPanel onClose={closeComponent} />
+      {/* Tool Panel */}
+      <ToolPanel
+        isOpen={!!toolId}
+        toolId={toolId}
+        onClose={() => {
+          setToolId(null);
+        }}
+        chatFlowState={{
+          messages,
+          isLoading,
+          error,
+          isThinking,
+          isStreaming,
+          showSuggestions,
+          clearError,
+          inputValue,
+          setInputValue,
+          sendMessage,
+          handleSubmit,
+          isSubmitting,
+          suggestions,
+          onSuggestionClick,
+          conversationId,
+        }}
+      />
     </div>
   );
 }

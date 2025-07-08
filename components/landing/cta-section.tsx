@@ -2,11 +2,11 @@
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { useRouter } from "next/navigation";
 
 export function CTASection() {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["cta", "common"]);
   const router = useRouter();
 
   const handleSignUp = () => {

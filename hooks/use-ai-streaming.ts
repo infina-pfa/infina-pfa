@@ -2,10 +2,10 @@ import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useAIAdvisorStreamProcessor } from "@/hooks/use-ai-advisor-stream";
 import { chatService } from "@/lib/services/chat.service";
-import { 
-  ChatMessage, 
-  AdvisorStreamRequest, 
-  UIAction 
+import {
+  ChatMessage,
+  AdvisorStreamRequest,
+  UIAction,
 } from "@/lib/types/chat.types";
 
 interface UseAIStreamingReturn {
@@ -14,15 +14,15 @@ interface UseAIStreamingReturn {
   isThinking: boolean;
   currentStreamingMessage: ChatMessage | null;
   error: string | null;
-  
+
   // Actions
   startStreaming: (request: AdvisorStreamRequest) => Promise<void>;
+  startToolStreaming: (request: AdvisorStreamRequest) => Promise<void>;
   stopStreaming: () => void;
   clearError: () => void;
 }
 
 interface UseAIStreamingOptions {
-  conversationId: string;
   userId: string;
   onMessageComplete?: (message: ChatMessage) => void;
   onMessageStreaming?: (message: ChatMessage) => void;
@@ -30,16 +30,18 @@ interface UseAIStreamingOptions {
   onFunctionToolComplete?: (action: UIAction) => void;
 }
 
-export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingReturn => {
+export const useAIStreaming = (
+  options: UseAIStreamingOptions
+): UseAIStreamingReturn => {
   const { t } = useTranslation();
   const [isThinking, setIsThinking] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [currentStreamingMessage, setCurrentStreamingMessage] = useState<ChatMessage | null>(null);
+  const [currentStreamingMessage, setCurrentStreamingMessage] =
+    useState<ChatMessage | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // AI Advisor stream processor
   const aiAdvisorProcessor = useAIAdvisorStreamProcessor({
-    conversationId: options.conversationId,
     userId: options.userId,
     onMessageComplete: async (message) => {
       // Clear streaming state
@@ -54,10 +56,10 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
     },
     onMessageStreaming: (message) => {
       setIsStreaming(true);
-      setIsThinking(false);    
+      setIsThinking(false);
       // Update current streaming message
       setCurrentStreamingMessage(message);
-      
+
       // Call external callback
       options.onMessageStreaming?.(message);
     },
@@ -68,32 +70,67 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
       if (currentStreamingMessage?.id === messageId) {
         setCurrentStreamingMessage(message);
       }
-      
+
       // Call external callback to update messages state
       options.onMessageUpdate?.(messageId, message);
     },
   });
 
-  const startStreaming = useCallback(async (request: AdvisorStreamRequest) => {
-    setIsStreaming(false);
-    setIsThinking(true);
-    setError(null);
-    setCurrentStreamingMessage(null);
-
-    try {
-      // Get stream from service
-      const stream = await chatService.startAIAdvisorStream(request);
-      
-      // Process the stream
-      await aiAdvisorProcessor.processStreamData(stream);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t("aiStreamFailed");
-      setError(errorMessage);
+  const startStreaming = useCallback(
+    async (request: AdvisorStreamRequest) => {
       setIsStreaming(false);
-      setIsThinking(false);
+      setIsThinking(true);
+      setError(null);
       setCurrentStreamingMessage(null);
-    }
-  }, [aiAdvisorProcessor, t]);
+
+      try {
+        // Get stream from service
+        const stream = await chatService.startAIAdvisorStream(request);
+
+        // Process the stream
+        await aiAdvisorProcessor.processStreamData(
+          request.conversationId,
+          stream
+        );
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : t("aiStreamFailed");
+        setError(errorMessage);
+        setIsStreaming(false);
+        setIsThinking(false);
+        setCurrentStreamingMessage(null);
+      }
+    },
+    [aiAdvisorProcessor, t]
+  );
+
+  const startToolStreaming = useCallback(
+    async (request: AdvisorStreamRequest) => {
+      setIsStreaming(false);
+      setIsThinking(true);
+      setError(null);
+      setCurrentStreamingMessage(null);
+
+      try {
+        // Get stream from service
+        const stream = await chatService.startAIAdvisorToolStream(request);
+
+        // Process the stream
+        await aiAdvisorProcessor.processStreamData(
+          request.conversationId,
+          stream
+        );
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : t("aiStreamFailed");
+        setError(errorMessage);
+        setIsStreaming(false);
+        setIsThinking(false);
+        setCurrentStreamingMessage(null);
+      }
+    },
+    [aiAdvisorProcessor, t]
+  );
 
   const stopStreaming = useCallback(() => {
     setIsStreaming(false);
@@ -112,7 +149,8 @@ export const useAIStreaming = (options: UseAIStreamingOptions): UseAIStreamingRe
     currentStreamingMessage,
     error,
     startStreaming,
+    startToolStreaming,
     stopStreaming,
-    clearError
+    clearError,
   };
-}; 
+};

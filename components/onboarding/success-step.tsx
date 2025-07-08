@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, MessageSquare } from "lucide-react";
 
@@ -9,7 +9,7 @@ interface SuccessStepProps {
 }
 
 export function SuccessStep({ onStartChat }: SuccessStepProps) {
-  const { t } = useTranslation();
+  const { t } = useAppTranslation(["onboarding", "common"]);
 
   return (
     <div className="max-w-2xl mx-auto text-center space-y-8">
