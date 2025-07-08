@@ -13,6 +13,7 @@ import { AppLayout } from "@/components/ui/app-layout";
 import { useRecentTransactionsSWR } from "@/hooks/swr/use-recent-transactions";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Transaction } from "@/lib/types/transaction.types";
+import { formatDateVN } from "@/lib/utils/date-formatter";
 import { format, parseISO } from "date-fns";
 import { useMemo, useState } from "react";
 
@@ -161,10 +162,7 @@ export default function TransactionsPage() {
                         id={expense.id}
                         name={expense.name}
                         amount={expense.amount}
-                        date={format(
-                          parseISO(expense.created_at),
-                          "dd MMM yyyy"
-                        )}
+                        date={formatDateVN(expense.created_at)}
                         budgetName={expense.budgetName}
                         budgetColor={expense.budgetColor}
                         description={expense.description}

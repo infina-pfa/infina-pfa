@@ -11,6 +11,7 @@ export const commonEn = {
   tools: "Tools",
   dashboard: "Dashboard",
   chat: "Chat",
+  app: "Infina",
 
   // Language
   language: "Language",
@@ -30,7 +31,7 @@ export const commonEn = {
   getStarted: "Get Started",
   learnMore: "Learn More",
   startFreeJourney: "Start your free journey",
-  
+
   // Common UI Actions
   loading: "Loading...",
   retry: "Retry",
@@ -52,7 +53,7 @@ export const commonEn = {
   no: "No",
   view: "View",
   viewAll: "View All",
-  
+
   // Error Messages
   unknownError: "An unknown error occurred",
 
@@ -79,21 +80,36 @@ export const commonEn = {
   noData: "No data available",
   noResults: "No results found",
   tryAgain: "Please try again",
-  
+
   // Form
   required: "Required",
   optional: "Optional",
   invalidInput: "Invalid input",
   fieldRequired: "This field is required",
-  
+
   // Time
   today: "Today",
   yesterday: "Yesterday",
   tomorrow: "Tomorrow",
-  
+
   // General
   goodbye: "Goodbye",
   hello: "Hello",
   thanks: "Thank you",
   pleaseWait: "Please wait",
+
+  // Tool id
+  "budget-tool": "Budgeting",
+  "loan-calculator": "Loan Calculator",
+  "interest-calculator": "Interest Calculator",
+  "salary-calculator": "Salary Calculator",
+
+  // Financial Tools Page
+  financialTools: "Financial Tools",
+  budgetingWidgetDescription:
+    "Manage your budget and track your expenses with our budgeting widget.",
+
+  // AI Assistant
+  aiAssistant: "AI Assistant",
+  openAIAssistant: "Open AI Assistant",
 };

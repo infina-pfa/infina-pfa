@@ -31,7 +31,6 @@ export const useRecentTransactionsSWR = (months: number = 6): UseRecentTransacti
       if (response.error) {
         throw new Error(response.error);
       }
-      console.log("response.transactions", response.transactions);
       return response.transactions;
     },
     {

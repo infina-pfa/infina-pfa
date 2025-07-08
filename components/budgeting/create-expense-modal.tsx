@@ -11,8 +11,24 @@ import { FormInput } from "@/components/ui/form-input";
 import { MoneyInput } from "@/components/ui/money-input";
 import { useExpenseCreateSWR } from "@/hooks/swr";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { CreateExpenseRequest } from "@/lib/types/transaction.types";
+import {
+  CreateExpenseRequest,
+  Transaction,
+} from "@/lib/types/transaction.types";
 import { useState } from "react";
+
+// Extended transaction type with budget info for callbacks
+interface ExpenseCallback {
+  id: string;
+  name: string;
+  amount: number;
+  date: string;
+  category: string;
+  type: string;
+  description: string | null;
+  budgetName?: string;
+  budgetColor?: string;
+}
 
 interface CreateExpenseModalProps {
   isOpen: boolean;
@@ -23,6 +39,11 @@ interface CreateExpenseModalProps {
     name: string;
     color: string;
   } | null;
+  onExpenseCreated?: (
+    name: string,
+    amount: number,
+    budgetName: string
+  ) => Promise<void>;
 }
 
 export const CreateExpenseModal = ({
@@ -30,9 +51,37 @@ export const CreateExpenseModal = ({
   onClose,
   onSuccess,
   budget,
+  onExpenseCreated,
 }: CreateExpenseModalProps) => {
   const { t } = useAppTranslation(["budgeting", "common"]);
-  const { createExpense, isCreating, error } = useExpenseCreateSWR();
+
+  // Create callback wrapper to include budget info
+  const handleExpenseCreated = async (
+    expense: Transaction & { budgetName?: string; budgetColor?: string }
+  ) => {
+    if (onExpenseCreated && budget) {
+      const expenseWithBudgetInfo: ExpenseCallback = {
+        id: expense.id,
+        name: expense.name,
+        amount: expense.amount,
+        date: new Date(expense.created_at).toLocaleDateString(),
+        category: budget.name,
+        type: expense.type,
+        description: expense.description,
+        budgetName: budget.name,
+        budgetColor: budget.color,
+      };
+      onExpenseCreated(
+        expenseWithBudgetInfo.name,
+        expenseWithBudgetInfo.amount,
+        budget.name
+      );
+    }
+  };
+
+  const { createExpense, isCreating, error } = useExpenseCreateSWR({
+    onSuccess: handleExpenseCreated,
+  });
 
   const [formData, setFormData] = useState<
     Omit<CreateExpenseRequest, "budgetId">

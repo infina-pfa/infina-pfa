@@ -24,6 +24,8 @@ interface BudgetModalProps {
   onClose: () => void;
   onSuccess: () => void;
   budget?: Budget | null; // Only required for edit mode
+  onBudgetCreated?: (budget: Budget) => Promise<void>;
+  onBudgetUpdated?: (budget: Budget, oldAmount?: number) => Promise<void>;
 }
 
 export const BudgetModal = ({
@@ -32,6 +34,8 @@ export const BudgetModal = ({
   onClose,
   onSuccess,
   budget,
+  onBudgetCreated,
+  onBudgetUpdated,
 }: BudgetModalProps) => {
   const { t } = useAppTranslation(["budgeting", "common"]);
 
@@ -53,6 +57,8 @@ export const BudgetModal = ({
     budget,
     onSuccess,
     onClose,
+    onBudgetCreated,
+    onBudgetUpdated,
   });
 
   // Don't render if in edit mode without budget

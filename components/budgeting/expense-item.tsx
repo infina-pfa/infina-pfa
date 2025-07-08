@@ -37,7 +37,6 @@ export const ExpenseItem = ({
   onDelete,
 }: ExpenseItemProps) => {
   const { t } = useAppTranslation(["budgeting"]);
-
   const handleEdit = () => {
     onEdit?.({
       id,

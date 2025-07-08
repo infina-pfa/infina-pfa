@@ -1,3 +1,13 @@
+import { openai } from "@/lib/openai";
+import { createClient } from "@/lib/supabase/server";
+import {
+  ChatComponentId,
+  ChatTool,
+  ChatToolId,
+  ConversationMessage,
+  UIActionType,
+} from "@/lib/types/ai-streaming.types";
+import { ResponseDataEvent } from "@/lib/types/chat.types";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -151,7 +161,7 @@ export async function POST(request: NextRequest) {
     const headers = new Headers({
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
@@ -180,6 +190,10 @@ export async function POST(request: NextRequest) {
               error instanceof Error
                 ? error.message
                 : "Unknown streaming error",
+            error:
+              error instanceof Error
+                ? error.message
+                : "Unknown streaming error",
             timestamp: new Date().toISOString(),
             context: 'streaming_response',
             provider: selectedProvider
@@ -195,7 +209,6 @@ export async function POST(request: NextRequest) {
 
     console.log("🚀 Returning stream response");
     return new Response(readable, { headers });
-
   } catch (error) {
     console.error('❌ Function error:', error);
     console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack available');
@@ -226,4 +239,4 @@ export async function OPTIONS() {
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
     },
   });
-} 
+}
