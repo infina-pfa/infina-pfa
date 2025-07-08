@@ -173,6 +173,39 @@ export interface OnboardingService {
     reasoning: string;
   }>;
   completeOnboarding(finalProfile: UserProfile): Promise<void>;
+  
+  // Chat history methods
+  saveChatMessage(
+    conversationId: string,
+    sender: 'user' | 'ai' | 'system',
+    content: string,
+    componentId?: string,
+    metadata?: Record<string, unknown>,
+    customTimestamp?: string
+  ): Promise<unknown>;
+  saveChatMessageAsync(
+    conversationId: string,
+    sender: 'user' | 'ai' | 'system',
+    content: string,
+    componentId?: string,
+    metadata?: Record<string, unknown>,
+    customTimestamp?: string
+  ): Promise<void>;
+  getChatQueueStatus(): Promise<{
+    queueSize: number;
+    isProcessing: boolean;
+    failedMessages: number;
+  }>;
+  flushChatQueue(): Promise<void>;
+  loadChatHistory(
+    conversationId: string,
+    limit?: number,
+    offset?: number
+  ): Promise<{
+    messages: unknown[];
+    total: number;
+  }>;
+  hasExistingChatHistory(conversationId: string): Promise<boolean>;
 }
 
 // Hook return types

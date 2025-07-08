@@ -90,7 +90,7 @@ export const inputValidationRules = {
     min: 0,
     max: 999999999999999,
     custom: (value: unknown) => {
-      if (!value) return 'Amount is required';
+      if (value === null || value === undefined || value === '') return 'Amount is required';
       
       let numValue: number;
       if (typeof value === 'string') {
@@ -103,7 +103,7 @@ export const inputValidationRules = {
       }
       
       if (isNaN(numValue)) return 'Must be a valid number';
-      if (numValue < 0) return 'Amount must be positive';
+      if (numValue < 0) return 'Amount must be positive or zero';
       if (numValue > 999999999999999) return 'Amount is too large';
       
       return null;
@@ -118,7 +118,7 @@ export const inputValidationRules = {
     min: 0,
     max: 999999999999,
     custom: (value: unknown) => {
-      if (!value) return 'Number is required';
+      if (value === null || value === undefined || value === '') return 'Number is required';
       
       let numValue: number;
       if (typeof value === 'string') {
@@ -131,7 +131,7 @@ export const inputValidationRules = {
       }
       
       if (isNaN(numValue)) return 'Must be a valid number';
-      if (numValue < 0) return 'Number must be positive';
+      if (numValue < 0) return 'Number must be positive or zero';
       if (numValue > 999999999999) return 'Number is too large';
       
       return null;

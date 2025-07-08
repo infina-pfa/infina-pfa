@@ -32,6 +32,7 @@ export const useOnboardingChat = (
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasStartedAI, setHasStartedAI] = useState(false);
+  const [hasInitialHistorySaved, setHasInitialHistorySaved] = useState(false);
 
   // Ref to prevent double initialization in Strict Mode
   const hasInitialized = useRef(false);
@@ -52,14 +53,218 @@ export const useOnboardingChat = (
       const initialState = await onboardingService.initializeOnboarding(userId);
       setState(initialState);
       
-      // Show initial welcome message and introduction template WITHOUT calling AI
-      showInitialWelcomeFlow();
+      // Check if there's existing chat history
+      if (initialState.conversationId) {
+        const hasHistory = await onboardingService.hasExistingChatHistory(initialState.conversationId);
+        
+        if (hasHistory) {
+          // Load existing chat history
+          await loadChatHistory(initialState.conversationId);
+        } else {
+          // Show initial welcome message and introduction template WITHOUT calling AI
+          showInitialWelcomeFlow();
+        }
+      } else {
+        // Show initial welcome message if no conversation ID
+        showInitialWelcomeFlow();
+      }
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t("initializationFailed");
       setError(errorMessage);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadChatHistory = async (conversationId: string) => {
+    try {
+      const { messages: chatHistory } = await onboardingService.loadChatHistory(conversationId);
+      
+      // Convert chat history to OnboardingMessage format - simplified version
+      const onboardingMessages: OnboardingMessage[] = chatHistory.map((msg) => {
+        const chatMsg = msg as {
+          id: string;
+          sender: 'user' | 'ai' | 'system';
+          content: string;
+          created_at: string;
+          component_id?: string;
+          metadata?: Record<string, unknown>;
+        };
+        
+        // Note: Component reconstruction will be handled by the conversation flow
+        // For now, just preserve the basic message structure
+        const component = undefined;
+        
+        return {
+          id: chatMsg.id,
+          type: chatMsg.sender === 'user' ? 'user' : 'ai',
+          content: chatMsg.content,
+          timestamp: new Date(chatMsg.created_at),
+          component,
+          metadata: chatMsg.metadata
+        };
+      });
+      
+      setMessages(onboardingMessages);
+      
+      // Mark that initial history is already saved (since we loaded it from DB)
+      if (onboardingMessages.length > 0) {
+        setHasInitialHistorySaved(true);
+      }
+      
+      // If we have chat history, user can continue from where they left off
+      console.log(`✅ Loaded ${onboardingMessages.length} messages from chat history`);
+      
+      // Check if there are any component messages that might need user interaction
+      const componentMessages = onboardingMessages.filter(msg => 
+        msg.metadata?.component
+      );
+      
+      if (componentMessages.length > 0) {
+        console.log(`🔧 Found ${componentMessages.length} component messages in history`);
+      }
+      
+      // If the last message is from AI and user hasn't responded, they can continue
+      const lastMessage = onboardingMessages[onboardingMessages.length - 1];
+      if (lastMessage?.type === 'ai') {
+        console.log("💬 User can continue conversation from where they left off");
+      }
+      
+    } catch (err) {
+      console.error("❌ Failed to load chat history:", err);
+      // If loading fails, show initial welcome flow
+      showInitialWelcomeFlow();
+    }
+  };
+
+  const saveChatMessage = async (
+    sender: 'user' | 'ai' | 'system',
+    content: string,
+    componentId?: string,
+    metadata?: Record<string, unknown>
+  ) => {
+    try {
+      if (!state.conversationId) {
+        console.warn("No conversation ID available for saving message");
+        return;
+      }
+      
+      // Use async save for better UX - doesn't block the UI
+      await onboardingService.saveChatMessageAsync(
+        state.conversationId,
+        sender,
+        content,
+        componentId,
+        metadata
+      );
+      
+      console.log(`Queued ${sender} message for background processing`);
+    } catch (error) {
+      console.error("Failed to queue chat message:", error);
+      // Don't throw error - continue with the flow even if saving fails
+    }
+  };
+
+  const saveInitialConversationHistory = async () => {
+    try {
+      if (!state.conversationId) {
+        console.warn("No conversation ID available for saving initial history");
+        return;
+      }
+
+      if (hasInitialHistorySaved) {
+        console.log("📋 Initial conversation history already saved, skipping...");
+        return;
+      }
+
+      console.log("💾 Saving initial conversation history with proper timestamps...");
+
+      // Use Vietnamese as default for now (same as showInitialWelcomeFlow)
+      const isVietnamese = i18n.language === 'vi' || true;
+
+      // Create timestamps with clear separation (5 seconds apart) to ensure correct order
+      const baseTime = Date.now() - 60000; // Start 1 minute ago
+      const welcomeTimestamp = new Date(baseTime).toISOString();
+      const suggestionTimestamp = new Date(baseTime + 5000).toISOString(); // +5 seconds
+      const componentTimestamp = new Date(baseTime + 10000).toISOString(); // +10 seconds
+
+      console.log("🕐 Using timestamps:", {
+        welcome: welcomeTimestamp,
+        suggestion: suggestionTimestamp,
+        component: componentTimestamp
+      });
+
+      // 1. Save welcome message (earliest timestamp)
+      const fullWelcomeContent = isVietnamese 
+        ? "Xin chào! Tôi là Fina, cố vấn tài chính AI của bạn 🤝\n\nTôi ở đây để giúp bạn kiểm soát tương lai tài chính của mình. Tôi có thể:\n• Giúp bạn lập ngân sách và theo dõi chi tiêu\n• Tư vấn chiến lược đầu tư phù hợp\n• Hỗ trợ lập kế hoạch cho các mục tiêu tài chính\n• Phân tích tình hình tài chính và đưa ra lời khuyên cá nhân hóa\n\nĐể bắt đầu, tôi cần tìm hiểu một chút về bạn. Điều này sẽ giúp tôi cung cấp lời khuyên phù hợp nhất với nhu cầu của bạn."
+        : "Hello! I'm Fina, your AI financial advisor 🤝\n\nI'm here to help you take control of your financial future. I can:\n• Help you create budgets and track spending\n• Advise on suitable investment strategies\n• Support planning for financial goals\n• Analyze your financial situation and provide personalized advice\n\nTo get started, I need to learn a bit about you. This will help me provide advice that best suits your needs.";
+
+      // Use synchronous save for initial history to ensure correct order
+      await onboardingService.saveChatMessage(
+        state.conversationId,
+        'ai',
+        fullWelcomeContent,
+        undefined,
+        undefined,
+        welcomeTimestamp
+      );
+
+      // 2. Save suggestion message (2nd timestamp)
+      const fullSuggestionContent = isVietnamese
+        ? "Hãy giới thiệu về bản thân bạn nhé! Bạn có thể chia sẻ về:"
+        : "Please introduce yourself! You can share about:";
+
+      await onboardingService.saveChatMessage(
+        state.conversationId,
+        'ai',
+        fullSuggestionContent,
+        undefined,
+        undefined,
+        suggestionTimestamp
+      );
+
+      // 3. Save introduction component (3rd timestamp)
+      const introComponentId = `introduction_template_${Date.now()}`;
+      const introComponentContent = isVietnamese
+        ? "Giới thiệu về bản thân bạn"
+        : "Introduce yourself";
+
+      await onboardingService.saveChatMessage(
+        state.conversationId,
+        'ai',
+        introComponentContent,
+        introComponentId,
+        {
+          component: {
+            type: "introduction_template",
+            title: introComponentContent,
+            context: {
+              template: isVietnamese
+                ? "Tôi tên là Tuấn, 24 tuổi, đang sống tại TPHCM. Tôi làm văn phòng với thu nhập hàng tháng khoảng 10 triệu VND. Hiện tại tôi muốn sớm đạt được tự do tài chính."
+                : "My name is Devin, I'm 24 years old, living in New York. I work as a Software Engineer with a monthly income of about 5000 dollars. Currently, I want to get a house in New York.",
+              suggestions: isVietnamese
+                ? [
+                    "Tôi mới bắt đầu tìm hiểu về quản lý tài chính cá nhân",
+                    "Tôi muốn bắt đầu đầu tư nhưng không biết bắt đầu từ đâu",
+                    "Tôi cần giúp đỡ để lập ngân sách hàng tháng hiệu quả"
+                  ]
+                : [
+                    "I'm just starting to learn about personal finance management",
+                    "I want to start investing but don't know where to begin",
+                    "I need help creating an effective monthly budget"
+                  ]
+            },
+            isCompleted: false
+          }
+        },
+        componentTimestamp
+      );
+
+      console.log("✅ Successfully saved complete initial conversation history in correct order");
+      setHasInitialHistorySaved(true);
+    } catch (error) {
+      console.error("❌ Failed to save initial conversation history:", error);
     }
   };
 
@@ -147,6 +352,7 @@ export const useOnboardingChat = (
                   // Show component after suggestion completes
                   setTimeout(() => {
                     // Add introduction template component with a fade-in effect
+                    const introComponentId = `introduction_template_${Date.now()}`;
                     const introComponent: OnboardingMessage = {
                       id: `intro-component-${Date.now()}`,
                       type: "ai",
@@ -155,15 +361,15 @@ export const useOnboardingChat = (
                         : "Introduce yourself",
                       timestamp: new Date(),
                       component: {
-                        id: `introduction_template_${Date.now()}`,
+                        id: introComponentId,
                         type: "introduction_template",
                         title: isVietnamese
                           ? "Giới thiệu về bản thân bạn"
                           : "Introduce yourself",
                         context: {
                           template: isVietnamese
-                            ? "Tôi tên là Tuấn, 24 tuổi, đang sống tại TPHCM. Tôi làm văn phòng với thu nhập hàng tháng khoảng 10 triệu VND. Hiện tại tôi không biết bắt đầu tư đâu."
-                            : "My name is [Name], I'm [Age] years old, living in [City]. I work as a [Occupation] with a monthly income of about [Income] million VND. Currently, I want to [Financial goal].",
+                            ? "Tôi tên là Tuấn, 24 tuổi, đang sống tại TPHCM. Tôi làm văn phòng với thu nhập hàng tháng khoảng 10 triệu VND. Hiện tại tôi muốn sớm đạt được tự do tài chính."
+                            : "My name is Devin, I'm 24 years old, living in New York. I work as a Software Engineer with a monthly income of about 5000 dollars. Currently, I want to get a house in New York.",
                           suggestions: isVietnamese
                             ? [
                                 "Tôi mới bắt đầu tìm hiểu về quản lý tài chính cá nhân",
@@ -181,6 +387,7 @@ export const useOnboardingChat = (
                     };
                     
                     setMessages(prev => [...prev, introComponent]);
+                    console.log("📝 Initial conversation flow completed (will be saved when user submits)");
                   }, 500); // Small delay before showing component
                 }
               }, 15); // Faster streaming for shorter message
@@ -194,15 +401,46 @@ export const useOnboardingChat = (
   const startOnboardingConversation = async (initialMessage: string, initialState: OnboardingState) => {
     console.log("Starting onboarding conversation with user input:", initialMessage);
     
+    // ✨ IMPROVED: Use same conversation history mapping as processUserMessage
+    const conversationHistory = messages.map(msg => {
+      let content = msg.content || "";
+      
+      // For AI messages with components, include component context
+      if (msg.type === "ai" && msg.component) {
+        const component = msg.component;
+        
+        // Add component title and context to content
+        content = `${content}${content ? "\n\n" : ""}[Component: ${component.type}]`;
+        if (component.title) {
+          content += `\nTitle: ${component.title}`;
+        }
+        
+        // If component is completed, include the user's response
+        if (component.isCompleted && component.response) {
+          const responseText = getResponseText(component.response);
+          content += `\nUser Response: ${responseText}`;
+        }
+      }
+      
+      return {
+        id: msg.id,
+        content: content,
+        sender: msg.type === "user" ? "user" as const : "ai" as const,
+        timestamp: msg.timestamp.toISOString(),
+      };
+    });
+    
+    // 🔍 DEBUG: Log conversation history at start
+    console.log(`🔍 Starting with full conversation history: ${conversationHistory.length} messages`);
+    console.log("📋 Starting conversation history:");
+    conversationHistory.forEach((msg, index) => {
+      console.log(`${index + 1}. [${msg.sender}] (${msg.id}): "${msg.content}" (${msg.content.length} chars)`);
+    });
+    
     // Start AI conversation with the user's introduction
     await streamOnboardingAI({
       message: initialMessage,
-      conversationHistory: messages.slice(-5).map(msg => ({
-        id: msg.id,
-        content: msg.content || "",
-        sender: msg.type === "user" ? "user" as const : "ai" as const,
-        timestamp: msg.timestamp.toISOString(),
-      })),
+      conversationHistory,
       userProfile: initialState.userProfile,
       currentStep: initialState.step
     });
@@ -222,6 +460,9 @@ export const useOnboardingChat = (
       
       setMessages(prev => [...prev, userMessage]);
       
+      // Save user message to database
+      await saveChatMessage('user', message);
+      
       // If this is the first user message, start AI conversation
       if (!hasStartedAI) {
         await startOnboardingConversation(message, state);
@@ -234,16 +475,38 @@ export const useOnboardingChat = (
       const errorMessage = err instanceof Error ? err.message : t("messageFailed");
       setError(errorMessage);
     }
-  }, [state, messages, hasStartedAI, t]);
+  }, [state, messages, hasStartedAI, t, saveChatMessage]);
 
   const processUserMessage = async (message: string) => {
-    // Prepare conversation history - include recent AI and user messages
-    const conversationHistory = messages.slice(-8).map(msg => ({
-      id: msg.id,
-      content: msg.content || "",
-      sender: msg.type === "user" ? "user" as const : "ai" as const,
-      timestamp: msg.timestamp.toISOString(),
-    }));
+    // Prepare conversation history - include ALL AI and user messages for full context
+    // ✨ IMPROVED: Include component details and response information
+    const conversationHistory = messages.map(msg => {
+      let content = msg.content || "";
+      
+      // For AI messages with components, include component context
+      if (msg.type === "ai" && msg.component) {
+        const component = msg.component;
+        
+        // Add component title and context to content
+        content = `${content}${content ? "\n\n" : ""}[Component: ${component.type}]`;
+        if (component.title) {
+          content += `\nTitle: ${component.title}`;
+        }
+        
+        // If component is completed, include the user's response
+        if (component.isCompleted && component.response) {
+          const responseText = getResponseText(component.response);
+          content += `\nUser Response: ${responseText}`;
+        }
+      }
+      
+      return {
+        id: msg.id,
+        content: content,
+        sender: msg.type === "user" ? "user" as const : "ai" as const,
+        timestamp: msg.timestamp.toISOString(),
+      };
+    });
 
     // Add current message
     conversationHistory.push({
@@ -253,6 +516,19 @@ export const useOnboardingChat = (
       timestamp: new Date().toISOString(),
     });
 
+    // 🔍 DEBUG: Log detailed conversation history to identify issues
+    console.log(`🔍 Sending full conversation history: ${conversationHistory.length} messages`);
+    console.log("📋 Detailed conversation history:");
+    conversationHistory.forEach((msg, index) => {
+      console.log(`${index + 1}. [${msg.sender}] (${msg.id}): "${msg.content}" (${msg.content.length} chars)`);
+    });
+    
+    // 🔍 DEBUG: Check for empty or short messages that might be causing issues
+    const emptyMessages = conversationHistory.filter(msg => !msg.content || msg.content.length < 5);
+    if (emptyMessages.length > 0) {
+      console.warn(`⚠️ Found ${emptyMessages.length} messages with empty/short content:`, emptyMessages);
+    }
+    
     await streamOnboardingAI({
       message,
       conversationHistory,
@@ -347,6 +623,9 @@ export const useOnboardingChat = (
                       ? { ...currentAIMessage! }
                       : msg
                   ));
+                  
+                  // Save AI message to database
+                  await saveChatMessage('ai', parsed.content);
                 }
               } else if (parsed.type === 'show_component') {
                 const { payload } = parsed;
@@ -364,8 +643,30 @@ export const useOnboardingChat = (
                   }
                 };
                 setMessages(prev => [...prev, componentMessage]);
+                
+                // Save component message to database
+                await saveChatMessage('ai', payload.title, payload.componentId, {
+                  component: {
+                    type: payload.componentType,
+                    title: payload.title,
+                    context: payload.context,
+                    isCompleted: false
+                  }
+                });
               } else if (parsed.type === 'tool_error') {
                 console.error("Tool error from server:", parsed);
+                
+                // Show more detailed error information
+                const errorMessage = parsed.error || "Unknown tool error occurred";
+                const toolName = parsed.tool_name || "unknown tool";
+                
+                console.error(`❌ Tool Error - ${toolName}: ${errorMessage}`);
+                
+                // Optionally show details if available
+                if (parsed.details) {
+                  console.error("Error details:", parsed.details);
+                }
+                
                 // Don't set error or show retry messages - just log it
                 // The AI will continue with text instead of showing component
               } else if (parsed.type === 'onboarding_complete') {
@@ -407,8 +708,11 @@ export const useOnboardingChat = (
       // Save the response to backend
       await onboardingService.saveUserResponse(componentId, response);
       
-      // Update component as completed in UI
-      setMessages(prev => prev.map(msg => {
+      // 🔧 BUILD UPDATED MESSAGES MANUALLY to avoid async state timing issues
+      let updatedMessages = [...messages];
+      
+      // Update component as completed in our manual array
+      updatedMessages = updatedMessages.map(msg => {
         if (msg.component?.id === componentId) {
           return {
             ...msg,
@@ -420,7 +724,7 @@ export const useOnboardingChat = (
           };
         }
         return msg;
-      }));
+      });
 
       // Update user profile based on response
       await updateProfileFromResponse(response);
@@ -428,7 +732,7 @@ export const useOnboardingChat = (
       // Get response text for the message
       const responseText = getResponseText(response);
       
-      // Add user message to show what they submitted
+      // Add user message to our manual array
       const userMessage: OnboardingMessage = {
         id: `user-${Date.now()}`,
         type: "user",
@@ -436,21 +740,80 @@ export const useOnboardingChat = (
         timestamp: new Date(),
       };
       
-      setMessages(prev => [...prev, userMessage]);
+      updatedMessages = [...updatedMessages, userMessage];
+      
+      // Save user response to database
+      await saveChatMessage('user', responseText, componentId, {
+        componentResponse: response
+      });
+      
+      // 🔧 UPDATE STATE with complete messages array
+      setMessages(updatedMessages);
+      
+      // 🔧 BUILD CONVERSATION HISTORY from our updated array (not from state)
+      const conversationHistory = updatedMessages.map(msg => {
+        let content = msg.content || "";
+        
+        // For AI messages with components, include component context
+        if (msg.type === "ai" && msg.component) {
+          const component = msg.component;
+          
+          // Add component title and context to content
+          content = `${content}${content ? "\n\n" : ""}[Component: ${component.type}]`;
+          if (component.title) {
+            content += `\nTitle: ${component.title}`;
+          }
+          
+          // If component is completed, include the user's response
+          if (component.isCompleted && component.response) {
+            const completedResponseText = getResponseText(component.response);
+            content += `\nUser Response: ${completedResponseText}`;
+          }
+        }
+        
+        return {
+          id: msg.id,
+          content: content,
+          sender: msg.type === "user" ? "user" as const : "ai" as const,
+          timestamp: msg.timestamp.toISOString(),
+        };
+      });
+
+      // 🔍 DEBUG: Log the manually built conversation history
+      console.log(`🔧 Manually built conversation history: ${conversationHistory.length} messages`);
+      console.log("📋 Manual conversation history (with completed components):");
+      conversationHistory.forEach((msg, index) => {
+        console.log(`${index + 1}. [${msg.sender}] (${msg.id}): "${msg.content}" (${msg.content.length} chars)`);
+      });
       
       // If this is the first component response (introduction), start AI conversation
       if (!hasStartedAI && componentId.includes('introduction_template')) {
-        await startOnboardingConversation(responseText, state);
+        // Save the initial conversation history first (welcome + suggestion + component)
+        await saveInitialConversationHistory();
+        
+        // For introduction, use manual conversation history
+        await streamOnboardingAI({
+          message: responseText,
+          conversationHistory,
+          userProfile: state.userProfile,
+          currentStep: state.step
+        });
+        setHasStartedAI(true);
       } else {
-        // Continue conversation with AI for subsequent responses
-        await processUserMessage(responseText);
+        // Continue conversation with AI for subsequent responses using manual history
+        await streamOnboardingAI({
+          message: responseText,
+          conversationHistory,
+          userProfile: state.userProfile,
+          currentStep: state.step
+        });
       }
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t("responseFailed");
       setError(errorMessage);
     }
-  }, [state, hasStartedAI, t]);
+  }, [state, hasStartedAI, t, messages]);
 
   const updateProfileFromResponse = async (response: ComponentResponse) => {
     const profileUpdates: Partial<UserProfile> = {};
@@ -527,14 +890,16 @@ export const useOnboardingChat = (
       return response.textValue;
     } else if (response.selectedOption) {
       return response.selectedOption;
-    } else if (response.financialValue) {
-      return `${response.financialValue.toLocaleString()} VND`;
-    } else if (response.rating) {
-      return `${response.rating}/5`;
-    } else if (response.sliderValue) {
+    } else if (response.financialValue !== undefined && response.financialValue !== null) {
+      // ✨ IMPROVED: More descriptive financial value formatting
+      const formattedValue = response.financialValue.toLocaleString('vi-VN');
+      return `${formattedValue} VND`;
+    } else if (response.rating !== undefined && response.rating !== null) {
+      return `Rated ${response.rating}/5`;
+    } else if (response.sliderValue !== undefined && response.sliderValue !== null) {
       return `${response.sliderValue}%`;
     }
-    return "ok";
+    return "Completed"; // More descriptive than "ok"
   };
 
   return {

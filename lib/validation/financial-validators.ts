@@ -5,14 +5,30 @@
 
 export const amountValidator = {
   /**
-   * Validate if amount is a positive number
+   * Validate if amount is a positive number or zero
+   */
+  isPositiveOrZero(amount: number | undefined | null): boolean {
+    return amount !== undefined && amount !== null && amount >= 0;
+  },
+
+  /**
+   * Validate if amount is a positive number (greater than 0)
    */
   isPositive(amount: number | undefined | null): boolean {
     return amount !== undefined && amount !== null && amount > 0;
   },
 
   /**
-   * Validate amount with custom error message
+   * Validate amount with custom error message (allows zero)
+   */
+  validatePositiveOrZero(amount: number | undefined | null, entityType: string): void {
+    if (!this.isPositiveOrZero(amount)) {
+      throw new Error(`${entityType} amount must be greater than or equal to 0`);
+    }
+  },
+
+  /**
+   * Validate amount with custom error message (requires positive)
    */
   validatePositive(amount: number | undefined | null, entityType: string): void {
     if (!this.isPositive(amount)) {

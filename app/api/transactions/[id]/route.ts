@@ -161,10 +161,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       }, { status: 400 });
     }
 
-    if (amount !== undefined && (amount <= 0)) {
+    if (amount !== undefined && (amount < 0)) {
       return NextResponse.json({
         success: false,
-        error: "Amount must be greater than 0"
+        error: "Amount must be greater than or equal to 0"
       }, { status: 400 });
     }
 

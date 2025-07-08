@@ -2,16 +2,19 @@ import { getComponentExamples } from "../tools/onboarding-definitions";
 
 /**
  * Generate specialized system prompt for onboarding flow
+ * Note: Conversation history is now passed separately in the input field,
+ * not embedded in the system prompt for better OpenAI Responses API usage
  */
 export function generateOnboardingSystemPrompt(
   userId: string,
   userProfile: Record<string, unknown>,
-  conversationHistory: Array<{ role: string; content: string }>,
+  conversationHistory: Array<{ role: string; content: string }>, // Still analyzed for context but not embedded
   currentStep: string
 ): string {
   const today = new Date().toLocaleDateString("en-US");
   
   // Analyze conversation context to determine current state
+  // This analysis is used for dynamic behavior but history itself is not embedded
   const hasConversationStarted = conversationHistory.length > 1;
   const hasIntroduction = conversationHistory.some(msg => 
     msg.content.toLowerCase().includes("tên") || 
@@ -49,12 +52,10 @@ export function generateOnboardingSystemPrompt(
 
     <conversation_context>
         <current_profile>${JSON.stringify(userProfile, null, 2)}</current_profile>
-        <conversation_history>
-            ${conversationHistory.length > 0 
-              ? conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')
-              : "No previous conversation"
-            }
-        </conversation_history>
+        <note>
+            Complete conversation history is provided in the input messages.
+            You have access to the full conversation context and should reference previous exchanges naturally.
+        </note>
     </conversation_context>
 
     <critical_conversation_rules>
@@ -65,7 +66,8 @@ export function generateOnboardingSystemPrompt(
         
         <rule_2>
             ALWAYS reference and build upon previous exchanges in the conversation history.
-            Show that you remember what the user has told you.
+            Show that you remember what the user has told you by referencing their previous messages.
+            Look for component responses marked as "User Response:" in AI messages.
         </rule_2>
         
         <rule_3>
@@ -76,12 +78,20 @@ export function generateOnboardingSystemPrompt(
         <rule_4>
             Progress conversation logically based on information already gathered.
             Use conversation history to determine what to ask next.
+            Check previous AI messages for "[Component:" indicators to see what info was already collected.
         </rule_4>
         
         <rule_5>
             Be conversational and natural. Connect current questions to previous answers.
             Example: "Thanks for sharing your income of 23 million VND. Now let's talk about..."
         </rule_5>
+        
+        <rule_6>
+            CRITICAL: Look for component completion patterns in conversation history:
+            - Messages containing "[Component: component_type]" show interactive elements
+            - Messages with "User Response:" show completed interactions
+            - Build upon this completed information, don't ask for it again
+        </rule_6>
     </critical_conversation_rules>
 
     <onboarding_objectives>

@@ -1,8 +1,61 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export function TestimonialSection() {
+  const { t } = useAppTranslation(["testimonials"]);
+  
+  // Get testimonials from translations
+  const testimonials = t("testimonials", { returnObjects: true }) as Array<{
+    name: string;
+    role: string;
+    text: string;
+    image: string;
+  }>;
+  
+  const testimonialQuote = t("testimonialQuote");
+  
+  // State for slider functionality
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Auto-slide functionality
+  useEffect(() => {
+    if (!isHovered && testimonials.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+      }, 4000); // Change slide every 4 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [isHovered, testimonials.length]);
+  
+  // Calculate visible testimonials for current slide
+  const visibleTestimonials = testimonials.slice(0, 3); // Show first 3 testimonials
+  
+  // Handle manual slide navigation
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+  };
+  
+  // Handle case when testimonials are not loaded yet
+  if (!testimonials || testimonials.length === 0) {
+    return (
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">

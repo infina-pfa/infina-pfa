@@ -5,6 +5,7 @@ import OpenAI from "openai";
 import { generateOnboardingSystemPrompt } from "@/lib/ai-advisor/prompts/onboarding-system-prompt";
 import { onboardingFunctionTools, validateComponentArguments } from "@/lib/ai-advisor/tools/onboarding-definitions";
 import { SystemPromptLogger } from "@/lib/utils/system-prompt-logger";
+import { TokenEstimator } from "@/lib/ai-advisor/utils/token-estimator";
 
 // Initialize OpenAI client
 const openaiClient = new OpenAI({
@@ -63,6 +64,200 @@ const convertToolsForResponsesAPI = (tools: typeof onboardingFunctionTools) => {
   }));
 };
 
+// Financial stage analysis logic (extracted from analyze-stage route)
+interface ProfileData {
+  name?: string;
+  age?: number;
+  income?: number;
+  expenses?: number;
+  currentDebts?: number;
+  savings?: number;
+  investmentExperience?: "none" | "beginner" | "intermediate" | "advanced";
+  primaryFinancialGoal?: string;
+  riskTolerance?: string;
+}
+
+const FINANCIAL_STAGES = {
+  survival: {
+    name: "Survival Stage",
+    description: "Focus on stopping cash bleed and basic financial stability"
+  },
+  debt: {
+    name: "Debt Elimination", 
+    description: "Priority on eliminating high-interest debt"
+  },
+  foundation: {
+    name: "Foundation Building",
+    description: "Building emergency fund and financial foundation"
+  },
+  investing: {
+    name: "Investing Stage",
+    description: "Ready to start building wealth through investments"
+  },
+  optimizing: {
+    name: "Optimizing Assets",
+    description: "Optimizing investment portfolio and tax efficiency"
+  },
+  protecting: {
+    name: "Protecting Assets", 
+    description: "Focus on insurance and asset protection"
+  },
+  retirement: {
+    name: "Retirement Planning",
+    description: "Advanced retirement and estate planning"
+  }
+} as const;
+
+function fallbackStageAnalysis(profile: ProfileData) {
+  const income = profile.income || 0;
+  const expenses = profile.expenses || 0;
+  const debts = profile.currentDebts || 0;
+  const savings = profile.savings || 0;
+
+  // Stage 0: Survival - negative cash flow
+  if (income < expenses) {
+    return {
+      stage: "survival",
+      confidence: 0.8,
+      reasoning: "Negative cash flow indicates immediate need for financial stabilization and expense reduction"
+    };
+  }
+
+  // Stage 1: Debt - has significant high-interest debt
+  if (debts > income * 0.3) {
+    return {
+      stage: "debt",
+      confidence: 0.7,
+      reasoning: "High debt-to-income ratio (>30%) suggests prioritizing debt elimination before other financial goals"
+    };
+  }
+
+  // Stage 2: Foundation - little to no emergency fund
+  const monthlyExpenses = expenses;
+  const emergencyFundMonths = monthlyExpenses > 0 ? savings / monthlyExpenses : 0;
+  
+  if (emergencyFundMonths < 3) {
+    return {
+      stage: "foundation",
+      confidence: 0.7,
+      reasoning: "Insufficient emergency fund (<3 months expenses) indicates need for foundation building before investing"
+    };
+  }
+
+  // Stage 3: Investing - has good foundation, ready to invest
+  if (emergencyFundMonths >= 3 && profile.investmentExperience === "none") {
+    return {
+      stage: "investing",
+      confidence: 0.6,
+      reasoning: "Good financial foundation established, ready to begin wealth building through investments"
+    };
+  }
+
+  // Stage 4: Optimizing - experienced investor with substantial assets
+  if (profile.investmentExperience === "intermediate" || profile.investmentExperience === "advanced") {
+    return {
+      stage: "optimizing",
+      confidence: 0.6,
+      reasoning: "Investment experience suggests focus on portfolio optimization and tax efficiency"
+    };
+  }
+
+  // Default to foundation building
+  return {
+    stage: "foundation",
+    confidence: 0.5,
+    reasoning: "Based on available information, foundation building appears most appropriate"
+  };
+}
+
+async function analyzeFinancialStageLogic(profile: ProfileData): Promise<{
+  success: boolean;
+  data?: { stage: string; confidence: number; reasoning: string };
+  error?: string;
+}> {
+  try {
+    // Use AI to analyze financial stage
+    const analysisPrompt = `
+      Analyze this user's financial profile and determine their appropriate financial stage:
+
+      User Profile:
+      - Name: ${profile.name || 'Not provided'}
+      - Age: ${profile.age || 'Not provided'}
+      - Monthly Income: ${profile.income ? `${profile.income.toLocaleString()} VND` : 'Not provided'}
+      - Monthly Expenses: ${profile.expenses ? `${profile.expenses.toLocaleString()} VND` : 'Not provided'} 
+      - Current Debts: ${profile.currentDebts ? `${profile.currentDebts.toLocaleString()} VND` : 'Not provided'}
+      - Current Savings: ${profile.savings ? `${profile.savings.toLocaleString()} VND` : 'Not provided'}
+      - Investment Experience: ${profile.investmentExperience || 'Not provided'}
+      - Primary Financial Goal: ${profile.primaryFinancialGoal || 'Not provided'}
+      - Risk Tolerance: ${profile.riskTolerance || 'Not provided'}
+
+      Available Financial Stages:
+      ${Object.entries(FINANCIAL_STAGES).map(([key, stage]) => 
+        `- ${key}: ${stage.name} - ${stage.description}`
+      ).join('\n')}
+
+      Based on this profile, determine:
+      1. The most appropriate financial stage (survival, debt, foundation, investing, optimizing, protecting, retirement)
+      2. Confidence level (0.0 to 1.0)
+      3. Clear reasoning for this classification
+
+      Respond in JSON format:
+      {
+        "stage": "stage_key",
+        "confidence": 0.8,
+        "reasoning": "Detailed explanation of why this stage was selected"
+      }
+    `;
+
+    const completion = await openaiClient.chat.completions.create({
+      model: "gpt-4.1-2025-04-14",
+      messages: [
+        {
+          role: "system",
+          content: "You are a financial advisor AI that analyzes user profiles to determine their appropriate financial stage. Always respond with valid JSON only."
+        },
+        {
+          role: "user", 
+          content: analysisPrompt
+        }
+      ],
+      temperature: 0.3
+    });
+
+    const analysisResult = JSON.parse(completion.choices[0].message.content || "{}");
+
+    return {
+      success: true,
+      data: analysisResult
+    };
+
+  } catch (aiError) {
+    console.error("AI Analysis failed, using fallback logic:", aiError);
+    
+    // Fallback to rule-based analysis
+    const fallbackResult = fallbackStageAnalysis(profile);
+    
+    return {
+      success: true,
+      data: fallbackResult
+    };
+  }
+}
+
+// Helper function to create well-formatted error objects
+const createToolError = (toolName: string, errorMessage: string, details?: Record<string, unknown>) => {
+  const safeErrorMessage = errorMessage || "Unknown error occurred";
+  const safeToolName = toolName || "unknown_tool";
+  
+  return {
+    type: "tool_error",
+    tool_name: safeToolName,
+    error: safeErrorMessage,
+    details: details || {},
+    timestamp: new Date().toISOString()
+  };
+};
+
 export async function POST(request: NextRequest) {
   console.log("🚀 POST /api/onboarding/ai-stream called");
   
@@ -77,6 +272,22 @@ export async function POST(request: NextRequest) {
       currentStep: requestBody.currentStep || 'unknown',
       hasUserProfile: !!requestBody.userProfile
     });
+
+    // // 🔍 DEBUG: Log detailed conversation history received from client
+    // if (requestBody.conversationHistory && requestBody.conversationHistory.length > 0) {
+    //   console.log("📋 Detailed conversation history received from client:");
+    //   requestBody.conversationHistory.forEach((msg, index) => {
+    //     console.log(`${index + 1}. [${msg.sender}] (${msg.id}): "${msg.content}" (${msg.content?.length || 0} chars)`);
+    //   });
+      
+    //   // Check for potential truncation or filtering issues
+    //   const emptyMessages = requestBody.conversationHistory.filter(msg => !msg.content || msg.content.length < 5);
+    //   if (emptyMessages.length > 0) {
+    //     console.warn(`⚠️ Server received ${emptyMessages.length} messages with empty/short content:`, emptyMessages);
+    //   }
+    // } else {
+    //   console.log("📋 No conversation history received from client");
+    // }
 
     // Create Supabase client for authentication
     const cookieStore = await cookies();
@@ -111,31 +322,48 @@ export async function POST(request: NextRequest) {
 
     console.log("✅ User authenticated:", user.id);
 
-    // Generate onboarding-specific system prompt
-    const conversationHistory = (requestBody.conversationHistory || []).map(msg => {
-      if (msg.sender === "user") {
-        return { role: "user" as const, content: msg.content };
-      } else {
-        return { role: "assistant" as const, content: msg.content };
-      }
-    });
+    // Use conversation history from current session (request body)
+    const completeConversationHistory = (requestBody.conversationHistory || []).map(msg => ({
+      role: msg.sender === "user" ? "user" as const : "assistant" as const,
+      content: msg.content
+    }));
 
-    const systemPrompt = generateOnboardingSystemPrompt(
+    console.log(`📥 Using session conversation history: ${completeConversationHistory.length} messages`);
+
+    // Generate onboarding-specific system prompt WITHOUT conversation history
+    // The conversation history will be passed separately in the input field
+    const systemInstructions = generateOnboardingSystemPrompt(
       user.id,
       requestBody.userProfile || {},
-      conversationHistory,
+      [], // Empty array - conversation history goes to input field instead
       requestBody.currentStep || "ai_welcome"
     );
 
-    console.log("📝 Generated onboarding system prompt");
+    console.log("📝 Generated onboarding system instructions (no history embedded)");
 
-    // Log system prompt to file for debugging
+    // Prepare input for Responses API - include complete conversation history + current message
+    // No system message in input - it will be passed via instructions field
+    const input = [
+      ...completeConversationHistory, // Include complete conversation history
+      { role: "user" as const, content: requestBody.message }
+    ];
+
+    // Convert tools for Responses API format
+    const responsesApiTools = convertToolsForResponsesAPI(onboardingFunctionTools);
+
+    // Calculate token metrics for cost tracking and monitoring
+    const systemInstructionsTokens = TokenEstimator.estimateTokensAdvanced(systemInstructions);
+    const inputTokens = TokenEstimator.estimateInputTokensFromMessages(input);
+    const toolTokens = TokenEstimator.estimateToolTokens(responsesApiTools);
+    const totalInputTokens = systemInstructionsTokens + inputTokens + toolTokens;
+
+    // Log system prompt to file for debugging (with token metrics)
     const requestId = await SystemPromptLogger.logSystemPrompt({
       userId: user.id,
       currentStep: requestBody.currentStep || "ai_welcome",
       userProfile: requestBody.userProfile,
-      conversationHistory,
-      systemPrompt,
+      conversationHistory: completeConversationHistory,
+      systemPrompt: systemInstructions,
       userMessage: requestBody.message,
     });
 
@@ -143,25 +371,9 @@ export async function POST(request: NextRequest) {
     await SystemPromptLogger.logPromptSummary({
       userId: user.id,
       currentStep: requestBody.currentStep || "ai_welcome",
-      promptLength: systemPrompt.length,
+      promptLength: systemInstructions.length,
       userMessage: requestBody.message,
       requestId,
-    });
-
-    // Prepare input for Responses API
-    const input = [
-      { role: "system" as const, content: systemPrompt },
-      ...conversationHistory.slice(-5), // Keep last 5 messages
-      { role: "user" as const, content: requestBody.message }
-    ];
-
-    // Convert tools for Responses API format
-    const responsesApiTools = convertToolsForResponsesAPI(onboardingFunctionTools);
-
-    console.log("💬 Prepared input for Responses API:", {
-      totalMessages: input.length,
-      systemPromptLength: systemPrompt.length,
-      requestId: requestId
     });
 
     // Set up SSE headers
@@ -183,15 +395,22 @@ export async function POST(request: NextRequest) {
           // Debug logging for input and tools
           console.log("🔧 Available onboarding tools:", responsesApiTools.length);
           console.log("📝 Final input for AI:", {
-            count: input.length,
-            systemPromptLength: input[0]?.content?.length || 0,
-            lastUserMessage: input[input.length - 1]?.content?.substring(0, 100) + "..."
+            inputMessagesCount: input.length,
+            lastUserMessage: input[input.length - 1]?.content?.substring(0, 100) + "...",
+            hasCompleteHistory: completeConversationHistory.length > 0,
+            tokenMetrics: {
+              systemInstructionsTokens,
+              inputMessagesTokens: inputTokens,
+              toolTokens,
+              totalEstimatedInputTokens: totalInputTokens
+            }
           });
 
-          // Use Responses API with streaming
+          // Use Responses API with streaming - instructions field for system prompt
           const stream = await openaiClient.responses.create({
             model: "gpt-4.1-2025-04-14",
-            input: input,
+            instructions: systemInstructions, // System prompt goes here instead of input
+            input: input, // Only conversation history + current message
             tools: responsesApiTools,
             stream: true,
             temperature: 0.7,
@@ -303,16 +522,11 @@ export async function POST(request: NextRequest) {
                         } else {
                           console.error(`❌ Argument validation failed for ${call.name}:`, validation.errors);
                           const errorMsg = `Invalid arguments for ${call.name}: ${validation.errors.join(", ")}`;
-                          const errorData = { 
-                            type: "tool_error", 
-                            tool_name: call.name, 
-                            error: errorMsg,
-                            details: { 
-                              rawArguments: call.arguments,
-                              validationErrors: validation.errors,
-                              hint: "Please provide all required parameters: component_type, title, component_id, context"
-                            }
-                          };
+                          const errorData = createToolError(call.name, errorMsg, {
+                            rawArguments: call.arguments,
+                            validationErrors: validation.errors,
+                            hint: "Please provide all required parameters: component_type, title, component_id, context"
+                          });
                           controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
                           failedCalls.push({ call, error: errorMsg });
                           continue;
@@ -323,16 +537,11 @@ export async function POST(request: NextRequest) {
                     } catch (parseError) {
                       console.error(`❌ Failed to parse arguments for ${call.name}:`, parseError);
                       const errorMsg = `Invalid JSON arguments provided by AI for ${call.name}. Please provide valid JSON.`;
-                      const errorData = { 
-                        type: "tool_error", 
-                        tool_name: call.name, 
-                        error: errorMsg, 
-                        details: { 
-                          rawArguments: call.arguments,
-                          parseError: parseError instanceof Error ? parseError.message : String(parseError),
-                          hint: "Arguments must be valid JSON format"
-                        }
-                      };
+                      const errorData = createToolError(call.name, errorMsg, {
+                        rawArguments: call.arguments,
+                        parseError: parseError instanceof Error ? parseError.message : String(parseError),
+                        hint: "Arguments must be valid JSON format"
+                      });
                       controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
                       failedCalls.push({ call, error: errorMsg });
                       continue;
@@ -366,14 +575,7 @@ export async function POST(request: NextRequest) {
                     // If arguments are invalid, don't use fallbacks - just report the error
                     console.error("🔧 Invalid arguments for show_onboarding_component, not using fallbacks");
                     const errorMsg = "Component arguments validation failed. Please provide valid component parameters.";
-                    const errorData = { 
-                      type: "tool_error", 
-                      tool_name: call.name, 
-                      error: errorMsg,
-                      details: { 
-                        message: "The AI needs to provide proper component parameters"
-                      }
-                    };
+                    const errorData = createToolError(call.name, errorMsg);
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
                     failedCalls.push({ call, error: errorMsg });
                     continue;
@@ -395,6 +597,97 @@ export async function POST(request: NextRequest) {
                       controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "onboarding_complete" })}\n\n`));
                       successfulCalls.push(call);
                       
+                  } else if (call.name === "analyze_financial_stage") {
+                      const { profile_data, trigger_completion } = toolData;
+                      
+                      if (!profile_data) {
+                        throw new Error("Missing profile_data in analyze_financial_stage call");
+                      }
+                      
+                      console.log("🔍 Analyzing financial stage for user:", user.id);
+                      
+                      // Call the analysis logic directly to avoid HTTP/auth issues
+                      const analysisResult = await analyzeFinancialStageLogic(profile_data);
+                      
+                      if (!analysisResult.success || !analysisResult.data) {
+                        throw new Error(`Analysis failed: ${analysisResult.error || 'No analysis data returned'}`);
+                      }
+                      
+                      const { stage, confidence, reasoning } = analysisResult.data;
+                      
+                      console.log("✅ Financial stage analysis completed:", { stage, confidence });
+                       
+                      // Map stage to friendly Vietnamese names
+                      const stageNames: Record<string, string> = {
+                        'survival': 'Tình trạng khẩn cấp (Survival)',
+                        'debt': 'Xoá bỏ nợ (Debt Elimination)',
+                        'foundation': 'Xây dựng nền tảng (Foundation Building)',
+                        'investing': 'Đầu tư và tích luỹ (Investing)',
+                        'optimizing': 'Tối ưu hóa tài sản (Optimizing Assets)',
+                        'protecting': 'Bảo vệ tài sản (Protecting Assets)',
+                        'retirement': 'Lập kế hoạch hưu trí (Retirement Planning)'
+                      };
+                       
+                      const stageName = stageNames[stage] || stage.charAt(0).toUpperCase() + stage.slice(1);
+                       
+                      // Stream the analysis result back to the user
+                      const analysisMessage = `🎯 **Phân tích tình trạng tài chính hoàn thành!**\n\n**Giai đoạn tài chính của bạn:** ${stageName}\n**Độ tin cậy:** ${Math.round(confidence * 100)}%\n\n**Lý do:** ${reasoning}\n\n${trigger_completion ? "🎉 Chúc mừng! Bạn đã hoàn thành quá trình thiết lập. Hệ thống sẽ chuyển bạn đến giao diện chính trong giây lát..." : ""}`;
+                       
+                      // Send the analysis result as streaming text
+                      const chars = analysisMessage.split('');
+                      for (let i = 0; i < chars.length; i++) {
+                        const textDelta = {
+                          type: "response_output_text_streaming",
+                          response_id: responseId,
+                          content: chars[i],
+                          timestamp: new Date().toISOString(),
+                        };
+                        controller.enqueue(encoder.encode(`data: ${JSON.stringify(textDelta)}\n\n`));
+                        
+                        // Small delay to simulate natural streaming
+                        await new Promise(resolve => setTimeout(resolve, 10));
+                      }
+                      
+                      // Send text done event
+                      const textDoneData = {
+                        type: "response_output_text_done",
+                        content: analysisMessage,
+                        timestamp: new Date().toISOString(),
+                      };
+                      controller.enqueue(encoder.encode(`data: ${JSON.stringify(textDoneData)}\n\n`));
+                      
+                      // Update user profile with the analysis results
+                      const profileUpdate = {
+                        financial_stage: stage,
+                        stage_confidence: confidence,
+                        stage_reasoning: reasoning,
+                        onboarding_completed: trigger_completion || false,
+                        onboarding_completed_at: trigger_completion ? new Date().toISOString() : null,
+                      };
+                      
+                      const { error: updateError } = await supabase
+                        .from("users")
+                        .update(profileUpdate)
+                        .eq('user_id', user.id);
+                      
+                      if (updateError) {
+                        console.error("❌ Error updating user profile:", updateError.message);
+                        throw new Error(`Supabase error updating profile: ${updateError.message}`);
+                      }
+                      
+                      console.log("✅ User profile updated with analysis results");
+                      
+                      // Trigger completion if requested
+                      if (trigger_completion) {
+                        // Small delay before completion
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        
+                        console.log("🏁 Triggering onboarding completion");
+                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "onboarding_complete" })}\n\n`));
+                      }
+                      
+                      successfulCalls.push(call);
+                      
                   } else {
                     console.log(`✅ Function call ${call.name} not handled explicitly, assuming success.`);
                     successfulCalls.push(call);
@@ -403,7 +696,7 @@ export async function POST(request: NextRequest) {
                 } catch (error: unknown) {
                   const errorMessage = error instanceof Error ? error.message : String(error);
                   console.error(`❌ Error processing tool call ${call.name} (${call.id}):`, errorMessage);
-                  const errorData = { type: "tool_error", tool_name: call.name, error: `Error processing tool call: ${errorMessage}` };
+                  const errorData = createToolError(call.name, errorMessage);
                   controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
                   failedCalls.push({ call, error: errorMessage });
                 }
@@ -428,7 +721,8 @@ export async function POST(request: NextRequest) {
           const errorData = {
             type: "error",
             message: "An unexpected error occurred during the stream.",
-            details: error instanceof Error ? error.message : String(error)
+            details: error instanceof Error ? error.message : String(error),
+            timestamp: new Date().toISOString()
           };
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
           controller.close();

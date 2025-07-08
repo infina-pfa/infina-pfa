@@ -400,7 +400,7 @@ export function validateComponentArguments(args: unknown): { isValid: boolean; e
       errors.push("slider requires range configuration with min/max in context");
     } else {
       const range = context.range as Record<string, unknown>;
-      if (!range.min || !range.max) {
+      if (range.min === undefined || range.min === null || range.max === undefined || range.max === null) {
         errors.push("slider requires range configuration with min/max in context");
       }
     }

@@ -27,7 +27,7 @@ export function FinancialInputComponent({
 
   const handleSubmit = async () => {
     const numericValue = parseFloat(financialValue);
-    if (!financialValue || numericValue <= 0 || isSubmitting) return;
+    if (!financialValue || numericValue < 0 || isNaN(numericValue) || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
@@ -44,7 +44,7 @@ export function FinancialInputComponent({
 
   const isValid = () => {
     const numericValue = parseFloat(financialValue);
-    return financialValue && numericValue > 0;
+    return financialValue && numericValue >= 0 && !isNaN(numericValue);
   };
 
   return (

@@ -47,10 +47,10 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
         
         if (isEditing) {
           // During editing, show formatted number (with thousand separators) but no currency symbol
-          setDisplayValue(numericValue > 0 ? formatNumber(numericValue) : "");
+          setDisplayValue(numericValue >= 0 ? formatNumber(numericValue) : "");
         } else {
           // When not editing, show full VND formatting
-          setDisplayValue(numericValue > 0 ? formatVND(numericValue) : "");
+          setDisplayValue(numericValue >= 0 ? formatVND(numericValue) : "");
         }
       } else {
         setDisplayValue("");
@@ -93,7 +93,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
       // Remove any currency formatting but keep thousand separators
       const cleanValue = numericValue.replace(/[^\d]/g, "");
       const num = parseInt(cleanValue, 10);
-      setDisplayValue(num > 0 ? formatNumber(num) : cleanValue);
+      setDisplayValue(num >= 0 ? formatNumber(num) : cleanValue);
 
       // Select all text for easy editing
       setTimeout(() => e.target.select(), 0);
@@ -106,7 +106,7 @@ export const MoneyInput = React.forwardRef<HTMLInputElement, MoneyInputProps>(
       if (value || value === 0) {
         const numericValue =
           typeof value === "string" ? parseFormattedNumber(value) : value;
-        setDisplayValue(numericValue > 0 ? formatVND(numericValue) : "");
+        setDisplayValue(numericValue >= 0 ? formatVND(numericValue) : "");
       } else {
         setDisplayValue("");
       }
