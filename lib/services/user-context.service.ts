@@ -57,15 +57,6 @@ Thông tin người dùng:
           }).format(userContext.financial.totalExpenses)
         : "Chưa có dữ liệu"
     }
-- Số lượng ngân sách: ${userContext.financial?.currentBudgets || 0}
-- Đã hoàn thành onboarding: ${
-      userContext.financial?.hasCompletedOnboarding ? "Có" : "Không"
-    }
-
-Thông tin học tập:
-- Level hiện tại: ${userContext.learning?.currentLevel || 1}
-- Điểm kinh nghiệm: ${userContext.learning?.xp || 0}
-- Mục tiêu hiện tại: ${userContext.learning?.currentGoal || "Chưa có mục tiêu"}
 `;
   },
 
