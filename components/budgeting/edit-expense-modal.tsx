@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 interface EditExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (name: string, amount: number, oldAmount?: number) => void;
   expense: {
     id: string;
     name: string;
@@ -85,7 +85,7 @@ export const EditExpenseModal = ({
       showSuccessToast(t("expenseUpdated"));
 
       // Call success callback and close modal
-      onSuccess?.();
+      onSuccess?.(expense.name, formData.amount || 0, expense.amount);
       onClose();
     }
   };

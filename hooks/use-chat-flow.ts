@@ -140,7 +140,10 @@ export const useChatFlow = (): UseChatFlowReturn => {
   /**
    * Main flow: User message → Create session → Update state → Save to DB → Stream AI
    */
-  const sendMessage = async (content: string) => {
+  const sendMessage = async (
+    content: string,
+    options?: { isToolMessage?: boolean }
+  ) => {
     if (!user) {
       return;
     }
@@ -154,7 +157,6 @@ export const useChatFlow = (): UseChatFlowReturn => {
       // Step 1: Create session if it doesn't exist
       if (!conversationId) {
         conversationId = (await createConversation()) || undefined;
-        console.log("🚀 ~ conversationId:", conversationId);
 
         if (!conversationId) {
           return;
@@ -212,7 +214,11 @@ export const useChatFlow = (): UseChatFlowReturn => {
         userContext,
       };
 
-      await aiStreaming.startStreaming(advisorRequest);
+      if (options?.isToolMessage) {
+        await aiStreaming.startToolStreaming(advisorRequest);
+      } else {
+        await aiStreaming.startStreaming(advisorRequest);
+      }
     } catch {
       // Error handling will be done by individual hooks
     }

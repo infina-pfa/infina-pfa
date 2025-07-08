@@ -5,7 +5,6 @@ export * from "./budget-color-selector";
 export * from "./budget-icon-selector";
 export * from "./budget-modal";
 export * from "./budget-month-year-selector";
-export * from "./budgeting-dashboard";
 export * from "./create-budget-modal";
 export * from "./create-expense-modal";
 export * from "./edit-budget-modal";

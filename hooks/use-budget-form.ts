@@ -2,8 +2,15 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useBudgetCreateSWR } from "@/hooks/swr/use-budget-create";
 import { useBudgetUpdateSWR } from "@/hooks/swr/use-budget-update";
-import { CreateBudgetRequest, UpdateBudgetRequest, Budget } from "@/lib/types/budget.types";
-import { inputValidationRules, parseFormattedNumber } from "@/lib/validation/input-validation";
+import {
+  CreateBudgetRequest,
+  UpdateBudgetRequest,
+  Budget,
+} from "@/lib/types/budget.types";
+import {
+  inputValidationRules,
+  parseFormattedNumber,
+} from "@/lib/validation/input-validation";
 import { validateField } from "@/lib/validation/form-validation";
 import { BUDGET_COLORS } from "@/lib/utils/budget-constants";
 
@@ -25,15 +32,37 @@ interface UseBudgetFormProps {
   budget?: Budget | null;
   onSuccess: () => void;
   onClose: () => void;
+  onBudgetCreated?: (budget: Budget) => Promise<void>;
+  onBudgetUpdated?: (budget: Budget, oldAmount?: number) => Promise<void>;
 }
 
-export const useBudgetForm = ({ mode, isOpen, budget, onSuccess, onClose }: UseBudgetFormProps) => {
+export const useBudgetForm = ({
+  mode,
+  isOpen,
+  budget,
+  onSuccess,
+  onClose,
+  onBudgetCreated,
+  onBudgetUpdated,
+}: UseBudgetFormProps) => {
   const { t } = useTranslation();
-  
-  // ✨ Use SWR hooks instead of regular hooks
-  const { createBudget, isCreating, error: createError } = useBudgetCreateSWR();
-  const { updateBudget, isUpdating, error: updateError } = useBudgetUpdateSWR();
-  
+
+  // ✨ Use SWR hooks with callbacks
+  const {
+    createBudget,
+    isCreating,
+    error: createError,
+  } = useBudgetCreateSWR({
+    onSuccess: onBudgetCreated,
+  });
+  const {
+    updateBudget,
+    isUpdating,
+    error: updateError,
+  } = useBudgetUpdateSWR({
+    onSuccess: onBudgetUpdated,
+  });
+
   // Determine which hooks to use based on mode
   const isLoading = mode === "create" ? isCreating : isUpdating;
   const error = mode === "create" ? createError : updateError;
@@ -50,7 +79,9 @@ export const useBudgetForm = ({ mode, isOpen, budget, onSuccess, onClose }: UseB
   });
 
   // Form state
-  const [formData, setFormData] = useState<BudgetFormData>(getDefaultFormData());
+  const [formData, setFormData] = useState<BudgetFormData>(
+    getDefaultFormData()
+  );
 
   // Form validation errors
   const [validationErrors, setValidationErrors] = useState<{
@@ -94,7 +125,10 @@ export const useBudgetForm = ({ mode, isOpen, budget, onSuccess, onClose }: UseB
     }
 
     // Validate amount using the money validation rule
-    const amountError = validateField(formData.amount, inputValidationRules.money);
+    const amountError = validateField(
+      formData.amount,
+      inputValidationRules.money
+    );
     if (amountError) {
       errors.amount = amountError;
     }
@@ -132,7 +166,8 @@ export const useBudgetForm = ({ mode, isOpen, budget, onSuccess, onClose }: UseB
       result = await createBudget(createData);
     } else if (mode === "edit" && budget) {
       const updateData: UpdateBudgetRequest = formData;
-      result = await updateBudget(budget.id, updateData);
+      const oldAmount = budget.amount; // Store old amount for callback
+      result = await updateBudget(budget.id, updateData, oldAmount);
     }
 
     if (result) {
@@ -148,7 +183,10 @@ export const useBudgetForm = ({ mode, isOpen, budget, onSuccess, onClose }: UseB
     }
   };
 
-  const handleInputChange = (field: keyof BudgetFormData, value: string | number) => {
+  const handleInputChange = (
+    field: keyof BudgetFormData,
+    value: string | number
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear validation error for this field
     if (validationErrors[field]) {
@@ -170,7 +208,10 @@ export const useBudgetForm = ({ mode, isOpen, budget, onSuccess, onClose }: UseB
         setValidationErrors((prev) => ({ ...prev, name: nameError }));
       }
     } else if (field === "amount") {
-      const amountError = validateField(formData.amount, inputValidationRules.money);
+      const amountError = validateField(
+        formData.amount,
+        inputValidationRules.money
+      );
       if (amountError) {
         setValidationErrors((prev) => ({ ...prev, amount: amountError }));
       }
@@ -201,4 +242,4 @@ export const useBudgetForm = ({ mode, isOpen, budget, onSuccess, onClose }: UseB
     handleClose,
     parseFormattedNumber,
   };
-}; 
+};

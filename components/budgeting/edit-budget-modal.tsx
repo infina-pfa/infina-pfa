@@ -8,6 +8,7 @@ interface EditBudgetModalProps {
   onClose: () => void;
   onSuccess: () => void;
   budget: Budget | null;
+  onBudgetUpdated?: (budget: Budget, oldAmount?: number) => Promise<void>;
 }
 
 export const EditBudgetModal = ({
@@ -15,6 +16,7 @@ export const EditBudgetModal = ({
   onClose,
   onSuccess,
   budget,
+  onBudgetUpdated,
 }: EditBudgetModalProps) => {
   return (
     <BudgetModal
@@ -23,6 +25,7 @@ export const EditBudgetModal = ({
       onClose={onClose}
       onSuccess={onSuccess}
       budget={budget}
+      onBudgetUpdated={onBudgetUpdated}
     />
   );
 };

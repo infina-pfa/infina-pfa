@@ -174,4 +174,34 @@ export const chatService = {
       throw new Error(appError.message);
     }
   },
+
+  /**
+   * Start AI advisor streaming response
+   */
+  async startAIAdvisorToolStream(
+    request: AdvisorStreamRequest
+  ): Promise<ReadableStream<Uint8Array>> {
+    try {
+      const response = await fetch("/api/chat/advisor-tool-interact-stream", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        throw new Error(`AI advisor request failed: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error("No response body from AI advisor");
+      }
+
+      return response.body;
+    } catch (error) {
+      const appError = handleError(error);
+      throw new Error(appError.message);
+    }
+  },
 };

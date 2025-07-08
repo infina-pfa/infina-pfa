@@ -18,7 +18,27 @@ import { Budget } from "@/lib/types/budget.types";
 import { formatDateVN } from "@/lib/utils/date-formatter";
 import { useMemo, useState } from "react";
 
-export function BudgetingWidget() {
+interface BudgetingWidgetProps {
+  onBudgetCreated?: (budget: Budget) => Promise<void>;
+  onBudgetUpdated?: (budget: Budget, oldAmount?: number) => Promise<void>;
+  onExpenseCreated?: (
+    name: string,
+    amount: number,
+    budgetName: string
+  ) => Promise<void>;
+  onExpenseUpdated?: (
+    name: string,
+    amount: number,
+    oldAmount?: number
+  ) => Promise<void>;
+}
+
+export function BudgetingWidget({
+  onBudgetCreated,
+  onBudgetUpdated,
+  onExpenseCreated,
+  onExpenseUpdated,
+}: BudgetingWidgetProps = {}) {
   const { t } = useAppTranslation(["budgeting", "common"]);
   const toast = useToast();
 
@@ -164,7 +184,10 @@ export function BudgetingWidget() {
 
         <div className="mt-6 md:mt-8">
           {/* ✨ No need to pass onExpenseUpdated - SWR handles automatic updates */}
-          <RecentExpensesList transactions={mappedTransactions} />
+          <RecentExpensesList
+            transactions={mappedTransactions}
+            onExpenseUpdated={onExpenseUpdated}
+          />
         </div>
       </main>
 
@@ -172,11 +195,9 @@ export function BudgetingWidget() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={() => {
-          // The actual budget creation is handled in the budget-modal.tsx
-          // which calls the createBudget function from useBudgetForm
-          // We'll update useBudgetForm to use our SWR hook instead
           setIsCreateModalOpen(false);
         }}
+        onBudgetCreated={onBudgetCreated}
       />
 
       <EditBudgetModal
@@ -186,13 +207,11 @@ export function BudgetingWidget() {
           setSelectedBudget(null);
         }}
         onSuccess={() => {
-          // The actual budget update is handled in the budget-modal.tsx
-          // which calls the updateBudget function from useBudgetForm
-          // We'll update useBudgetForm to use our SWR hook instead
           setIsEditModalOpen(false);
           setSelectedBudget(null);
         }}
         budget={selectedBudget}
+        onBudgetUpdated={onBudgetUpdated}
       />
 
       <CreateExpenseModal
@@ -204,7 +223,6 @@ export function BudgetingWidget() {
         onSuccess={() => {
           setIsCreateExpenseModalOpen(false);
           setSelectedBudget(null);
-          // ✨ SWR automatically updates the data - no manual refetch needed!
         }}
         budget={
           selectedBudget
@@ -215,6 +233,7 @@ export function BudgetingWidget() {
               }
             : null
         }
+        onExpenseCreated={onExpenseCreated}
       />
     </div>
   );

@@ -23,7 +23,7 @@ export interface Transaction {
 
 interface RecentExpensesListProps {
   transactions: Transaction[];
-  onExpenseUpdated?: () => void;
+  onExpenseUpdated?: (name: string, amount: number, oldAmount?: number) => void;
 }
 
 export const RecentExpensesList = ({
@@ -60,8 +60,12 @@ export const RecentExpensesList = ({
     setIsEditModalOpen(true);
   };
 
-  const handleEditSuccess = () => {
-    onExpenseUpdated?.();
+  const handleEditSuccess = (
+    name: string,
+    amount: number,
+    oldAmount?: number
+  ) => {
+    onExpenseUpdated?.(name, amount, oldAmount);
     setIsEditModalOpen(false);
     setSelectedExpense(null);
   };

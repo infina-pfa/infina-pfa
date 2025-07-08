@@ -1,21 +1,35 @@
-import { useState } from 'react';
-import { mutate } from 'swr';
-import { budgetService } from '@/lib/services/budget.service';
-import { useAppTranslation } from '@/hooks/use-translation';
-import type { UpdateBudgetRequest, Budget } from '@/lib/types/budget.types';
+import { useState } from "react";
+import { mutate } from "swr";
+import { budgetService } from "@/lib/services/budget.service";
+import { useAppTranslation } from "@/hooks/use-translation";
+import type { UpdateBudgetRequest, Budget } from "@/lib/types/budget.types";
 
 interface UseBudgetUpdateSWRReturn {
-  updateBudget: (id: string, data: UpdateBudgetRequest) => Promise<Budget | null>;
+  updateBudget: (
+    id: string,
+    data: UpdateBudgetRequest,
+    oldAmount?: number
+  ) => Promise<Budget | null>;
   isUpdating: boolean;
   error: string | null;
 }
 
-export function useBudgetUpdateSWR(): UseBudgetUpdateSWRReturn {
-  const { t } = useAppTranslation(['budgeting', 'common']);
+interface UseBudgetUpdateSWRProps {
+  onSuccess?: (budget: Budget, oldAmount?: number) => Promise<void> | void;
+}
+
+export function useBudgetUpdateSWR({
+  onSuccess,
+}: UseBudgetUpdateSWRProps = {}): UseBudgetUpdateSWRReturn {
+  const { t } = useAppTranslation(["budgeting", "common"]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updateBudget = async (id: string, data: UpdateBudgetRequest): Promise<Budget | null> => {
+  const updateBudget = async (
+    id: string,
+    data: UpdateBudgetRequest,
+    oldAmount?: number
+  ): Promise<Budget | null> => {
     try {
       setIsUpdating(true);
       setError(null);
@@ -31,17 +45,29 @@ export function useBudgetUpdateSWR(): UseBudgetUpdateSWRReturn {
       if (response.budget) {
         // ✨ SWR Magic: Invalidate all budget queries to trigger re-fetch
         await mutate(
-          key => Array.isArray(key) && key[0] === 'budgets',
+          (key) => Array.isArray(key) && key[0] === "budgets",
           undefined,
           { revalidate: true }
         );
+
+        // Call success callback if provided
+        if (onSuccess) {
+          try {
+            onSuccess(response.budget, oldAmount);
+          } catch (callbackError) {
+            console.error("Budget update callback failed:", callbackError);
+          }
+        }
 
         return response.budget;
       }
 
       return null;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : t('unknownError', { ns: 'common' });
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : t("unknownError", { ns: "common" });
       setError(errorMessage);
       return null;
     } finally {
@@ -54,4 +80,4 @@ export function useBudgetUpdateSWR(): UseBudgetUpdateSWRReturn {
     isUpdating,
     error,
   };
-} 
+}

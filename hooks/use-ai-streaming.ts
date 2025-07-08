@@ -17,6 +17,7 @@ interface UseAIStreamingReturn {
 
   // Actions
   startStreaming: (request: AdvisorStreamRequest) => Promise<void>;
+  startToolStreaming: (request: AdvisorStreamRequest) => Promise<void>;
   stopStreaming: () => void;
   clearError: () => void;
 }
@@ -103,6 +104,34 @@ export const useAIStreaming = (
     [aiAdvisorProcessor, t]
   );
 
+  const startToolStreaming = useCallback(
+    async (request: AdvisorStreamRequest) => {
+      setIsStreaming(false);
+      setIsThinking(true);
+      setError(null);
+      setCurrentStreamingMessage(null);
+
+      try {
+        // Get stream from service
+        const stream = await chatService.startAIAdvisorToolStream(request);
+
+        // Process the stream
+        await aiAdvisorProcessor.processStreamData(
+          request.conversationId,
+          stream
+        );
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : t("aiStreamFailed");
+        setError(errorMessage);
+        setIsStreaming(false);
+        setIsThinking(false);
+        setCurrentStreamingMessage(null);
+      }
+    },
+    [aiAdvisorProcessor, t]
+  );
+
   const stopStreaming = useCallback(() => {
     setIsStreaming(false);
     setIsThinking(false);
@@ -120,6 +149,7 @@ export const useAIStreaming = (
     currentStreamingMessage,
     error,
     startStreaming,
+    startToolStreaming,
     stopStreaming,
     clearError,
   };

@@ -31,6 +31,7 @@ export function ChatInterface() {
     suggestions,
     onSuggestionClick,
     conversationId,
+    sendMessage,
   } = useChatFlow();
 
   useEffect(() => {
@@ -155,6 +156,7 @@ export function ChatInterface() {
           clearError,
           inputValue,
           setInputValue,
+          sendMessage,
           handleSubmit,
           isSubmitting,
           suggestions,
