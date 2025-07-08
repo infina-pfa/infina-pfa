@@ -114,7 +114,7 @@ export class AIAdvisorOrchestratorService {
     const allTools = functionTools;
     console.log("🛠️ Tools configured:", {
       toolCount: allTools.length,
-      toolNames: allTools.map(tool => tool.name)
+      toolNames: allTools.map(tool => tool.function.name)
     });
 
     // Generate system prompt

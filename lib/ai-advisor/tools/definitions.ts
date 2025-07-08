@@ -51,78 +51,84 @@ export const mcpToolsList = [
 export const functionTools: FunctionTool[] = [
   {
     type: "function" as const,
-    name: UIActionType.OPEN_TOOL,
-    description: "Open a specific financial tool for the user when they need practical assistance",
-    parameters: {
-      type: "object",
-      properties: {
-        tool_id: {
-          type: "string",
-          description: "ID of the tool to open",
-          enum: ["budget-tool", "loan-calculator", "interest-calculator", "salary-calculator", "bank-interest-compare", "learning-center"]
+    function: {
+      name: UIActionType.OPEN_TOOL,
+      description: "Open a specific financial tool for the user when they need practical assistance",
+      parameters: {
+        type: "object",
+        properties: {
+          tool_id: {
+            type: "string",
+            description: "ID of the tool to open",
+            enum: ["budget-tool", "loan-calculator", "interest-calculator", "salary-calculator", "bank-interest-compare", "learning-center"]
+          },
+          title: {
+            type: "string",
+            description: "Title or reason for opening the tool"
+          },
+          context: {
+            type: "object",
+            description: "Additional context or parameters for the tool"
+          },
+          trigger_reason: {
+            type: "string",
+            description: "Explanation for why this tool should be opened"
+          }
         },
-        title: {
-          type: "string",
-          description: "Title or reason for opening the tool"
-        },
-        context: {
-          type: "object",
-          description: "Additional context or parameters for the tool"
-        },
-        trigger_reason: {
-          type: "string",
-          description: "Explanation for why this tool should be opened"
-        }
-      },
-      required: ["tool_id", "title", "trigger_reason"]
+        required: ["tool_id", "title", "trigger_reason"]
+      }
     }
   },
   {
     type: "function" as const,
-    name: UIActionType.SHOW_COMPONENT,
-    description: "Show a specific component to the user instead of long information",
-    parameters: {
-      type: "object",
-      properties: {
-        component_id: {
-          type: "string",
-          description: "ID of the component to show",
-          enum: ["budget-overview", "budget-detail", "expense-summary", "income-summary", "financial-dashboard"]
+    function: {
+      name: UIActionType.SHOW_COMPONENT,
+      description: "Show a specific component to the user instead of long information",
+      parameters: {
+        type: "object",
+        properties: {
+          component_id: {
+            type: "string",
+            description: "ID of the component to show",
+            enum: ["budget-overview", "budget-detail", "expense-summary", "income-summary", "financial-dashboard"]
+          },
+          title: {
+            type: "string",
+            description: "Title of the component"
+          },
+          context: {
+            type: "object",
+            description: "Additional context or parameters for the component"
+          }
         },
-        title: {
-          type: "string",
-          description: "Title of the component"
-        },
-        context: {
-          type: "object",
-          description: "Additional context or parameters for the component"
-        }
-      },
-      required: ["component_id", "title"]
+        required: ["component_id", "title"]
+      }
     }
   },
   {
     type: "function" as const,
-    name: UIActionType.SHOW_SUGGESTION,
-    description: "Show a contextual suggestion card to the user",
-    parameters: {
-      type: "object",
-      properties: {
-        suggestion_type: {
-          type: "string",
-          description: "Type of suggestion",
-          enum: ["tip", "warning", "recommendation", "insight"]
+    function: {
+      name: UIActionType.SHOW_SUGGESTION,
+      description: "Show a contextual suggestion card to the user",
+      parameters: {
+        type: "object",
+        properties: {
+          suggestion_type: {
+            type: "string",
+            description: "Type of suggestion",
+            enum: ["tip", "warning", "recommendation", "insight"]
+          },
+          title: {
+            type: "string",
+            description: "Title of the suggestion"
+          },
+          content: {
+            type: "string",
+            description: "Content of the suggestion"
+          }
         },
-        title: {
-          type: "string",
-          description: "Title of the suggestion"
-        },
-        content: {
-          type: "string",
-          description: "Content of the suggestion"
-        }
-      },
-      required: ["suggestion_type", "title", "content"]
+        required: ["suggestion_type", "title", "content"]
+      }
     }
   }
 ];

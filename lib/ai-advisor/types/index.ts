@@ -28,12 +28,14 @@ export interface MCPToolItem {
 
 export interface FunctionTool {
   type: "function";
-  name: string;
-  description: string;
-  parameters: {
-    type: string;
-    properties: Record<string, unknown>;
-    required: string[];
+  function: {
+    name: string;
+    description: string;
+    parameters: {
+      type: string;
+      properties: Record<string, unknown>;
+      required: string[];
+    };
   };
 }
 
