@@ -183,3 +183,33 @@ export const incomeValidator = {
     }
   },
 };
+
+// Individual validation functions for easier use in forms
+export const validateIncomeName = (name: string): string | null => {
+  if (!name || name.trim().length === 0) {
+    return "Income name is required";
+  }
+  if (name.length > 100) {
+    return "Income name cannot exceed 100 characters";
+  }
+  return null;
+};
+
+export const validateIncomeAmount = (amount: number): string | null => {
+  if (!amount || amount <= 0) {
+    return "Income amount must be greater than 0";
+  }
+  if (amount > 999999999999999) {
+    return "Income amount is too large";
+  }
+  return null;
+};
+
+export const validateIncomeDescription = (
+  description: string
+): string | null => {
+  if (description && description.length > 500) {
+    return "Description cannot exceed 500 characters";
+  }
+  return null;
+};

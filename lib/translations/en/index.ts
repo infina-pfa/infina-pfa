@@ -10,6 +10,7 @@ import { authEn } from "./auth";
 import { chatEn } from "./chat";
 import { onboardingEn } from "./onboarding";
 import { budgetingEn } from "./budgeting";
+import { incomeEn } from "./income";
 
 export const enTranslations = {
   ...commonEn,
@@ -24,4 +25,5 @@ export const enTranslations = {
   ...chatEn,
   ...onboardingEn,
   ...budgetingEn,
+  ...incomeEn,
 };

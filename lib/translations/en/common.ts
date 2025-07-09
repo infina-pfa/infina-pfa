@@ -12,6 +12,7 @@ export const commonEn = {
   dashboard: "Dashboard",
   chat: "Chat",
   app: "Infina",
+  income: "Income",
 
   // Language
   language: "Language",

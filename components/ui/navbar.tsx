@@ -9,9 +9,11 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   LogOut,
   ChevronDown,
-  Sparkles,
-  Calculator,
-  Wrench,
+  PlusCircle,
+  BarChart3,
+  MessageCircle,
+  Home,
+  DollarSign,
 } from "lucide-react";
 import { FinaIcon } from "@/components/ui/fina-icon";
 import { useTranslation } from "react-i18next";
@@ -19,19 +21,29 @@ import { usePathname } from "next/navigation";
 
 const navigationItems = [
   {
-    key: "fina",
-    href: "/chat",
-    icon: Sparkles,
+    key: "dashboard",
+    href: "/",
+    icon: Home,
   },
   {
     key: "budgeting",
     href: "/budgeting",
-    icon: Calculator,
+    icon: BarChart3,
+  },
+  {
+    key: "income",
+    href: "/income",
+    icon: DollarSign,
+  },
+  {
+    key: "fina",
+    href: "/chat",
+    icon: MessageCircle,
   },
   {
     key: "tools",
     href: "/tools",
-    icon: Wrench,
+    icon: PlusCircle,
   },
 ];
 
