@@ -42,4 +42,15 @@ export const incomeVi = {
   // Actions
   incomeDeleteSuccess: "Xóa thu nhập thành công",
   incomeDeleteError: "Không thể xóa thu nhập",
+
+  // Success/Error Messages
+  incomeCreateSuccess: "Tạo thu nhập thành công",
+  incomeCreateError: "Không thể tạo thu nhập",
+  incomeUpdateSuccess: "Cập nhật thu nhập thành công",
+  incomeUpdateError: "Không thể cập nhật thu nhập",
+  updateIncome: "Cập nhật thu nhập",
+
+  // Additional fields
+  noCategory: "Không có danh mục",
+  descriptionPlaceholder: "Nhập mô tả (tùy chọn)",
 };

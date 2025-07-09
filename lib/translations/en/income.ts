@@ -42,4 +42,15 @@ export const incomeEn = {
   // Actions
   incomeDeleteSuccess: "Income deleted successfully",
   incomeDeleteError: "Failed to delete income",
+
+  // Success/Error Messages
+  incomeCreateSuccess: "Income created successfully",
+  incomeCreateError: "Failed to create income",
+  incomeUpdateSuccess: "Income updated successfully",
+  incomeUpdateError: "Failed to update income",
+  updateIncome: "Update Income",
+
+  // Additional fields
+  noCategory: "No category",
+  descriptionPlaceholder: "Enter description (optional)",
 };

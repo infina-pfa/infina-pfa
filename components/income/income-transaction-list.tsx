@@ -7,12 +7,14 @@ import { formatCurrency } from "@/lib/utils";
 
 interface IncomeTransactionListProps {
   incomes: Income[];
+  loading?: boolean;
   onCreateIncome: () => void;
   onEditIncome: (income: Income) => void;
 }
 
 export function IncomeTransactionList({
   incomes,
+  loading = false,
   onCreateIncome,
   onEditIncome,
 }: IncomeTransactionListProps) {
@@ -32,7 +34,8 @@ export function IncomeTransactionList({
         </h2>
         <Button
           onClick={onCreateIncome}
-          className="bg-[#0055FF] hover:bg-[#0041CC] text-white font-nunito px-6 py-3 rounded-[9999px] text-[14px] md:text-[16px] min-h-[44px] w-full sm:w-auto"
+          disabled={loading}
+          className="bg-[#0055FF] hover:bg-[#0041CC] text-white font-nunito px-6 py-3 rounded-[9999px] text-[14px] md:text-[16px] min-h-[44px] w-full sm:w-auto disabled:opacity-50"
         >
           {t("createIncome")}
         </Button>
@@ -40,7 +43,24 @@ export function IncomeTransactionList({
 
       {/* Transaction List - Mobile optimized */}
       <div className="space-y-0">
-        {incomes.length === 0 ? (
+        {loading ? (
+          // Loading skeleton
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 px-2">
+                  <div className="flex-1 mb-2 sm:mb-0">
+                    <div className="h-4 bg-[#E5E7EB] rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-[#E5E7EB] rounded w-1/2"></div>
+                  </div>
+                  <div className="text-left sm:text-right">
+                    <div className="h-4 bg-[#E5E7EB] rounded w-24"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : incomes.length === 0 ? (
           <div className="text-center py-8 md:py-12">
             <p className="text-[14px] md:text-[16px] text-[#6B7280] font-nunito mb-4">
               {t("noIncomeTransactions")}
@@ -78,7 +98,8 @@ export function IncomeTransactionList({
                   {income.name}
                 </h3>
                 <p className="text-[12px] md:text-[14px] text-[#6B7280] font-nunito">
-                  {formatDate(income.created_at)} • {income.description}
+                  {formatDate(income.created_at)} •{" "}
+                  {income.description || t("noCategory")}
                 </p>
               </div>
 
@@ -87,6 +108,15 @@ export function IncomeTransactionList({
                 <p className="text-[16px] md:text-[16px] font-bold text-[#111827] font-nunito break-words">
                   {formatCurrency(income.amount)}
                 </p>
+                {income.recurring > 0 && (
+                  <p className="text-[12px] text-[#6B7280] font-nunito">
+                    {income.recurring === 7 && t("weekly")}
+                    {income.recurring === 14 && t("biweekly")}
+                    {income.recurring === 30 && t("monthly")}
+                    {income.recurring === 90 && t("quarterly")}
+                    {income.recurring === 365 && t("yearly")}
+                  </p>
+                )}
               </div>
             </div>
           ))

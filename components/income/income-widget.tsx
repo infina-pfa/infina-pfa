@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Income } from "@/lib/types/income.types";
 import { formatCurrency } from "@/lib/utils";
+import { useIncomeListSWR } from "@/hooks/swr";
 
 // Import simplified components
 import { IncomeTransactionList } from "./income-transaction-list";
@@ -29,45 +29,18 @@ export function IncomeWidget({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState<Income | null>(null);
 
-  // Mock data for selected month
-  const mockIncomes: Income[] = [
-    {
-      id: "1",
-      user_id: "user-1",
-      name: "Software Engineer Salary",
-      amount: 8000000,
-      type: "income",
-      description: "Salary",
-      recurring: 30,
-      created_at: "2024-01-01T00:00:00Z",
-      updated_at: "2024-01-01T00:00:00Z",
-    },
-    {
-      id: "2",
-      user_id: "user-1",
-      name: "Freelance Project",
-      amount: 2500000,
-      type: "income",
-      description: "Freelance",
-      recurring: 0,
-      created_at: "2024-01-15T00:00:00Z",
-      updated_at: "2024-01-15T00:00:00Z",
-    },
-    {
-      id: "3",
-      user_id: "user-1",
-      name: "Investment Returns",
-      amount: 1200000,
-      type: "income",
-      description: "Investment",
-      recurring: 30,
-      created_at: "2024-01-20T00:00:00Z",
-      updated_at: "2024-01-20T00:00:00Z",
-    },
-  ];
+  // Get month/year for filtering
+  const month = selectedMonth.getMonth() + 1;
+  const year = selectedMonth.getFullYear();
+
+  // Fetch incomes using SWR
+  const { incomes, loading, error, refetch } = useIncomeListSWR({
+    month,
+    year,
+  });
 
   // Calculate total for selected month
-  const totalMonthIncome = mockIncomes.reduce(
+  const totalMonthIncome = incomes.reduce(
     (sum, income) => sum + income.amount,
     0
   );
@@ -76,6 +49,22 @@ export function IncomeWidget({
   const handleEditIncome = (income: Income) => {
     setSelectedIncome(income);
     setIsEditModalOpen(true);
+  };
+
+  // Handle income creation success
+  const handleIncomeCreated = async (income: Income) => {
+    await refetch(); // Refresh the list
+    if (onIncomeCreated) {
+      await onIncomeCreated(income);
+    }
+  };
+
+  // Handle income update success
+  const handleIncomeUpdated = async (income: Income) => {
+    await refetch(); // Refresh the list
+    if (onIncomeUpdated) {
+      await onIncomeUpdated(income);
+    }
   };
 
   return (
@@ -100,13 +89,25 @@ export function IncomeWidget({
             {t("totalSelectedMonthIncome")}
           </p>
           <p className="text-[24px] md:text-[32px] font-bold text-[#111827] font-nunito break-words">
-            {formatCurrency(totalMonthIncome)}
+            {loading ? (
+              <span className="animate-pulse bg-[#E5E7EB] h-8 w-48 rounded inline-block"></span>
+            ) : (
+              formatCurrency(totalMonthIncome)
+            )}
           </p>
         </div>
 
+        {/* Error State */}
+        {error && (
+          <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-[12px] p-4 mb-6 md:mb-8">
+            <p className="text-[#DC2626] text-[14px] font-nunito">{error}</p>
+          </div>
+        )}
+
         {/* Income Transactions List - Mobile optimized */}
         <IncomeTransactionList
-          incomes={mockIncomes}
+          incomes={incomes}
+          loading={loading}
           onCreateIncome={() => setIsCreateModalOpen(true)}
           onEditIncome={handleEditIncome}
         />
@@ -119,7 +120,7 @@ export function IncomeWidget({
         onSuccess={() => {
           setIsCreateModalOpen(false);
         }}
-        onIncomeCreated={onIncomeCreated}
+        onIncomeCreated={handleIncomeCreated}
       />
 
       <EditIncomeModal
@@ -133,7 +134,7 @@ export function IncomeWidget({
           setSelectedIncome(null);
         }}
         income={selectedIncome}
-        onIncomeUpdated={onIncomeUpdated}
+        onIncomeUpdated={handleIncomeUpdated}
       />
     </div>
   );

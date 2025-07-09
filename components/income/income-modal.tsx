@@ -1,32 +1,24 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { FormInput, FormTextarea } from "@/components/ui/form-input";
-import { MoneyInput } from "@/components/ui/money-input";
 import { useIncomeForm } from "@/hooks/use-income-form";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { Income } from "@/lib/types/income.types";
-import { IncomeCategorySelector } from "./income-category-selector";
-
-type IncomeModalMode = "create" | "edit";
+import { Dialog } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { FormInput } from "@/components/ui/form-input";
+import { MoneyInput } from "@/components/ui/money-input";
+import { INCOME_CATEGORIES, Income } from "@/lib/types/income.types";
 
 interface IncomeModalProps {
-  mode: IncomeModalMode;
+  mode: "create" | "edit";
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  income?: Income | null; // Only required for edit mode
+  income?: Income | null;
   onIncomeCreated?: (income: Income) => Promise<void>;
   onIncomeUpdated?: (income: Income) => Promise<void>;
 }
 
-export const IncomeModal = ({
+export function IncomeModal({
   mode,
   isOpen,
   onClose,
@@ -34,10 +26,9 @@ export const IncomeModal = ({
   income,
   onIncomeCreated,
   onIncomeUpdated,
-}: IncomeModalProps) => {
+}: IncomeModalProps) {
   const { t } = useAppTranslation(["income", "common"]);
 
-  // Use custom hook for form logic
   const {
     formData,
     validationErrors,
@@ -59,153 +50,204 @@ export const IncomeModal = ({
     onIncomeUpdated,
   });
 
-  // Don't render if in edit mode without income
-  if (mode === "edit" && !income) return null;
-
-  // Modal content configuration based on mode
-  const modalConfig = {
-    create: {
-      title: t("createIncome", { ns: "income" }),
-      description: t("createIncomeDesc", { ns: "income" }),
-      submitText: isLoading
-        ? t("creating", { ns: "common" })
-        : t("create", { ns: "common" }),
-    },
-    edit: {
-      title: t("editIncome", { ns: "income" }),
-      description: t("editIncomeDesc", { ns: "income" }),
-      submitText: isLoading
-        ? t("updating", { ns: "common" })
-        : t("update", { ns: "common" }),
-    },
-  };
-
-  const config = modalConfig[mode];
-
-  // Recurring period options
-  const recurringOptions = [
-    { value: "0", label: t("oneTime", { ns: "income" }) },
-    { value: "1", label: t("daily", { ns: "income" }) },
-    { value: "7", label: t("weekly", { ns: "income" }) },
-    { value: "14", label: t("biweekly", { ns: "income" }) },
-    { value: "30", label: t("monthly", { ns: "income" }) },
-    { value: "90", label: t("quarterly", { ns: "income" }) },
-    { value: "365", label: t("yearly", { ns: "income" }) },
-  ];
+  const title = mode === "create" ? t("createIncome") : t("editIncome");
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-[#FFFFFF] border-0 max-w-[90vw] sm:max-w-[640px] rounded-xl p-0 font-nunito max-h-[90vh] overflow-y-auto scrollbar-hide">
-        <div className="p-4 md:p-6">
-          <DialogHeader className="mb-4 md:mb-6">
-            <DialogTitle className="text-[18px] md:text-[20px] font-semibold text-[#111827] font-nunito leading-[24px] md:leading-[28px]">
-              {config.title}
-            </DialogTitle>
-          </DialogHeader>
+      {/* Mobile: Fullscreen, Desktop: Centered modal */}
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/50"
+          onClick={handleClose}
+          aria-hidden="true"
+        />
 
-          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-            {/* Income Name */}
-            <FormInput
-              label={t("incomeName", { ns: "income" })}
-              value={formData.name}
-              onChange={(value) => handleInputChange("name", value)}
-              onBlur={() => handleFieldBlur("name")}
-              placeholder={t("incomeNamePlaceholder", { ns: "income" })}
-              error={validationErrors.name}
-              touched={touched.name}
-              required
-            />
-
-            {/* Income Amount */}
-            <MoneyInput
-              label={t("incomeAmount", { ns: "income" })}
-              value={formData.amount || 0}
-              onChange={(value) =>
-                handleInputChange("amount", parseFormattedNumber(value))
-              }
-              onBlur={() => handleFieldBlur("amount")}
-              placeholder={t("incomeAmountPlaceholder", { ns: "income" })}
-              error={validationErrors.amount}
-              touched={touched.amount}
-              required
-            />
-
-            {/* Category Selection */}
-            <IncomeCategorySelector
-              selectedCategory={formData.category}
-              onCategoryChange={(category) =>
-                handleInputChange("category", category)
-              }
-            />
-
-            {/* Recurring Period */}
-            <div>
-              <label className="block text-[14px] font-bold text-[#111827] font-nunito mb-4">
-                {t("recurringPeriod", { ns: "income" })}
-              </label>
-              <select
-                value={formData.recurring.toString()}
-                onChange={(e) =>
-                  handleInputChange("recurring", parseInt(e.target.value))
-                }
-                className="h-12 w-full px-3 bg-transparent border-0 border-b border-[#E5E7EB] focus:border-[#0055FF] focus:outline-none font-nunito text-[14px] md:text-[16px]"
+        {/* Modal Content */}
+        <div className="relative bg-white w-full sm:w-auto sm:max-w-[480px] sm:mx-4 rounded-t-[12px] sm:rounded-[12px] max-h-[90vh] sm:max-h-[80vh] overflow-hidden">
+          {/* Header - Mobile optimized */}
+          <div className="flex items-center justify-between p-4 md:p-6 border-b border-[#E5E7EB]">
+            <h2 className="text-[20px] md:text-[24px] font-bold text-[#111827] font-nunito">
+              {title}
+            </h2>
+            <button
+              onClick={handleClose}
+              className="p-2 hover:bg-[#F9FAFB] rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label={t("close", { ns: "common" })}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {recurringOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <p className="text-[12px] text-[#6B7280] font-nunito mt-2">
-                {formData.recurring === 0
-                  ? t("oneTimeIncomeTooltip", { ns: "income" })
-                  : t("recurringIncomeTooltip", { ns: "income" })}
-              </p>
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
 
-            {/* Description */}
-            <FormTextarea
-              label={t("incomeDescription", { ns: "income" })}
-              value={formData.description || ""}
-              onChange={(value) => handleInputChange("description", value)}
-              onBlur={() => handleFieldBlur("description")}
-              placeholder={t("incomeDescriptionPlaceholder", { ns: "income" })}
-              error={validationErrors.description}
-              touched={touched.description}
-              rows={3}
-            />
+          {/* Form Content - Mobile optimized */}
+          <div className="overflow-y-auto max-h-[calc(90vh-140px)] sm:max-h-none">
+            <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-lg p-3">
+                  <p className="text-[#DC2626] text-[14px] font-nunito">
+                    {error}
+                  </p>
+                </div>
+              )}
 
-            {/* Error Display */}
-            {error && (
-              <div className="bg-[#FEF2F2] rounded-lg p-3 md:p-4">
-                <p className="text-[#F44336] text-[12px] md:text-[14px] font-nunito">
-                  {error}
-                </p>
+              {/* Income Name */}
+              <div>
+                <FormInput
+                  label={t("incomeName")}
+                  type="text"
+                  value={formData.name}
+                  onChange={(value) => handleInputChange("name", value)}
+                  onBlur={() => handleFieldBlur("name")}
+                  error={touched.name ? validationErrors.name : undefined}
+                  placeholder={t("incomeNamePlaceholder")}
+                  required
+                />
               </div>
-            )}
 
-            {/* Form Actions */}
-            <div className="flex flex-col sm:flex-row-reverse gap-3 pt-3 md:pt-4">
-              <Button
-                type="submit"
-                className="flex-1 h-10 md:h-12 bg-[#0055FF] hover:bg-[#0041CC] text-white font-nunito text-sm md:text-base"
-                disabled={isLoading}
-              >
-                {config.submitText}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                className="flex-1 h-10 md:h-12 text-sm md:text-base"
-                disabled={isLoading}
-              >
-                {t("cancel", { ns: "common" })}
-              </Button>
-            </div>
-          </form>
+              {/* Amount */}
+              <div>
+                <MoneyInput
+                  label={t("amount")}
+                  value={formData.amount}
+                  onChange={(value) =>
+                    handleInputChange(
+                      "amount",
+                      parseFormattedNumber(value.toString())
+                    )
+                  }
+                  onBlur={() => handleFieldBlur("amount")}
+                  error={touched.amount ? validationErrors.amount : undefined}
+                  placeholder={t("amountPlaceholder")}
+                  required
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-[14px] font-bold text-[#111827] font-nunito mb-1">
+                  {t("category")}
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) =>
+                    handleInputChange("category", e.target.value)
+                  }
+                  className="w-full h-12 px-3 bg-transparent border-0 border-b border-[#E5E7EB] focus:border-[#0055FF] focus:outline-none font-nunito text-[16px]"
+                  style={{
+                    WebkitAppearance: "none",
+                    MozAppearance: "none",
+                    appearance: "none",
+                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 8px center",
+                    backgroundSize: "20px",
+                  }}
+                >
+                  <option value={INCOME_CATEGORIES.SALARY}>
+                    {t("salary")}
+                  </option>
+                  <option value={INCOME_CATEGORIES.FREELANCE}>
+                    {t("freelance")}
+                  </option>
+                  <option value={INCOME_CATEGORIES.BUSINESS}>
+                    {t("business")}
+                  </option>
+                  <option value={INCOME_CATEGORIES.INVESTMENT}>
+                    {t("investment")}
+                  </option>
+                  <option value={INCOME_CATEGORIES.OTHER}>{t("other")}</option>
+                </select>
+              </div>
+
+              {/* Description */}
+              <div>
+                <FormInput
+                  label={t("description", { ns: "common" })}
+                  type="text"
+                  value={formData.description || ""}
+                  onChange={(value) => handleInputChange("description", value)}
+                  onBlur={() => handleFieldBlur("description")}
+                  error={
+                    touched.description
+                      ? validationErrors.description
+                      : undefined
+                  }
+                  placeholder={
+                    t("descriptionPlaceholder", { ns: "common" }) ||
+                    "Enter description"
+                  }
+                />
+              </div>
+
+              {/* Frequency */}
+              <div>
+                <label className="block text-[14px] font-bold text-[#111827] font-nunito mb-1">
+                  {t("frequency")}
+                </label>
+                <select
+                  value={formData.recurring.toString()}
+                  onChange={(e) =>
+                    handleInputChange("recurring", parseInt(e.target.value))
+                  }
+                  className="w-full h-12 px-3 bg-transparent border-0 border-b border-[#E5E7EB] focus:border-[#0055FF] focus:outline-none font-nunito text-[16px]"
+                  style={{
+                    WebkitAppearance: "none",
+                    MozAppearance: "none",
+                    appearance: "none",
+                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 8px center",
+                    backgroundSize: "20px",
+                  }}
+                >
+                  <option value="7">{t("weekly")}</option>
+                  <option value="14">{t("biweekly")}</option>
+                  <option value="30">{t("monthly")}</option>
+                  <option value="90">{t("quarterly")}</option>
+                  <option value="365">{t("yearly")}</option>
+                  <option value="0">{t("oneTime")}</option>
+                </select>
+              </div>
+
+              {/* Actions - Mobile optimized */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Button
+                  type="button"
+                  onClick={handleClose}
+                  disabled={isLoading}
+                  className="w-full sm:w-auto bg-white border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] font-nunito px-6 py-3 rounded-[9999px] min-h-[44px]"
+                >
+                  {t("cancel", { ns: "common" })}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full sm:w-auto bg-[#0055FF] hover:bg-[#0041CC] text-white font-nunito px-6 py-3 rounded-[9999px] min-h-[44px] disabled:opacity-50"
+                >
+                  {isLoading
+                    ? t("saving", { ns: "common" })
+                    : mode === "create"
+                    ? t("createIncome")
+                    : t("updateIncome", { ns: "income" })}
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
-      </DialogContent>
+      </div>
     </Dialog>
   );
-};
+}

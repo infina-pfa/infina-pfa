@@ -82,6 +82,10 @@ export function BudgetingWidget({
   const mappedTransactions: Transaction[] = useMemo(() => {
     if (!recentTransactions) return [];
 
+    console.log(
+      "🚀 ~ returnrecentTransactions.map ~ transaction:",
+      recentTransactions
+    );
     return recentTransactions.map((transaction) => ({
       id: transaction.id,
       name: transaction.name,
