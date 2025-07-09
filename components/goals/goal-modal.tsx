@@ -62,11 +62,11 @@ export function GoalModal({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[480px] p-0 font-nunito overflow-hidden">
         <DialogHeader className="pt-4 md:pt-6 pb-0">
-          <DialogTitle className="text-[20px] md:text-[24px] font-bold text-[#111827]">
+          <DialogTitle className="text-[20px] md:text-[24px] font-bold text-[#111827] font-nunito text-center">
             {title}
           </DialogTitle>
         </DialogHeader>
-        <div className="overflow-y-auto max-h-[calc(90vh-140px)] sm:max-h-[60vh]">
+        <div className="overflow-y-auto max-h-[calc(90vh-140px)] sm:max-h-[80vh]">
           <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-6">
             {/* Error Message */}
             {error && (
@@ -77,10 +77,11 @@ export function GoalModal({
 
             {/* Title */}
             <div>
-              <label className="block text-[14px] font-bold text-[#111827] mb-1">
+              <label className="block text-[14px] text-[#111827] mb-1">
                 {t("goalTitle")}
               </label>
               <Input
+                required
                 type="text"
                 value={formData.title}
                 onChange={(e) => handleInputChange("title", e.target.value)}
@@ -118,7 +119,7 @@ export function GoalModal({
               />
             </div>
 
-            <div>
+            {/* <div>
               <MoneyInput
                 label={t("currentAmount")}
                 value={formData.current_amount}
@@ -135,13 +136,12 @@ export function GoalModal({
                     : undefined
                 }
                 placeholder={t("currentAmountPlaceholder")}
-                required
               />
-            </div>
+            </div> */}
 
             {/* Due Date */}
             <div>
-              <label className="block text-[14px] font-bold text-[#111827] mb-1">
+              <label className="block text-[14px] text-[#111827] mb-1">
                 {t("dueDate")}
               </label>
               <Input
@@ -160,7 +160,7 @@ export function GoalModal({
 
             {/* Description */}
             <div>
-              <label className="block text-[14px] font-bold text-[#111827] mb-1">
+              <label className="block text-[14px] text-[#111827] mb-1">
                 {t("description")}
               </label>
               <textarea
@@ -180,7 +180,7 @@ export function GoalModal({
             </div>
 
             {/* Actions */}
-            <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4">
+            <DialogFooter className="flex flex-col sm:flex-row-reverse sm:justify-start gap-3 pt-4">
               <Button
                 type="submit"
                 disabled={isLoading}

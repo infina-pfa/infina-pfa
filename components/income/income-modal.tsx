@@ -60,7 +60,7 @@ export function IncomeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[480px] p-0 font-nunito overflow-hidden">
+      <DialogContent className="sm:max-w-[480px] p-0 font-nunito overflow-hidden border-0">
         <DialogHeader className="p-4 md:p-6">
           <DialogTitle className="text-[20px] md:text-[24px] font-bold text-[#111827]">
             {title}
@@ -155,7 +155,7 @@ export function IncomeModal({
             </div>
 
             {/* Actions */}
-            <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4">
+            <DialogFooter className="flex flex-col sm:flex-row-reverse gap-3 pt-4">
               <Button
                 type="submit"
                 disabled={isLoading}

@@ -26,9 +26,9 @@ export function IncomeTransactionList({
   };
 
   return (
-    <div className="bg-[#FFFFFF] rounded-[12px] p-4 md:p-6">
+    <div className="bg-[#FFFFFF] rounded-[12px] p-4">
       {/* Header with title and create button - Mobile responsive */}
-      <div className="flex flex-row justify-between items-center gap-4 mb-6">
+      <div className="flex flex-row justify-between items-center gap-4 mb-4">
         <h2 className="text-[20px] md:text-[24px] font-bold text-[#111827] font-nunito">
           {t("incomeTransactions")}
         </h2>
@@ -36,7 +36,7 @@ export function IncomeTransactionList({
           variant="ghost"
           onClick={onCreateIncome}
           disabled={loading}
-          className="text-[#0055FF] font-semibold pr-0 py-0"
+          className="text-[#0055FF] font-semibold p-2"
         >
           {t("createIncome")}
         </Button>

@@ -3,17 +3,17 @@ export const goalsVi = {
   goalsSummaryTitle: "Tổng Quan Mục Tiêu",
   totalGoals: "Tổng Số Mục Tiêu",
   completedGoals: "Mục Tiêu Đã Hoàn Thành",
-  currentAmount: "Hiện Tại",
-  targetAmount: "Mục Tiêu",
+  currentAmount: "Tổng số tiền",
+  targetAmount: "Số Tiền",
 
   // Goals List
   goalsList: "Mục Tiêu Tài Chính",
-  addNewGoal: "Thêm",
+  addNewGoal: "Thêm Mục Tiêu",
   noGoalsFound:
     "Không tìm thấy mục tiêu nào. Hãy tạo mục tiêu đầu tiên của bạn!",
 
   // Goal Card
-  dueDate: "Ngày Đáo Hạn",
+  dueDate: "Ngày kết thúc",
   progress: "Tiến Độ",
   completed: "Hoàn Thành",
   remaining: "Còn Lại",
@@ -32,7 +32,7 @@ export const goalsVi = {
   createGoal: "Tạo Mục Tiêu",
   editGoal: "Chỉnh Sửa Mục Tiêu",
   updateGoal: "Cập Nhật Mục Tiêu",
-  goalTitle: "Tên Mục Tiêu",
+  goalTitle: "Tên",
   description: "Mô Tả",
   goalTitlePlaceholder: "Dự phòng cho bản thân",
   currentAmountPlaceholder: "Hiện tại đang có bao nhiêu tiền",

@@ -101,7 +101,7 @@ export const useIncomeForm = ({
     return {
       amount: 0,
       category: INCOME_CATEGORIES.SALARY,
-      recurring: 0,
+      recurring: 30,
     };
   };
 

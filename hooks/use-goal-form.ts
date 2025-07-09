@@ -6,10 +6,7 @@ import {
   Goal,
   UpdateGoalRequest,
 } from "@/lib/types/goal.types";
-import {
-  amountValidator,
-  textValidator,
-} from "@/lib/validation/financial-validators";
+import { textValidator } from "@/lib/validation/financial-validators";
 import { useCallback, useEffect, useState } from "react";
 
 interface GoalFormData {
@@ -87,8 +84,8 @@ export const useGoalForm = ({
       return {
         title: goal.title,
         description: goal.description,
-        current_amount: goal.current_amount,
-        target_amount: goal.target_amount,
+        current_amount: goal.current_amount || 0,
+        target_amount: goal.target_amount || 0,
         due_date: goal.due_date,
       };
     }
@@ -148,22 +145,9 @@ export const useGoalForm = ({
       errors.title = t("goalTitleTooLong");
     }
 
-    // Validate current amount
-    if (!amountValidator.isPositive(formData.current_amount)) {
-      errors.current_amount = t("currentAmountPositive");
-    }
-
     // Validate target amount if provided
     if (formData.target_amount !== null && formData.target_amount <= 0) {
       errors.target_amount = t("targetAmountPositive");
-    }
-
-    // Validate target amount is greater than current amount
-    if (
-      formData.target_amount !== null &&
-      formData.current_amount > formData.target_amount
-    ) {
-      errors.target_amount = t("targetAmountGreaterThanCurrent");
     }
 
     // Validate description length if provided
