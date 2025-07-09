@@ -79,6 +79,7 @@ export const goalService = {
       );
 
       if (response.success && response.data) {
+        console.log("🚀 ~ response.data:", response.data);
         return {
           goals: response.data,
           error: null,

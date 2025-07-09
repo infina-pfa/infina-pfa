@@ -1,42 +1,31 @@
-import { Database } from "@/lib/supabase/database";
+import { Transaction } from "./transaction.types";
 
-// Database types
-export type Goal = Database["public"]["Tables"]["goals"]["Row"];
-export type GoalInsert = Database["public"]["Tables"]["goals"]["Insert"];
-export type GoalUpdate = Database["public"]["Tables"]["goals"]["Update"];
+export interface Goal {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  current_amount: number;
+  target_amount: number | null;
+  due_date: string | null;
+  created_at: string;
+  updated_at: string;
+  transactions?: Transaction[];
+}
 
-export type GoalTransaction =
-  Database["public"]["Tables"]["goal_transactions"]["Row"];
-export type GoalTransactionInsert =
-  Database["public"]["Tables"]["goal_transactions"]["Insert"];
-
-// Extended types for goal with transactions data
-export type GoalWithTransactions = Goal & {
-  transactions: Array<{
-    id: string;
-    name: string;
-    amount: number;
-    date: string;
-    type: string;
-    description: string | null;
-  }>;
-  progress: number; // Percentage of completion
-};
-
-// API Request/Response types
 export interface CreateGoalRequest {
   title: string;
-  target_amount?: number;
-  current_amount?: number;
   description?: string;
+  current_amount: number;
+  target_amount?: number;
   due_date?: string;
 }
 
 export interface UpdateGoalRequest {
   title?: string;
-  target_amount?: number;
-  current_amount?: number;
   description?: string;
+  current_amount?: number;
+  target_amount?: number;
   due_date?: string;
 }
 

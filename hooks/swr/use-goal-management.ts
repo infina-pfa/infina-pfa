@@ -1,38 +1,96 @@
-import { useGoalListSWR } from "./use-goal-list";
-import { useGoalCreateSWR } from "./use-goal-create";
-import { useGoalUpdateSWR } from "./use-goal-update";
-import { useGoalDeleteSWR } from "./use-goal-delete";
-import type { GoalFilters } from "@/lib/types/goal.types";
+"use client";
 
-interface UseGoalManagementSWRProps {
-  filters?: GoalFilters;
-}
+import { Goal } from "@/lib/types/goal.types";
+import { useState } from "react";
 
-export function useGoalManagementSWR({
-  filters,
-}: UseGoalManagementSWRProps = {}) {
-  const list = useGoalListSWR(filters);
-  const create = useGoalCreateSWR();
-  const update = useGoalUpdateSWR();
-  const remove = useGoalDeleteSWR();
+// Mock data for goals
+const mockGoals: Goal[] = [
+  {
+    id: "1",
+    user_id: "user1",
+    title: "Buy a new car",
+    description: "Save for a new car",
+    current_amount: 15000000,
+    target_amount: 30000000,
+    due_date: "2025-12-31",
+    created_at: "2023-01-01",
+    updated_at: "2023-01-01",
+    transactions: [
+      {
+        id: "t1",
+        name: "Salary deposit",
+        amount: 5000000,
+        type: "income",
+        description: "Monthly savings for car",
+        created_at: "2023-02-15",
+        updated_at: "2023-02-15",
+        user_id: "user1",
+        recurring: 0,
+      },
+      {
+        id: "t2",
+        name: "Bonus deposit",
+        amount: 10000000,
+        type: "income",
+        description: "Year-end bonus for car fund",
+        created_at: "2023-12-20",
+        updated_at: "2023-12-20",
+        user_id: "user1",
+        recurring: 0,
+      },
+    ],
+  },
+  {
+    id: "2",
+    user_id: "user1",
+    title: "Emergency fund",
+    description: "3 months of expenses",
+    current_amount: 20000000,
+    target_amount: 20000000,
+    due_date: "2023-06-30",
+    created_at: "2023-01-01",
+    updated_at: "2023-06-30",
+    transactions: [
+      {
+        id: "t3",
+        name: "Salary deposit",
+        amount: 5000000,
+        type: "income",
+        description: "Monthly savings for emergency",
+        created_at: "2023-02-15",
+        updated_at: "2023-02-15",
+        user_id: "user1",
+        recurring: 0,
+      },
+    ],
+  },
+  {
+    id: "3",
+    user_id: "user1",
+    title: "Wedding fund",
+    description: "Save for wedding expenses",
+    current_amount: 50000000,
+    target_amount: 100000000,
+    due_date: "2026-01-01",
+    created_at: "2023-01-01",
+    updated_at: "2023-01-01",
+    transactions: [],
+  },
+];
+
+export function useGoalManagementSWR() {
+  const [goals, setGoals] = useState<Goal[]>(mockGoals);
+  const [loading, setLoading] = useState(false);
+
+  // In a real implementation, this would use SWR to fetch goals from the API
+  // For now, we'll just return the mock data
 
   return {
-    // List operations
-    goals: list.goals,
-    loading: list.loading,
-    error: list.error || create.error || update.error || remove.error,
-    refetch: list.refetch,
-
-    // Create operations
-    createGoal: create.createGoal,
-    isCreating: create.isCreating,
-
-    // Update operations
-    updateGoal: update.updateGoal,
-    isUpdating: update.isUpdating,
-
-    // Delete operations
-    deleteGoal: remove.deleteGoal,
-    isDeleting: remove.isDeleting,
+    goals,
+    loading,
+    // These functions would be implemented in a real application
+    createGoal: () => console.log("Create goal"),
+    updateGoal: () => console.log("Update goal"),
+    deleteGoal: () => console.log("Delete goal"),
   };
 }

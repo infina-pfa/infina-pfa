@@ -29,6 +29,8 @@ import { onboardingVi } from "./translations/vi/onboarding";
 import { onboardingEn } from "./translations/en/onboarding";
 import { incomeVi } from "./translations/vi/income";
 import { incomeEn } from "./translations/en/income";
+import { goalsVi } from "./translations/vi/goals";
+import { goalsEn } from "./translations/en/goals";
 
 // Translation resources
 const resources = {
@@ -46,6 +48,7 @@ const resources = {
     chat: chatVi,
     onboarding: onboardingVi,
     income: incomeVi,
+    goals: goalsVi,
   },
   en: {
     common: commonEn,
@@ -61,6 +64,7 @@ const resources = {
     chat: chatEn,
     onboarding: onboardingEn,
     income: incomeEn,
+    goals: goalsEn,
   },
 };
 
