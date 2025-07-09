@@ -11,6 +11,10 @@ import { ResponseDataEvent } from "@/lib/types/chat.types";
 import { NextRequest, NextResponse } from "next/server";
 import { Message } from "openai/resources/beta/threads/messages.mjs";
 import { FunctionTool } from "openai/resources/responses/responses.mjs";
+import {
+  userContextService,
+  fetchUserFinancialContext,
+} from "@/lib/services/user-context.service";
 
 // Chat tools configuration
 const chatTools: ChatTool[] = [
@@ -125,7 +129,7 @@ const tools: FunctionTool[] = [
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, conversationHistory, userContext } = await request.json();
+    const { message, conversationHistory } = await request.json();
 
     if (!message) {
       return NextResponse.json(
@@ -155,43 +159,16 @@ export async function POST(request: NextRequest) {
     console.log("📝 Message:", message);
     console.log("💬 History Length:", conversationHistory?.length || 0);
 
-    // Prepare user context information
-    const contextInfo = userContext
-      ? `
-Thông tin người dùng:
-- User ID: ${user.id}
-- Thông tin tài chính người dùng:
-- Tổng thu nhập: ${
-          userContext.financial?.totalIncome
-            ? new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }).format(userContext.financial.totalIncome)
-            : "Chưa có dữ liệu"
-        }
-- Tổng chi tiêu: ${
-          userContext.financial?.totalExpenses
-            ? new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }).format(userContext.financial.totalExpenses)
-            : "Chưa có dữ liệu"
-        }
-- Số lượng ngân sách: ${userContext.financial?.currentBudgets || 0}
-- Đã hoàn thành onboarding: ${
-          userContext.financial?.hasCompletedOnboarding ? "Có" : "Không"
-        }
-
-Thông tin học tập:
-- Level hiện tại: ${userContext.learning?.currentLevel || 1}
-- Điểm kinh nghiệm: ${userContext.learning?.xp || 0}
-- Mục tiêu hiện tại: ${userContext.learning?.currentGoal || "Chưa có mục tiêu"}
-`
-      : `
-Thông tin người dùng:
-- User ID: ${user.id}
-- Chưa có thông tin context người dùng
-`;
+    // Get user context using the imported function
+    let contextInfo = "";
+    try {
+      const userContext = await fetchUserFinancialContext(supabase, user.id);
+      contextInfo = userContextService.formatUserContext(user.id, userContext);
+      console.log("✅ User context fetched successfully", contextInfo);
+    } catch (error) {
+      contextInfo = userContextService.formatUserContext(user.id);
+      console.error("⚠️ Failed to fetch user context:", error);
+    }
 
     // Prepare conversation history
     const historyContext =

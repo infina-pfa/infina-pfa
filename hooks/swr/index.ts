@@ -15,3 +15,6 @@ export { useIncomeUpdateSWR } from "./use-income-update";
 export { useIncomeDeleteSWR } from "./use-income-delete";
 export { useIncomeStatsSWR } from "./use-income-stats";
 export { useIncomeManagement } from "./use-income-management";
+
+// Financial overview hooks
+export { useFinancialOverviewSWR } from "./use-financial-overview";
