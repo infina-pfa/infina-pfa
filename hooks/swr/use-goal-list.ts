@@ -1,10 +1,10 @@
 import useSWR from "swr";
 import { goalService } from "@/lib/services/goal.service";
 import { useAppTranslation } from "@/hooks/use-translation";
-import type { GoalFilters, GoalWithTransactions } from "@/lib/types/goal.types";
+import type { GoalFilters, Goal } from "@/lib/types/goal.types";
 
 interface UseGoalListSWRReturn {
-  goals: GoalWithTransactions[];
+  goals: Goal[];
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;

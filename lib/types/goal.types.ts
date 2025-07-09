@@ -106,6 +106,6 @@ export interface AddTransactionToGoalRequest {
 
 export interface AddTransactionToGoalResponse {
   success: boolean;
-  goalTransaction: GoalTransaction | null;
+  goalTransaction: Transaction | null;
   error: string | null;
 }

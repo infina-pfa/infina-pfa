@@ -7,12 +7,11 @@ import {
   GoalListResponse,
   GoalFilters,
   GoalStats,
-  GoalWithTransactions,
   AddTransactionToGoalRequest,
   AddTransactionToGoalResponse,
-  GoalTransaction,
   Goal,
 } from "@/lib/types/goal.types";
+import { Transaction } from "../types/transaction.types";
 
 // Type for translation function
 type TranslationFunction = (
@@ -61,7 +60,7 @@ export const goalService = {
   async getAllWithTransactions(
     filters?: GoalFilters,
     t?: TranslationFunction
-  ): Promise<{ goals: GoalWithTransactions[]; error: string | null }> {
+  ): Promise<{ goals: Goal[]; error: string | null }> {
     try {
       const params: Record<string, string | number> = {};
 
@@ -73,10 +72,7 @@ export const goalService = {
       // Add parameter to request transactions data
       params.withTransactions = "1";
 
-      const response = await apiClient.get<GoalWithTransactions[]>(
-        "/goals",
-        params
-      );
+      const response = await apiClient.get<Goal[]>("/goals", params);
 
       if (response.success && response.data) {
         console.log("🚀 ~ response.data:", response.data);
@@ -103,9 +99,7 @@ export const goalService = {
    */
   async getById(id: string, t?: TranslationFunction): Promise<GoalResponse> {
     try {
-      const response = await apiClient.get<GoalWithTransactions>(
-        `/goals/${id}`
-      );
+      const response = await apiClient.get<Goal>(`/goals/${id}`);
 
       if (response.success && response.data) {
         return {
@@ -132,10 +126,7 @@ export const goalService = {
     t?: TranslationFunction
   ): Promise<GoalResponse> {
     try {
-      const response = await apiClient.post<GoalWithTransactions>(
-        "/goals",
-        data
-      );
+      const response = await apiClient.post<Goal>("/goals", data);
 
       if (response.success && response.data) {
         return {
@@ -163,10 +154,7 @@ export const goalService = {
     t?: TranslationFunction
   ): Promise<GoalResponse> {
     try {
-      const response = await apiClient.put<GoalWithTransactions>(
-        `/goals/${id}`,
-        data
-      );
+      const response = await apiClient.put<Goal>(`/goals/${id}`, data);
 
       if (response.success && response.data) {
         return {
@@ -294,7 +282,7 @@ export const goalService = {
     t?: TranslationFunction
   ): Promise<AddTransactionToGoalResponse> {
     try {
-      const response = await apiClient.post<GoalTransaction>(
+      const response = await apiClient.post<Transaction>(
         "/goals/transactions",
         data
       );

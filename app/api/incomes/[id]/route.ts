@@ -4,7 +4,7 @@ import { incomeValidator } from "@/lib/validation/financial-validators";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now();
   try {
@@ -26,7 +26,7 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Get single income transaction
     const { data: income, error } = await supabase
@@ -73,13 +73,16 @@ export async function GET(
     );
   } finally {
     const duration = Date.now() - startTime;
-    console.log(`GET /api/incomes/${params.id} duration: ${duration}ms`);
+    const resolvedParams = await params;
+    console.log(
+      `GET /api/incomes/${resolvedParams.id} duration: ${duration}ms`
+    );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now();
   try {
@@ -101,7 +104,7 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Parse request body
     const body = await request.json();
@@ -180,13 +183,16 @@ export async function PUT(
     );
   } finally {
     const duration = Date.now() - startTime;
-    console.log(`PUT /api/incomes/${params.id} duration: ${duration}ms`);
+    const resolvedParams = await params;
+    console.log(
+      `PUT /api/incomes/${resolvedParams.id} duration: ${duration}ms`
+    );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const startTime = Date.now();
   try {
@@ -208,7 +214,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Delete income transaction
     const { error } = await supabase
@@ -243,6 +249,9 @@ export async function DELETE(
     );
   } finally {
     const duration = Date.now() - startTime;
-    console.log(`DELETE /api/incomes/${params.id} duration: ${duration}ms`);
+    const resolvedParams = await params;
+    console.log(
+      `DELETE /api/incomes/${resolvedParams.id} duration: ${duration}ms`
+    );
   }
 }
