@@ -1,6 +1,13 @@
 import { supabase } from "@/lib/supabase";
 import { handleError } from "@/lib/error-handler";
-import { AuthUser, SignInRequest, SignUpRequest, AuthResponse, ForgotPasswordRequest, ResetPasswordRequest } from "@/lib/types/auth.types";
+import {
+  AuthUser,
+  SignInRequest,
+  SignUpRequest,
+  AuthResponse,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+} from "@/lib/types/auth.types";
 
 // Type for translation function
 type TranslationFunction = (key: string) => string;
@@ -11,7 +18,10 @@ export const authService = {
    */
   async getCurrentUser(): Promise<AuthUser | null> {
     try {
-      const { data: { user }, error } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
       if (error) throw error;
       return user as AuthUser | null;
     } catch (error) {
@@ -23,12 +33,17 @@ export const authService = {
   /**
    * Sign in with email and password
    */
-  async signIn(credentials: SignInRequest, t?: TranslationFunction): Promise<AuthResponse> {
+  async signIn(
+    credentials: SignInRequest,
+    t?: TranslationFunction
+  ): Promise<AuthResponse> {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword(credentials);
-      
+      const { data, error } = await supabase.auth.signInWithPassword(
+        credentials
+      );
+
       if (error) throw error;
-      
+
       return {
         user: data.user as AuthUser,
         error: null,
@@ -45,17 +60,20 @@ export const authService = {
   /**
    * Sign up with email and password
    */
-  async signUp(credentials: SignUpRequest, t?: TranslationFunction): Promise<AuthResponse> {
+  async signUp(
+    credentials: SignUpRequest,
+    t?: TranslationFunction
+  ): Promise<AuthResponse> {
     try {
       const { data, error } = await supabase.auth.signUp({
         ...credentials,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/verify`
-        }
+          emailRedirectTo: `${window.location.origin}/sign-in`,
+        },
       });
-      
+
       if (error) throw error;
-      
+
       return {
         user: data.user as AuthUser,
         error: null,
@@ -72,14 +90,20 @@ export const authService = {
   /**
    * Send password reset email
    */
-  async forgotPassword(request: ForgotPasswordRequest, t?: TranslationFunction): Promise<{ error: string | null }> {
+  async forgotPassword(
+    request: ForgotPasswordRequest,
+    t?: TranslationFunction
+  ): Promise<{ error: string | null }> {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(request.email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
-      });
-      
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        request.email,
+        {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        }
+      );
+
       if (error) throw error;
-      
+
       return { error: null };
     } catch (error) {
       const appError = handleError(error, t);
@@ -90,15 +114,18 @@ export const authService = {
   /**
    * Resend email verification
    */
-  async resendEmailVerification(email: string, t?: TranslationFunction): Promise<{ error: string | null }> {
+  async resendEmailVerification(
+    email: string,
+    t?: TranslationFunction
+  ): Promise<{ error: string | null }> {
     try {
       const { error } = await supabase.auth.resend({
-        type: 'signup',
+        type: "signup",
         email: email,
       });
-      
+
       if (error) throw error;
-      
+
       return { error: null };
     } catch (error) {
       const appError = handleError(error, t);
@@ -109,24 +136,27 @@ export const authService = {
   /**
    * Reset password with new password
    */
-  async resetPassword(request: ResetPasswordRequest, t?: TranslationFunction): Promise<{ error: string | null }> {
+  async resetPassword(
+    request: ResetPasswordRequest,
+    t?: TranslationFunction
+  ): Promise<{ error: string | null }> {
     try {
       // Validate passwords match
       if (request.password !== request.confirmPassword) {
-        throw new Error('Passwords do not match');
+        throw new Error("Passwords do not match");
       }
 
       // Validate password strength
       if (request.password.length < 6) {
-        throw new Error('Password must be at least 6 characters long');
+        throw new Error("Password must be at least 6 characters long");
       }
 
       const { error } = await supabase.auth.updateUser({
         password: request.password,
       });
-      
+
       if (error) throw error;
-      
+
       return { error: null };
     } catch (error) {
       const appError = handleError(error, t);
@@ -157,4 +187,4 @@ export const authService = {
       callback(session?.user as AuthUser | null);
     });
   },
-}; 
+};

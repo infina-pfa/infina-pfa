@@ -45,9 +45,9 @@ export default function VerifyEmailPage() {
 
         setState("success");
 
-        // Redirect to onboarding after a short delay
+        // Redirect to chat after a short delay
         setTimeout(() => {
-          router.push("/onboarding");
+          router.push("/chat");
         }, 3000);
       } catch (error) {
         console.error("Verification error:", error);
@@ -63,8 +63,8 @@ export default function VerifyEmailPage() {
     router.push("/auth/sign-in");
   };
 
-  const handleRetryOnboarding = () => {
-    router.push("/onboarding");
+  const handleRetryChat = () => {
+    router.push("/chat");
   };
 
   if (state === "loading") {
@@ -103,13 +103,13 @@ export default function VerifyEmailPage() {
             </p>
             <div className="space-y-4">
               <p className="text-sm text-[#6B7280] font-nunito">
-                {t("redirectingToOnboarding")}
+                {t("redirectingToChat")}
               </p>
               <Button
-                onClick={handleRetryOnboarding}
+                onClick={handleRetryChat}
                 className="w-full bg-[#0055FF] hover:bg-blue-700 text-white font-nunito"
               >
-                {t("continueToOnboarding")}
+                {t("continueToChat")}
               </Button>
             </div>
           </div>
