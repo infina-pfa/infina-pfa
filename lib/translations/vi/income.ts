@@ -6,17 +6,17 @@ export const incomeVi = {
   selectMonth: "Chọn tháng",
 
   // Total Income
-  totalSelectedMonthIncome: "Tổng thu nhập tháng được chọn",
+  totalSelectedMonthIncome: "Tổng thu nhập",
 
   // Transaction List
-  incomeTransactions: "Giao dịch thu nhập",
-  createIncome: "Tạo",
-  editIncome: "Chỉnh sửa thu nhập",
-  noIncomeTransactions: "Không có giao dịch thu nhập nào trong tháng này",
+  incomeTransactions: "Lịch sử",
+  createIncome: "Thêm thu nhập",
+  editIncome: "Chỉnh sửa",
+  noIncomeTransactions: "Không có lịch sử thu nhập nào trong tháng này",
   createFirstIncome: "Tạo thu nhập đầu tiên",
 
   // Form fields
-  incomeName: "Tên thu nhập",
+  incomeName: "Tên",
   amount: "Số tiền",
   category: "Danh mục",
   frequency: "Tần suất",

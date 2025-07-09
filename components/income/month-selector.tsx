@@ -11,7 +11,7 @@ export function MonthSelector({
   selectedMonth,
   onMonthChange,
 }: MonthSelectorProps) {
-  const { t, i18n } = useAppTranslation(["income", "common"]);
+  const { i18n } = useAppTranslation(["income"]);
 
   // Generate list of months (current month and 11 months back)
   const generateMonthOptions = () => {
@@ -72,9 +72,6 @@ export function MonthSelector({
 
   return (
     <div>
-      <label className="block text-[14px] font-bold text-[#111827] font-nunito mb-1">
-        {t("selectMonth")}
-      </label>
       <select
         value={getMonthValue(selectedMonth)}
         onChange={(e) => handleMonthChange(e.target.value)}

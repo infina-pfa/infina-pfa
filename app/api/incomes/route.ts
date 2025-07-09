@@ -130,12 +130,11 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { name, amount, description, recurring } = body;
+    const { amount, description, recurring } = body;
 
     // Validate input data
     try {
       incomeValidator.validateCreate({
-        name,
         amount,
         description,
         recurring,
@@ -157,10 +156,10 @@ export async function POST(request: NextRequest) {
     const { data: income, error } = await supabase
       .from("transactions")
       .insert({
+        name: "user income",
         user_id: user.id,
-        name: name.trim(),
         amount,
-        description: description?.trim() || null,
+        description: description,
         type: "income",
         recurring: recurring || 0,
       })

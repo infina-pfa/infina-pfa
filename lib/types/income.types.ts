@@ -7,16 +7,14 @@ export type Income = Transaction & {
 
 // API Request/Response types
 export interface CreateIncomeRequest {
-  name: string;
   amount: number;
-  description?: string; // Will contain category info
+  description: string; // Will contain category info
   recurring?: number; // 0 = one-time, 1 = daily, 7 = weekly, 30 = monthly, etc.
 }
 
 export interface UpdateIncomeRequest {
-  name?: string;
   amount?: number;
-  description?: string;
+  description: string;
   recurring?: number;
 }
 

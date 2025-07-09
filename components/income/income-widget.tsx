@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useIncomeListSWR } from "@/hooks/swr";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Income } from "@/lib/types/income.types";
 import { formatCurrency } from "@/lib/utils";
-import { useIncomeListSWR } from "@/hooks/swr";
+import { useState } from "react";
 
 // Import simplified components
-import { IncomeTransactionList } from "./income-transaction-list";
 import { CreateIncomeModal } from "./create-income-modal";
 import { EditIncomeModal } from "./edit-income-modal";
-import { MonthSelector } from "./month-selector";
+import { IncomeTransactionList } from "./income-transaction-list";
 
 interface IncomeWidgetProps {
   onIncomeCreated?: (income: Income) => Promise<void>;
@@ -24,7 +23,7 @@ export function IncomeWidget({
   const { t } = useAppTranslation(["income", "common"]);
 
   // State
-  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [selectedMonth] = useState(new Date());
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState<Income | null>(null);
@@ -76,12 +75,12 @@ export function IncomeWidget({
         </h1>
 
         {/* Month Selector - Mobile optimized */}
-        <div className="mb-6 md:mb-8">
+        {/* <div className="mb-6 md:mb-8">
           <MonthSelector
             selectedMonth={selectedMonth}
             onMonthChange={setSelectedMonth}
           />
-        </div>
+        </div> */}
 
         {/* Total Income - Mobile optimized */}
         <div className="bg-[#FFFFFF] rounded-[12px] p-4 md:p-6 mb-6 md:mb-8">

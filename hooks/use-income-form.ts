@@ -1,24 +1,18 @@
-import { useState, useEffect, useCallback } from "react";
 import { useIncomeCreateSWR, useIncomeUpdateSWR } from "@/hooks/swr";
 import { useToast } from "@/hooks/use-toast";
 import { useAppTranslation } from "@/hooks/use-translation";
 import {
-  Income,
   CreateIncomeRequest,
-  UpdateIncomeRequest,
+  Income,
   INCOME_CATEGORIES,
+  UpdateIncomeRequest,
 } from "@/lib/types/income.types";
-import {
-  validateIncomeName,
-  validateIncomeAmount,
-  validateIncomeDescription,
-} from "@/lib/validation/financial-validators";
+import { validateIncomeAmount } from "@/lib/validation/financial-validators";
+import { useCallback, useEffect, useState } from "react";
 
 interface IncomeFormData {
-  name: string;
   amount: number;
   category: string;
-  description: string | null;
   recurring: number;
 }
 
@@ -98,19 +92,15 @@ export const useIncomeForm = ({
       };
 
       return {
-        name: income.name,
         amount: income.amount,
         category: getCategoryFromDescription(income.description),
-        description: income.description,
         recurring: income.recurring,
       };
     }
 
     return {
-      name: "",
       amount: 0,
       category: INCOME_CATEGORIES.SALARY,
-      description: "",
       recurring: 0,
     };
   };
@@ -150,19 +140,9 @@ export const useIncomeForm = ({
   const validateForm = (): boolean => {
     const errors: IncomeFormValidationErrors = {};
 
-    // Validate name
-    const nameError = validateIncomeName(formData.name);
-    if (nameError) errors.name = nameError;
-
     // Validate amount
     const amountError = validateIncomeAmount(formData.amount);
     if (amountError) errors.amount = amountError;
-
-    // Validate description
-    if (formData.description) {
-      const descError = validateIncomeDescription(formData.description);
-      if (descError) errors.description = descError;
-    }
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -205,14 +185,10 @@ export const useIncomeForm = ({
     try {
       if (mode === "create") {
         // Build description with category included
-        const description = formData.description
-          ? `${formData.category}: ${formData.description}`
-          : formData.category;
 
         const createData: CreateIncomeRequest = {
-          name: formData.name,
           amount: formData.amount,
-          description,
+          description: formData.category,
           recurring: formData.recurring,
         };
 
@@ -224,14 +200,10 @@ export const useIncomeForm = ({
         }
       } else if (mode === "edit" && income) {
         // Build description with category included
-        const description = formData.description
-          ? `${formData.category}: ${formData.description}`
-          : formData.category;
 
         const updateData: UpdateIncomeRequest = {
-          name: formData.name,
           amount: formData.amount,
-          description,
+          description: formData.category,
           recurring: formData.recurring,
         };
 

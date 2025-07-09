@@ -105,12 +105,11 @@ export async function PUT(
 
     // Parse request body
     const body = await request.json();
-    const { name, amount, description, recurring } = body;
+    const { amount, description, recurring } = body;
 
     // Validate input data
     try {
       incomeValidator.validateUpdate({
-        name,
         amount,
         description,
         recurring,
@@ -131,10 +130,8 @@ export async function PUT(
     // Build update object with only provided fields
     const updateData: Record<string, string | number | null> = {};
 
-    if (name !== undefined) updateData.name = name.trim();
     if (amount !== undefined) updateData.amount = amount;
-    if (description !== undefined)
-      updateData.description = description?.trim() || null;
+    if (description !== undefined) updateData.description = description;
     if (recurring !== undefined) updateData.recurring = recurring;
 
     // Update income transaction

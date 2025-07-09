@@ -139,14 +139,10 @@ export const incomeValidator = {
    * Validate income creation data
    */
   validateCreate(data: {
-    name?: string;
     amount?: number;
     description?: string;
     recurring?: number;
   }): void {
-    textValidator.validateNotEmpty(data.name, "Income name");
-    textValidator.validateLength(data.name, 100, "Income name");
-
     amountValidator.validatePositive(data.amount, "Income");
 
     if (data.description) {
@@ -160,16 +156,10 @@ export const incomeValidator = {
    * Validate income update data
    */
   validateUpdate(data: {
-    name?: string;
     amount?: number;
     description?: string;
     recurring?: number;
   }): void {
-    if (data.name !== undefined) {
-      textValidator.validateNotEmpty(data.name, "Income name");
-      textValidator.validateLength(data.name, 100, "Income name");
-    }
-
     if (data.amount !== undefined) {
       amountValidator.validatePositive(data.amount, "Income");
     }
@@ -182,17 +172,6 @@ export const incomeValidator = {
       recurringValidator.validateRecurring(data.recurring);
     }
   },
-};
-
-// Individual validation functions for easier use in forms
-export const validateIncomeName = (name: string): string | null => {
-  if (!name || name.trim().length === 0) {
-    return "Income name is required";
-  }
-  if (name.length > 100) {
-    return "Income name cannot exceed 100 characters";
-  }
-  return null;
 };
 
 export const validateIncomeAmount = (amount: number): string | null => {
