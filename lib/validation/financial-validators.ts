@@ -14,7 +14,10 @@ export const amountValidator = {
   /**
    * Validate amount with custom error message
    */
-  validatePositive(amount: number | undefined | null, entityType: string): void {
+  validatePositive(
+    amount: number | undefined | null,
+    entityType: string
+  ): void {
     if (!this.isPositive(amount)) {
       throw new Error(`${entityType} amount must be greater than 0`);
     }
@@ -29,7 +32,7 @@ export const dateValidator = {
     const checkDate = new Date(date);
     const today = new Date();
     today.setHours(23, 59, 59, 999); // End of today
-    
+
     return checkDate <= today;
   },
 
@@ -54,7 +57,7 @@ export const dateValidator = {
    */
   validateRange(startDate: string | Date, endDate: string | Date): void {
     if (!this.isEndAfterStart(startDate, endDate)) {
-      throw new Error('End date must be after start date');
+      throw new Error("End date must be after start date");
     }
   },
 };
@@ -86,7 +89,11 @@ export const textValidator = {
   /**
    * Validate text length
    */
-  validateLength(text: string | undefined | null, maxLength: number, fieldName: string): void {
+  validateLength(
+    text: string | undefined | null,
+    maxLength: number,
+    fieldName: string
+  ): void {
     if (!this.isWithinLimit(text, maxLength)) {
       throw new Error(`${fieldName} cannot exceed ${maxLength} characters`);
     }
@@ -106,7 +113,82 @@ export const recurringValidator = {
    */
   validateMonth(month: number | undefined | null): void {
     if (month !== undefined && month !== null && !this.isValidMonth(month)) {
-      throw new Error('Recurring month must be between 1 and 12');
+      throw new Error("Recurring month must be between 1 and 12");
     }
   },
-}; 
+
+  /**
+   * Check if recurring period is valid (0 for one-time, positive for recurring)
+   */
+  isValidRecurring(recurring: number | undefined | null): boolean {
+    return recurring === undefined || recurring === null || recurring >= 0;
+  },
+
+  /**
+   * Validate recurring period
+   */
+  validateRecurring(recurring: number | undefined | null): void {
+    if (!this.isValidRecurring(recurring)) {
+      throw new Error("Recurring period must be 0 or greater");
+    }
+  },
+};
+
+export const incomeValidator = {
+  /**
+   * Validate income creation data
+   */
+  validateCreate(data: {
+    amount?: number;
+    description?: string;
+    recurring?: number;
+  }): void {
+    amountValidator.validatePositive(data.amount, "Income");
+
+    if (data.description) {
+      textValidator.validateLength(data.description, 500, "Income description");
+    }
+
+    recurringValidator.validateRecurring(data.recurring);
+  },
+
+  /**
+   * Validate income update data
+   */
+  validateUpdate(data: {
+    amount?: number;
+    description?: string;
+    recurring?: number;
+  }): void {
+    if (data.amount !== undefined) {
+      amountValidator.validatePositive(data.amount, "Income");
+    }
+
+    if (data.description !== undefined) {
+      textValidator.validateLength(data.description, 500, "Income description");
+    }
+
+    if (data.recurring !== undefined) {
+      recurringValidator.validateRecurring(data.recurring);
+    }
+  },
+};
+
+export const validateIncomeAmount = (amount: number): string | null => {
+  if (!amount || amount <= 0) {
+    return "Income amount must be greater than 0";
+  }
+  if (amount > 999999999999999) {
+    return "Income amount is too large";
+  }
+  return null;
+};
+
+export const validateIncomeDescription = (
+  description: string
+): string | null => {
+  if (description && description.length > 500) {
+    return "Description cannot exceed 500 characters";
+  }
+  return null;
+};

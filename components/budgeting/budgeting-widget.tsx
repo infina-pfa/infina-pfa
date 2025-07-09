@@ -81,7 +81,6 @@ export function BudgetingWidget({
   // Map API transactions to component's Transaction type
   const mappedTransactions: Transaction[] = useMemo(() => {
     if (!recentTransactions) return [];
-
     return recentTransactions.map((transaction) => ({
       id: transaction.id,
       name: transaction.name,

@@ -3,22 +3,29 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = await createClient();
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({
-        success: false,
-        error: "Authentication required"
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
+      );
     }
 
     // Get query parameters
     const { searchParams } = new URL(request.url);
-    const limit = searchParams.get('limit');
-    const budgetId = searchParams.get('budgetId');
+    const type = searchParams.get("type");
+    const limit = searchParams.get("limit");
+    const budgetId = searchParams.get("budgetId");
 
     let data, error;
 
@@ -26,7 +33,8 @@ export async function GET(request: NextRequest) {
     if (budgetId) {
       let budgetQuery = supabase
         .from("transactions")
-        .select(`
+        .select(
+          `
           *,
           budget_transactions!inner (
             budget_id,
@@ -34,9 +42,10 @@ export async function GET(request: NextRequest) {
               name
             )
           )
-        `)
+        `
+        )
         .eq("user_id", user.id)
-        .eq('budget_transactions.budget_id', budgetId)
+        .eq("budget_transactions.budget_id", budgetId)
         .order("created_at", { ascending: false });
 
       // Apply limit if provided
@@ -53,7 +62,8 @@ export async function GET(request: NextRequest) {
     } else {
       let query = supabase
         .from("transactions")
-        .select(`
+        .select(
+          `
           *,
           budget_transactions (
             budget_id,
@@ -62,8 +72,10 @@ export async function GET(request: NextRequest) {
               color
             )
           )
-        `)
+        `
+        )
         .eq("user_id", user.id)
+        .eq("type", type || "outcome")
         .order("created_at", { ascending: false });
 
       // Apply limit if provided
@@ -81,16 +93,22 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("Error fetching transactions:", error);
-      return NextResponse.json({
-        success: false,
-        error: "Failed to fetch transactions"
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to fetch transactions",
+        },
+        { status: 500 }
+      );
     }
 
     // Transform data to include budget name and color
-    const transformedData = data?.map(transaction => {
+    const transformedData = data?.map((transaction) => {
       // For transactions with budget info
-      if (transaction.budget_transactions && transaction.budget_transactions.length > 0) {
+      if (
+        transaction.budget_transactions &&
+        transaction.budget_transactions.length > 0
+      ) {
         const budgetInfo = transaction.budget_transactions[0];
         return {
           id: transaction.id,
@@ -105,7 +123,7 @@ export async function GET(request: NextRequest) {
           budgetColor: budgetInfo.budgets?.color || "#0055FF",
           created_at: transaction.created_at,
         };
-      } 
+      }
       // For transactions without budget info
       return {
         id: transaction.id,
@@ -123,30 +141,38 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: transformedData || []
+      data: transformedData || [],
     });
-
   } catch (error) {
     console.error("Error in transactions GET:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Internal server error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = await createClient();
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({
-        success: false,
-        error: "Authentication required"
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
+      );
     }
 
     // Parse request body
@@ -155,24 +181,34 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!name?.trim()) {
-      return NextResponse.json({
-        success: false,
-        error: "Transaction name is required"
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Transaction name is required",
+        },
+        { status: 400 }
+      );
     }
 
     if (!amount || amount <= 0) {
-      return NextResponse.json({
-        success: false,
-        error: "Amount must be greater than 0"
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Amount must be greater than 0",
+        },
+        { status: 400 }
+      );
     }
 
-    if (!type || !['income', 'outcome', 'transfer'].includes(type)) {
-      return NextResponse.json({
-        success: false,
-        error: "Valid transaction type is required (income, outcome, transfer)"
-      }, { status: 400 });
+    if (!type || !["income", "outcome", "transfer"].includes(type)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Valid transaction type is required (income, outcome, transfer)",
+        },
+        { status: 400 }
+      );
     }
 
     // If budgetId is provided, verify budget exists and belongs to user
@@ -185,10 +221,13 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (budgetError || !budget) {
-        return NextResponse.json({
-          success: false,
-          error: "Budget not found"
-        }, { status: 404 });
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Budget not found",
+          },
+          { status: 404 }
+        );
       }
     }
 
@@ -200,7 +239,7 @@ export async function POST(request: NextRequest) {
       description: description?.trim() || null,
       type,
       recurring: 0,
-      ...(date && { created_at: new Date(date).toISOString() })
+      ...(date && { created_at: new Date(date).toISOString() }),
     };
 
     const { data: transaction, error: transactionError } = await supabase
@@ -211,10 +250,13 @@ export async function POST(request: NextRequest) {
 
     if (transactionError) {
       console.error("Error creating transaction:", transactionError);
-      return NextResponse.json({
-        success: false,
-        error: "Failed to create transaction"
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to create transaction",
+        },
+        { status: 500 }
+      );
     }
 
     let budgetTransaction = null;
@@ -233,40 +275,48 @@ export async function POST(request: NextRequest) {
 
       if (linkError) {
         // If linking fails, delete the transaction to maintain consistency
-        await supabase
-          .from("transactions")
-          .delete()
-          .eq("id", transaction.id);
-        
+        await supabase.from("transactions").delete().eq("id", transaction.id);
+
         console.error("Error linking transaction to budget:", linkError);
-        return NextResponse.json({
-          success: false,
-          error: "Failed to link transaction to budget"
-        }, { status: 500 });
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Failed to link transaction to budget",
+          },
+          { status: 500 }
+        );
       }
 
       budgetTransaction = bt;
 
       // Return both transaction and budget transaction for expense creation
-      return NextResponse.json({
-        success: true,
-        data: {
-          transaction,
-          budgetTransaction
-        }
-      }, { status: 201 });
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            transaction,
+            budgetTransaction,
+          },
+        },
+        { status: 201 }
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: transaction
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        data: transaction,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error in transactions POST:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Internal server error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   }
-} 
+}

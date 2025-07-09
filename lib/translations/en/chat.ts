@@ -76,12 +76,51 @@ export const chatEn = {
   unknownComponentDescription: "A helpful tool for managing your finances",
 
   // Chat Suggestions (default ones)
-  suggestions: {
+  suggestionOptions: {
     budgetHelp: "Help me create a monthly budget",
     savingsGoal: "How can I save more money?",
     investmentAdvice: "What should I invest in?",
     debtManagement: "How to pay off my debt faster?",
     emergencyFund: "How much should I save for emergencies?",
     retirementPlanning: "Help me plan for retirement",
+  },
+
+  // Chat UI (additional)
+  loadingMessages: "Loading messages...",
+  noMessages: "No messages yet",
+  typingIndicator: "Finny is typing...",
+
+  // AI Advisor Context
+  aiAdvisorContext: {
+    title: "Finny - Your Financial Advisor",
+    description: "Ask me anything about your finances",
+    placeholder: "Ask Finny a question...",
+    loadingResponse: "Thinking...",
+    errorMessage: "Sorry, I couldn't process your request",
+
+    // Context information translations
+    userInfo: "User Information",
+    userId: "User ID",
+    noContextData: "No context data available",
+
+    financialInfo: "Financial Information",
+    totalIncome: "Total Income",
+    totalExpenses: "Total Expenses",
+    budgetCount: "Budget Count",
+    completedOnboarding: "Completed Onboarding",
+    noData: "No data available",
+    yes: "Yes",
+    no: "No",
+
+    learningInfo: "Learning Information",
+    currentLevel: "Current Level",
+    experiencePoints: "Experience Points",
+    currentGoal: "Current Goal",
+    noGoal: "No goal set",
+
+    conversationHistory: "Conversation History",
+    firstConversation: "This is the first conversation.",
+    user: "User",
+    ai: "AI",
   },
 };
