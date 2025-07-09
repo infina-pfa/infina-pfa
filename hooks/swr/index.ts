@@ -18,3 +18,10 @@ export { useIncomeManagement } from "./use-income-management";
 
 // Financial overview hooks
 export { useFinancialOverviewSWR } from "./use-financial-overview";
+
+// Goal management hooks
+export { useGoalListSWR } from "./use-goal-list";
+export { useGoalCreateSWR } from "./use-goal-create";
+export { useGoalUpdateSWR } from "./use-goal-update";
+export { useGoalDeleteSWR } from "./use-goal-delete";
+export { useGoalManagementSWR } from "./use-goal-management";
