@@ -22,28 +22,35 @@ export default function VerifyEmailPage() {
     const verifyEmail = async () => {
       try {
         // Get tokens from URL params (Supabase auth flow)
-        const tokenHash = searchParams.get("token_hash");
+        const token = searchParams.get("token");
         const type = searchParams.get("type");
 
-        if (!tokenHash || type !== "signup") {
+        console.log("🚀 ~ verifyEmail ~ token:", token);
+        console.log("🚀 ~ verifyEmail ~ type:", type);
+
+        if (!token || type !== "signup") {
           throw new Error("Invalid verification link");
         }
 
-        // Verify the email using Supabase
+        // Verify the email using Supabase with PKCE token
         const { error } = await supabase.auth.verifyOtp({
-          token_hash: tokenHash,
+          token_hash: token,
           type: "signup",
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error("Verification error:", error);
+          throw error;
+        }
 
         setState("success");
 
         // Redirect to onboarding after a short delay
         setTimeout(() => {
-          router.push("/chat");
+          router.push("/onboarding");
         }, 3000);
       } catch (error) {
+        console.error("Verification error:", error);
         setState("error");
         setError(error instanceof Error ? error.message : t("unexpectedError"));
       }
