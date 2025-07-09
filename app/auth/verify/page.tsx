@@ -41,7 +41,7 @@ export default function VerifyEmailPage() {
 
         // Redirect to onboarding after a short delay
         setTimeout(() => {
-          router.push("/onboarding");
+          router.push("/chat");
         }, 3000);
       } catch (error) {
         setState("error");

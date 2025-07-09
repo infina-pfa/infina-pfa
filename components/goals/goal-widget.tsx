@@ -1,13 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import { useGoalManagementSWR } from "@/hooks/swr";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { formatCurrency } from "@/lib/utils";
-import { GoalList, GoalTransactionList } from "./";
+import { Goal } from "@/lib/types/goal.types";
+import {
+  GoalList,
+  GoalTransactionList,
+  CreateGoalModal,
+  EditGoalModal,
+} from "./";
 
 export function GoalWidget() {
   const { t } = useAppTranslation(["goals", "common"]);
-  const { goals, loading } = useGoalManagementSWR();
+  const { goals, loading, deleteGoal } = useGoalManagementSWR();
+
+  // Modal states
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
 
   // Calculate summary data
   const totalCurrentAmount = goals.reduce(
@@ -26,18 +38,45 @@ export function GoalWidget() {
 
   // Handle create goal
   const handleCreateGoal = () => {
-    console.log("Opening create goal modal");
+    setIsCreateModalOpen(true);
   };
 
   // Handle edit goal
   const handleEditGoal = (goalId: string) => {
-    console.log("Opening edit goal modal for goal:", goalId);
+    const goal = goals.find((g) => g.id === goalId);
+    if (goal) {
+      setSelectedGoal(goal);
+      setIsEditModalOpen(true);
+    }
   };
 
   // Handle delete goal
-  const handleDeleteGoal = (goalId: string) => {
-    console.log("Deleting goal:", goalId);
-    // In a real implementation, this would call the delete function from the hook
+  const handleDeleteGoal = async (goalId: string) => {
+    try {
+      await deleteGoal(goalId);
+    } catch (error) {
+      console.error("Error deleting goal:", error);
+    }
+  };
+
+  // Handle modal close
+  const handleCloseCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedGoal(null);
+  };
+
+  // Handle modal success
+  const handleCreateSuccess = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const handleEditSuccess = () => {
+    setIsEditModalOpen(false);
+    setSelectedGoal(null);
   };
 
   return (
@@ -79,6 +118,21 @@ export function GoalWidget() {
           />
         </div>
       </div>
+
+      {/* Create Goal Modal */}
+      <CreateGoalModal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        onSuccess={handleCreateSuccess}
+      />
+
+      {/* Edit Goal Modal */}
+      <EditGoalModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSuccess={handleEditSuccess}
+        goal={selectedGoal}
+      />
     </div>
   );
 }

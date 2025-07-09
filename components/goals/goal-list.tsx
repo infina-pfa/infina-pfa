@@ -52,13 +52,13 @@ export function GoalList({
           <p className="text-[#6B7280] font-nunito">{t("noGoalsFound")}</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
           {goals.map((goal) => (
             <GoalCard
               key={goal.id}
               goal={goal}
               onEdit={() => onEditGoal(goal.id)}
-              onDelete={() => onDeleteGoal(goal.id)}
+              // onDelete={() => onDeleteGoal(goal.id)}
             />
           ))}
         </div>

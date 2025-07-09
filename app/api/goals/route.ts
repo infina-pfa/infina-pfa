@@ -1,9 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
-import { Goal } from "@/lib/types/goal.types";
 
-// Define interface for goal with transactions
-interface GoalWithTransactions extends Goal {
+// Define interface for database goal with transactions
+interface DbGoalWithTransactions {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  current_amount: number;
+  target_amount: number | null;
+  due_date: string | null;
+  created_at: string;
+  updated_at: string;
   goal_transactions?: Array<{
     transaction_id: string;
     transactions: {
@@ -38,58 +46,44 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get query parameters for filtering
+    // Get query parameters for filtering and pagination
     const { searchParams } = new URL(request.url);
-    const completed = searchParams.get("completed") === "1";
-    const upcoming = searchParams.get("upcoming") === "1";
     const withTransactions = searchParams.get("withTransactions") === "1";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
 
-    // Build query - include transactions data if requested
-    let selectClause = "*";
+    // Calculate pagination offsets
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    // Select only necessary fields for better performance
+    let selectFields =
+      "id, user_id, title, description, current_amount, target_amount, due_date, created_at, updated_at";
+
+    // Build query with optimized field selection
     if (withTransactions) {
-      selectClause = `
-        *,
+      // Only fetch a limited number of recent transactions for each goal
+      selectFields = `
+        ${selectFields},
         goal_transactions (
           transaction_id,
           transactions (
-            id,
-            name,
-            amount,
-            created_at,
-            type,
-            description
+            id, name, amount, created_at, type, description
           )
         )
       `;
     }
 
-    let query = supabase
+    // Use range for pagination
+    const query = supabase
       .from("goals")
-      .select(selectClause)
+      .select(selectFields, { count: "exact" })
       .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
-    // Apply filters
-    if (completed) {
-      // A goal is completed when current_amount >= target_amount
-      query = query.gte(
-        "current_amount",
-        supabase.rpc("get_column", { column_name: "target_amount" })
-      );
-    }
-
-    if (upcoming) {
-      // Get goals with due dates within the next 30 days
-      const today = new Date();
-      const thirtyDaysFromNow = new Date();
-      thirtyDaysFromNow.setDate(today.getDate() + 30);
-
-      query = query
-        .lte("due_date", thirtyDaysFromNow.toISOString())
-        .gte("due_date", today.toISOString());
-    }
-
-    const { data: goals, error } = await query;
+    // Execute the query
+    const { data: goals, error, count } = await query;
 
     if (error) {
       console.error("Error fetching goals:", error);
@@ -102,14 +96,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // If withTransactions is requested, calculate progress data
-    if (withTransactions && goals) {
-      // Cast goals to unknown first to avoid TypeScript error
-      const goalsWithTransactions = (
-        goals as unknown as GoalWithTransactions[]
-      ).map((goal) => {
+    // If withTransactions is requested, process the transactions data efficiently
+    if (withTransactions && goals && goals.length > 0) {
+      // Use type assertion since we know the structure
+      const typedGoals = goals as unknown as DbGoalWithTransactions[];
+
+      const goalsWithTransactions = typedGoals.map((goal) => {
+        // Process only the transactions we need
         const transactions =
-          goal.goal_transactions?.map((gt) => ({
+          goal.goal_transactions?.slice(0, 10).map((gt) => ({
             id: gt.transactions.id,
             name: gt.transactions.name,
             amount: gt.transactions.amount,
@@ -118,7 +113,7 @@ export async function GET(request: NextRequest) {
             description: gt.transactions.description,
           })) || [];
 
-        // Calculate progress percentage
+        // Calculate progress percentage efficiently
         const progress = goal.target_amount
           ? Math.min(
               100,
@@ -126,8 +121,17 @@ export async function GET(request: NextRequest) {
             )
           : 0;
 
+        // Return only what we need
         return {
-          ...goal,
+          id: goal.id,
+          user_id: goal.user_id,
+          title: goal.title,
+          description: goal.description,
+          current_amount: goal.current_amount,
+          target_amount: goal.target_amount,
+          due_date: goal.due_date,
+          created_at: goal.created_at,
+          updated_at: goal.updated_at,
           transactions,
           progress,
         };
@@ -136,12 +140,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         data: goalsWithTransactions,
+        pagination: {
+          page,
+          pageSize,
+          total: count || goalsWithTransactions.length,
+        },
       });
     }
 
     return NextResponse.json({
       success: true,
       data: goals || [],
+      pagination: {
+        page,
+        pageSize,
+        total: count || 0,
+      },
     });
   } catch (error) {
     console.error("Error in goals GET:", error);

@@ -5,16 +5,14 @@ import { formatCurrency } from "@/lib/utils";
 import { formatDateVN } from "@/lib/utils/date-formatter";
 import { Goal } from "@/lib/types/goal.types";
 import { ProgressBar } from "@/components/budgeting/progress-bar";
-import { Edit, Trash2 } from "lucide-react";
 import { useAppTranslation } from "@/hooks/use-translation";
 
 interface GoalCardProps {
   goal: Goal;
   onEdit: () => void;
-  onDelete: () => void;
 }
 
-export function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
+export function GoalCard({ goal, onEdit }: GoalCardProps) {
   const { t } = useAppTranslation(["goals"]);
 
   // Calculate progress percentage
@@ -25,19 +23,14 @@ export function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
       )
     : 0;
 
-  // Calculate remaining amount
-  const remainingAmount = goal.target_amount
-    ? Math.max(0, goal.target_amount - goal.current_amount)
-    : 0;
-
-  // Check if goal is completed
-  const isCompleted =
-    goal.target_amount && goal.current_amount >= goal.target_amount;
-
   return (
-    <Card className="p-4 md:p-5 border-0 bg-[#FFFFFF] rounded-[12px] shadow-none">
+    <Card
+      className="p-0 border-0 bg-[#FFFFFF] rounded-[12px] shadow-none cursor-pointer hover:bg-[#F0F2F5] transition-colors gap-2"
+      onClick={onEdit}
+    >
+      {/* Top section - horizontal layout with title and current value */}
       <div className="flex justify-between items-start">
-        <div>
+        <div className="flex-1">
           <h3 className="font-semibold text-[16px] md:text-[18px] text-[#111827] font-nunito">
             {goal.title}
           </h3>
@@ -47,53 +40,29 @@ export function GoalCard({ goal, onEdit, onDelete }: GoalCardProps) {
             </p>
           )}
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={onEdit}
-            className="p-1 rounded-full hover:bg-[#F0F2F5]"
-            aria-label={t("edit")}
-          >
-            <Edit className="h-4 w-4 text-[#6B7280]" />
-          </button>
-          <button
-            onClick={onDelete}
-            className="p-1 rounded-full hover:bg-[#F0F2F5]"
-            aria-label={t("delete")}
-          >
-            <Trash2 className="h-4 w-4 text-[#6B7280]" />
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-4">
-        <div className="flex justify-between text-[12px] md:text-[14px] mb-1 font-nunito">
-          <span className="text-[#6B7280]">{t("progress")}</span>
-          <span className="text-[#111827] font-medium">
-            {progressPercentage}%
-          </span>
-        </div>
-        <ProgressBar value={progressPercentage} color="#0055FF" />
-      </div>
-
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <div className="p-3 bg-[#F0F2F5] rounded-[8px]">
-          <p className="text-[12px] text-[#6B7280] font-nunito mb-1">
-            {isCompleted ? t("completed") : t("currentAmount")}
+        <div className="flex flex-col items-end">
+          <p className="text-[12px] text-[#6B7280] font-nunito">
+            {t("currentAmount")}
           </p>
-          <p className="font-semibold text-[14px] md:text-[16px] text-[#111827] font-nunito">
+          <p className="font-semibold text-[16px] md:text-[18px] text-[#111827] font-nunito">
             {formatCurrency(goal.current_amount)}
           </p>
         </div>
-        <div className="p-3 bg-[#F0F2F5] rounded-[8px]">
-          <p className="text-[12px] text-[#6B7280] font-nunito mb-1">
-            {isCompleted ? t("targetAmount") : t("remaining")}
+      </div>
+
+      {/* Middle section - full-width progress bar */}
+      <ProgressBar className="" value={progressPercentage} color="#0055FF" />
+
+      {/* Bottom section - horizontal layout with target amount and progress percentage */}
+      <div className="flex justify-between items-center">
+        <div>
+          <p className="text-[14px] text-[#6B7280] font-nunito">
+            {t("targetAmount")}: {formatCurrency(goal.target_amount || 0)}
           </p>
-          <p className="font-semibold text-[14px] md:text-[16px] text-[#111827] font-nunito">
-            {formatCurrency(
-              isCompleted && goal.target_amount
-                ? goal.target_amount
-                : remainingAmount
-            )}
+        </div>
+        <div>
+          <p className="text-[14px] font-medium text-[#2ECC71] font-nunito">
+            {t("completed")} {progressPercentage}%
           </p>
         </div>
       </div>

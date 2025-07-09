@@ -24,4 +24,8 @@ export { useFinancialOverviewSWR } from "./use-financial-overview";
 export { useRecentTransactionsSWR } from "./use-recent-transactions";
 
 // Goal hooks
+export { useGoalListSWR } from "./use-goal-list";
+export { useGoalCreateSWR } from "./use-goal-create";
+export { useGoalUpdateSWR } from "./use-goal-update";
+export { useGoalDeleteSWR } from "./use-goal-delete";
 export { useGoalManagementSWR } from "./use-goal-management";
