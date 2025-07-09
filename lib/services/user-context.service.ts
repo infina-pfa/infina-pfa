@@ -60,15 +60,8 @@ interface FinancialContext {
   }>;
 }
 
-interface LearningContext {
-  currentLevel?: number;
-  xp?: number;
-  currentGoal?: string;
-}
-
 export interface UserContext {
   financial?: FinancialContext;
-  learning?: LearningContext;
 }
 
 /**
