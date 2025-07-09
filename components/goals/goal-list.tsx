@@ -10,7 +10,7 @@ interface GoalListProps {
   goals: Goal[];
   onCreateGoal: () => void;
   onEditGoal: (goalId: string) => void;
-  onDeleteGoal: (goalId: string) => void;
+  // onDeleteGoal: (goalId: string) => void;
   loading?: boolean;
 }
 
@@ -18,7 +18,7 @@ export function GoalList({
   goals,
   onCreateGoal,
   onEditGoal,
-  onDeleteGoal,
+  // onDeleteGoal,
   loading = false,
 }: GoalListProps) {
   const { t } = useAppTranslation(["goals"]);

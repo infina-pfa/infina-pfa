@@ -14,7 +14,7 @@ import {
 
 export function GoalWidget() {
   const { t } = useAppTranslation(["goals", "common"]);
-  const { goals, loading, deleteGoal } = useGoalManagementSWR();
+  const { goals, loading } = useGoalManagementSWR();
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -51,13 +51,13 @@ export function GoalWidget() {
   };
 
   // Handle delete goal
-  const handleDeleteGoal = async (goalId: string) => {
-    try {
-      await deleteGoal(goalId);
-    } catch (error) {
-      console.error("Error deleting goal:", error);
-    }
-  };
+  // const handleDeleteGoal = async (goalId: string) => {
+  //   try {
+  //     await deleteGoal(goalId);
+  //   } catch (error) {
+  //     console.error("Error deleting goal:", error);
+  //   }
+  // };
 
   // Handle modal close
   const handleCloseCreateModal = () => {
@@ -106,7 +106,7 @@ export function GoalWidget() {
           goals={goals}
           onCreateGoal={handleCreateGoal}
           onEditGoal={handleEditGoal}
-          onDeleteGoal={handleDeleteGoal}
+          // onDeleteGoal={handleDeleteGoal}
           loading={loading}
         />
 
