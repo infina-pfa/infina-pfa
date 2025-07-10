@@ -228,6 +228,137 @@ export class AIAdvisorOrchestratorService {
   }
 
   /**
+   * Safely parse function call arguments with comprehensive validation and error handling
+   */
+  private parseToolArguments(callId: string, argumentsStr: string): Record<string, unknown> {
+    // Trim whitespace and check for empty string
+    const trimmedArgs = argumentsStr.trim();
+    
+    if (!trimmedArgs) {
+      console.log(`🔧 Empty arguments for call ${callId}, using default empty object`);
+      return {};
+    }
+
+    // Check if it looks like JSON (starts with { and ends with })
+    if (!trimmedArgs.startsWith('{') || !trimmedArgs.endsWith('}')) {
+      console.warn(`⚠️ Arguments for call ${callId} don't look like JSON:`, {
+        length: trimmedArgs.length,
+        starts_with: trimmedArgs.substring(0, 10),
+        ends_with: trimmedArgs.substring(Math.max(0, trimmedArgs.length - 10)),
+        full_args: trimmedArgs.length < 200 ? trimmedArgs : `${trimmedArgs.substring(0, 100)}...${trimmedArgs.substring(trimmedArgs.length - 100)}`
+      });
+      return {};
+    }
+
+    try {
+      // Attempt to parse the JSON
+      const parsed = JSON.parse(trimmedArgs);
+      
+      // Validate that it's an object
+      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+        console.warn(`⚠️ Parsed arguments for call ${callId} is not a valid object:`, typeof parsed);
+        return {};
+      }
+
+      console.log(`✅ Successfully parsed arguments for call ${callId}:`, Object.keys(parsed));
+      return parsed as Record<string, unknown>;
+
+    } catch (error) {
+      console.error(`❌ JSON parsing failed for call ${callId}:`, {
+        error: error instanceof Error ? error.message : String(error),
+        argumentsLength: trimmedArgs.length,
+        argumentsPreview: trimmedArgs.length < 200 ? trimmedArgs : `${trimmedArgs.substring(0, 100)}...${trimmedArgs.substring(trimmedArgs.length - 100)}`,
+        startsWithBrace: trimmedArgs.startsWith('{'),
+        endsWithBrace: trimmedArgs.endsWith('}')
+      });
+
+      // Try to extract any valid JSON-like properties as fallback
+      try {
+        const fallbackData = this.extractFallbackData(trimmedArgs);
+        if (Object.keys(fallbackData).length > 0) {
+          console.log(`🔄 Using fallback data extraction for call ${callId}:`, Object.keys(fallbackData));
+          return fallbackData;
+        }
+      } catch (fallbackError) {
+        console.warn(`⚠️ Fallback extraction also failed for call ${callId}:`, fallbackError);
+      }
+
+      return {};
+    }
+  }
+
+  /**
+   * Attempt to extract data from malformed JSON as a fallback
+   */
+  private extractFallbackData(invalidJson: string): Record<string, unknown> {
+    const fallbackData: Record<string, unknown> = {};
+    
+    // Try to extract common patterns using regex
+    const patterns = [
+      { key: 'component_id', regex: /"component_id"\s*:\s*"([^"]+)"/i },
+      { key: 'tool_id', regex: /"tool_id"\s*:\s*"([^"]+)"/i },
+      { key: 'title', regex: /"title"\s*:\s*"([^"]+)"/i },
+      { key: 'context', regex: /"context"\s*:\s*({[^}]*})/i }
+    ];
+
+    for (const pattern of patterns) {
+      const match = invalidJson.match(pattern.regex);
+      if (match && match[1]) {
+        try {
+          if (pattern.key === 'context') {
+            fallbackData[pattern.key] = JSON.parse(match[1]);
+          } else {
+            fallbackData[pattern.key] = match[1];
+          }
+        } catch {
+          // Skip this field if parsing fails
+        }
+      }
+    }
+
+    return fallbackData;
+  }
+
+  /**
+   * Validate if a string might be complete JSON
+   */
+  private isLikelyCompleteJson(str: string): boolean {
+    const trimmed = str.trim();
+    if (!trimmed) return false;
+    
+    // Count braces to check if JSON is likely complete
+    let braceCount = 0;
+    let inString = false;
+    let escaped = false;
+    
+    for (let i = 0; i < trimmed.length; i++) {
+      const char = trimmed[i];
+      
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      
+      if (char === '\\') {
+        escaped = true;
+        continue;
+      }
+      
+      if (char === '"') {
+        inString = !inString;
+        continue;
+      }
+      
+      if (!inString) {
+        if (char === '{') braceCount++;
+        if (char === '}') braceCount--;
+      }
+    }
+    
+    return braceCount === 0 && trimmed.startsWith('{') && trimmed.endsWith('}');
+  }
+
+  /**
    * Process OpenAI stream using standard chat completions
    */
   private async processOpenAIStream(
@@ -312,7 +443,24 @@ export class AIAdvisorOrchestratorService {
             }
 
             if (toolCall.function?.arguments) {
-              functionCalls[callId].arguments += toolCall.function.arguments;
+              // Validate the chunk before adding it
+              const chunk = toolCall.function.arguments;
+              
+              // Check for suspicious patterns that might indicate corruption
+              if (chunk.includes('\0') || chunk.includes('\ufffd')) {
+                console.warn(`⚠️ Suspicious characters detected in function arguments chunk for call ${callId}:`, {
+                  chunk: chunk.substring(0, 50),
+                  hasNullChar: chunk.includes('\0'),
+                  hasReplacementChar: chunk.includes('\ufffd')
+                });
+              }
+              
+              functionCalls[callId].arguments += chunk;
+              
+              // Log progress for long arguments accumulation
+              if (functionCalls[callId].arguments.length % 100 === 0) {
+                console.log(`📝 Accumulating arguments for call ${callId}: ${functionCalls[callId].arguments.length} chars`);
+              }
               
               const streamingData = {
                 type: "response_function_call_arguments_streaming",
@@ -344,14 +492,24 @@ export class AIAdvisorOrchestratorService {
           
           for (const callId in functionCalls) {
             const call = functionCalls[callId];
+            
+            // Enhanced logging for debugging
+            console.log(`🔍 Processing function call ${callId}:`, {
+              name: call.name,
+              argumentsLength: call.arguments.length,
+              argumentsValid: this.isLikelyCompleteJson(call.arguments),
+              argumentsPreview: call.arguments.length < 100 ? call.arguments : `${call.arguments.substring(0, 50)}...${call.arguments.substring(call.arguments.length - 50)}`
+            });
+
             try {
-              const toolData = JSON.parse(call.arguments || "{}");
+              const toolData = this.parseToolArguments(callId, call.arguments);
+              
               const action = {
                 type: call.name,
                 payload: {
-                  componentId: toolData.component_id,
-                  toolId: toolData.tool_id,
-                  title: toolData.title,
+                  componentId: toolData.component_id || null,
+                  toolId: toolData.tool_id || null,
+                  title: toolData.title || null,
                   context: toolData.context || {},
                 },
               };
@@ -361,10 +519,26 @@ export class AIAdvisorOrchestratorService {
                 action,
                 timestamp: new Date().toISOString(),
               };
+              
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(functionDoneData)}\n\n`));
-              console.log("📤 Sent function_done event for:", call.name);
+              console.log("📤 Sent function_done event for:", call.name, "with payload keys:", Object.keys(action.payload));
+              
             } catch (error) {
-              console.error("Error parsing function arguments:", error);
+              console.error(`❌ Critical error processing function call ${callId}:`, {
+                error: error instanceof Error ? error.message : String(error),
+                callName: call.name,
+                stack: error instanceof Error ? error.stack : undefined
+              });
+              
+              // Send error event for this specific function call
+              const errorData = {
+                type: "response_function_call_error",
+                error: `Failed to process function call: ${error instanceof Error ? error.message : String(error)}`,
+                callId: callId,
+                callName: call.name,
+                timestamp: new Date().toISOString(),
+              };
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`));
             }
           }
 
