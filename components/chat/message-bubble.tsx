@@ -4,6 +4,7 @@ import { ChatMessage } from "@/lib/types/chat.types";
 import { MessageTimestamp } from "./message-timestamp";
 import { ToolMessage } from "./tool-message";
 import { TextMessage } from "./text-message";
+import { ComponentMessage } from "./component-message";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -29,6 +30,10 @@ export function MessageBubble({ message, onToolClick }: MessageBubbleProps) {
 
           {message.type === "tool" && (
             <ToolMessage message={message} onToolClick={onToolClick} />
+          )}
+
+          {message.type === "component" && (
+            <ComponentMessage message={message} />
           )}
 
           <MessageTimestamp timestamp={message.created_at} isUser={isUser} />

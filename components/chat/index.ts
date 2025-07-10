@@ -1,9 +1,12 @@
 // Export all chat components
+export * from "./ai-notification-card";
 export * from "./budget-analysis-message";
 export * from "./budget-summary";
 export * from "./chat-input";
 export * from "./chat-interface";
 export * from "./chat-popup";
+export * from "./financial-overview-card";
+export * from "./financial-overview-message";
 export * from "./floating-ai-button";
 export * from "./markdown-message";
 export * from "./message-bubble";

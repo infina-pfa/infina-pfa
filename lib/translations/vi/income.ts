@@ -1,0 +1,56 @@
+export const incomeVi = {
+  // Page Title
+  incomeManagement: "Quản lý thu nhập",
+
+  // Month Selection
+  selectMonth: "Chọn tháng",
+
+  // Total Income
+  totalSelectedMonthIncome: "Tổng thu nhập",
+
+  // Transaction List
+  incomeTransactions: "Lịch sử",
+  createIncome: "Thêm thu nhập",
+  editIncome: "Chỉnh sửa",
+  noIncomeTransactions: "Không có lịch sử thu nhập nào trong tháng này",
+  createFirstIncome: "Tạo thu nhập đầu tiên",
+
+  // Form fields
+  incomeName: "Tên",
+  amount: "Số tiền",
+  category: "Danh mục",
+  frequency: "Tần suất",
+  selectCategory: "Chọn danh mục",
+  incomeNamePlaceholder: "Nhập tên thu nhập",
+  amountPlaceholder: "Nhập số tiền",
+
+  // Categories
+  salary: "Lương",
+  freelance: "Làm tự do",
+  business: "Kinh doanh",
+  investment: "Đầu tư",
+  other: "Khác",
+
+  // Frequencies
+  weekly: "Hàng tuần",
+  biweekly: "Hai tuần một lần",
+  monthly: "Hàng tháng",
+  quarterly: "Hàng quý",
+  yearly: "Hàng năm",
+  oneTime: "Một lần",
+
+  // Actions
+  incomeDeleteSuccess: "Xóa thu nhập thành công",
+  incomeDeleteError: "Không thể xóa thu nhập",
+
+  // Success/Error Messages
+  incomeCreateSuccess: "Tạo thu nhập thành công",
+  incomeCreateError: "Không thể tạo thu nhập",
+  incomeUpdateSuccess: "Cập nhật thu nhập thành công",
+  incomeUpdateError: "Không thể cập nhật thu nhập",
+  updateIncome: "Cập nhật thu nhập",
+
+  // Additional fields
+  noCategory: "Không có danh mục",
+  descriptionPlaceholder: "Nhập mô tả (tùy chọn)",
+};

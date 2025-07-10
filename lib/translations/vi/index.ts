@@ -10,6 +10,8 @@ import { authVi } from "./auth";
 import { chatVi } from "./chat";
 import { onboardingVi } from "./onboarding";
 import { budgetingVi } from "./budgeting";
+import { incomeVi } from "./income";
+import { goalsVi } from "./goals";
 
 export const viTranslations = {
   ...commonVi,
@@ -24,4 +26,6 @@ export const viTranslations = {
   ...chatVi,
   ...onboardingVi,
   ...budgetingVi,
+  ...incomeVi,
+  goals: goalsVi,
 };

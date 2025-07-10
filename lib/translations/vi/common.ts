@@ -112,4 +112,8 @@ export const commonVi = {
   // AI Assistant
   aiAssistant: "Trợ lý AI",
   openAIAssistant: "Mở trợ lý AI",
+
+  // Form fields
+  description: "Mô tả",
+  descriptionPlaceholder: "Nhập mô tả",
 };

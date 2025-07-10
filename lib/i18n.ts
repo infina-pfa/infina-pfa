@@ -27,6 +27,10 @@ import { chatVi } from "./translations/vi/chat";
 import { chatEn } from "./translations/en/chat";
 import { onboardingVi } from "./translations/vi/onboarding";
 import { onboardingEn } from "./translations/en/onboarding";
+import { incomeVi } from "./translations/vi/income";
+import { incomeEn } from "./translations/en/income";
+import { goalsVi } from "./translations/vi/goals";
+import { goalsEn } from "./translations/en/goals";
 
 // Translation resources
 const resources = {
@@ -43,6 +47,8 @@ const resources = {
     auth: authVi,
     chat: chatVi,
     onboarding: onboardingVi,
+    income: incomeVi,
+    goals: goalsVi,
   },
   en: {
     common: commonEn,
@@ -57,6 +63,8 @@ const resources = {
     auth: authEn,
     chat: chatEn,
     onboarding: onboardingEn,
+    income: incomeEn,
+    goals: goalsEn,
   },
 };
 
@@ -68,8 +76,20 @@ i18n
     lng: "vi", // Default language is Vietnamese
     fallbackLng: "vi", // Fallback to Vietnamese
     defaultNS: "common",
-    ns: ["common", "budgeting", "hero", "howItWorks", "financialStages", 
-         "features", "testimonials", "cta", "footer", "auth", "chat", "onboarding"],
+    ns: [
+      "common",
+      "budgeting",
+      "hero",
+      "howItWorks",
+      "financialStages",
+      "features",
+      "testimonials",
+      "cta",
+      "footer",
+      "auth",
+      "chat",
+      "onboarding",
+    ],
 
     detection: {
       // Language detection settings

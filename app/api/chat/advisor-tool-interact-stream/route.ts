@@ -1,35 +1,23 @@
-import { openai } from "@/lib/openai";
-import { createClient } from "@/lib/supabase/server";
-import { ConversationMessage } from "@/lib/types/ai-streaming.types";
-import { ResponseDataEvent } from "@/lib/types/chat.types";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { Message } from "openai/resources/beta/threads/messages.mjs";
+import { authenticateUser } from "@/lib/middleware/auth-middleware";
+import { userContextService } from "@/lib/services/user-context.service";
+import { aiStreamingService } from "@/lib/services/ai-streaming.service";
+import { ConversationMessage } from "@/lib/types/ai-streaming.types";
+import { chatErrorHandler } from "@/lib/chat-error-handler";
 
 export async function POST(request: NextRequest) {
   try {
     const { message, conversationHistory, userContext } = await request.json();
 
     if (!message) {
-      return NextResponse.json(
-        { error: "Message is required" },
-        { status: 400 }
-      );
+      return chatErrorHandler.missingMessageError();
     }
 
-    // Create Supabase client
-    const supabase = await createClient();
-
-    // Get current user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+    // Authenticate user
+    const { user, errorResponse } = await authenticateUser();
+    if (errorResponse) {
+      return chatErrorHandler.authenticationError();
     }
 
     console.log("🚀 AI Advisor Stream Function Called");
@@ -38,55 +26,14 @@ export async function POST(request: NextRequest) {
     console.log("💬 History Length:", conversationHistory?.length || 0);
 
     // Prepare user context information
-    const contextInfo = userContext
-      ? `
-Thông tin người dùng:
-- User ID: ${user.id}
-- Thông tin tài chính người dùng:
-- Tổng thu nhập: ${
-          userContext.financial?.totalIncome
-            ? new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }).format(userContext.financial.totalIncome)
-            : "Chưa có dữ liệu"
-        }
-- Tổng chi tiêu: ${
-          userContext.financial?.totalExpenses
-            ? new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }).format(userContext.financial.totalExpenses)
-            : "Chưa có dữ liệu"
-        }
-- Số lượng ngân sách: ${userContext.financial?.currentBudgets || 0}
-- Đã hoàn thành onboarding: ${
-          userContext.financial?.hasCompletedOnboarding ? "Có" : "Không"
-        }
-
-Thông tin học tập:
-- Level hiện tại: ${userContext.learning?.currentLevel || 1}
-- Điểm kinh nghiệm: ${userContext.learning?.xp || 0}
-- Mục tiêu hiện tại: ${userContext.learning?.currentGoal || "Chưa có mục tiêu"}
-`
-      : `
-Thông tin người dùng:
-- User ID: ${user.id}
-- Chưa có thông tin context người dùng
-`;
+    const contextInfo = userContextService.formatUserContext(
+      user.id,
+      userContext
+    );
 
     // Prepare conversation history
     const historyContext =
-      conversationHistory && conversationHistory.length > 0
-        ? conversationHistory
-            .slice(-15)
-            .map((msg: ConversationMessage, index: number) => {
-              return `${index + 1}. ${
-                msg.sender === "user" ? "Người dùng" : "AI"
-              }: ${msg.content}`;
-            })
-            .join("\n")
-        : "Đây là cuộc trò chuyện đầu tiên.";
+      userContextService.formatConversationHistory(conversationHistory);
 
     const systemPrompt = `
 <system_prompt>
@@ -96,10 +43,10 @@ Thông tin người dùng:
     </general_info>
 
     <identity>
-        <name>Finny</name>
+        <name>Infina</name>
         <creator>Infina Financial Personal Advisor</creator>
         <description>
-            You are Finny, an AI Personal Financial Advisor. Your mission is to guide users through their financial journey by providing personalized, actionable advice.
+            You are Infina, an AI Personal Financial Advisor. Your primary role is to provide personalized financial guidance by reacting to users' financial actions and decisions in real-time. You help users make better financial choices through supportive, actionable advice.
         </description>
     </identity>
 
@@ -126,6 +73,7 @@ Thông tin người dùng:
                 - Use relevant emojis 📊💰📈.
                 - Use bullet points for lists, not long paragraphs.
                 - Provide clear, natural calls to action.
+                - Short response, not too long, under 50 words.
             </mobile_first>
             <tone_guidelines>
                 - Confident but not authoritarian; friendly and approachable.
@@ -133,7 +81,111 @@ Thông tin người dùng:
                 - Encourage positive action.
             </tone_guidelines>
         </response_format>
+
+        <action_reactions>
+            <budgeting>
+                <overspending>React with concern when users create budgets that exceed their available income. Suggest adjustments.</overspending>
+                <good_practice>Praise users when they create realistic budgets aligned with their financial goals.</good_practice>
+                <savings>Encourage users to allocate portions of their budget to savings.</savings>
+            </budgeting>
+            <expenses>
+                <high_expense>When users report large expenses, help them evaluate the impact on their overall budget.</high_expense>
+                <recurring_costs>Identify opportunities to reduce recurring expenses.</recurring_costs>
+            </expenses>
+            <income>
+                <new_income>Congratulate on new income sources and suggest smart allocation.</new_income>
+                <income_drop>Provide supportive guidance when income decreases.</income_drop>
+            </income>
+        </action_reactions>
     </response_instructions>
+
+    <examples>
+        <example id="1">
+            <user_action>
+                <context>
+                    <user_id>123</user_id>
+                    <total_income>10,000,000 vnd</total_income>
+                    <total_expenses>9,000,000 vnd</total_expenses>
+                </context>
+                <content>Tôi vừa mới tạo ngân sách đi chơi Paris 50,000,000 vnd</content>
+            </user_action>
+            <response>
+                <content>
+                ⚠️ Chuyến đi Paris 50tr VND có vẻ vượt quá khả năng tài chính hiện tại của bạn:
+                
+                • Thu nhập hiện tại: 10tr VND
+                • Chi tiêu hiện tại: 9tr VND
+                
+                Bạn có thể cân nhắc lên kế hoạch tiết kiệm dài hạn hoặc điều chỉnh ngân sách cho phù hợp hơn không?
+                </content>
+            </response>
+        </example>
+
+        <example id="2">
+            <user_action>
+                <context>
+                    <user_id>456</user_id>
+                    <total_income>15,000,000 vnd</total_income>
+                    <total_expenses>7,000,000 vnd</total_expenses>
+                </context>
+                <content>Tôi vừa tạo ngân sách tiết kiệm 3,000,000 vnd mỗi tháng</content>
+            </user_action>
+            <response>
+                <content>
+                🎯 Tuyệt vời! Việc tiết kiệm 3tr VND/tháng rất hợp lý với thu nhập 15tr VND của bạn.
+                
+                • Bạn đang tiết kiệm 20% thu nhập - đây là tỷ lệ lý tưởng!
+                • Tiếp tục duy trì sẽ giúp bạn xây dựng quỹ dự phòng vững chắc.
+                
+                Bạn có mục tiêu cụ thể cho khoản tiết kiệm này không?
+                </content>
+            </response>
+        </example>
+
+        <example id="3">
+            <user_action>
+                <context>
+                    <user_id>789</user_id>
+                    <total_income>20,000,000 vnd</total_income>
+                    <total_expenses>18,000,000 vnd</total_expenses>
+                </context>
+                <content>Tôi vừa chi 5,000,000 vnd cho một chiếc điện thoại mới</content>
+            </user_action>
+            <response>
+                <content>
+                📱 Khoản chi 5tr VND cho điện thoại mới khá lớn khi bạn đang chi tiêu 18tr/20tr thu nhập.
+                
+                • Khoản này chiếm 25% thu nhập tháng này
+                • Chỉ còn 2tr dư sau các chi phí thường xuyên
+                
+                Bạn đã lên kế hoạch điều chỉnh chi tiêu khác để cân đối chưa?
+                </content>
+            </response>
+        </example>
+
+        <example id="4">
+            <user_action>
+                <context>
+                    <user_id>101</user_id>
+                    <total_income>25,000,000 vnd</total_income>
+                    <total_expenses>10,000,000 vnd</total_expenses>
+                </context>
+                <content>Tôi vừa được tăng lương thêm 5,000,000 vnd mỗi tháng</content>
+            </user_action>
+            <response>
+                <content>
+                🎉 Chúc mừng bạn! Mức tăng lương 5tr VND rất đáng kể.
+                
+                Gợi ý phân bổ hợp lý:
+                • 40% (2tr): Tiết kiệm/đầu tư
+                • 40% (2tr): Nâng cao chất lượng sống
+                • 20% (1tr): Quỹ dự phòng
+                
+                Bạn dự định sử dụng khoản tăng lương này như thế nào?
+                </content>
+            </response>
+        </example>
+    </examples>
 </system_prompt>
 `;
 
@@ -146,181 +198,20 @@ Thông tin người dùng:
       { role: "user", content: message },
     ];
 
-    // Create streaming response
-    const stream = await openai.responses.create({
-      model: "gpt-4.1-2025-04-14",
-      input: messages,
-      stream: true,
-      temperature: 0.7,
-      max_output_tokens: 1000,
-    });
+    try {
+      // Create streaming response
+      const stream = await aiStreamingService.createStream(messages);
 
-    // Set up Server-Sent Events headers
-    const headers = new Headers({
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    });
-
-    // Create a readable stream
-    const readable = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-
-        try {
-          let responseContent = "";
-          interface FunctionCall {
-            id: string;
-            name: string;
-            arguments: string;
-          }
-          const functionCalls: Record<string, FunctionCall> = {};
-          for await (const chunk of stream) {
-            // Handle different chunk types properly for responses API
-            if (!chunk || typeof chunk !== "object") {
-              continue;
-            }
-
-            // Handle response creation to send response_id
-            if (chunk.type === "response.created" && chunk.response?.id) {
-              const data = {
-                type: ResponseDataEvent.RESPONSE_CREATED,
-                response_id: chunk.response.id,
-                timestamp: new Date().toISOString(),
-              };
-              const message = `data: ${JSON.stringify(data)}\n\n`;
-              controller.enqueue(encoder.encode(message));
-            }
-
-            // Handle text content deltas
-            if (chunk.type === "response.output_text.delta" && chunk.delta) {
-              responseContent += chunk.delta;
-              const data = {
-                type: ResponseDataEvent.OUTPUT_TEXT_STREAMING,
-                content: chunk.delta,
-                timestamp: new Date().toISOString(),
-              };
-              const message = `data: ${JSON.stringify(data)}\n\n`;
-              controller.enqueue(encoder.encode(message));
-            }
-
-            if (chunk.type === "response.output_text.done") {
-              const data = {
-                type: ResponseDataEvent.OUTPUT_TEXT_DONE,
-                content: responseContent,
-                timestamp: new Date().toISOString(),
-              };
-              const message = `data: ${JSON.stringify(data)}\n\n`;
-              controller.enqueue(encoder.encode(message));
-            }
-
-            // Handle function call arguments deltas
-            if (chunk.type === "response.function_call_arguments.delta") {
-              const data = {
-                type: ResponseDataEvent.FUNCTION_CALL_ARGUMENTS_STREAMING,
-                timestamp: new Date().toISOString(),
-              };
-              const message = `data: ${JSON.stringify(data)}\n\n`;
-              controller.enqueue(encoder.encode(message));
-            }
-
-            if (chunk.type === "response.mcp_call.in_progress") {
-              const data = {
-                type: ResponseDataEvent.MCP_TOOL_CALLING,
-                timestamp: new Date().toISOString(),
-              };
-              const message = `data: ${JSON.stringify(data)}\n\n`;
-              controller.enqueue(encoder.encode(message));
-            }
-
-            if (
-              chunk.type === "response.output_item.done" &&
-              chunk.item.type === "function_call"
-            ) {
-              console.log("🔍 Function call arguments:", chunk);
-              const toolData = JSON.parse(chunk.item.arguments);
-              const action = {
-                type: chunk.item.name,
-                payload: {
-                  componentId: toolData.component_id,
-                  toolId: toolData.tool_id,
-                  title: toolData.title,
-                  context: toolData.context || {},
-                },
-              };
-
-              const data = {
-                type: ResponseDataEvent.FUNCTION_CALL_ARGUMENTS_DONE,
-                action,
-                timestamp: new Date().toISOString(),
-              };
-              const message = `data: ${JSON.stringify(data)}\n\n`;
-              controller.enqueue(encoder.encode(message));
-            }
-
-            if (
-              chunk.type === "response.output_item.done" &&
-              chunk.item.type === "mcp_call"
-            ) {
-              const data = {
-                type: ResponseDataEvent.MCP_TOOL_CALL_DONE,
-                timestamp: new Date().toISOString(),
-              };
-              const message = `data: ${JSON.stringify(data)}\n\n`;
-              controller.enqueue(encoder.encode(message));
-            }
-
-            // Handle response completion - Process all completed function calls
-            if (chunk.type === "response.completed") {
-              console.log(
-                "✅ Response completed - Processing function calls:",
-                Object.keys(functionCalls).length
-              );
-
-              // Send completion event
-              const completionData = {
-                type: ResponseDataEvent.RESPONSE_COMPLETED,
-                finish_reason: "completed",
-                timestamp: new Date().toISOString(),
-              };
-              const message = `data: ${JSON.stringify(completionData)}\n\n`;
-              controller.enqueue(encoder.encode(message));
-              break;
-            }
-          }
-
-          // End the stream
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-          controller.close();
-        } catch (error) {
-          console.error("❌ Streaming error:", error);
-          const errorData = {
-            type: "error",
-            error:
-              error instanceof Error
-                ? error.message
-                : "Unknown streaming error",
-            timestamp: new Date().toISOString(),
-          };
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify(errorData)}\n\n`)
-          );
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(readable, { headers });
+      // Return the readable stream
+      return aiStreamingService.createReadableStream(stream);
+    } catch (error) {
+      if (error instanceof Error) {
+        return chatErrorHandler.openAIError(error);
+      }
+      return chatErrorHandler.internalError(error);
+    }
   } catch (error) {
-    console.error("❌ Function error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    return chatErrorHandler.internalError(error);
   }
 }
 
