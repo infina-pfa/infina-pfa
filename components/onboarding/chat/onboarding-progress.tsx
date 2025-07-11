@@ -10,17 +10,9 @@ interface OnboardingProgressProps {
 export function OnboardingProgress({ currentStep }: OnboardingProgressProps) {
   const { t } = useAppTranslation(["onboarding", "common"]);
 
-  const steps: OnboardingStep[] = [
-    "ai_welcome",
-    "user_introduction", 
-    "financial_assessment",
-    "risk_assessment",
-    "goal_setting",
-    "stage_analysis",
-    "complete"
-  ];
+  const steps: OnboardingStep[] = ["ai_welcome", "complete"];
 
-  const currentStepIndex = steps.findIndex(step => step === currentStep);
+  const currentStepIndex = steps.findIndex((step) => step === currentStep);
   const progressPercentage = ((currentStepIndex + 1) / steps.length) * 100;
 
   return (
@@ -43,4 +35,4 @@ export function OnboardingProgress({ currentStep }: OnboardingProgressProps) {
       </div>
     </div>
   );
-} 
+}
