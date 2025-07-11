@@ -5,6 +5,7 @@ import {
   ComponentResponse,
   UseOnboardingChatReturn,
   UserProfile,
+  FinancialStage,
 } from "@/lib/types/onboarding.types";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { onboardingService } from "@/lib/services/onboarding.service";
@@ -186,19 +187,17 @@ export const useOnboardingChat = (
       // Create timestamps with clear separation (5 seconds apart) to ensure correct order
       const baseTime = Date.now() - 60000; // Start 1 minute ago
       const welcomeTimestamp = new Date(baseTime).toISOString();
-      const suggestionTimestamp = new Date(baseTime + 5000).toISOString(); // +5 seconds
-      const componentTimestamp = new Date(baseTime + 10000).toISOString(); // +10 seconds
+      const stageSelectorTimestamp = new Date(baseTime + 5000).toISOString(); // +5 seconds
 
       console.log("🕐 Using timestamps:", {
         welcome: welcomeTimestamp,
-        suggestion: suggestionTimestamp,
-        component: componentTimestamp
+        stageSelector: stageSelectorTimestamp,
       });
 
-      // 1. Save welcome message (earliest timestamp)
+      // 1. Save welcome message (earliest timestamp) - NEW STAGE-FIRST VERSION
       const fullWelcomeContent = isVietnamese 
-        ? "Xin chào! Tôi là Fina, cố vấn tài chính AI của bạn 🤝\n\nTôi ở đây để giúp bạn kiểm soát tương lai tài chính của mình. Tôi có thể:\n• Giúp bạn lập ngân sách và theo dõi chi tiêu\n• Tư vấn chiến lược đầu tư phù hợp\n• Hỗ trợ lập kế hoạch cho các mục tiêu tài chính\n• Phân tích tình hình tài chính và đưa ra lời khuyên cá nhân hóa\n\nĐể bắt đầu, tôi cần tìm hiểu một chút về bạn. Điều này sẽ giúp tôi cung cấp lời khuyên phù hợp nhất với nhu cầu của bạn."
-        : "Hello! I'm Fina, your AI financial advisor 🤝\n\nI'm here to help you take control of your financial future. I can:\n• Help you create budgets and track spending\n• Advise on suitable investment strategies\n• Support planning for financial goals\n• Analyze your financial situation and provide personalized advice\n\nTo get started, I need to learn a bit about you. This will help me provide advice that best suits your needs.";
+        ? "Xin chào! Tôi là Fina, cố vấn tài chính AI của bạn 🤝\n\nTôi ở đây để giúp bạn kiểm soát tương lai tài chính của mình và cung cấp hướng dẫn cụ thể phù hợp với tình hình tài chính hiện tại của bạn.\n\n✨ Để tôi có thể hỗ trợ bạn tốt nhất, hãy cho tôi biết bạn đang ở giai đoạn nào trong hành trình tài chính:"
+        : "Hello! I'm Fina, your AI financial advisor 🤝\n\nI'm here to help you take control of your financial future and provide specific guidance that fits your current financial situation.\n\n✨ To help you best, let me know what stage you're at in your financial journey:";
 
       // Use synchronous save for initial history to ensure correct order
       await onboardingService.saveChatMessage(
@@ -210,58 +209,54 @@ export const useOnboardingChat = (
         welcomeTimestamp
       );
 
-      // 2. Save suggestion message (2nd timestamp)
-      const fullSuggestionContent = isVietnamese
-        ? "Hãy giới thiệu về bản thân bạn nhé! Bạn có thể chia sẻ về:"
-        : "Please introduce yourself! You can share about:";
+      // 2. Save decision tree component (2nd timestamp)
+      const decisionTreeComponentId = `decision_tree_${Date.now()}`;
+      const decisionTreeContent = isVietnamese
+        ? "Tôi sẽ hỏi bạn 2 câu hỏi ngắn để xác định chính xác ưu tiên tài chính của bạn:"
+        : "I'll ask you 2 quick questions to accurately determine your financial priority:";
 
       await onboardingService.saveChatMessage(
         state.conversationId,
         'ai',
-        fullSuggestionContent,
-        undefined,
-        undefined,
-        suggestionTimestamp
-      );
-
-      // 3. Save introduction component (3rd timestamp)
-      const introComponentId = `introduction_template_${Date.now()}`;
-      const introComponentContent = isVietnamese
-        ? "Giới thiệu về bản thân bạn"
-        : "Introduce yourself";
-
-      await onboardingService.saveChatMessage(
-        state.conversationId,
-        'ai',
-        introComponentContent,
-        introComponentId,
+        decisionTreeContent,
+        decisionTreeComponentId,
         {
           component: {
-            type: "introduction_template",
-            title: introComponentContent,
+            type: "decision_tree",
+            title: isVietnamese ? "Hãy xác định ưu tiên tài chính của bạn" : "Let's determine your financial priority",
             context: {
-              template: isVietnamese
-                ? "Tôi tên là Tuấn, 24 tuổi, đang sống tại TPHCM. Tôi làm văn phòng với thu nhập hàng tháng khoảng 10 triệu VND. Hiện tại tôi muốn sớm đạt được tự do tài chính."
-                : "My name is Devin, I'm 24 years old, living in New York. I work as a Software Engineer with a monthly income of about 5000 dollars. Currently, I want to get a house in New York.",
-              suggestions: isVietnamese
-                ? [
-                    "Tôi mới bắt đầu tìm hiểu về quản lý tài chính cá nhân",
-                    "Tôi muốn bắt đầu đầu tư nhưng không biết bắt đầu từ đâu",
-                    "Tôi cần giúp đỡ để lập ngân sách hàng tháng hiệu quả"
-                  ]
-                : [
-                    "I'm just starting to learn about personal finance management",
-                    "I want to start investing but don't know where to begin",
-                    "I need help creating an effective monthly budget"
-                  ]
+              questions: [
+                {
+                  id: "high_interest_debt",
+                  question: isVietnamese 
+                    ? "Bạn có bất kỳ khoản nợ nào, chẳng hạn như dư nợ thẻ tín dụng hoặc các khoản vay cá nhân, với lãi suất cao hơn 8% không?"
+                    : "Do you have any debt, such as credit card balances or personal loans, with an interest rate higher than 8%?",
+                  explanation: isVietnamese
+                    ? "Vui lòng loại trừ khoản thế chấp chính hoặc các khoản vay sinh viên lãi suất thấp."
+                    : "Please exclude your primary mortgage or low-interest student loans from this.",
+                  yesLabel: isVietnamese ? "Có" : "Yes",
+                  noLabel: isVietnamese ? "Không" : "No"
+                },
+                {
+                  id: "emergency_fund",
+                  question: isVietnamese
+                    ? "Nếu bạn mất nguồn thu nhập chính ngày hôm nay, bạn có đủ tiền mặt trong tài khoản tiết kiệm dễ tiếp cận để trang trải tất cả các chi phí sinh hoạt thiết yếu trong ít nhất ba tháng không?"
+                    : "If you were to lose your primary source of income today, do you have enough cash in a readily accessible savings account to cover all of your essential living expenses for at least three months?",
+                  explanation: isVietnamese
+                    ? "Chi phí thiết yếu bao gồm nhà ở, thực phẩm, tiện ích, giao thông và các nhu cầu thiết yếu khác."
+                    : "Essential expenses include housing, food, utilities, transportation, and other necessities.",
+                  yesLabel: isVietnamese ? "Có" : "Yes",
+                  noLabel: isVietnamese ? "Không" : "No"
+                }
+              ]
             },
             isCompleted: false
           }
         },
-        componentTimestamp
+        stageSelectorTimestamp
       );
 
-      console.log("✅ Successfully saved complete initial conversation history in correct order");
+      console.log("✅ Successfully saved new stage-first conversation history in correct order");
       setHasInitialHistorySaved(true);
     } catch (error) {
       console.error("❌ Failed to save initial conversation history:", error);
@@ -292,10 +287,10 @@ export const useOnboardingChat = (
       
       setMessages([welcomeMessage]);
       
-      // Stream the welcome content character by character
+      // NEW STAGE-FIRST WELCOME MESSAGE
       const fullWelcomeContent = isVietnamese 
-        ? "Xin chào! Tôi là Fina, cố vấn tài chính AI của bạn 🤝\n\nTôi ở đây để giúp bạn kiểm soát tương lai tài chính của mình. Tôi có thể:\n• Giúp bạn lập ngân sách và theo dõi chi tiêu\n• Tư vấn chiến lược đầu tư phù hợp\n• Hỗ trợ lập kế hoạch cho các mục tiêu tài chính\n• Phân tích tình hình tài chính và đưa ra lời khuyên cá nhân hóa\n\nĐể bắt đầu, tôi cần tìm hiểu một chút về bạn. Điều này sẽ giúp tôi cung cấp lời khuyên phù hợp nhất với nhu cầu của bạn."
-        : "Hello! I'm Fina, your AI financial advisor 🤝\n\nI'm here to help you take control of your financial future. I can:\n• Help you create budgets and track spending\n• Advise on suitable investment strategies\n• Support planning for financial goals\n• Analyze your financial situation and provide personalized advice\n\nTo get started, I need to learn a bit about you. This will help me provide advice that best suits your needs.";
+        ? "Xin chào! Tôi là Fina, cố vấn tài chính AI của bạn 🤝\n\nTôi ở đây để giúp bạn kiểm soát tương lai tài chính của mình và cung cấp hướng dẫn cụ thể phù hợp với tình hình tài chính hiện tại của bạn.\n\n✨ Để tôi có thể hỗ trợ bạn tốt nhất, hãy cho tôi biết bạn đang ở giai đoạn nào trong hành trình tài chính:"
+        : "Hello! I'm Fina, your AI financial advisor 🤝\n\nI'm here to help you take control of your financial future and provide specific guidance that fits your current financial situation.\n\n✨ To help you best, let me know what stage you're at in your financial journey:";
       
       let currentIndex = 0;
       const streamInterval = setInterval(() => {
@@ -312,90 +307,64 @@ export const useOnboardingChat = (
           clearInterval(streamInterval);
           setIsStreaming(false);
           
-          // After welcome message completes, show thinking again before suggestion
+          // After welcome message completes, show stage selector component immediately
           setTimeout(() => {
             setIsAIThinking(true);
             
             setTimeout(() => {
               setIsAIThinking(false);
-              setIsStreaming(true);
               
-              // Add suggestion message with streaming
-              const suggestionMessage: OnboardingMessage = {
-                id: `suggestion-${Date.now()}`,
+              // Add decision tree component directly without more text
+              const decisionTreeMessage: OnboardingMessage = {
+                id: `decision-tree-${Date.now()}`,
                 type: "ai",
-                content: "",
+                content: isVietnamese ? "Tôi sẽ hỏi bạn 2 câu hỏi ngắn để xác định chính xác ưu tiên tài chính của bạn:" : "I'll ask you 2 quick questions to accurately determine your financial priority:",
                 timestamp: new Date(),
+                component: {
+                  id: `decision_tree_${Date.now()}`,
+                  type: "decision_tree",
+                  title: isVietnamese ? "Hãy xác định ưu tiên tài chính của bạn" : "Let's determine your financial priority",
+                  context: {
+                    questions: [
+                      {
+                        id: "high_interest_debt",
+                        question: isVietnamese 
+                          ? "Bạn có bất kỳ khoản nợ nào, chẳng hạn như dư nợ thẻ tín dụng hoặc các khoản vay cá nhân, với lãi suất cao hơn 8% không?"
+                          : "Do you have any debt, such as credit card balances or personal loans, with an interest rate higher than 8%?",
+                        explanation: isVietnamese
+                          ? "Vui lòng loại trừ khoản thế chấp chính hoặc các khoản vay sinh viên lãi suất thấp."
+                          : "Please exclude your primary mortgage or low-interest student loans from this.",
+                        yesLabel: isVietnamese ? "Có" : "Yes",
+                        noLabel: isVietnamese ? "Không" : "No"
+                      },
+                      {
+                        id: "emergency_fund",
+                        question: isVietnamese
+                          ? "Nếu bạn mất nguồn thu nhập chính ngày hôm nay, bạn có đủ tiền mặt trong tài khoản tiết kiệm dễ tiếp cận để trang trải tất cả các chi phí sinh hoạt thiết yếu trong ít nhất ba tháng không?"
+                          : "If you were to lose your primary source of income today, do you have enough cash in a readily accessible savings account to cover all of your essential living expenses for at least three months?",
+                        explanation: isVietnamese
+                          ? "Chi phí thiết yếu bao gồm nhà ở, thực phẩm, tiện ích, giao thông và các nhu cầu thiết yếu khác."
+                          : "Essential expenses include housing, food, utilities, transportation, and other necessities.",
+                        yesLabel: isVietnamese ? "Có" : "Yes",
+                        noLabel: isVietnamese ? "Không" : "No"
+                      }
+                    ]
+                  },
+                  isCompleted: false
+                }
               };
               
-              setMessages(prev => [...prev, suggestionMessage]);
+              setMessages(prev => [...prev, decisionTreeMessage]);
               
-              const fullSuggestionContent = isVietnamese
-                ? "Hãy giới thiệu về bản thân bạn nhé! Bạn có thể chia sẻ về:"
-                : "Please introduce yourself! You can share about:";
-              
-              let suggestionIndex = 0;
-              const suggestionInterval = setInterval(() => {
-                if (suggestionIndex < fullSuggestionContent.length) {
-                  const chunkSize = Math.floor(Math.random() * 4) + 2;
-                  suggestionIndex += chunkSize;
-                  
-                  setMessages(prev => prev.map(msg => 
-                    msg.id === suggestionMessage.id 
-                      ? { ...msg, content: fullSuggestionContent.slice(0, suggestionIndex) }
-                      : msg
-                  ));
-                } else {
-                  clearInterval(suggestionInterval);
-                  setIsStreaming(false);
-                  
-                  // Show component after suggestion completes
-                  setTimeout(() => {
-                    // Add introduction template component with a fade-in effect
-                    const introComponentId = `introduction_template_${Date.now()}`;
-                    const introComponent: OnboardingMessage = {
-                      id: `intro-component-${Date.now()}`,
-                      type: "ai",
-                      content: isVietnamese
-                        ? "Giới thiệu về bản thân bạn"
-                        : "Introduce yourself",
-                      timestamp: new Date(),
-                      component: {
-                        id: introComponentId,
-                        type: "introduction_template",
-                        title: isVietnamese
-                          ? "Giới thiệu về bản thân bạn"
-                          : "Introduce yourself",
-                        context: {
-                          template: isVietnamese
-                            ? "Tôi tên là Tuấn, 24 tuổi, đang sống tại TPHCM. Tôi làm văn phòng với thu nhập hàng tháng khoảng 10 triệu VND. Hiện tại tôi muốn sớm đạt được tự do tài chính."
-                            : "My name is Devin, I'm 24 years old, living in New York. I work as a Software Engineer with a monthly income of about 5000 dollars. Currently, I want to get a house in New York.",
-                          suggestions: isVietnamese
-                            ? [
-                                "Tôi mới bắt đầu tìm hiểu về quản lý tài chính cá nhân",
-                                "Tôi muốn bắt đầu đầu tư nhưng không biết bắt đầu từ đâu",
-                                "Tôi cần giúp đỡ để lập ngân sách hàng tháng hiệu quả"
-                              ]
-                            : [
-                                "I'm just starting to learn about personal finance management",
-                                "I want to start investing but don't know where to begin",
-                                "I need help creating an effective monthly budget"
-                              ]
-                        },
-                        isCompleted: false
-                      }
-                    };
-                    
-                    setMessages(prev => [...prev, introComponent]);
-                    console.log("📝 Initial conversation flow completed (will be saved when user submits)");
-                  }, 500); // Small delay before showing component
-                }
-              }, 15); // Faster streaming for shorter message
-            }, 800); // Thinking delay before suggestion
-          }, 1000); // Delay after welcome message
+            }, 1000); // Short delay before showing component
+          }, 800); // Brief pause after welcome message
         }
-      }, 20); // Streaming speed for welcome message
-    }, 1500); // Initial delay to show chat interface first
+      }, 30); // Faster streaming for better UX
+      
+    }, 1200); // Initial delay before starting
+
+    // Save the new initial flow to chat history  
+    saveInitialConversationHistory();
   };
 
   const startOnboardingConversation = async (initialMessage: string, initialState: OnboardingState) => {
@@ -818,6 +787,55 @@ export const useOnboardingChat = (
   const updateProfileFromResponse = async (response: ComponentResponse) => {
     const profileUpdates: Partial<UserProfile> = {};
 
+    // Handle decision tree response
+    if (response.determinedStage && response.answers) {
+      profileUpdates.identifiedStage = response.determinedStage as FinancialStage;
+      profileUpdates.stageConfirmed = true;
+      
+      console.log(`✅ Decision tree determined stage: ${response.determinedStage}`);
+      console.log(`📋 User answers:`, response.answers);
+      console.log(`🧠 Reasoning:`, response.reasoning);
+    }
+
+    // Handle stage selector response (legacy)
+    if (response.selectedStage) {
+      profileUpdates.identifiedStage = response.selectedStage;
+      profileUpdates.stageConfirmed = true;
+    }
+
+    // Handle expense categories response
+    if (response.expenseBreakdown) {
+      profileUpdates.expenseBreakdown = response.expenseBreakdown;
+      
+      // Calculate total monthly expenses
+      const breakdown = response.expenseBreakdown;
+      let total = 0;
+      
+      // Add basic expense categories
+      if (breakdown.housing) total += breakdown.housing;
+      if (breakdown.food) total += breakdown.food;
+      if (breakdown.transportation) total += breakdown.transportation;
+      if (breakdown.other) total += breakdown.other;
+      
+      // Add additional expenses if any
+      if (breakdown.additional && Array.isArray(breakdown.additional)) {
+        total += breakdown.additional.reduce((sum, item) => sum + (item.amount || 0), 0);
+      }
+      
+      profileUpdates.expenses = total;
+    }
+
+    // Handle savings capacity response
+    if (response.savingsCapacity) {
+      profileUpdates.monthlySavingsCapacity = response.savingsCapacity;
+    }
+
+    // Handle goal confirmation response
+    if (response.goalConfirmed) {
+      // Goal confirmation usually comes with goalDetails
+      // This will be handled in the component context
+    }
+
     // Parse different types of responses
     if (response.textValue) {
       // Extract information from text responses
@@ -886,6 +904,58 @@ export const useOnboardingChat = (
   };
 
   const getResponseText = (response: ComponentResponse): string => {
+    // Handle decision tree response
+    if (response.determinedStage && response.answers) {
+      const stageNames = {
+        debt: "Get Out of Debt",
+        start_saving: "Start Saving", 
+        start_investing: "Start Investing"
+      };
+      
+      const stageName = stageNames[response.determinedStage as keyof typeof stageNames] || response.determinedStage;
+      return `Determined financial stage: ${stageName}`;
+    }
+    
+    // Handle stage selector response (legacy)
+    if (response.selectedStage) {
+      const stageNames = {
+        debt: "Get Out of Debt",
+        start_saving: "Start Saving", 
+        start_investing: "Start Investing"
+      };
+      
+      const stageName = stageNames[response.selectedStage as keyof typeof stageNames] || response.selectedStage;
+      return `Selected stage: ${stageName}`;
+    }
+    
+    // Handle expense breakdown response
+    if (response.expenseBreakdown) {
+      const breakdown = response.expenseBreakdown;
+      let total = 0;
+      
+      if (breakdown.housing) total += breakdown.housing;
+      if (breakdown.food) total += breakdown.food;
+      if (breakdown.transportation) total += breakdown.transportation;
+      if (breakdown.other) total += breakdown.other;
+      if (breakdown.additional && Array.isArray(breakdown.additional)) {
+        total += breakdown.additional.reduce((sum, item) => sum + (item.amount || 0), 0);
+      }
+      
+      const formattedTotal = total.toLocaleString('vi-VN');
+      return `Monthly expenses: ${formattedTotal} VND`;
+    }
+    
+    // Handle savings capacity response
+    if (response.savingsCapacity) {
+      const formattedAmount = response.savingsCapacity.toLocaleString('vi-VN');
+      return `Monthly savings capacity: ${formattedAmount} VND`;
+    }
+    
+    // Handle goal confirmation
+    if (response.goalConfirmed !== undefined) {
+      return response.goalConfirmed ? "Goal confirmed" : "Goal needs adjustment";
+    }
+    
     if (response.textValue) {
       return response.textValue;
     } else if (response.selectedOption) {

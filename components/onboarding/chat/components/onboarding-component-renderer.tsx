@@ -8,6 +8,13 @@ import { TextInputComponent } from "./text-input-component";
 import { FinancialInputComponent } from "./financial-input-component";
 import { GoalSelectorComponent } from "./goal-selector-component";
 import { IntroductionTemplateComponent } from "./introduction-template-component";
+// New stage-first components
+import { StageSelectorComponent } from "./stage-selector-component";
+import { DecisionTreeComponent } from "./decision-tree-component";
+import { ExpenseCategoriesComponent } from "./expense-categories-component";
+import { SavingsCapacityComponent } from "./savings-capacity-component";
+import { GoalConfirmationComponent } from "./goal-confirmation-component";
+import { EducationContentComponent } from "./education-content-component";
 
 interface OnboardingComponentRendererProps {
   component: OnboardingComponent;
@@ -74,6 +81,54 @@ export function OnboardingComponentRenderer({
     case "introduction_template":
       return (
         <IntroductionTemplateComponent
+          component={component}
+          onResponse={handleResponse}
+        />
+      );
+
+    case "stage_selector":
+      return (
+        <StageSelectorComponent
+          component={component}
+          onResponse={handleResponse}
+        />
+      );
+
+    case "decision_tree":
+      return (
+        <DecisionTreeComponent
+          component={component}
+          onResponse={handleResponse}
+        />
+      );
+
+    case "expense_categories":
+      return (
+        <ExpenseCategoriesComponent
+          component={component}
+          onResponse={handleResponse}
+        />
+      );
+
+    case "savings_capacity":
+      return (
+        <SavingsCapacityComponent
+          component={component}
+          onResponse={handleResponse}
+        />
+      );
+
+    case "goal_confirmation":
+      return (
+        <GoalConfirmationComponent
+          component={component}
+          onResponse={handleResponse}
+        />
+      );
+
+    case "education_content":
+      return (
+        <EducationContentComponent
           component={component}
           onResponse={handleResponse}
         />

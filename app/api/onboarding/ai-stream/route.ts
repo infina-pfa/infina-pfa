@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import OpenAI from "openai";
-import { generateOnboardingSystemPrompt } from "@/lib/ai-advisor/prompts/onboarding-system-prompt";
+import { generateStageSpecificPrompt, validateStageCompatibility, logPromptSelection, type FinancialStage } from "@/lib/ai-advisor/prompts/prompt-orchestrator";
 import { onboardingFunctionTools, validateComponentArguments } from "@/lib/ai-advisor/tools/onboarding-definitions";
 import { SystemPromptLogger } from "@/lib/utils/system-prompt-logger";
 import { TokenEstimator } from "@/lib/ai-advisor/utils/token-estimator";
@@ -330,13 +330,29 @@ export async function POST(request: NextRequest) {
 
     console.log(`📥 Using session conversation history: ${completeConversationHistory.length} messages`);
 
-    // Generate onboarding-specific system prompt WITHOUT conversation history
+    // Generate stage-specific system prompt based on user's identified financial stage
     // The conversation history will be passed separately in the input field
-    const systemInstructions = generateOnboardingSystemPrompt(
-      user.id,
-      requestBody.userProfile || {},
-      [], // Empty array - conversation history goes to input field instead
-      requestBody.currentStep || "ai_welcome"
+    const systemInstructions = generateStageSpecificPrompt({
+      userId: user.id,
+      userProfile: requestBody.userProfile || {},
+      conversationHistory: [], // Empty array - conversation history goes to input field instead
+      currentStep: requestBody.currentStep || "ai_welcome"
+    });
+
+    // Validate stage compatibility and log prompt selection for debugging
+    const identifiedStage = (requestBody.userProfile?.identifiedStage || 'none') as FinancialStage;
+    if (identifiedStage !== 'none') {
+      const stageValidation = validateStageCompatibility(identifiedStage, requestBody.userProfile || {});
+      if (!stageValidation.isValid) {
+        console.warn('⚠️ Stage compatibility issue:', stageValidation);
+      }
+    }
+    
+    logPromptSelection(
+      user.id, 
+      identifiedStage, 
+      identifiedStage === 'none' ? 'onboarding' : `${identifiedStage}_stage`,
+      requestBody.userProfile || {}
     );
 
     console.log("📝 Generated onboarding system instructions (no history embedded)");

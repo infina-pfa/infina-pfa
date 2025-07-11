@@ -6,39 +6,49 @@ export interface OnboardingState {
   isComplete: boolean;
   conversationId: string | null;
   userId: string;
+  // New fields for stage-based flow
+  financialStage?: FinancialStage;
+  stageFlow?: StageFlow;
+  currentStageStep?: number;
 }
 
 export type OnboardingStep = 
   | "ai_welcome"
-  | "user_introduction" 
-  | "financial_assessment"
-  | "risk_assessment"
-  | "goal_setting"
-  | "stage_analysis"
+  | "stage_identification"
+  | "stage_introduction"
+  | "stage_flow"
   | "complete";
 
 export interface UserProfile {
-  // Basic demographics
-  name: string;
+  name?: string;
   age?: number;
   gender?: "male" | "female" | "other" | "prefer_not_to_say";
   location?: string;
-  
-  // Financial situation
+  // Financial information
   income?: number;
   expenses?: number;
   currentDebts?: number;
   savings?: number;
+  // New expense breakdown for saving flow
+  expenseBreakdown?: {
+    housing?: number; // Nhà ở (thuê nhà/điện/nước)
+    food?: number; // Ăn uống
+    transportation?: number; // Di chuyển
+    other?: number; // Chi tiêu khác (giải trí, mua sắm, v.v.)
+    additional?: Array<{ name: string; amount: number }>; // User can add more
+  };
+  // Savings goals and capacity
+  monthlySavingsCapacity?: number;
+  emergencyFundGoal?: number;
+  timelineToGoal?: number; // months
+  // Stage information
+  identifiedStage?: FinancialStage;
+  stageConfirmed?: boolean;
+  // Investment and risk information
   investmentExperience?: "none" | "beginner" | "intermediate" | "advanced";
-  
-  // Goals and preferences
   primaryFinancialGoal?: string;
   timeHorizon?: "short" | "medium" | "long";
   riskTolerance?: "conservative" | "moderate" | "aggressive";
-  
-  // Assessment results
-  financialStage?: FinancialStage;
-  qualitativeData?: QualitativeAssessment;
 }
 
 export interface QualitativeAssessment {
@@ -50,14 +60,43 @@ export interface QualitativeAssessment {
   preferredLearningStyle: "visual" | "reading" | "hands_on" | "interactive";
 }
 
+// New financial stages based on user requirements
 export type FinancialStage = 
-  | "survival"      // Stage 0: Stop bleeding cash
-  | "debt"          // Stage 1: Eliminate bad debt
-  | "foundation"    // Stage 2: Build emergency fund
-  | "investing"     // Stage 3: Start investing
-  | "optimizing"    // Stage 4: Optimize assets
-  | "protecting"    // Stage 5: Protect assets
-  | "retirement";   // Stage 6: Retirement planning
+  | "debt" 
+  | "start_saving" 
+  | "start_investing";
+
+// Stage-specific flows
+export type StageFlow = 
+  | "debt_elimination"
+  | "saving_emergency_fund"
+  | "investment_start";
+
+// New type for tracking specific stage step progression
+export type SavingFlowStep = 
+  | 0  // Initial/stage selection
+  | 1  // Emergency fund explanation and acceptance
+  | 2  // Expense categories collection
+  | 3  // Savings capacity determination  
+  | 4  // Goal confirmation
+  | 5; // HYSA guidance and completion
+
+// New components for the updated flow
+export type ComponentType = 
+  | "multiple_choice"
+  | "rating_scale"
+  | "slider"
+  | "text_input"
+  | "financial_input"
+  | "goal_selector"
+  | "introduction_template"
+  // New stage-specific components
+  | "stage_selector"
+  | "decision_tree"
+  | "expense_categories"
+  | "savings_capacity"
+  | "goal_confirmation"
+  | "education_content";
 
 export interface OnboardingMessage {
   id: string;
@@ -85,7 +124,14 @@ export type OnboardingComponentType =
   | "text_input"
   | "financial_input"
   | "goal_selector"
-  | "introduction_template";
+  | "introduction_template"
+  // New stage-specific components
+  | "stage_selector"
+  | "decision_tree"
+  | "expense_categories"
+  | "savings_capacity"
+  | "goal_confirmation"
+  | "education_content";
 
 export interface ComponentData {
   // Multiple choice
@@ -126,6 +172,55 @@ export interface ComponentData {
   // Introduction template
   template?: string;
   suggestions?: string[];
+  
+  // Stage selector
+  stages?: Array<{
+    id: FinancialStage;
+    title: string;
+    description: string;
+    criteria: string[];
+  }>;
+  
+  // Decision tree
+  questions?: Array<{
+    id: string;
+    question: string;
+    explanation?: string;
+    yesLabel?: string;
+    noLabel?: string;
+  }>;
+  
+  // Expense categories
+  categories?: Array<{
+    id: string;
+    name: string;
+    placeholder: string;
+    required: boolean;
+  }>;
+  allowAdditional?: boolean;
+  
+  // Savings capacity
+  incomeHint?: string;
+  savingsHint?: string;
+  
+  // Goal confirmation
+  goalDetails?: {
+    amount: number;
+    timeframe: number;
+    monthlyTarget: number;
+  };
+  
+  // Education content
+  educationContent?: EducationContent;
+}
+
+// New education content structure
+export interface EducationContent {
+  type: "video" | "text";
+  title: string;
+  content: string;
+  videoUrl?: string;
+  relatedActions?: string[];
 }
 
 export interface ComponentResponse {
@@ -134,6 +229,22 @@ export interface ComponentResponse {
   sliderValue?: number;
   textValue?: string;
   financialValue?: number;
+  // New response types for stage-specific components
+  selectedStage?: FinancialStage;
+  // Decision tree
+  answers?: Record<string, boolean>;
+  determinedStage?: string;
+  reasoning?: string;
+  expenseBreakdown?: {
+    housing?: number;
+    food?: number;
+    transportation?: number;
+    other?: number;
+    additional?: Array<{ name: string; amount: number }>;
+  };
+  savingsCapacity?: number;
+  goalConfirmed?: boolean;
+  educationCompleted?: boolean;
   completedAt: Date;
 }
 

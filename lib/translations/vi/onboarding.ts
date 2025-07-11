@@ -130,6 +130,117 @@ export const onboardingVi = {
   responseFailed: "Không thể lưu phản hồi",
   completionFailed: "Không thể hoàn thành quá trình onboarding",
   continueMessage: "Vui lòng tiếp tục với câu hỏi tiếp theo",
+
+  // NEW STAGE-FIRST FLOW TRANSLATIONS
+
+  // Stage Selector Component
+  selectFinancialStage: "Chọn tình hình tài chính hiện tại của bạn",
+  stageDebt: "Tôi có nợ cần giải quyết",
+  stageStartSaving: "Tôi muốn bắt đầu tiết kiệm", 
+  stageStartInvesting: "Tôi sẵn sàng đầu tư",
+  
+  // Financial stages descriptions for AI
+  debtStageTitle: "Thoát khỏi nợ nần",
+  debtStageDescription: "Tập trung vào việc xóa nợ lãi suất cao đang ảnh hưởng đến tài chính",
+  savingStageTitle: "Bắt đầu xây dựng quỹ dự phòng khẩn cấp", 
+  savingStageDescription: "Xây dựng quỹ dự phòng khẩn cấp đầu tiên để tạo sự an toàn tài chính",
+  investingStageTitle: "Bắt đầu hành trình đầu tư",
+  investingStageDescription: "Bắt đầu đầu tư để xây dựng tài sản dài hạn với nền tảng vững chắc",
+  
+  // Decision Tree Questions
+  decisionTreeTitle: "Hãy xác định ưu tiên tài chính của bạn",
+  decisionTreeSubtitle: "Vui lòng trả lời hai câu hỏi sau để xác định mục tiêu chính của bạn.",
+  question1Title: "Bạn có nợ lãi suất cao không?",
+  question1Text: "Bạn có bất kỳ khoản nợ nào, chẳng hạn như dư nợ thẻ tín dụng hoặc các khoản vay cá nhân, với lãi suất cao hơn 8% không?",
+  question1Explanation: "Vui lòng loại trừ khoản thế chấp chính hoặc các khoản vay sinh viên lãi suất thấp.",
+  question2Title: "Bạn có quỹ dự phòng khẩn cấp không?",
+  question2Text: "Nếu bạn mất nguồn thu nhập chính ngày hôm nay, bạn có đủ tiền mặt trong tài khoản tiết kiệm dễ tiếp cận để trang trải tất cả các chi phí sinh hoạt thiết yếu trong ít nhất ba tháng không?",
+  question2Explanation: "Chi phí thiết yếu bao gồm nhà ở, thực phẩm, tiện ích, giao thông và các nhu cầu thiết yếu khác.",
+
+  // Decision Tree Reasoning
+  debtStageReasoning: "Dựa trên câu trả lời của bạn, mục tiêu chính của bạn nên là THOÁT KHỎI NỢ NẦN. Nợ lãi suất cao là một tình trạng khẩn cấp về tài chính. Các khoản thanh toán lãi đang làm cạn kiệt tài sản của bạn, và việc trả hết số nợ này sẽ mang lại lợi nhuận đảm bảo bằng với lãi suất. Trước khi bạn có thể xây dựng tài sản hiệu quả, bạn phải ngăn chặn những tổn thất này.",
+  savingStageReasoning: "Dựa trên câu trả lời của bạn, mục tiêu chính của bạn nên là BẮT ĐẦU TIẾT KIỆM CHO QUỸ DỰ PHÒNG KHẨN CẤP. Bạn đang ở một vị trí tuyệt vời, đã tránh được gánh nặng của nợ lãi suất cao. Bước tiếp theo của bạn là xây dựng một mạng lưới an toàn tài chính. Quỹ dự phòng khẩn cấp bảo vệ bạn khỏi các sự kiện bất ngờ và ngăn bạn không phải vay nợ khi xảy ra khủng hoảng.",
+  investingStageReasoning: "Dựa trên câu trả lời của bạn, mục tiêu chính của bạn nên là BẮT ĐẦU ĐẦU TƯ. Chúc mừng, bạn đã xây dựng thành công một nền tảng tài chính vững chắc. Với việc không có nợ lãi suất cao và một quỹ dự phòng khẩn cấp đầy đủ, giờ đây bạn đã sẵn sàng tập trung vào việc xây dựng tài sản dài hạn thông qua đầu tư.",
+
+  // Decision Tree Navigation
+  questionNumber: "Câu hỏi",
+  ofTotal: "trên",
+  previousAnswers: "Câu trả lời trước đó",
+  yesAnswer: "Có",
+  noAnswer: "Không",
+  
+  // Expense Categories Component
+  housingExpenses: "Nhà ở (thuê nhà/điện/nước)",
+  foodExpenses: "Ăn uống",
+  transportExpenses: "Di chuyển",
+  otherExpenses: "Chi tiêu khác (giải trí, mua sắm, v.v.)",
+  additionalExpenses: "Chi phí bổ sung",
+  expenseName: "Tên chi phí",
+  expenseNamePlaceholder: "ví dụ: Netflix, Gym membership",
+  amount: "Số tiền",
+  add: "Thêm",
+  addMoreExpenses: "Thêm chi phí khác",
+  totalMonthlyExpenses: "Tổng chi phí hàng tháng",
+  housingExpensesPlaceholder: "Tiền thuê nhà, điện, nước, internet...",
+  foodExpensesPlaceholder: "Ăn uống, đi chợ, order đồ ăn...",
+  transportExpensesPlaceholder: "Xăng xe, grab, xe bus...",
+  otherExpensesPlaceholder: "Giải trí, quần áo, mỹ phẩm...",
+  
+  // Savings Capacity Component
+  monthlySavingsCapacity: "Khả năng tiết kiệm hàng tháng",
+  savingsCapacityPlaceholder: "ví dụ: 5,000,000 VND",
+  savingsAmountRequired: "Vui lòng nhập số tiền bạn có thể tiết kiệm hàng tháng",
+  savingsAmountTooLow: "Số tiền tiết kiệm tối thiểu nên ít nhất 100,000 VND",
+  savingsProjection: "Dự báo tiết kiệm",
+  monthly: "Hàng tháng",
+  quarterly: "Hàng quý (3 tháng)",
+  yearly: "Hàng năm",
+  savingsTips: "💡 Mẹo tiết kiệm",
+  savingsTip1: "Bắt đầu với số tiền thực tế mà bạn có thể duy trì ổn định",
+  savingsTip2: "Thiết lập chuyển khoản tự động để việc tiết kiệm trở nên dễ dàng",
+  savingsTip3: "Xem xét và điều chỉnh số tiền tiết kiệm của bạn mỗi vài tháng",
+  incomeHint: "Nếu thu nhập của bạn là 15 triệu VND/tháng",
+  savingsHint: "Bạn có thể tiết kiệm bao nhiêu mỗi tháng một cách thoải mái?",
+  
+  // Goal Confirmation Component
+  emergencyFundGoal: "Mục tiêu quỹ dự phòng khẩn cấp của bạn",
+  goalBreakdown: "Chi tiết mục tiêu",
+  monthlyTarget: "Mục tiêu hàng tháng",
+  timeToGoal: "Thời gian đạt mục tiêu",
+  months: "tháng",
+  month: "tháng",
+  yourProgressTimeline: "Lộ trình tiến độ của bạn",
+  andMoreMonths: "và {count} tháng nữa",
+  emergencyFundBenefits: "Lợi ích của quỹ dự phòng khẩn cấp",
+  benefit1: "An tâm khi biết bạn đã chuẩn bị cho những chi phí bất ngờ",
+  benefit2: "Tránh nợ nần khi đối mặt với khẩn cấp tài chính",
+  benefit3: "Xây dựng nền tảng cho các mục tiêu tài chính tương lai",
+  confirmGoal: "Vâng, hãy bắt đầu!",
+  adjustGoal: "Để tôi điều chỉnh lại",
+  
+  // Education Content Component
+  clickToWatch: "Nhấn để xem",
+  watchOnYouTube: "Xem trên YouTube",
+  whatWouldYouLikeToKnow: "Bạn muốn biết gì?",
+  continueToNextStep: "Tiếp tục bước tiếp theo",
+  educationTip: "Hãy dành thời gian để hiểu những khái niệm này - chúng là nền tảng cho thành công tài chính của bạn!",
+  
+  // Suggested Actions for Start Saving Flow
+  explainWhy: "Giải thích",
+  howToStart: "Tôi nên bắt đầu như thế nào?",
+  explain532Method: "Giải thích phương pháp 5-3-2?",
+  stepByStepGuide: "hướng dẫn tôi từng bước đi",
+  whyThisGoal: "Giải thích vì sao đây là mục tiêu hợp với tôi?",
+  okNextStep: "OK bước tiếp theo là gì",
+  whatIsHYSA: "HYSA là gì vậy?",
+  whyNowNotEndMonth: "Tại sao phải bỏ vô bây giờ thay vì cuối tháng?",
+  
+  // Education Content Topics
+  emergencyFundImportance: "Vì sao nên bắt đầu sớm và tầm quan trọng của quỹ dự phòng",
+  method532Explanation: "Giải thích phương pháp 5-3-2 với ví dụ cụ thể",
+  goalCalculationMethodology: "Cách tính toán mục tiêu dựa trên chi phí, thu nhập và quy tắc quỹ dự phòng",
+  hysaExplanation: "HYSA và lợi ích của Infina TKSL so với tiết kiệm ngân hàng truyền thống",
+  payYourselfFirst: "Nguyên tắc 'Trả cho bản thân trước'",
   
   // Legacy translations - keeping for compatibility
   welcomeTitle: "Chào mừng đến với Infina PFA",

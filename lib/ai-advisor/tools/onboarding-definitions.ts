@@ -18,7 +18,14 @@ export const showOnboardingComponentTool = {
             "text_input",
             "financial_input",
             "goal_selector",
-            "introduction_template"
+            "introduction_template",
+            // New stage-first components
+            "stage_selector",
+            "decision_tree",
+            "expense_categories", 
+            "savings_capacity",
+            "goal_confirmation",
+            "education_content"
           ],
           description: "Type of component to display - determines the UI component that will be rendered. REQUIRED: Must be one of the enum values."
         },
@@ -28,7 +35,7 @@ export const showOnboardingComponentTool = {
         },
         component_id: {
           type: "string",
-          description: "Unique identifier for this component instance. REQUIRED: Use format 'component_type_timestamp' (e.g. 'introduction_template_1751563582612')"
+          description: "Unique identifier for this component instance. REQUIRED: Use format 'component_type_timestamp' (e.g. 'stage_selector_1751563582612')"
         },
         context: {
           type: "object",
@@ -114,6 +121,105 @@ export const showOnboardingComponentTool = {
               type: "array",
               items: { type: "string" },
               description: "Quick suggestion buttons for user convenience"
+            },
+
+            // NEW STAGE-FIRST COMPONENTS
+
+            // Stage selector - required for component_type: "stage_selector"
+            stages: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string", description: "Financial stage identifier (debt, start_saving, start_investing)" },
+                  title: { type: "string", description: "Display title for the stage" },
+                  description: { type: "string", description: "Brief description of the stage" },
+                  criteria: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "List of criteria that define this stage"
+                  }
+                },
+                required: ["id", "title", "description", "criteria"]
+              },
+              description: "Array of financial stages to choose from (REQUIRED for stage_selector)"
+            },
+
+            // Decision tree - required for component_type: "decision_tree"
+            questions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string", description: "Question identifier (e.g. high_interest_debt, emergency_fund)" },
+                  question: { type: "string", description: "The question text to display" },
+                  explanation: { type: "string", description: "Optional explanation or clarification" },
+                  yesLabel: { type: "string", description: "Custom label for Yes button (optional)" },
+                  noLabel: { type: "string", description: "Custom label for No button (optional)" }
+                },
+                required: ["id", "question"]
+              },
+              description: "Array of decision tree questions to ask (REQUIRED for decision_tree)"
+            },
+
+            // Expense categories - required for component_type: "expense_categories"
+            categories: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string", description: "Category identifier" },
+                  name: { type: "string", description: "Category display name" },
+                  placeholder: { type: "string", description: "Placeholder text for input" },
+                  required: { type: "boolean", description: "Whether this category is required" }
+                },
+                required: ["id", "name", "placeholder", "required"]
+              },
+              description: "Array of expense categories to collect (REQUIRED for expense_categories)"
+            },
+            allowAdditional: {
+              type: "boolean",
+              description: "Whether user can add additional expense categories (REQUIRED for expense_categories)"
+            },
+
+            // Savings capacity - optional for component_type: "savings_capacity"
+            incomeHint: {
+              type: "string",
+              description: "Hint text about income assessment"
+            },
+            savingsHint: {
+              type: "string", 
+              description: "Hint text about savings capacity"
+            },
+
+            // Goal confirmation - required for component_type: "goal_confirmation"
+            goalDetails: {
+              type: "object",
+              properties: {
+                amount: { type: "number", description: "Target emergency fund amount" },
+                timeframe: { type: "number", description: "Timeline to achieve goal in months" },
+                monthlyTarget: { type: "number", description: "Required monthly savings amount" }
+              },
+              required: ["amount", "timeframe", "monthlyTarget"],
+              description: "Goal details for confirmation (REQUIRED for goal_confirmation)"
+            },
+
+            // Education content - required for component_type: "education_content"  
+            educationContent: {
+              type: "object",
+              properties: {
+                type: { type: "string", enum: ["video", "text"], description: "Type of educational content" },
+                title: { type: "string", description: "Title of the educational content" },
+                content: { type: "string", description: "Main educational content text" },
+                videoUrl: { type: "string", description: "URL for video content (if type is video)" },
+                relatedActions: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "Related action buttons for user interaction"
+                }
+              },
+              required: ["type", "title", "content"],
+              description: "Educational content structure (REQUIRED for education_content)"
             }
           }
         }
@@ -249,32 +355,118 @@ export function getOnboardingToolsInfo(): string {
 export function getComponentExamples(): string {
   const timestamp = new Date().getTime();
   return `
-- **Introduction Template Example**:
+- **Stage Selector Example**:
   \`\`\`json
   {
-    "component_type": "introduction_template",
-    "title": "Let's get to know each other! Please introduce yourself.",
-    "component_id": "introduction_template_${timestamp}",
+    "component_type": "stage_selector",
+    "title": "Để tôi có thể tư vấn tốt nhất, hãy chọn tình huống tài chính hiện tại của bạn:",
+    "component_id": "stage_selector_${timestamp}",
     "context": {
-      "template": "My name is [Name], I'm [Age] years old, and I live in [City]. I work as a [Occupation]. My main financial goal is to [Goal].",
-      "suggestions": ["Fill out my profile", "Tell me about my finances", "Let's start onboarding"]
+      "stages": [
+        {
+          "id": "debt",
+          "title": "Tôi đang có nợ cần giải quyết",
+          "description": "Bạn có các khoản nợ thẻ tín dụng, nợ tiêu dùng hoặc các khoản vay ngắn hạn đang ảnh hưởng đến tài chính",
+          "criteria": ["Nợ thẻ tín dụng hoặc nợ tiêu dùng", "Lãi suất cao (>15%/năm)", "Ảnh hưởng đến chi tiêu hàng tháng"]
+        },
+        {
+          "id": "start_saving",
+          "title": "Tôi muốn bắt đầu tiết kiệm",
+          "description": "Bạn không có nợ đáng kể nhưng chưa có quỹ dự phòng, muốn xây dựng nền tảng tài chính vững chắc",
+          "criteria": ["Không có nợ xấu", "Chưa có quỹ dự phòng", "Muốn xây dựng thói quen tiết kiệm"]
+        },
+        {
+          "id": "start_investing", 
+          "title": "Tôi sẵn sàng đầu tư",
+          "description": "Bạn đã có quỹ dự phòng và muốn bắt đầu đầu tư để tăng trưởng tài sản dài hạn",
+          "criteria": ["Đã có quỹ dự phòng 3-6 tháng", "Thu nhập ổn định", "Muốn tăng trưởng tài sản"]
+        }
+      ]
     }
   }
   \`\`\`
 
-- **Multiple Choice Example**:
+- **Expense Categories Example**:
   \`\`\`json
   {
-    "component_type": "multiple_choice",
-    "title": "What is your primary financial goal right now?",
-    "component_id": "multiple_choice_${timestamp}",
+    "component_type": "expense_categories",
+    "title": "Để tính toán quỹ dự phòng phù hợp, hãy cho tôi biết chi tiêu hàng tháng của bạn:",
+    "component_id": "expense_categories_${timestamp}",
     "context": {
-      "options": [
-        {"id": "goal_1", "label": "Save for a down payment", "value": "down_payment"},
-        {"id": "goal_2", "label": "Pay off high-interest debt", "value": "pay_debt"},
-        {"id": "goal_3", "label": "Build an emergency fund", "value": "emergency_fund"},
-        {"id": "goal_4", "label": "Start investing for retirement", "value": "invest_retirement"}
-      ]
+      "categories": [
+        {
+          "id": "housing",
+          "name": "Nhà ở (thuê nhà/điện/nước)",
+          "placeholder": "Ví dụ: 8,000,000 VND",
+          "required": true
+        },
+        {
+          "id": "food",
+          "name": "Ăn uống",
+          "placeholder": "Ví dụ: 4,000,000 VND",
+          "required": true
+        },
+        {
+          "id": "transportation",
+          "name": "Di chuyển",
+          "placeholder": "Ví dụ: 2,000,000 VND",
+          "required": true
+        },
+        {
+          "id": "other",
+          "name": "Chi tiêu khác (giải trí, mua sắm, v.v.)",
+          "placeholder": "Ví dụ: 3,000,000 VND",
+          "required": true
+        }
+      ],
+      "allowAdditional": true
+    }
+  }
+  \`\`\`
+
+- **Savings Capacity Example**:
+  \`\`\`json
+  {
+    "component_type": "savings_capacity",
+    "title": "Bạn có thể tiết kiệm bao nhiều mỗi tháng?",
+    "component_id": "savings_capacity_${timestamp}",
+    "context": {
+      "incomeHint": "Bạn không cần chia sẻ thu nhập chính xác, chỉ cần ước tính khả năng tiết kiệm",
+      "savingsHint": "Hãy thật thà về số tiền bạn có thể tiết kiệm một cách bền vững mỗi tháng"
+    }
+  }
+  \`\`\`
+
+- **Goal Confirmation Example**:
+  \`\`\`json
+  {
+    "component_type": "goal_confirmation",
+    "title": "Đây là mục tiêu quỹ dự phòng dành cho bạn:",
+    "component_id": "goal_confirmation_${timestamp}",
+    "context": {
+      "goalDetails": {
+        "amount": 51000000,
+        "timeframe": 6,
+        "monthlyTarget": 8500000
+      }
+    }
+  }
+  \`\`\`
+
+- **Education Content Example**:
+  \`\`\`json
+  {
+    "component_type": "education_content",
+    "title": "Tại sao nên xây dựng quỹ dự phòng sớm?",
+    "component_id": "education_content_${timestamp}",
+    "context": {
+      "educationContent": {
+        "type": "video",
+        "title": "Quỹ dự phòng - Nền tảng của sự tự do tài chính",
+        "content": "Quỹ dự phòng là khoản tiền dành riêng để đối phó với các tình huống khẩn cấp như mất việc, ốm đau, hoặc các chi phí bất ngờ. Đây là bước đầu tiên và quan trọng nhất trong hành trình tài chính của bạn...",
+        "videoUrl": "https://youtube.com/watch?v=emergency-fund-basics",
+        "relatedActions": ["Tôi nên bắt đầu như thế nào?", "Làm sao để duy trì động lực?"]
+      }
     }
   }
   \`\`\`
@@ -283,61 +475,29 @@ export function getComponentExamples(): string {
   \`\`\`json
   {
     "component_type": "financial_input",
-    "title": "What is your estimated monthly income?",
+    "title": "Thu nhập hàng tháng của bạn là bao nhiều?",
     "component_id": "financial_input_${timestamp}",
     "context": {
       "inputType": "income",
-      "placeholder": "e.g., 25,000,000 VND",
+      "placeholder": "Ví dụ: 25,000,000 VND",
       "currency": "VND"
     }
   }
   \`\`\`
 
-- **Rating Scale Example**:
+- **Multiple Choice Example**:
   \`\`\`json
   {
-    "component_type": "rating_scale",
-    "title": "On a scale of 1 to 5, how comfortable are you with investment risk?",
-    "component_id": "rating_scale_${timestamp}",
+    "component_type": "multiple_choice",
+    "title": "Mục tiêu tài chính chính của bạn là gì?",
+    "component_id": "multiple_choice_${timestamp}",
     "context": {
-      "scale": {
-        "min": 1,
-        "max": 5,
-        "labels": ["Very Uncomfortable", "Very Comfortable"]
-      }
-    }
-  }
-  \`\`\`
-
-- **Slider Example**:
-  \`\`\`json
-  {
-    "component_type": "slider",
-    "title": "What percentage of your income do you aim to save each month?",
-    "component_id": "slider_${timestamp}",
-    "context": {
-      "range": {
-        "min": 0,
-        "max": 50,
-        "step": 5,
-        "unit": "%"
-      }
-    }
-  }
-  \`\`\`
-  
-- **Text Input Example**:
-  \`\`\`json
-  {
-    "component_type": "text_input",
-    "title": "What is your current occupation?",
-    "component_id": "text_input_${timestamp}",
-    "context": {
-      "placeholder": "e.g., Software Engineer, Doctor, etc.",
-      "validation": {
-        "required": true,
-        "minLength": 2
-      }
+      "options": [
+        {"id": "emergency_fund", "label": "Xây dựng quỹ dự phòng", "value": "emergency_fund"},
+        {"id": "pay_debt", "label": "Trả hết nợ", "value": "pay_debt"},
+        {"id": "save_house", "label": "Tiết kiệm mua nhà", "value": "save_house"},
+        {"id": "invest_retirement", "label": "Đầu tư cho tương lai", "value": "invest_retirement"}
+      ]
     }
   }
   \`\`\`
@@ -402,6 +562,44 @@ export function validateComponentArguments(args: unknown): { isValid: boolean; e
       const range = context.range as Record<string, unknown>;
       if (range.min === undefined || range.min === null || range.max === undefined || range.max === null) {
         errors.push("slider requires range configuration with min/max in context");
+      }
+    }
+  }
+
+  // New component validations
+  if (argObj.component_type === 'stage_selector' && context) {
+    if (!context.stages || !Array.isArray(context.stages) || context.stages.length < 2) {
+      errors.push("stage_selector requires stages array with at least 2 stages");
+    }
+  }
+
+  if (argObj.component_type === 'expense_categories' && context) {
+    if (!context.categories || !Array.isArray(context.categories) || context.categories.length < 1) {
+      errors.push("expense_categories requires categories array with at least 1 category");
+    }
+    if (context.allowAdditional === undefined) {
+      errors.push("expense_categories requires allowAdditional boolean flag");
+    }
+  }
+
+  if (argObj.component_type === 'goal_confirmation' && context) {
+    if (!context.goalDetails || typeof context.goalDetails !== 'object') {
+      errors.push("goal_confirmation requires goalDetails object");
+    } else {
+      const goalDetails = context.goalDetails as Record<string, unknown>;
+      if (!goalDetails.amount || !goalDetails.timeframe || !goalDetails.monthlyTarget) {
+        errors.push("goal_confirmation requires goalDetails with amount, timeframe, and monthlyTarget");
+      }
+    }
+  }
+
+  if (argObj.component_type === 'education_content' && context) {
+    if (!context.educationContent || typeof context.educationContent !== 'object') {
+      errors.push("education_content requires educationContent object");
+    } else {
+      const eduContent = context.educationContent as Record<string, unknown>;
+      if (!eduContent.type || !eduContent.title || !eduContent.content) {
+        errors.push("education_content requires educationContent with type, title, and content");
       }
     }
   }
