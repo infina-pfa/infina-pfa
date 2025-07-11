@@ -1,3 +1,5 @@
+import OpenAi from "openai";
+
 export interface ChatTool {
   id: string;
   name: string;
@@ -8,7 +10,7 @@ export interface ChatTool {
 export interface ConversationMessage {
   id: string;
   content: string;
-  sender: 'user' | 'ai';
+  sender: "user" | "ai";
   timestamp: string;
 }
 
@@ -26,18 +28,7 @@ export interface MCPToolItem {
   description: string;
 }
 
-export interface FunctionTool {
-  type: "function";
-  function: {
-    name: string;
-    description: string;
-    parameters: {
-      type: string;
-      properties: Record<string, unknown>;
-      required: string[];
-    };
-  };
-}
+export type Tool = OpenAi.Responses.Tool;
 
 // Gemini-specific interfaces
 export interface GeminiFunctionDeclaration {
@@ -129,7 +120,7 @@ export interface RequestBody {
   userContext: UserContext;
   conversationId: string;
   user_id: string;
-  provider?: 'openai' | 'gemini'; // Optional provider selection
+  provider?: "openai" | "gemini"; // Optional provider selection
 }
 
 export interface MemorySearchOptions {
@@ -161,4 +152,4 @@ export enum UIActionType {
   OPEN_TOOL = "open_tool",
   SHOW_COMPONENT = "show_component",
   SHOW_SUGGESTION = "show_suggestion",
-} 
+}

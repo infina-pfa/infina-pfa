@@ -44,6 +44,7 @@ export function ChatInterface() {
     conversationId,
     sendMessage,
   } = chatFlow;
+  console.log("🚀 ~ ChatInterface ~ messages:", messages);
 
   useEffect(() => {
     // Check if we're on client-side

@@ -41,17 +41,12 @@ export const aiStreamingService = {
    * @param stream OpenAI streaming response
    * @returns Readable stream with SSE format
    */
-  createReadableStream(stream: Stream<OpenAIChunk>) {
-    // Set up Server-Sent Events headers
-    const headers = new Headers({
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    });
-
+  createReadableStream(
+    stream: Stream<OpenAIChunk>,
+    options?: {
+      onResponsesCompleted?: (responseContent: string) => void;
+    }
+  ) {
     // Create a readable stream
     const readable = new ReadableStream({
       async start(controller) {
@@ -182,6 +177,11 @@ export const aiStreamingService = {
 
           // End the stream
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+
+          if (options?.onResponsesCompleted) {
+            options.onResponsesCompleted(responseContent);
+          }
+
           controller.close();
         } catch (error) {
           console.error("❌ Streaming error:", error);
@@ -202,6 +202,6 @@ export const aiStreamingService = {
       },
     });
 
-    return new Response(readable, { headers });
+    return readable;
   },
 };

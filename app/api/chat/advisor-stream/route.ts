@@ -200,39 +200,17 @@ export async function POST(request: NextRequest) {
 
     // Create a readable stream
     console.log("🌊 Creating readable stream...");
-    const readable = new ReadableStream({
-      async start(controller) {
-        console.log("🎬 Stream started, calling orchestrator...");
-        try {
-          await orchestratorService.processRequest(
-            aiAdvisorRequest,
-            llmConfig,
-            controller
-          );
-          console.log("✅ Orchestrator completed successfully");
-        } catch (error) {
-          console.error("❌ Streaming error:", error);
-          handleMCPError(error, "streaming");
-
-          const encoder = new TextEncoder();
-          const errorData = {
-            type: "error",
-            error:
-              error instanceof Error
-                ? error.message
-                : "Unknown streaming error",
-            timestamp: new Date().toISOString(),
-            context: "streaming_response",
-            provider: selectedProvider,
-          };
-
-          const message = `data: ${JSON.stringify(errorData)}\n\n`;
-          controller.enqueue(encoder.encode(message));
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-          controller.close();
-        }
-      },
-    });
+    let readable: ReadableStream | null = null;
+    try {
+      readable = await orchestratorService.processRequest(
+        aiAdvisorRequest,
+        llmConfig
+      );
+      console.log("✅ Orchestrator completed successfully");
+    } catch (error) {
+      console.error("❌ Streaming error:", error);
+      handleMCPError(error, "streaming");
+    }
 
     console.log("🚀 Returning stream response");
     return new Response(readable, { headers });
