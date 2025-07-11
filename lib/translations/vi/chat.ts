@@ -95,6 +95,38 @@ export const chatVi = {
   noMessages: "Chưa có tin nhắn",
   typingIndicator: "Finny đang nhập...",
 
+  // Onboarding Stage Identification
+  onboarding: {
+    welcomeMessage:
+      "Xin chào! Tôi là Fina, cố vấn tài chính AI của bạn 🤝\n\nTôi ở đây để giúp bạn kiểm soát tương lai tài chính của mình và cung cấp hướng dẫn cụ thể phù hợp với tình hình tài chính hiện tại của bạn.\n\n✨ Để tôi có thể hỗ trợ bạn tốt nhất, hãy cho tôi biết bạn đang ở giai đoạn nào trong hành trình tài chính:",
+    questionsIntro:
+      "Tôi sẽ hỏi bạn 2 câu hỏi ngắn để xác định chính xác ưu tiên tài chính của bạn:",
+
+    // Questions (from PRD)
+    debtQuestion:
+      "Bạn có bất kỳ khoản nợ nào, chẳng hạn như dư nợ thẻ tín dụng hoặc các khoản vay cá nhân, với lãi suất cao hơn 8% không?",
+    emergencyFundQuestion:
+      "Nếu bạn mất nguồn thu nhập chính ngày hôm nay, bạn có đủ tiền mặt trong tài khoản tiết kiệm dễ tiếp cận để trang trải tất cả các chi phí sinh hoạt thiết yếu trong ít nhất ba tháng không?",
+
+    // Answer options
+    yes: "Có",
+    no: "Không",
+
+    // Stage confirmations
+    debtStageConfirmation:
+      "Dựa trên câu trả lời của bạn, bạn đang ở giai đoạn **Quản lý nợ**. Ưu tiên của bạn nên là trả hết nợ lãi suất cao trước.",
+    noSavingStageConfirmation:
+      "Dựa trên câu trả lời của bạn, bạn đang ở giai đoạn **Xây dựng quỹ khẩn cấp**. Ưu tiên của bạn nên là xây dựng quỹ khẩn cấp 3-6 tháng.",
+    investingStageConfirmation:
+      "Dựa trên câu trả lời của bạn, bạn đang ở giai đoạn **Sẵn sàng đầu tư**. Bạn có thể bắt đầu tập trung vào xây dựng tài sản dài hạn thông qua đầu tư.",
+
+    // Actions
+    getStarted: "Bắt đầu thôi!",
+    continue: "Tiếp tục",
+    analysisComplete:
+      "Phân tích hoàn tất! Hãy bắt đầu hành trình tài chính của bạn.",
+  },
+
   // AI Advisor Context
   aiAdvisorContext: {
     title: "Finny - Cố vấn tài chính của bạn",

@@ -32,4 +32,10 @@ export const commonEn = {
   // Form fields
   description: "Description",
   descriptionPlaceholder: "Enter description",
+
+  // Question flow
+  question: "Question",
+  of: "of",
+  analyzing: "Analyzing",
+  retry: "Retry",
 };

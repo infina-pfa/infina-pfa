@@ -7,10 +7,13 @@ export async function POST(request: NextRequest) {
     const { profile } = await request.json();
 
     if (!profile) {
-      return NextResponse.json({
-        success: false,
-        error: "Profile data is required"
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Profile data is required",
+        },
+        { status: 400 }
+      );
     }
 
     // Create Supabase client
@@ -37,21 +40,30 @@ export async function POST(request: NextRequest) {
     );
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({
-        success: false,
-        error: "Authentication required"
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
+      );
     }
 
     // Update or create user profile in the main users table
     const userUpdateData = {
-      name: profile.name || user.user_metadata?.name || user.email?.split('@')[0] || "User",
-      onboarding_completed: true,
+      name:
+        profile.name ||
+        user.user_metadata?.name ||
+        user.email?.split("@")[0] ||
+        "User",
       onboarding_completed_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     // Check if user already exists
@@ -70,34 +82,38 @@ export async function POST(request: NextRequest) {
         .eq("user_id", user.id);
     } else {
       // Create new user record
-      userResult = await supabase
-        .from("users")
-        .insert({
-          user_id: user.id,
-          ...userUpdateData
-        });
+      userResult = await supabase.from("users").insert({
+        user_id: user.id,
+        ...userUpdateData,
+      });
     }
 
     if (userResult.error) {
       console.error("Error updating user profile:", userResult.error);
-      return NextResponse.json({
-        success: false,
-        error: "Failed to complete onboarding"
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to complete onboarding",
+        },
+        { status: 500 }
+      );
     }
 
     // Store complete onboarding profile data
     const { error: profileError } = await supabase
       .from("onboarding_profiles")
-      .upsert({
-        user_id: user.id,
-        profile_data: profile,
-        is_completed: true,
-        completed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: 'user_id'
-      });
+      .upsert(
+        {
+          user_id: user.id,
+          profile_data: profile,
+          is_completed: true,
+          completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        {
+          onConflict: "user_id",
+        }
+      );
 
     if (profileError) {
       console.error("Error saving final onboarding profile:", profileError);
@@ -110,15 +126,17 @@ export async function POST(request: NextRequest) {
       data: {
         user_id: user.id,
         profile: profile,
-        completed_at: new Date().toISOString()
-      }
+        completed_at: new Date().toISOString(),
+      },
     });
-
   } catch (error) {
     console.error("Error in onboarding complete:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Internal server error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   }
-} 
+}

@@ -212,7 +212,7 @@ export async function fetchUserFinancialContext(
     // 4. Check if user has completed onboarding
     const { data: userProfile } = await supabase
       .from("profiles")
-      .select("onboarding_completed")
+      .select("onboarding_completed_at")
       .eq("id", userId)
       .single();
 
@@ -221,7 +221,7 @@ export async function fetchUserFinancialContext(
         totalIncome,
         totalExpenses: totalExpense,
         currentBudgets: budgets?.length || 0,
-        hasCompletedOnboarding: userProfile?.onboarding_completed || false,
+        hasCompletedOnboarding: userProfile?.onboarding_completed_at || false,
         budgetTotal: totalBudget,
         budgetSpent: totalBudgetSpent,
         budgetRemaining: totalBudget - totalBudgetSpent,

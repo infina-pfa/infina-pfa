@@ -31,7 +31,8 @@ export interface UserProfile {
   name: string;
   user_id: string;
   total_asset_value: number;
-  onboarding_completed: boolean;
+  onboarding_completed_at?: string;
+  financial_stage?: string;
   created_at: string;
   updated_at: string;
 }
@@ -46,4 +47,4 @@ export interface UserCheckResponse {
   exists: boolean;
   user: UserProfile | null;
   error: string | null;
-} 
+}

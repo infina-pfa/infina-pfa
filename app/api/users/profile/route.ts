@@ -1,42 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET() {
   try {
     // Create Supabase client
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
-      }
-    );
+    const supabase = await createClient();
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({
-        success: false,
-        error: "Authentication required"
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
+      );
     }
 
     // Get user profile from users table
@@ -52,65 +35,56 @@ export async function GET() {
         success: true,
         data: {
           user_id: user.id,
-          name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || "User",
+          name:
+            user.user_metadata?.name ||
+            user.user_metadata?.full_name ||
+            user.email?.split("@")[0] ||
+            "User",
           email: user.email,
           total_asset_value: 0,
-          onboarding_completed: false,
+          onboarding_completed_at: null,
+          financial_stage: null,
           created_at: user.created_at,
-          updated_at: user.updated_at
-        }
+          updated_at: user.updated_at,
+        },
       });
     }
 
     return NextResponse.json({
       success: true,
-      data: userProfile
+      data: userProfile,
     });
-
   } catch (error) {
     console.error("Error in users profile GET:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Internal server error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     // Create Supabase client
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
-      }
-    );
+    const supabase = await createClient();
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({
-        success: false,
-        error: "Authentication required"
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
+      );
     }
 
     // Parse request body
@@ -119,10 +93,13 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!name?.trim()) {
-      return NextResponse.json({
-        success: false,
-        error: "Name is required"
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Name is required",
+        },
+        { status: 400 }
+      );
     }
 
     // Create user profile
@@ -138,61 +115,50 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("Error creating user profile:", error);
-      return NextResponse.json({
-        success: false,
-        error: "Failed to create user profile"
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to create user profile",
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      data: userProfile
+      data: userProfile,
     });
-
   } catch (error) {
     console.error("Error in users profile POST:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Internal server error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function PATCH(request: NextRequest) {
   try {
     // Create Supabase client
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
-      }
-    );
+    const supabase = await createClient();
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({
-        success: false,
-        error: "Authentication required"
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
+      );
     }
 
     // Parse request body
@@ -202,10 +168,13 @@ export async function PATCH(request: NextRequest) {
     // Only update provided fields
     if (body.name !== undefined) {
       if (!body.name?.trim()) {
-        return NextResponse.json({
-          success: false,
-          error: "Name cannot be empty"
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Name cannot be empty",
+          },
+          { status: 400 }
+        );
       }
       updateData.name = body.name.trim();
     }
@@ -214,36 +183,109 @@ export async function PATCH(request: NextRequest) {
       updateData.total_asset_value = body.total_asset_value;
     }
 
+    if (body.onboarding_completed_at !== undefined) {
+      updateData.onboarding_completed_at = body.onboarding_completed_at;
+    }
+
+    if (body.financial_stage !== undefined) {
+      // Validate financial_stage values
+      const validStages = ["debt", "no_saving", "start_investing"];
+      if (!validStages.includes(body.financial_stage)) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Invalid financial_stage. Must be one of: ${validStages.join(
+              ", "
+            )}`,
+          },
+          { status: 400 }
+        );
+      }
+      updateData.financial_stage = body.financial_stage;
+    }
+
     if (body.updated_at !== undefined) {
       updateData.updated_at = body.updated_at;
     }
 
-    // Update user profile
-    const { data: userProfile, error } = await supabase
+    // Always update the updated_at timestamp
+    updateData.updated_at = new Date().toISOString();
+
+    // Check if user profile exists first
+    const { data: existingProfile } = await supabase
       .from("users")
-      .update(updateData)
+      .select("id")
       .eq("user_id", user.id)
-      .select("*")
       .single();
 
-    if (error) {
-      console.error("Error updating user profile:", error);
-      return NextResponse.json({
-        success: false,
-        error: "Failed to update user profile"
-      }, { status: 500 });
+    let userProfile;
+
+    if (existingProfile) {
+      // Update existing user profile
+      const { data, error } = await supabase
+        .from("users")
+        .update(updateData)
+        .eq("user_id", user.id)
+        .select("*")
+        .single();
+
+      if (error) {
+        console.error("Error updating user profile:", error);
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Failed to update user profile",
+          },
+          { status: 500 }
+        );
+      }
+      userProfile = data;
+    } else {
+      // Create new user profile if it doesn't exist
+      const insertData = {
+        user_id: user.id,
+        name:
+          updateData.name ||
+          user.user_metadata?.name ||
+          user.user_metadata?.full_name ||
+          user.email?.split("@")[0] ||
+          "User",
+        total_asset_value: updateData.total_asset_value || 0,
+        ...updateData,
+        created_at: new Date().toISOString(),
+      };
+
+      const { data, error } = await supabase
+        .from("users")
+        .insert(insertData)
+        .select("*")
+        .single();
+
+      if (error) {
+        console.error("Error creating user profile:", error);
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Failed to create user profile",
+          },
+          { status: 500 }
+        );
+      }
+      userProfile = data;
     }
 
     return NextResponse.json({
       success: true,
-      data: userProfile
+      data: userProfile,
     });
-
   } catch (error) {
     console.error("Error in users profile PATCH:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Internal server error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   }
-} 
+}

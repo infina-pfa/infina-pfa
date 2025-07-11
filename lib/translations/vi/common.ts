@@ -116,4 +116,9 @@ export const commonVi = {
   // Form fields
   description: "Mô tả",
   descriptionPlaceholder: "Nhập mô tả",
+
+  // Question flow
+  question: "Câu hỏi",
+  of: "trong",
+  analyzing: "Đang phân tích",
 };

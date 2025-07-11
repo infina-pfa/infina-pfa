@@ -7,14 +7,17 @@ export async function PATCH(request: NextRequest) {
     const updates = await request.json();
     console.log("Received profile update request:", {
       updates,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     if (!updates || Object.keys(updates).length === 0) {
-      return NextResponse.json({
-        success: false,
-        error: "Profile updates are required"
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Profile updates are required",
+        },
+        { status: 400 }
+      );
     }
 
     // Create Supabase client
@@ -41,17 +44,27 @@ export async function PATCH(request: NextRequest) {
     );
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({
-        success: false,
-        error: "Authentication required"
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
+      );
     }
 
     // Separate fields that should go to users table vs onboarding_profiles table
-    const userTableFields = ['name', 'total_asset_value', 'onboarding_completed', 'onboarding_completed_at'];
+    const userTableFields = [
+      "name",
+      "total_asset_value",
+      "onboarding_completed_at",
+    ];
     const userUpdates: Record<string, unknown> = {};
     const profileData: Record<string, unknown> = {};
 
@@ -68,7 +81,7 @@ export async function PATCH(request: NextRequest) {
       userTableFields,
       userUpdates,
       profileData,
-      userId: user.id
+      userId: user.id,
     });
 
     // Update users table if there are valid user fields
@@ -86,16 +99,19 @@ export async function PATCH(request: NextRequest) {
           .from("users")
           .update({
             ...userUpdates,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           })
           .eq("user_id", user.id);
 
         if (updateError) {
           console.error("Error updating user profile:", updateError);
-          return NextResponse.json({
-            success: false,
-            error: "Failed to update profile"
-          }, { status: 500 });
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Failed to update profile",
+            },
+            { status: 500 }
+          );
         }
       } else {
         // Insert new record - ensure required fields have defaults
@@ -105,7 +121,7 @@ export async function PATCH(request: NextRequest) {
           total_asset_value: userUpdates.total_asset_value || 0,
           ...userUpdates,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         };
 
         const { error: insertError } = await supabase
@@ -114,10 +130,13 @@ export async function PATCH(request: NextRequest) {
 
         if (insertError) {
           console.error("Error creating user profile:", insertError);
-          return NextResponse.json({
-            success: false,
-            error: "Failed to create profile"
-          }, { status: 500 });
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Failed to create profile",
+            },
+            { status: 500 }
+          );
         }
       }
     }
@@ -134,7 +153,7 @@ export async function PATCH(request: NextRequest) {
       // Merge with existing profile data
       const mergedProfileData = {
         ...(existingProfile?.profile_data || {}),
-        ...profileData
+        ...profileData,
       };
 
       if (existingProfile) {
@@ -143,16 +162,19 @@ export async function PATCH(request: NextRequest) {
           .from("onboarding_profiles")
           .update({
             profile_data: mergedProfileData,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           })
           .eq("user_id", user.id);
 
         if (profileError) {
           console.error("Error updating onboarding profile:", profileError);
-          return NextResponse.json({
-            success: false,
-            error: "Failed to update onboarding profile"
-          }, { status: 500 });
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Failed to update onboarding profile",
+            },
+            { status: 500 }
+          );
         }
       } else {
         // Insert new record
@@ -163,15 +185,18 @@ export async function PATCH(request: NextRequest) {
             profile_data: mergedProfileData,
             is_completed: false,
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           });
 
         if (profileError) {
           console.error("Error creating onboarding profile:", profileError);
-          return NextResponse.json({
-            success: false,
-            error: "Failed to create onboarding profile"
-          }, { status: 500 });
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Failed to create onboarding profile",
+            },
+            { status: 500 }
+          );
         }
       }
     }
@@ -180,19 +205,21 @@ export async function PATCH(request: NextRequest) {
       userId: user.id,
       userUpdates,
       profileData,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     return NextResponse.json({
       success: true,
-      data: { updated: true }
+      data: { updated: true },
     });
-
   } catch (error) {
     console.error("Error updating onboarding profile:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Internal server error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   }
-} 
+}
