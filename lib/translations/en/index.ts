@@ -12,6 +12,7 @@ import { onboardingEn } from "./onboarding";
 import { budgetingEn } from "./budgeting";
 import { incomeEn } from "./income";
 import { goalsEn } from "./goals";
+import { spendingEn } from "./spending";
 
 export const enTranslations = {
   ...commonEn,
@@ -28,4 +29,5 @@ export const enTranslations = {
   ...budgetingEn,
   ...incomeEn,
   goals: goalsEn,
+  spending: spendingEn,
 };
