@@ -1,6 +1,10 @@
 "use client";
 
-import { OnboardingMessage, ComponentResponse } from "@/lib/types/onboarding.types";
+import {
+  OnboardingMessage,
+  ComponentResponse,
+  OnboardingComponent,
+} from "@/lib/types/onboarding.types";
 import { OnboardingComponentRenderer } from "./components/onboarding-component-renderer";
 import { formatDistanceToNow } from "date-fns";
 import { Bot, User } from "lucide-react";
@@ -8,7 +12,10 @@ import { useEffect, useState } from "react";
 
 interface OnboardingMessageBubbleProps {
   message: OnboardingMessage;
-  onComponentResponse: (componentId: string, response: ComponentResponse) => Promise<void>;
+  onComponentResponse: (
+    componentId: string,
+    response: ComponentResponse
+  ) => Promise<void>;
 }
 
 export function OnboardingMessageBubble({
@@ -16,7 +23,7 @@ export function OnboardingMessageBubble({
   onComponentResponse,
 }: OnboardingMessageBubbleProps) {
   const isAI = message.type === "ai" || message.type === "component";
-  const isComponent = !!message.component;
+  const isComponent = !!(message.component || message.metadata?.component);
   const [showComponent, setShowComponent] = useState(false);
 
   // Add fade-in animation for components
@@ -31,8 +38,16 @@ export function OnboardingMessageBubble({
   }, [isComponent]);
 
   return (
-    <div className={`flex ${isAI ? "justify-start" : "justify-end"} mb-3 sm:mb-4 animate-fadeIn`}>
-      <div className={`flex max-w-[90%] sm:max-w-[80%] ${isAI ? "flex-row" : "flex-row-reverse"}`}>
+    <div
+      className={`flex ${
+        isAI ? "justify-start" : "justify-end"
+      } mb-3 sm:mb-4 animate-fadeIn`}
+    >
+      <div
+        className={`flex max-w-[90%] sm:max-w-[80%] ${
+          isAI ? "flex-row" : "flex-row-reverse"
+        }`}
+      >
         {/* Avatar */}
         <div
           className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -41,7 +56,11 @@ export function OnboardingMessageBubble({
               : "bg-[#F0F2F5] text-[#6B7280] ml-2 sm:ml-3"
           }`}
         >
-          {isAI ? <Bot className="w-3 h-3 sm:w-4 sm:h-4" /> : <User className="w-3 h-3 sm:w-4 sm:h-4" />}
+          {isAI ? (
+            <Bot className="w-3 h-3 sm:w-4 sm:h-4" />
+          ) : (
+            <User className="w-3 h-3 sm:w-4 sm:h-4" />
+          )}
         </div>
 
         {/* Message Content */}
@@ -49,33 +68,35 @@ export function OnboardingMessageBubble({
           {/* Message bubble */}
           <div
             className={`px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl ${
-              isAI
-                ? "bg-[#F0F2F5] text-[#111827]"
-                : "bg-[#0055FF] text-white"
+              isAI ? "bg-[#F0F2F5] text-[#111827]" : "bg-[#0055FF] text-white"
             }`}
           >
             {/* Text content - only show if there's no component to avoid duplicate titles */}
-            {message.content && !isComponent && (
+            {message.content && (
               <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">
                 {message.content}
               </div>
             )}
 
             {/* Component content with fade-in animation */}
-            {isComponent && message.component && (
-              <div 
-                className={`transition-all duration-500 ease-out ${
-                  showComponent 
-                    ? "opacity-100 transform translate-y-0" 
-                    : "opacity-0 transform translate-y-2"
-                }`}
-              >
-                <OnboardingComponentRenderer
-                  component={message.component}
-                  onResponse={onComponentResponse}
-                />
-              </div>
-            )}
+            {isComponent &&
+              (message.component || message.metadata?.component) && (
+                <div
+                  className={`transition-all duration-500 ease-out ${
+                    showComponent
+                      ? "opacity-100 transform translate-y-0"
+                      : "opacity-0 transform translate-y-2"
+                  }`}
+                >
+                  <OnboardingComponentRenderer
+                    component={
+                      (message.component as OnboardingComponent) ||
+                      (message.metadata?.component as OnboardingComponent)
+                    }
+                    onResponse={onComponentResponse}
+                  />
+                </div>
+              )}
           </div>
 
           {/* Timestamp */}
@@ -90,4 +111,4 @@ export function OnboardingMessageBubble({
       </div>
     </div>
   );
-} 
+}

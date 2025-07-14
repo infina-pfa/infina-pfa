@@ -1,16 +1,16 @@
 "use client";
 
 import { useChatFlow } from "@/hooks/use-chat-flow";
-import { useAppTranslation } from "@/hooks/use-translation";
 import { useOnboardingCheck } from "@/hooks/use-onboarding-check";
+import { useAppTranslation } from "@/hooks/use-translation";
+import { ChatToolId } from "@/lib/types/ai-streaming.types";
+import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
-import { StageIdentificationFlow } from "./onboarding/stage-identification-flow";
-import { useEffect, useState } from "react";
-import { ChatToolId } from "@/lib/types/ai-streaming.types";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
@@ -20,7 +20,6 @@ export function ChatInterface() {
   const {
     isLoading: onboardingLoading,
     needsOnboarding,
-    markOnboardingComplete,
     error: onboardingError,
   } = useOnboardingCheck();
 
@@ -44,7 +43,6 @@ export function ChatInterface() {
     conversationId,
     sendMessage,
   } = chatFlow;
-  console.log("🚀 ~ ChatInterface ~ messages:", messages);
 
   useEffect(() => {
     // Check if we're on client-side
@@ -64,13 +62,6 @@ export function ChatInterface() {
     }
   }, []);
 
-  // Handle onboarding completion
-  const handleOnboardingComplete = (financialStage: string) => {
-    markOnboardingComplete(financialStage);
-    // Optionally trigger a welcome message in chat or refresh
-    // Could show a success toast here
-  };
-
   // Loading state for onboarding check
   if (onboardingLoading || chatLoading) {
     return (
@@ -89,7 +80,7 @@ export function ChatInterface() {
 
   // Show onboarding flow if needed
   if (needsOnboarding) {
-    return <StageIdentificationFlow onComplete={handleOnboardingComplete} />;
+    return redirect("/onboarding");
   }
 
   // Show onboarding error if there's an issue

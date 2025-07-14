@@ -12,7 +12,7 @@ export interface OnboardingState {
   currentStageStep?: number;
 }
 
-export type OnboardingStep = 
+export type OnboardingStep =
   | "ai_welcome"
   | "stage_identification"
   | "stage_introduction"
@@ -53,7 +53,7 @@ export interface UserProfile {
 
 export interface QualitativeAssessment {
   financialKnowledge: number; // 1-5 scale
-  riskComfort: number; // 1-5 scale  
+  riskComfort: number; // 1-5 scale
   planningHorizon: "short" | "medium" | "long";
   primaryMotivation: string;
   biggestConcern: string;
@@ -61,28 +61,25 @@ export interface QualitativeAssessment {
 }
 
 // New financial stages based on user requirements
-export type FinancialStage = 
-  | "debt" 
-  | "start_saving" 
-  | "start_investing";
+export type FinancialStage = "debt" | "start_saving" | "start_investing";
 
 // Stage-specific flows
-export type StageFlow = 
+export type StageFlow =
   | "debt_elimination"
   | "saving_emergency_fund"
   | "investment_start";
 
 // New type for tracking specific stage step progression
-export type SavingFlowStep = 
-  | 0  // Initial/stage selection
-  | 1  // Emergency fund explanation and acceptance
-  | 2  // Expense categories collection
-  | 3  // Savings capacity determination  
-  | 4  // Goal confirmation
+export type SavingFlowStep =
+  | 0 // Initial/stage selection
+  | 1 // Emergency fund explanation and acceptance
+  | 2 // Expense categories collection
+  | 3 // Savings capacity determination
+  | 4 // Goal confirmation
   | 5; // HYSA guidance and completion
 
 // New components for the updated flow
-export type ComponentType = 
+export type ComponentType =
   | "multiple_choice"
   | "rating_scale"
   | "slider"
@@ -119,7 +116,7 @@ export interface OnboardingComponent {
 
 export type OnboardingComponentType =
   | "multiple_choice"
-  | "rating_scale" 
+  | "rating_scale"
   | "slider"
   | "text_input"
   | "financial_input"
@@ -131,7 +128,8 @@ export type OnboardingComponentType =
   | "expense_categories"
   | "savings_capacity"
   | "goal_confirmation"
-  | "education_content";
+  | "education_content"
+  | "suggestions";
 
 export interface ComponentData {
   // Multiple choice
@@ -141,14 +139,14 @@ export interface ComponentData {
     value: string;
     description?: string;
   }>;
-  
+
   // Rating scale
   scale?: {
     min: number;
     max: number;
     labels: string[];
   };
-  
+
   // Slider
   range?: {
     min: number;
@@ -156,7 +154,7 @@ export interface ComponentData {
     step: number;
     unit?: string;
   };
-  
+
   // Text input
   placeholder?: string;
   validation?: {
@@ -164,15 +162,15 @@ export interface ComponentData {
     minLength?: number;
     maxLength?: number;
   };
-  
+
   // Financial input
   currency?: string;
   inputType?: "income" | "expense" | "debt" | "savings";
-  
+
   // Introduction template
   template?: string;
   suggestions?: string[];
-  
+
   // Stage selector
   stages?: Array<{
     id: FinancialStage;
@@ -180,7 +178,7 @@ export interface ComponentData {
     description: string;
     criteria: string[];
   }>;
-  
+
   // Decision tree
   questions?: Array<{
     id: string;
@@ -189,7 +187,7 @@ export interface ComponentData {
     yesLabel?: string;
     noLabel?: string;
   }>;
-  
+
   // Expense categories
   categories?: Array<{
     id: string;
@@ -198,18 +196,18 @@ export interface ComponentData {
     required: boolean;
   }>;
   allowAdditional?: boolean;
-  
+
   // Savings capacity
   incomeHint?: string;
   savingsHint?: string;
-  
+
   // Goal confirmation
   goalDetails?: {
     amount: number;
     timeframe: number;
     monthlyTarget: number;
   };
-  
+
   // Education content
   educationContent?: EducationContent;
 }
@@ -276,7 +274,10 @@ export interface OnboardingActionPayload {
 // Service interfaces
 export interface OnboardingService {
   initializeOnboarding(userId: string): Promise<OnboardingState>;
-  saveUserResponse(componentId: string, response: ComponentResponse): Promise<void>;
+  saveUserResponse(
+    componentId: string,
+    response: ComponentResponse
+  ): Promise<void>;
   updateUserProfile(updates: Partial<UserProfile>): Promise<void>;
   analyzeFinancialStage(profile: UserProfile): Promise<{
     stage: FinancialStage;
@@ -284,11 +285,11 @@ export interface OnboardingService {
     reasoning: string;
   }>;
   completeOnboarding(finalProfile: UserProfile): Promise<void>;
-  
+
   // Chat history methods
   saveChatMessage(
     conversationId: string,
-    sender: 'user' | 'ai' | 'system',
+    sender: "user" | "ai" | "system",
     content: string,
     componentId?: string,
     metadata?: Record<string, unknown>,
@@ -296,7 +297,7 @@ export interface OnboardingService {
   ): Promise<unknown>;
   saveChatMessageAsync(
     conversationId: string,
-    sender: 'user' | 'ai' | 'system',
+    sender: "user" | "ai" | "system",
     content: string,
     componentId?: string,
     metadata?: Record<string, unknown>,
@@ -325,13 +326,16 @@ export interface UseOnboardingChatReturn {
   state: OnboardingState;
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   sendMessage: (message: string) => Promise<void>;
-  handleComponentResponse: (componentId: string, response: ComponentResponse) => Promise<void>;
-  
+  handleComponentResponse: (
+    componentId: string,
+    response: ComponentResponse
+  ) => Promise<void>;
+
   // Chat specific
   messages: OnboardingMessage[];
   isAIThinking: boolean;
   isStreaming: boolean;
-} 
+}

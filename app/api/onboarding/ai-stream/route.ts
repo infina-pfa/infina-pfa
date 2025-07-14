@@ -385,11 +385,20 @@ export async function POST(request: NextRequest) {
       `📥 Using session conversation history: ${completeConversationHistory.length} messages`
     );
 
+    const userData = await supabase
+      .from("users")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+
     // Generate stage-specific system prompt based on user's identified financial stage
     // The conversation history will be passed separately in the input field
     const systemInstructions = generateStageSpecificPrompt({
       userId: user.id,
-      userProfile: requestBody.userProfile || {},
+      userProfile: {
+        ...requestBody.userProfile,
+        identifiedStage: userData.data?.financial_stage,
+      },
       conversationHistory: [], // Empty array - conversation history goes to input field instead
       currentStep: requestBody.currentStep || "ai_welcome",
     });
@@ -735,7 +744,7 @@ export async function POST(request: NextRequest) {
                       throw new Error("Missing profile_updates in tool call");
                     }
                     const { error: updateError } = await supabase
-                      .from("users")
+                      .from("onboarding_profiles")
                       .update(profile_updates)
                       .eq("user_id", user.id);
                     if (updateError)

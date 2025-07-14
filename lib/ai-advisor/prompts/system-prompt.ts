@@ -26,12 +26,20 @@ export function generateSystemPrompt(
 
     <available_tools>
         <summary>List of tools that can be activated to assist the user.</summary>
-        <ui_tools>
-          ${toolsInfo}
-        </ui_tools>
         <mcp_tools>
           ${mcpToolsInfo}
         </mcp_tools>
+        <ui_tools>
+          ${toolsInfo}
+          <show_video_tool>
+            <name>Video Tool</name>
+            <description>Show a specific video to the user</description>
+            <requirements>
+                <requirement>You must call MCP tool to get the video url before call this function</requirement>
+                <requirement>You must call show_video tool to show the video to the user</requirement>
+            </requirements>
+          </show_video_tool>
+        </ui_tools>
     </available_tools>
 
     <input_context>
@@ -63,4 +71,4 @@ export function generateSystemPrompt(
     </response_instructions>
 </system_prompt>
 `;
-} 
+}

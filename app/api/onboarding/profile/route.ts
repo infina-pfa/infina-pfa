@@ -84,15 +84,14 @@ export async function PATCH(request: NextRequest) {
       userId: user.id,
     });
 
-    // Update users table if there are valid user fields
-    if (Object.keys(userUpdates).length > 0) {
-      // First, check if user record exists
-      const { data: existingUser } = await supabase
-        .from("users")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("id")
+      .eq("user_id", user.id)
+      .single();
 
+    // Update users table if there are valid user fields
+    if (Object.keys(userUpdates).length > 0 || !existingUser) {
       if (existingUser) {
         // Update existing record
         const { error: updateError } = await supabase
@@ -119,6 +118,7 @@ export async function PATCH(request: NextRequest) {
           user_id: user.id,
           name: userUpdates.name || "User", // Default name if not provided
           total_asset_value: userUpdates.total_asset_value || 0,
+          financial_stage: profileData.identifiedStage || "debt",
           ...userUpdates,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),

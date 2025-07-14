@@ -187,10 +187,10 @@ export async function PATCH(request: NextRequest) {
       updateData.onboarding_completed_at = body.onboarding_completed_at;
     }
 
-    if (body.financial_stage !== undefined) {
+    if (body.profileData?.identifiedStage !== undefined) {
       // Validate financial_stage values
       const validStages = ["debt", "no_saving", "start_investing"];
-      if (!validStages.includes(body.financial_stage)) {
+      if (!validStages.includes(body.profileData.identifiedStage)) {
         return NextResponse.json(
           {
             success: false,
@@ -201,7 +201,7 @@ export async function PATCH(request: NextRequest) {
           { status: 400 }
         );
       }
-      updateData.financial_stage = body.financial_stage;
+      updateData.financial_stage = body.profileData.identifiedStage;
     }
 
     if (body.updated_at !== undefined) {
@@ -241,6 +241,7 @@ export async function PATCH(request: NextRequest) {
       }
       userProfile = data;
     } else {
+      console.log("🚀 ~ PATCH ~ updateData:", updateData);
       // Create new user profile if it doesn't exist
       const insertData = {
         user_id: user.id,

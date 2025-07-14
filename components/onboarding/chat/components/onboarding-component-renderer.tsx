@@ -1,6 +1,9 @@
 "use client";
 
-import { OnboardingComponent, ComponentResponse } from "@/lib/types/onboarding.types";
+import {
+  OnboardingComponent,
+  ComponentResponse,
+} from "@/lib/types/onboarding.types";
 import { MultipleChoiceComponent } from "./multiple-choice-component";
 import { RatingScaleComponent } from "./rating-scale-component";
 import { SliderComponent } from "./slider-component";
@@ -15,18 +18,23 @@ import { ExpenseCategoriesComponent } from "./expense-categories-component";
 import { SavingsCapacityComponent } from "./savings-capacity-component";
 import { GoalConfirmationComponent } from "./goal-confirmation-component";
 import { EducationContentComponent } from "./education-content-component";
+import { Suggestions } from "./suggestions";
 
 interface OnboardingComponentRendererProps {
   component: OnboardingComponent;
-  onResponse: (componentId: string, response: ComponentResponse) => Promise<void>;
+  onResponse: (
+    componentId: string,
+    response: ComponentResponse
+  ) => Promise<void>;
 }
 
 export function OnboardingComponentRenderer({
   component,
   onResponse,
 }: OnboardingComponentRendererProps) {
+  console.log("🚀 ~ component:", component);
   const handleResponse = async (response: ComponentResponse) => {
-    await onResponse(component.id, response);
+    await onResponse(component.id || component.type, response);
   };
 
   switch (component.type) {
@@ -48,18 +56,12 @@ export function OnboardingComponentRenderer({
 
     case "slider":
       return (
-        <SliderComponent
-          component={component}
-          onResponse={handleResponse}
-        />
+        <SliderComponent component={component} onResponse={handleResponse} />
       );
 
     case "text_input":
       return (
-        <TextInputComponent
-          component={component}
-          onResponse={handleResponse}
-        />
+        <TextInputComponent component={component} onResponse={handleResponse} />
       );
 
     case "financial_input":
@@ -133,6 +135,20 @@ export function OnboardingComponentRenderer({
           onResponse={handleResponse}
         />
       );
+    case "suggestions":
+      return (
+        <Suggestions
+          suggestions={
+            component.context.options?.map((option) => option.label) || []
+          }
+          onSelect={(suggestion) =>
+            handleResponse({
+              selectedOption: suggestion,
+              completedAt: new Date(),
+            })
+          }
+        />
+      );
 
     default:
       return (
@@ -141,4 +157,4 @@ export function OnboardingComponentRenderer({
         </div>
       );
   }
-} 
+}

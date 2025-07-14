@@ -5,7 +5,8 @@ export const showOnboardingComponentTool = {
   type: "function" as const,
   function: {
     name: "show_onboarding_component",
-    description: "Display an interactive component in the onboarding chat to collect specific user information. CRITICAL: You MUST provide ALL required parameters as valid JSON. Never call this function with empty arguments.",
+    description:
+      "Display an interactive component in the onboarding chat to collect specific user information. CRITICAL: You MUST provide ALL required parameters as valid JSON. Never call this function with empty arguments.",
     parameters: {
       type: "object",
       properties: {
@@ -13,7 +14,7 @@ export const showOnboardingComponentTool = {
           type: "string",
           enum: [
             "multiple_choice",
-            "rating_scale", 
+            "rating_scale",
             "slider",
             "text_input",
             "financial_input",
@@ -22,24 +23,29 @@ export const showOnboardingComponentTool = {
             // New stage-first components
             "stage_selector",
             "decision_tree",
-            "expense_categories", 
+            "expense_categories",
             "savings_capacity",
             "goal_confirmation",
-            "education_content"
+            "education_content",
+            "suggestions",
           ],
-          description: "Type of component to display - determines the UI component that will be rendered. REQUIRED: Must be one of the enum values."
+          description:
+            "Type of component to display - determines the UI component that will be rendered. REQUIRED: Must be one of the enum values.",
         },
         title: {
           type: "string",
-          description: "Clear, user-friendly title/question to display above the component. REQUIRED: Must be a meaningful question or instruction for the user."
+          description:
+            "Clear, user-friendly title/question to display above the component. REQUIRED: Must be a meaningful question or instruction for the user.",
         },
         component_id: {
           type: "string",
-          description: "Unique identifier for this component instance. REQUIRED: Use format 'component_type_timestamp' (e.g. 'stage_selector_1751563582612')"
+          description:
+            "Unique identifier for this component instance. REQUIRED: Use format 'component_type_timestamp' (e.g. 'stage_selector_1751563582612')",
         },
         context: {
           type: "object",
-          description: "Configuration data specific to the component type. REQUIRED: Must include appropriate properties based on component_type.",
+          description:
+            "Configuration data specific to the component type. REQUIRED: Must include appropriate properties based on component_type.",
           properties: {
             // Multiple choice - required for component_type: "multiple_choice"
             options: {
@@ -47,80 +53,118 @@ export const showOnboardingComponentTool = {
               items: {
                 type: "object",
                 properties: {
-                  id: { type: "string", description: "Unique option identifier" },
-                  label: { type: "string", description: "Display text for the option" },
-                  value: { type: "string", description: "Value to be returned when selected" },
-                  description: { type: "string", description: "Optional additional description" }
+                  id: {
+                    type: "string",
+                    description: "Unique option identifier",
+                  },
+                  label: {
+                    type: "string",
+                    description: "Display text for the option",
+                  },
+                  value: {
+                    type: "string",
+                    description: "Value to be returned when selected",
+                  },
+                  description: {
+                    type: "string",
+                    description: "Optional additional description",
+                  },
                 },
-                required: ["id", "label", "value"]
+                required: ["id", "label", "value"],
               },
-              description: "Array of selectable options (REQUIRED for multiple_choice components). Must have at least 2 options."
+              description:
+                "Array of selectable options (REQUIRED for multiple_choice components). Must have at least 2 options.",
             },
-            
+
             // Rating scale - required for component_type: "rating_scale"
             scale: {
               type: "object",
               properties: {
-                min: { type: "number", default: 1, description: "Minimum scale value" },
-                max: { type: "number", default: 5, description: "Maximum scale value" },
+                min: {
+                  type: "number",
+                  default: 1,
+                  description: "Minimum scale value",
+                },
+                max: {
+                  type: "number",
+                  default: 5,
+                  description: "Maximum scale value",
+                },
                 labels: {
                   type: "array",
                   items: { type: "string" },
-                  description: "Labels for scale endpoints (e.g., ['Very Low', 'Very High'])"
-                }
+                  description:
+                    "Labels for scale endpoints (e.g., ['Very Low', 'Very High'])",
+                },
               },
-              description: "Scale configuration (REQUIRED for rating_scale components)"
+              description:
+                "Scale configuration (REQUIRED for rating_scale components)",
             },
-            
+
             // Slider - required for component_type: "slider"
             range: {
               type: "object",
               properties: {
                 min: { type: "number", description: "Minimum slider value" },
                 max: { type: "number", description: "Maximum slider value" },
-                step: { type: "number", default: 1, description: "Step increment" },
-                unit: { type: "string", description: "Unit of measurement (e.g., '%', 'VND')" }
+                step: {
+                  type: "number",
+                  default: 1,
+                  description: "Step increment",
+                },
+                unit: {
+                  type: "string",
+                  description: "Unit of measurement (e.g., '%', 'VND')",
+                },
               },
               required: ["min", "max"],
-              description: "Range configuration (REQUIRED for slider components)"
+              description:
+                "Range configuration (REQUIRED for slider components)",
             },
-            
+
             // Text input - optional for component_type: "text_input"
             placeholder: {
               type: "string",
-              description: "Placeholder text for input field"
+              description: "Placeholder text for input field",
             },
             validation: {
               type: "object",
               properties: {
                 required: { type: "boolean", default: true },
                 minLength: { type: "number" },
-                maxLength: { type: "number" }
+                maxLength: { type: "number" },
               },
-              description: "Input validation rules"
+              description: "Input validation rules",
             },
-            
+
             // Financial input - required for component_type: "financial_input"
             currency: {
               type: "string",
               default: "VND",
-              description: "Currency code (e.g., VND, USD)"
+              description: "Currency code (e.g., VND, USD)",
             },
             inputType: {
               type: "string",
               enum: ["income", "expense", "debt", "savings"],
-              description: "Type of financial data being collected (REQUIRED for financial_input)"
+              description:
+                "Type of financial data being collected (REQUIRED for financial_input)",
             },
-            
+
             // Introduction template - optional for component_type: "introduction_template"
             template: {
               type: "string",
-              description: "Example template text to guide user input"
+              description: "Example template text to guide user input",
             },
             suggestions: {
               type: "array",
-              items: { type: "string" },
-              description: "Quick suggestion buttons for user convenience"
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  label: { type: "string" },
+                },
+              },
+              description: "Quick suggestion buttons for user convenience",
             },
 
             // NEW STAGE-FIRST COMPONENTS
@@ -131,18 +175,29 @@ export const showOnboardingComponentTool = {
               items: {
                 type: "object",
                 properties: {
-                  id: { type: "string", description: "Financial stage identifier (debt, start_saving, start_investing)" },
-                  title: { type: "string", description: "Display title for the stage" },
-                  description: { type: "string", description: "Brief description of the stage" },
+                  id: {
+                    type: "string",
+                    description:
+                      "Financial stage identifier (debt, start_saving, start_investing)",
+                  },
+                  title: {
+                    type: "string",
+                    description: "Display title for the stage",
+                  },
+                  description: {
+                    type: "string",
+                    description: "Brief description of the stage",
+                  },
                   criteria: {
                     type: "array",
                     items: { type: "string" },
-                    description: "List of criteria that define this stage"
-                  }
+                    description: "List of criteria that define this stage",
+                  },
                 },
-                required: ["id", "title", "description", "criteria"]
+                required: ["id", "title", "description", "criteria"],
               },
-              description: "Array of financial stages to choose from (REQUIRED for stage_selector)"
+              description:
+                "Array of financial stages to choose from (REQUIRED for stage_selector)",
             },
 
             // Decision tree - required for component_type: "decision_tree"
@@ -151,15 +206,32 @@ export const showOnboardingComponentTool = {
               items: {
                 type: "object",
                 properties: {
-                  id: { type: "string", description: "Question identifier (e.g. high_interest_debt, emergency_fund)" },
-                  question: { type: "string", description: "The question text to display" },
-                  explanation: { type: "string", description: "Optional explanation or clarification" },
-                  yesLabel: { type: "string", description: "Custom label for Yes button (optional)" },
-                  noLabel: { type: "string", description: "Custom label for No button (optional)" }
+                  id: {
+                    type: "string",
+                    description:
+                      "Question identifier (e.g. high_interest_debt, emergency_fund)",
+                  },
+                  question: {
+                    type: "string",
+                    description: "The question text to display",
+                  },
+                  explanation: {
+                    type: "string",
+                    description: "Optional explanation or clarification",
+                  },
+                  yesLabel: {
+                    type: "string",
+                    description: "Custom label for Yes button (optional)",
+                  },
+                  noLabel: {
+                    type: "string",
+                    description: "Custom label for No button (optional)",
+                  },
                 },
-                required: ["id", "question"]
+                required: ["id", "question"],
               },
-              description: "Array of decision tree questions to ask (REQUIRED for decision_tree)"
+              description:
+                "Array of decision tree questions to ask (REQUIRED for decision_tree)",
             },
 
             // Expense categories - required for component_type: "expense_categories"
@@ -169,65 +241,100 @@ export const showOnboardingComponentTool = {
                 type: "object",
                 properties: {
                   id: { type: "string", description: "Category identifier" },
-                  name: { type: "string", description: "Category display name" },
-                  placeholder: { type: "string", description: "Placeholder text for input" },
-                  required: { type: "boolean", description: "Whether this category is required" }
+                  name: {
+                    type: "string",
+                    description: "Category display name",
+                  },
+                  placeholder: {
+                    type: "string",
+                    description: "Placeholder text for input",
+                  },
+                  required: {
+                    type: "boolean",
+                    description: "Whether this category is required",
+                  },
                 },
-                required: ["id", "name", "placeholder", "required"]
+                required: ["id", "name", "placeholder", "required"],
               },
-              description: "Array of expense categories to collect (REQUIRED for expense_categories)"
+              description:
+                "Array of expense categories to collect (REQUIRED for expense_categories)",
             },
             allowAdditional: {
               type: "boolean",
-              description: "Whether user can add additional expense categories (REQUIRED for expense_categories)"
+              description:
+                "Whether user can add additional expense categories (REQUIRED for expense_categories)",
             },
 
             // Savings capacity - optional for component_type: "savings_capacity"
             incomeHint: {
               type: "string",
-              description: "Hint text about income assessment"
+              description: "Hint text about income assessment",
             },
             savingsHint: {
-              type: "string", 
-              description: "Hint text about savings capacity"
+              type: "string",
+              description: "Hint text about savings capacity",
             },
 
             // Goal confirmation - required for component_type: "goal_confirmation"
             goalDetails: {
               type: "object",
               properties: {
-                amount: { type: "number", description: "Target emergency fund amount" },
-                timeframe: { type: "number", description: "Timeline to achieve goal in months" },
-                monthlyTarget: { type: "number", description: "Required monthly savings amount" }
+                amount: {
+                  type: "number",
+                  description: "Target emergency fund amount",
+                },
+                timeframe: {
+                  type: "number",
+                  description: "Timeline to achieve goal in months",
+                },
+                monthlyTarget: {
+                  type: "number",
+                  description: "Required monthly savings amount",
+                },
               },
               required: ["amount", "timeframe", "monthlyTarget"],
-              description: "Goal details for confirmation (REQUIRED for goal_confirmation)"
+              description:
+                "Goal details for confirmation (REQUIRED for goal_confirmation)",
             },
 
-            // Education content - required for component_type: "education_content"  
+            // Education content - required for component_type: "education_content"
             educationContent: {
               type: "object",
               properties: {
-                type: { type: "string", enum: ["video", "text"], description: "Type of educational content" },
-                title: { type: "string", description: "Title of the educational content" },
-                content: { type: "string", description: "Main educational content text" },
-                videoUrl: { type: "string", description: "URL for video content (if type is video)" },
+                type: {
+                  type: "string",
+                  enum: ["video", "text"],
+                  description: "Type of educational content",
+                },
+                title: {
+                  type: "string",
+                  description: "Title of the educational content",
+                },
+                content: {
+                  type: "string",
+                  description: "Main educational content text",
+                },
+                videoUrl: {
+                  type: "string",
+                  description: "URL for video content (if type is video)",
+                },
                 relatedActions: {
                   type: "array",
                   items: { type: "string" },
-                  description: "Related action buttons for user interaction"
-                }
+                  description: "Related action buttons for user interaction",
+                },
               },
               required: ["type", "title", "content"],
-              description: "Educational content structure (REQUIRED for education_content)"
-            }
-          }
-        }
+              description:
+                "Educational content structure (REQUIRED for education_content)",
+            },
+          },
+        },
       },
       required: ["component_type", "title", "component_id", "context"],
-      additionalProperties: false
-    }
-  }
+      additionalProperties: false,
+    },
+  },
 };
 
 /**
@@ -237,7 +344,8 @@ export const updateOnboardingProfileTool = {
   type: "function" as const,
   function: {
     name: "update_onboarding_profile",
-    description: "Update user profile with information gathered during onboarding",
+    description:
+      "Update user profile with information gathered during onboarding",
     parameters: {
       type: "object",
       properties: {
@@ -247,9 +355,9 @@ export const updateOnboardingProfileTool = {
           properties: {
             name: { type: "string" },
             age: { type: "number" },
-            gender: { 
+            gender: {
               type: "string",
-              enum: ["male", "female", "other", "prefer_not_to_say"]
+              enum: ["male", "female", "other", "prefer_not_to_say"],
             },
             location: { type: "string" },
             income: { type: "number" },
@@ -258,23 +366,23 @@ export const updateOnboardingProfileTool = {
             savings: { type: "number" },
             investmentExperience: {
               type: "string",
-              enum: ["none", "beginner", "intermediate", "advanced"]
+              enum: ["none", "beginner", "intermediate", "advanced"],
             },
             primaryFinancialGoal: { type: "string" },
             timeHorizon: {
-              type: "string", 
-              enum: ["short", "medium", "long"]
+              type: "string",
+              enum: ["short", "medium", "long"],
             },
             riskTolerance: {
               type: "string",
-              enum: ["conservative", "moderate", "aggressive"] 
-            }
-          }
-        }
+              enum: ["conservative", "moderate", "aggressive"],
+            },
+          },
+        },
       },
-      required: ["profile_updates"]
-    }
-  }
+      required: ["profile_updates"],
+    },
+  },
 };
 
 /**
@@ -284,7 +392,8 @@ export const analyzeFinancialStageTool = {
   type: "function" as const,
   function: {
     name: "analyze_financial_stage",
-    description: "Analyze user's current financial situation to determine their appropriate financial stage",
+    description:
+      "Analyze user's current financial situation to determine their appropriate financial stage",
     parameters: {
       type: "object",
       properties: {
@@ -299,18 +408,18 @@ export const analyzeFinancialStageTool = {
             investmentExperience: { type: "string" },
             riskTolerance: { type: "string" },
             primaryGoal: { type: "string" },
-            age: { type: "number" }
-          }
+            age: { type: "number" },
+          },
         },
         trigger_completion: {
           type: "boolean",
           description: "Whether to complete onboarding after analysis",
-          default: false
-        }
+          default: false,
+        },
       },
-      required: ["profile_data"]
-    }
-  }
+      required: ["profile_data"],
+    },
+  },
 };
 
 /**
@@ -320,13 +429,14 @@ export const completeOnboardingTool = {
   type: "function" as const,
   function: {
     name: "complete_onboarding",
-    description: "Finalizes the user onboarding process after all necessary information has been gathered and analyzed.",
+    description:
+      "Finalizes the user onboarding process after all necessary information has been gathered and analyzed.",
     parameters: {
       type: "object",
       properties: {},
-      required: []
-    }
-  }
+      required: [],
+    },
+  },
 };
 
 /**
@@ -336,17 +446,19 @@ export const onboardingFunctionTools = [
   showOnboardingComponentTool,
   updateOnboardingProfileTool,
   analyzeFinancialStageTool,
-  completeOnboardingTool
+  completeOnboardingTool,
 ];
 
 /**
  * Get tools info for onboarding system prompt
  */
 export function getOnboardingToolsInfo(): string {
-  return onboardingFunctionTools.map(tool => {
-    const { name, description } = tool.function;
-    return `- ${name}: ${description}`;
-  }).join('\n');
+  return onboardingFunctionTools
+    .map((tool) => {
+      const { name, description } = tool.function;
+      return `- ${name}: ${description}`;
+    })
+    .join("\n");
 }
 
 /**
@@ -507,102 +619,143 @@ export function getComponentExamples(): string {
 /**
  * Validate component arguments
  */
-export function validateComponentArguments(args: unknown): { isValid: boolean; errors: string[] } {
+export function validateComponentArguments(args: unknown): {
+  isValid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
-  
-  if (!args || typeof args !== 'object') {
+
+  if (!args || typeof args !== "object") {
     errors.push("Arguments must be a valid object");
     return { isValid: false, errors };
   }
-  
+
   const argObj = args as Record<string, unknown>;
-  
+
   // Check required fields
   if (!argObj.component_type) {
     errors.push("component_type is required");
   }
-  
+
   if (!argObj.title) {
     errors.push("title is required");
   }
-  
+
   if (!argObj.component_id) {
     errors.push("component_id is required");
   }
-  
-  if (!argObj.context || typeof argObj.context !== 'object') {
+
+  if (!argObj.context || typeof argObj.context !== "object") {
     errors.push("context object is required");
   }
-  
+
   const context = argObj.context as Record<string, unknown>;
-  
+
   // Validate component-specific requirements
-  if (argObj.component_type === 'multiple_choice' && context) {
-    if (!context.options || !Array.isArray(context.options) || context.options.length < 2) {
-      errors.push("multiple_choice requires options array with at least 2 options");
+  if (argObj.component_type === "multiple_choice" && context) {
+    if (
+      !context.options ||
+      !Array.isArray(context.options) ||
+      context.options.length < 2
+    ) {
+      errors.push(
+        "multiple_choice requires options array with at least 2 options"
+      );
     }
   }
-  
-  if (argObj.component_type === 'financial_input' && context) {
+
+  if (argObj.component_type === "financial_input" && context) {
     if (!context.inputType) {
       errors.push("financial_input requires inputType in context");
     }
   }
-  
-  if (argObj.component_type === 'rating_scale' && context) {
+
+  if (argObj.component_type === "rating_scale" && context) {
     if (!context.scale) {
       errors.push("rating_scale requires scale configuration in context");
     }
   }
-  
-  if (argObj.component_type === 'slider' && context) {
-    if (!context.range || typeof context.range !== 'object') {
-      errors.push("slider requires range configuration with min/max in context");
+
+  if (argObj.component_type === "slider" && context) {
+    if (!context.range || typeof context.range !== "object") {
+      errors.push(
+        "slider requires range configuration with min/max in context"
+      );
     } else {
       const range = context.range as Record<string, unknown>;
-      if (range.min === undefined || range.min === null || range.max === undefined || range.max === null) {
-        errors.push("slider requires range configuration with min/max in context");
+      if (
+        range.min === undefined ||
+        range.min === null ||
+        range.max === undefined ||
+        range.max === null
+      ) {
+        errors.push(
+          "slider requires range configuration with min/max in context"
+        );
       }
     }
   }
 
   // New component validations
-  if (argObj.component_type === 'stage_selector' && context) {
-    if (!context.stages || !Array.isArray(context.stages) || context.stages.length < 2) {
-      errors.push("stage_selector requires stages array with at least 2 stages");
+  if (argObj.component_type === "stage_selector" && context) {
+    if (
+      !context.stages ||
+      !Array.isArray(context.stages) ||
+      context.stages.length < 2
+    ) {
+      errors.push(
+        "stage_selector requires stages array with at least 2 stages"
+      );
     }
   }
 
-  if (argObj.component_type === 'expense_categories' && context) {
-    if (!context.categories || !Array.isArray(context.categories) || context.categories.length < 1) {
-      errors.push("expense_categories requires categories array with at least 1 category");
+  if (argObj.component_type === "expense_categories" && context) {
+    if (
+      !context.categories ||
+      !Array.isArray(context.categories) ||
+      context.categories.length < 1
+    ) {
+      errors.push(
+        "expense_categories requires categories array with at least 1 category"
+      );
     }
     if (context.allowAdditional === undefined) {
       errors.push("expense_categories requires allowAdditional boolean flag");
     }
   }
 
-  if (argObj.component_type === 'goal_confirmation' && context) {
-    if (!context.goalDetails || typeof context.goalDetails !== 'object') {
+  if (argObj.component_type === "goal_confirmation" && context) {
+    if (!context.goalDetails || typeof context.goalDetails !== "object") {
       errors.push("goal_confirmation requires goalDetails object");
     } else {
       const goalDetails = context.goalDetails as Record<string, unknown>;
-      if (!goalDetails.amount || !goalDetails.timeframe || !goalDetails.monthlyTarget) {
-        errors.push("goal_confirmation requires goalDetails with amount, timeframe, and monthlyTarget");
+      if (
+        !goalDetails.amount ||
+        !goalDetails.timeframe ||
+        !goalDetails.monthlyTarget
+      ) {
+        errors.push(
+          "goal_confirmation requires goalDetails with amount, timeframe, and monthlyTarget"
+        );
       }
     }
   }
 
-  if (argObj.component_type === 'education_content' && context) {
-    if (!context.educationContent || typeof context.educationContent !== 'object') {
+  if (argObj.component_type === "education_content" && context) {
+    if (
+      !context.educationContent ||
+      typeof context.educationContent !== "object"
+    ) {
       errors.push("education_content requires educationContent object");
     } else {
       const eduContent = context.educationContent as Record<string, unknown>;
       if (!eduContent.type || !eduContent.title || !eduContent.content) {
-        errors.push("education_content requires educationContent with type, title, and content");
+        errors.push(
+          "education_content requires educationContent with type, title, and content"
+        );
       }
     }
   }
-  
+
   return { isValid: errors.length === 0, errors };
-} 
+}

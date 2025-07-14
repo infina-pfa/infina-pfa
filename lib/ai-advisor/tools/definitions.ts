@@ -1,5 +1,5 @@
-import { ChatToolId } from "@/lib/types/ai-streaming.types";
-import { ChatTool, Tool, UIActionType } from "../types/index";
+import { ChatComponentId, ChatToolId } from "@/lib/types/ai-streaming.types";
+import { ChatComponent, ChatTool, Tool, UIActionType } from "../types/index";
 
 export const chatTools: ChatTool[] = [
   {
@@ -34,13 +34,44 @@ export const chatTools: ChatTool[] = [
   },
 ];
 
+export const componentTools: ChatComponent[] = [
+  {
+    id: ChatComponentId.BUDGET_OVERVIEW,
+    name: "Budget Overview",
+    description: "Show a overview of the user's budget",
+  },
+  {
+    id: ChatComponentId.BUDGET_DETAIL,
+    name: "Budget Detail",
+    description: "Show a detail of the user's budget",
+  },
+  {
+    id: ChatComponentId.VIDEO,
+    name: "Video",
+    description: "Show a video to the user",
+  },
+];
+
 export const mcpToolsList = [
   {
-    id: "personal-finance-management",
-    name: "Quản lý tài chính cá nhân",
+    id: "budget-management",
+    name: "Budget Management",
     description:
-      "Có thể giúp user tạo/quản lý/cập nhật/xoá: {ngân sách, chi tiêu, thu nhập}, và phân tích tình hình tài chính cá nhân cũng như các tài khoản tài chính khác",
-    keywords: [],
+      "Can help user create/manage/update/delete: {budget, spending, income}, and analyze the financial situation of the user as well as other financial accounts",
+    keywords: ["budget", "spending", "income", "financial", "account"],
+  },
+  {
+    id: "goal-management",
+    name: "Goal Management",
+    description:
+      "Can help user create/manage/update/delete: {goal, spending, income}, and analyze the financial situation of the user as well as other financial accounts",
+    keywords: ["goal", "financial", "account"],
+  },
+  {
+    id: "get-financial-concepts-videos",
+    name: "Get Financial Concepts Videos",
+    description: "Can help user get financial concepts videos url",
+    keywords: ["financial", "concepts", "videos", "url"],
   },
 ];
 
@@ -58,11 +89,10 @@ export const functionTools: Tool[] = [
           type: "string",
           description: "ID of the tool to open",
           enum: [
-            "budget-tool",
-            "loan-calculator",
-            "interest-calculator",
-            "salary-calculator",
-            "learning-center",
+            ChatToolId.BUDGET_TOOL,
+            ChatToolId.LOAN_CALCULATOR,
+            ChatToolId.INTEREST_CALCULATOR,
+            ChatToolId.SALARY_CALCULATOR,
           ],
         },
         title: {
@@ -93,7 +123,10 @@ export const functionTools: Tool[] = [
         component_id: {
           type: "string",
           description: "ID of the component to show",
-          enum: ["budget-overview", "budget-detail"],
+          enum: [
+            ChatComponentId.BUDGET_OVERVIEW,
+            ChatComponentId.BUDGET_DETAIL,
+          ],
         },
         title: {
           type: "string",
@@ -101,6 +134,27 @@ export const functionTools: Tool[] = [
         },
       },
       required: ["component_id", "title"],
+    },
+  },
+  {
+    type: "function",
+    strict: false,
+    name: UIActionType.SHOW_VIDEO,
+    description:
+      "Show a specific video to the user, you must call MCP tool to get the video url before call this function",
+    parameters: {
+      type: "object",
+      properties: {
+        video_url: {
+          type: "string",
+          description: "URL of the video to show",
+        },
+        title: {
+          type: "string",
+          description: "Title of the video",
+        },
+      },
+      required: ["video_url", "title"],
     },
   },
 ];
@@ -112,6 +166,15 @@ export function getToolsInfo(): string {
         `Tool ID: "${tool.id}" | Tên: "${tool.name}" | Mô tả: "${
           tool.description
         }" | Từ khóa: [${tool.keywords.join(", ")}]`
+    )
+    .join("\n");
+}
+
+export function getComponentToolsInfo(): string {
+  return componentTools
+    .map(
+      (component) =>
+        `Component ID: "${component.id}" | Name: "${component.name}" | Description: "${component.description}"`
     )
     .join("\n");
 }
