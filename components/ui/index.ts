@@ -23,5 +23,4 @@ export * from "./sheet";
 export * from "./sidebar";
 export * from "./skeleton";
 export * from "./spending-form";
-export * from "./spending-form-demo";
 export { default as StackingCard } from "./stacking-card";

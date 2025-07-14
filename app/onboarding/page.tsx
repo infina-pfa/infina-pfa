@@ -22,7 +22,11 @@ export default function OnboardingPage() {
       try {
         const result = await userService.checkUserExists();
 
-        if (result.exists && result.user && result.user.onboarding_completed) {
+        if (
+          result.exists &&
+          result.user &&
+          result.user.onboarding_completed_at
+        ) {
           // User has completed onboarding, redirect to chat
           router.push("/chat");
         }
