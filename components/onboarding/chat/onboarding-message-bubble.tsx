@@ -6,6 +6,7 @@ import {
   OnboardingComponent,
 } from "@/lib/types/onboarding.types";
 import { OnboardingComponentRenderer } from "./components/onboarding-component-renderer";
+import { MarkdownRenderer } from "./markdown-renderer";
 import { formatDistanceToNow } from "date-fns";
 import { Bot, User } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -73,8 +74,14 @@ export function OnboardingMessageBubble({
           >
             {/* Text content - only show if there's no component to avoid duplicate titles */}
             {message.content && !isComponent && (
-              <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">
-                {message.content as string}
+              <div className="break-words">
+                {isAI ? (
+                  <MarkdownRenderer content={message.content as string} />
+                ) : (
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                    {message.content as string}
+                  </div>
+                )}
               </div>
             )}
 
@@ -90,8 +97,7 @@ export function OnboardingMessageBubble({
                 >
                   <OnboardingComponentRenderer
                     component={
-                      (message.component as OnboardingComponent) ||
-                      (message.metadata?.component as OnboardingComponent)
+                      (message.component || message.metadata?.component) as OnboardingComponent
                     }
                     onResponse={onComponentResponse}
                   />
