@@ -91,15 +91,22 @@ export async function PATCH(request: NextRequest) {
       .single();
 
     // Update users table if there are valid user fields
-    if (Object.keys(userUpdates).length > 0 || !existingUser) {
+    if (Object.keys(userUpdates).length > 0 || profileData.identifiedStage || !existingUser) {
       if (existingUser) {
         // Update existing record
+        const updateData: Record<string, unknown> = {
+          ...userUpdates,
+          updated_at: new Date().toISOString(),
+        };
+
+        // Update financial_stage if identifiedStage is provided in profileData
+        if (profileData.identifiedStage) {
+          updateData.financial_stage = profileData.identifiedStage;
+        }
+
         const { error: updateError } = await supabase
           .from("users")
-          .update({
-            ...userUpdates,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updateData)
           .eq("user_id", user.id);
 
         if (updateError) {

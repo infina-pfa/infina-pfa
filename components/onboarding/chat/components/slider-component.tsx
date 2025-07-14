@@ -31,6 +31,7 @@ export function SliderComponent({
     try {
       await onResponse({
         sliderValue,
+        sliderUnit: range.unit, // Include unit from context
         completedAt: new Date(),
       });
     } catch (error) {

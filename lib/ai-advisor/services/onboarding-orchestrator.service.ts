@@ -75,9 +75,7 @@ export class OnboardingOrchestratorService {
       conversationHistory: [], // Empty array - conversation history goes to input field instead
     });
 
-    console.log("📝 Onboarding system prompt generated:", {
-      promptLength: systemInstructions.length,
-    });
+
 
     // Log system prompt to file for debugging 
     const requestId = await SystemPromptLogger.logSystemPrompt({
@@ -99,10 +97,6 @@ export class OnboardingOrchestratorService {
       requestId,
     });
 
-    console.log("📝 System prompt logged successfully:", { requestId });
-
-    // Convert onboarding function tools to Responses API format and combine with MCP
-    console.log("🛠️ Setting up onboarding tools with MCP integration...");
     const onboardingTools = this.convertToolsForResponsesAPI(onboardingFunctionTools);
     
     // Add MCP tool if enabled (use union type for function and MCP tools)
@@ -121,18 +115,9 @@ export class OnboardingOrchestratorService {
         })
       };
       allTools.push(mcpTool);
-      console.log("🔧 MCP tool added to tools array:", this.mcpConfig.serverLabel);
     }
-    
-    console.log("🛠️ Onboarding tools configured:", {
-      functionToolCount: onboardingTools.length,
-      mcpEnabled: this.mcpConfig.enabled,
-      totalToolCount: allTools.length,
-      mcpServerUrl: this.mcpConfig.enabled ? this.mcpConfig.serverUrl : "disabled",
-    });
 
     // Prepare input for Responses API - include complete conversation history + current message
-    console.log("💬 Preparing messages for onboarding LLM...");
     const completeConversationHistory = (conversationHistory || []).map((msg) => ({
       role: msg.sender === "user" ? ("user" as const) : ("assistant" as const),
       content: msg.content,
@@ -143,13 +128,8 @@ export class OnboardingOrchestratorService {
       { role: "user" as const, content: message },
     ];
 
-    console.log("💬 Onboarding messages prepared:", {
-      inputCount: input.length,
-      totalLength: input.reduce((sum, m) => sum + m.content.length, 0),
-    });
-
     // Process OpenAI stream with MCP integration
-    console.log("🌊 Starting onboarding OpenAI stream with MCP...");
+    
     return this.processOpenAIStreamWithMCP(
       systemInstructions,
       input,
@@ -182,19 +162,10 @@ export class OnboardingOrchestratorService {
     llmConfig: LLMConfig,
     userId: string
   ): Promise<ReadableStream> {
-    console.log("🤖 Using OpenAI streaming with MCP for onboarding...");
-    console.log("🔧 Onboarding OpenAI request config:", {
-      model: llmConfig.model,
-      temperature: llmConfig.temperature,
-      inputCount: Array.isArray(input) ? input.length : 0,
-      toolCount: Array.isArray(allTools) ? allTools.length : 0,
-      hasApiKey: !!llmConfig.apiKey,
-      mcpEnabled: this.mcpConfig.enabled,
-      userId: userId,
-    });
+
 
     try {
-      console.log("📡 Creating onboarding OpenAI stream with MCP...");
+      
       
       // Create stream configuration with MCP support (MCP tools are in the tools array)
       const streamConfig = {
@@ -206,17 +177,9 @@ export class OnboardingOrchestratorService {
         temperature: llmConfig.temperature,
       };
 
-      console.log("🔧 Final stream config:", {
-        model: streamConfig.model,
-        hasInstructions: !!streamConfig.instructions,
-        inputLength: streamConfig.input.length,
-        toolsCount: streamConfig.tools.length,
-        toolTypes: streamConfig.tools.map((tool) => 'type' in tool ? tool.type : 'unknown'),
-      });
 
       const stream = await this.openaiClient.responses.create(streamConfig);
 
-      console.log("🌊 Onboarding OpenAI stream with MCP created successfully");
 
       // Return custom onboarding stream with specialized tool handling
       return this.createOnboardingReadableStream(stream);

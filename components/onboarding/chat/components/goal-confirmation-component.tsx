@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { OnboardingComponent, ComponentResponse } from "@/lib/types/onboarding.types";
 import { useAppTranslation } from "@/hooks/use-translation";
+import { useAuthContext } from "@/components/providers/auth-provider";
+import { goalService } from "@/lib/services/goal.service";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Target, Calendar, DollarSign, Edit3, Sparkles, TrendingUp } from "lucide-react";
 
@@ -22,15 +24,81 @@ export function GoalConfirmationComponent({
   onResponse,
 }: GoalConfirmationComponentProps) {
   const { t } = useAppTranslation(["onboarding", "common"]);
+  const { user } = useAuthContext();
   
   const goalDetails = component.context.goalDetails as GoalDetails;
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  /**
+   * Create or update emergency fund goal in the database
+   */
+  const createOrUpdateEmergencyFundGoal = async () => {
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    // Calculate due date based on timeframe (months from now)
+    const dueDate = new Date();
+    dueDate.setMonth(dueDate.getMonth() + goalDetails.timeframe);
+
+    // Emergency fund goal data
+    const emergencyFundData = {
+      title: "Quỹ Dự phòng Khẩn cấp",
+      description: `Mục tiêu xây dựng quỹ dự phòng khẩn cấp ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng với mức tiết kiệm ${formatCurrency(goalDetails.monthlyTarget)} VND mỗi tháng.`,
+      target_amount: goalDetails.amount,
+      current_amount: 0,
+      due_date: dueDate.toISOString(),
+    };
+
+    // First, check if an emergency fund goal already exists
+    const existingGoalsResponse = await goalService.getAll(undefined, t);
+    
+    if (existingGoalsResponse.error) {
+      throw new Error(existingGoalsResponse.error);
+    }
+
+    // Look for existing emergency fund goal (by title)
+    const existingEmergencyFundGoal = existingGoalsResponse.goals.find(
+      goal => goal.title.toLowerCase().includes("quỹ dự phòng") || 
+              goal.title.toLowerCase().includes("emergency fund")
+    );
+
+    if (existingEmergencyFundGoal) {
+      // Update existing goal
+      console.log("Updating existing emergency fund goal:", existingEmergencyFundGoal.id);
+      const updateResponse = await goalService.update(
+        existingEmergencyFundGoal.id,
+        emergencyFundData,
+        t
+      );
+      
+      if (updateResponse.error) {
+        throw new Error(updateResponse.error);
+      }
+      
+      return updateResponse.goal;
+    } else {
+      // Create new goal
+      console.log("Creating new emergency fund goal");
+      const createResponse = await goalService.create(emergencyFundData, t);
+      
+      if (createResponse.error) {
+        throw new Error(createResponse.error);
+      }
+      
+      return createResponse.goal;
+    }
+  };
 
   const handleConfirm = async () => {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
     try {
+      // Create or update emergency fund goal
+      const goal = await createOrUpdateEmergencyFundGoal();
+      console.log("Emergency fund goal created/updated successfully:", goal);
+
       await onResponse({
         goalConfirmed: true,
         goalDetails: {
@@ -47,12 +115,36 @@ export function GoalConfirmationComponent({
           amount: goalDetails.amount,
           monthlyTarget: goalDetails.monthlyTarget,
           timeframe: goalDetails.timeframe,
-          readyToStart: true
+          readyToStart: true,
+          goalId: goal?.id, // Include the goal ID for reference
         },
         completedAt: new Date(),
       });
     } catch (error) {
       console.error("Error confirming goal:", error);
+      // You could add error handling UI here if needed
+      // For now, we'll still proceed with the onResponse to not break the flow
+      await onResponse({
+        goalConfirmed: true,
+        goalDetails: {
+          amount: goalDetails.amount,
+          timeframe: goalDetails.timeframe,
+          monthlyTarget: goalDetails.monthlyTarget,
+          type: "emergency_fund"
+        },
+        userAction: "confirmed",
+        userMessage: `Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng với mức tiết kiệm ${formatCurrency(goalDetails.monthlyTarget)} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.`,
+        nextSteps: "guide_implementation",
+        actionContext: {
+          goalType: "emergency_fund",
+          amount: goalDetails.amount,
+          monthlyTarget: goalDetails.monthlyTarget,
+          timeframe: goalDetails.timeframe,
+          readyToStart: true,
+          goalCreationError: error instanceof Error ? error.message : "Unknown error",
+        },
+        completedAt: new Date(),
+      });
     } finally {
       setIsSubmitting(false);
     }

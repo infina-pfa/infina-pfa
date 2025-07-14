@@ -29,14 +29,6 @@ export async function POST(request: NextRequest) {
   try {
     const requestBody: OnboardingStreamRequest = await request.json();
 
-    console.log("📥 Onboarding stream request:", {
-      hasMessage: !!requestBody.message,
-      messageLength: requestBody.message?.length || 0,
-      hasHistory: !!requestBody.conversationHistory,
-      historyLength: requestBody.conversationHistory?.length || 0,
-      hasUserProfile: !!requestBody.userProfile,
-    });
-
     // Create Supabase client for authentication
     const cookieStore = await cookies();
     const supabase = createServerClient(
@@ -92,12 +84,6 @@ export async function POST(request: NextRequest) {
 
     // Get LLM configuration
     const llmConfig = getLLMConfig(defaultProvider);
-    console.log("🤖 Using LLM config:", {
-      provider: llmConfig.provider,
-      model: llmConfig.model,
-      mcpEnabled: onboardingMcpConfig.enabled,
-      mcpServerUrl: onboardingMcpConfig.serverUrl,
-    });
 
     // Get user data for stage information
     const userData = await supabase
@@ -116,12 +102,6 @@ export async function POST(request: NextRequest) {
       },
       user_id: user.id,
     };
-
-    console.log("🔄 Processing request through MCP orchestrator...", {
-      userId: user.id,
-      hasUserProfile: !!orchestratorRequest.userProfile,
-      conversationLength: orchestratorRequest.conversationHistory.length,
-    });
 
     // Note: Token metrics and system prompt logging are now managed by the orchestrator service
 

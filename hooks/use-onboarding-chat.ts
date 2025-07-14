@@ -9,12 +9,16 @@ import {
 } from "@/lib/types/onboarding.types";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { onboardingService } from "@/lib/services/onboarding.service";
+import { budgetService } from "@/lib/services/budget.service";
+import { CreateBudgetRequest } from "@/lib/types/budget.types";
+import { useAuth } from "@/hooks/use-auth";
 
 export const useOnboardingChat = (
   userId: string,
   onComplete: () => void
 ): UseOnboardingChatReturn => {
   const { t, i18n } = useAppTranslation(["onboarding", "common"]);
+  const { user } = useAuth();
 
   // Core state
   const [state, setState] = useState<OnboardingState>({
@@ -854,6 +858,116 @@ export const useOnboardingChat = (
     [state, hasStartedAI, t, messages]
   );
 
+  // 🔧 NEW: Create budgets from expense breakdown with duplicate handling
+  const createBudgetsFromExpenseBreakdown = async (
+    expenseBreakdown: Record<string, number>
+  ) => {
+    try {
+      console.log("🏗️ Creating budgets from expense breakdown:", expenseBreakdown);
+
+      // Get current month and year
+      const now = new Date();
+      const month = now.getMonth() + 1; // JavaScript months are 0-based
+      const year = now.getFullYear();
+
+      // Define budget mapping for expense categories
+      const budgetMapping: Record<string, {
+        name: string;
+        category: "fixed" | "flexible";
+        icon: string;
+        color: string;
+      }> = {
+        housing: {
+          name: i18n.language === 'vi' ? "Nhà ở" : "Housing",
+          category: "fixed",
+          icon: "home",
+          color: "#0055FF"
+        },
+        food: {
+          name: i18n.language === 'vi' ? "Ăn uống" : "Food",
+          category: "flexible", 
+          icon: "food",
+          color: "#2ECC71"
+        },
+        transport: {
+          name: i18n.language === 'vi' ? "Di chuyển" : "Transportation",
+          category: "flexible",
+          icon: "car",
+          color: "#FF9800"
+        },
+        other: {
+          name: i18n.language === 'vi' ? "Chi tiêu khác" : "Other Expenses",
+          category: "flexible",
+          icon: "other",
+          color: "#F44336"
+        }
+      };
+
+      // Get existing budgets first to check for duplicates
+      console.log("🔍 Checking for existing budgets...");
+      const existingBudgetsResponse = await budgetService.getAll({ month, year }, t);
+      const existingBudgets = existingBudgetsResponse.budgets || [];
+
+      // Create/update budgets for each category
+      const budgetPromises = Object.entries(expenseBreakdown).map(async ([categoryId, amount]) => {
+        if (amount > 0 && budgetMapping[categoryId]) {
+          const mapping = budgetMapping[categoryId];
+          
+          // Check if budget already exists
+          const existingBudget = existingBudgets.find(b => b.name === mapping.name);
+          
+          if (existingBudget) {
+            // Update existing budget
+            console.log(`🔄 Updating existing budget for ${categoryId}:`, existingBudget.id);
+            
+            const updateResult = await budgetService.update(existingBudget.id, {
+              amount,
+              category: mapping.category,
+              icon: mapping.icon,
+              color: mapping.color
+            }, t);
+            
+            if (updateResult.budget) {
+              console.log(`✅ Budget updated for ${categoryId}:`, updateResult.budget);
+            } else {
+              console.error(`❌ Failed to update budget for ${categoryId}:`, updateResult.error);
+            }
+          } else {
+            // Create new budget
+            const budgetData: CreateBudgetRequest = {
+              month,
+              year,
+              name: mapping.name,
+              category: mapping.category,
+              icon: mapping.icon,
+              color: mapping.color,
+              amount
+            };
+
+            console.log(`📊 Creating new budget for ${categoryId}:`, budgetData);
+
+            const result = await budgetService.create(budgetData, t);
+            
+            if (result.budget) {
+              console.log(`✅ Budget created for ${categoryId}:`, result.budget);
+            } else {
+              console.error(`❌ Failed to create budget for ${categoryId}:`, result.error);
+            }
+          }
+        }
+      });
+
+      // Wait for all budget operations to complete
+      await Promise.all(budgetPromises);
+      
+      console.log("🎉 Successfully processed all budgets from expense breakdown");
+
+    } catch (error) {
+      console.error("❌ Error creating budgets from expense breakdown:", error);
+      // Don't throw error to avoid disrupting the onboarding flow
+    }
+  };
+
   const updateProfileFromResponse = async (response: ComponentResponse) => {
     const profileUpdates: Partial<UserProfile> = {};
 
@@ -892,6 +1006,11 @@ export const useOnboardingChat = (
       });
 
       profileUpdates.expenses = total;
+
+      // 🔧 NEW: Create budgets from expense breakdown
+      if (user?.id) {
+        await createBudgetsFromExpenseBreakdown(breakdown);
+      }
     }
 
     // Handle savings capacity response
@@ -1078,7 +1197,9 @@ export const useOnboardingChat = (
       response.sliderValue !== undefined &&
       response.sliderValue !== null
     ) {
-      return `${response.sliderValue}%`;
+      // Use unit from response if available, otherwise fallback to no unit
+      const unit = response.sliderUnit || '';
+      return unit ? `${response.sliderValue} ${unit}` : `${response.sliderValue}`;
     }
     return "Completed"; // More descriptive than "ok"
   };

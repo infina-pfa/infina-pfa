@@ -229,6 +229,7 @@ export interface ComponentResponse {
   selectedOption?: string;
   rating?: number;
   sliderValue?: number;
+  sliderUnit?: string; // Add unit for slider responses
   textValue?: string;
   financialValue?: number;
   // New response types for stage-specific components
@@ -266,6 +267,8 @@ export interface ComponentResponse {
     currentTimeframe?: number;
     needsAdjustment?: boolean;
     adjustmentRequested?: boolean;
+    goalId?: string; // ID of the created/updated goal
+    goalCreationError?: string; // Error message if goal creation fails
   };
   adjustmentReason?: string;
   educationCompleted?: boolean;
