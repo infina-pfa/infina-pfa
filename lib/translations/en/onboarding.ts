@@ -163,6 +163,7 @@ export const onboardingEn = {
   watchOnYouTube: "Watch on YouTube",
   whatWouldYouLikeToKnow: "What would you like to know?",
   continueToNextStep: "Continue to next step",
+  educationContentCompleted: "Finished reading content and ready to continue",
   educationTip:
     "Take your time to understand these concepts - they're the foundation of your financial success!",
 

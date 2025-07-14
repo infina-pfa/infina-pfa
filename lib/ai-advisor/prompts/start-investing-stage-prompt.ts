@@ -6,8 +6,7 @@
 export function generateStartInvestingStagePrompt(
   userId: string,
   userProfile: Record<string, unknown>,
-  conversationHistory: Array<{ role: string; content: string }>,
-  currentStep: string
+  conversationHistory: Array<{ role: string; content: string }>
 ): string {
   const conversationStarted = conversationHistory.length > 2;
   const currentStageStep = userProfile.currentStageStep || 0;
@@ -22,7 +21,7 @@ export function generateStartInvestingStagePrompt(
             <user_id>${userId}</user_id>
             <conversation_started>${conversationStarted}</conversation_started>
             <stage_step>${currentStageStep}</stage_step>
-            <current_system_step>${currentStep}</current_system_step>
+    
         </current_conversation_context>
     </start_investing_stage_configuration>
 

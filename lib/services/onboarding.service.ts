@@ -2,8 +2,7 @@ import {
   OnboardingState, 
   OnboardingService as OnboardingServiceInterface,
   ComponentResponse,
-  UserProfile,
-  FinancialStage
+  UserProfile
 } from "@/lib/types/onboarding.types";
 import { apiClient } from "@/lib/api-client";
 
@@ -76,28 +75,7 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
     }
   }
 
-  async analyzeFinancialStage(profile: UserProfile): Promise<{
-    stage: FinancialStage;
-    confidence: number;
-    reasoning: string;
-  }> {
-    try {
-      const response = await apiClient.post<{
-        stage: FinancialStage;
-        confidence: number;
-        reasoning: string;
-      }>("/onboarding/analyze-stage", { profile });
 
-      if (!response.success || !response.data) {
-        throw new Error(response.error || "Failed to analyze stage");
-      }
-
-      return response.data;
-    } catch (error) {
-      console.error("Failed to analyze financial stage:", error);
-      throw new Error("Failed to analyze your financial stage. Please try again.");
-    }
-  }
 
   async completeOnboarding(finalProfile: UserProfile): Promise<void> {
     try {

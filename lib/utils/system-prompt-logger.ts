@@ -5,7 +5,6 @@ interface SystemPromptLogData {
   userId: string;
   requestId: string;
   timestamp: string;
-  currentStep: string;
   userProfile?: Record<string, unknown>;
   conversationHistory?: Array<{
     role: "user" | "assistant";
@@ -42,14 +41,12 @@ export class SystemPromptLogger {
    */
   public static async logSystemPrompt({
     userId,
-    currentStep,
     userProfile,
     conversationHistory,
     systemPrompt,
     userMessage,
   }: {
     userId: string;
-    currentStep: string;
     userProfile?: Record<string, unknown>;
     conversationHistory?: Array<{
       role: "user" | "assistant";
@@ -68,7 +65,6 @@ export class SystemPromptLogger {
         userId,
         requestId,
         timestamp,
-        currentStep,
         userProfile,
         conversationHistory,
         systemPrompt,
@@ -84,7 +80,7 @@ export class SystemPromptLogger {
       await fs.writeFile(filepath, JSON.stringify(logData, null, 2), 'utf-8');
 
       console.log(`📝 System prompt logged to: ${filepath}`);
-      console.log(`📊 Prompt stats: ${systemPrompt.length} characters, Step: ${currentStep}`);
+      console.log(`📊 Prompt stats: ${systemPrompt.length} characters`);
 
       return requestId;
     } catch (error) {
@@ -99,13 +95,11 @@ export class SystemPromptLogger {
    */
   public static async logPromptSummary({
     userId,
-    currentStep,
     promptLength,
     userMessage,
     requestId,
   }: {
     userId: string;
-    currentStep: string;
     promptLength: number;
     userMessage: string;
     requestId?: string;
@@ -120,7 +114,6 @@ export class SystemPromptLogger {
         timestamp,
         userId: userId.slice(0, 8), // Shortened for privacy
         requestId: requestId || this.generateRequestId(),
-        currentStep,
         promptLength,
         userMessagePreview: userMessage.substring(0, 100),
       };

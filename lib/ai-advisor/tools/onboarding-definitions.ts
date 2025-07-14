@@ -160,11 +160,22 @@ export const showOnboardingComponentTool = {
               items: {
                 type: "object",
                 properties: {
-                  id: { type: "string" },
-                  label: { type: "string" },
+                  id: {
+                    type: "string",
+                    description: "Unique suggestion identifier",
+                  },
+                  label: {
+                    type: "string",
+                    description: "Display text for the suggestion button",
+                  },
+                  value: {
+                    type: "string",
+                    description: "Value to be returned when selected",
+                  },
                 },
+                required: ["id", "label", "value"],
               },
-              description: "Quick suggestion buttons for user convenience",
+              description: "Quick suggestion buttons for user convenience (REQUIRED for suggestions component)",
             },
 
             // NEW STAGE-FIRST COMPONENTS
@@ -338,91 +349,6 @@ export const showOnboardingComponentTool = {
 };
 
 /**
- * Function definition for updating user profile during onboarding
- */
-export const updateOnboardingProfileTool = {
-  type: "function" as const,
-  function: {
-    name: "update_onboarding_profile",
-    description:
-      "Update user profile with information gathered during onboarding",
-    parameters: {
-      type: "object",
-      properties: {
-        profile_updates: {
-          type: "object",
-          description: "Profile fields to update",
-          properties: {
-            name: { type: "string" },
-            age: { type: "number" },
-            gender: {
-              type: "string",
-              enum: ["male", "female", "other", "prefer_not_to_say"],
-            },
-            location: { type: "string" },
-            income: { type: "number" },
-            expenses: { type: "number" },
-            currentDebts: { type: "number" },
-            savings: { type: "number" },
-            investmentExperience: {
-              type: "string",
-              enum: ["none", "beginner", "intermediate", "advanced"],
-            },
-            primaryFinancialGoal: { type: "string" },
-            timeHorizon: {
-              type: "string",
-              enum: ["short", "medium", "long"],
-            },
-            riskTolerance: {
-              type: "string",
-              enum: ["conservative", "moderate", "aggressive"],
-            },
-          },
-        },
-      },
-      required: ["profile_updates"],
-    },
-  },
-};
-
-/**
- * Function definition for analyzing financial stage
- */
-export const analyzeFinancialStageTool = {
-  type: "function" as const,
-  function: {
-    name: "analyze_financial_stage",
-    description:
-      "Analyze user's current financial situation to determine their appropriate financial stage",
-    parameters: {
-      type: "object",
-      properties: {
-        profile_data: {
-          type: "object",
-          description: "Complete user profile for analysis",
-          properties: {
-            income: { type: "number" },
-            expenses: { type: "number" },
-            debts: { type: "number" },
-            savings: { type: "number" },
-            investmentExperience: { type: "string" },
-            riskTolerance: { type: "string" },
-            primaryGoal: { type: "string" },
-            age: { type: "number" },
-          },
-        },
-        trigger_completion: {
-          type: "boolean",
-          description: "Whether to complete onboarding after analysis",
-          default: false,
-        },
-      },
-      required: ["profile_data"],
-    },
-  },
-};
-
-/**
  * Function definition for completing the onboarding process
  */
 export const completeOnboardingTool = {
@@ -444,8 +370,6 @@ export const completeOnboardingTool = {
  */
 export const onboardingFunctionTools = [
   showOnboardingComponentTool,
-  updateOnboardingProfileTool,
-  analyzeFinancialStageTool,
   completeOnboardingTool,
 ];
 
@@ -459,161 +383,6 @@ export function getOnboardingToolsInfo(): string {
       return `- ${name}: ${description}`;
     })
     .join("\n");
-}
-
-/**
- * Get example function call for each component type
- */
-export function getComponentExamples(): string {
-  const timestamp = new Date().getTime();
-  return `
-- **Stage Selector Example**:
-  \`\`\`json
-  {
-    "component_type": "stage_selector",
-    "title": "Để tôi có thể tư vấn tốt nhất, hãy chọn tình huống tài chính hiện tại của bạn:",
-    "component_id": "stage_selector_${timestamp}",
-    "context": {
-      "stages": [
-        {
-          "id": "debt",
-          "title": "Tôi đang có nợ cần giải quyết",
-          "description": "Bạn có các khoản nợ thẻ tín dụng, nợ tiêu dùng hoặc các khoản vay ngắn hạn đang ảnh hưởng đến tài chính",
-          "criteria": ["Nợ thẻ tín dụng hoặc nợ tiêu dùng", "Lãi suất cao (>15%/năm)", "Ảnh hưởng đến chi tiêu hàng tháng"]
-        },
-        {
-          "id": "start_saving",
-          "title": "Tôi muốn bắt đầu tiết kiệm",
-          "description": "Bạn không có nợ đáng kể nhưng chưa có quỹ dự phòng, muốn xây dựng nền tảng tài chính vững chắc",
-          "criteria": ["Không có nợ xấu", "Chưa có quỹ dự phòng", "Muốn xây dựng thói quen tiết kiệm"]
-        },
-        {
-          "id": "start_investing", 
-          "title": "Tôi sẵn sàng đầu tư",
-          "description": "Bạn đã có quỹ dự phòng và muốn bắt đầu đầu tư để tăng trưởng tài sản dài hạn",
-          "criteria": ["Đã có quỹ dự phòng 3-6 tháng", "Thu nhập ổn định", "Muốn tăng trưởng tài sản"]
-        }
-      ]
-    }
-  }
-  \`\`\`
-
-- **Expense Categories Example**:
-  \`\`\`json
-  {
-    "component_type": "expense_categories",
-    "title": "Để tính toán quỹ dự phòng phù hợp, hãy cho tôi biết chi tiêu hàng tháng của bạn:",
-    "component_id": "expense_categories_${timestamp}",
-    "context": {
-      "categories": [
-        {
-          "id": "housing",
-          "name": "Nhà ở (thuê nhà/điện/nước)",
-          "placeholder": "Ví dụ: 8,000,000 VND",
-          "required": true
-        },
-        {
-          "id": "food",
-          "name": "Ăn uống",
-          "placeholder": "Ví dụ: 4,000,000 VND",
-          "required": true
-        },
-        {
-          "id": "transportation",
-          "name": "Di chuyển",
-          "placeholder": "Ví dụ: 2,000,000 VND",
-          "required": true
-        },
-        {
-          "id": "other",
-          "name": "Chi tiêu khác (giải trí, mua sắm, v.v.)",
-          "placeholder": "Ví dụ: 3,000,000 VND",
-          "required": true
-        }
-      ],
-      "allowAdditional": true
-    }
-  }
-  \`\`\`
-
-- **Savings Capacity Example**:
-  \`\`\`json
-  {
-    "component_type": "savings_capacity",
-    "title": "Bạn có thể tiết kiệm bao nhiều mỗi tháng?",
-    "component_id": "savings_capacity_${timestamp}",
-    "context": {
-      "incomeHint": "Bạn không cần chia sẻ thu nhập chính xác, chỉ cần ước tính khả năng tiết kiệm",
-      "savingsHint": "Hãy thật thà về số tiền bạn có thể tiết kiệm một cách bền vững mỗi tháng"
-    }
-  }
-  \`\`\`
-
-- **Goal Confirmation Example**:
-  \`\`\`json
-  {
-    "component_type": "goal_confirmation",
-    "title": "Đây là mục tiêu quỹ dự phòng dành cho bạn:",
-    "component_id": "goal_confirmation_${timestamp}",
-    "context": {
-      "goalDetails": {
-        "amount": 51000000,
-        "timeframe": 6,
-        "monthlyTarget": 8500000
-      }
-    }
-  }
-  \`\`\`
-
-- **Education Content Example**:
-  \`\`\`json
-  {
-    "component_type": "education_content",
-    "title": "Tại sao nên xây dựng quỹ dự phòng sớm?",
-    "component_id": "education_content_${timestamp}",
-    "context": {
-      "educationContent": {
-        "type": "video",
-        "title": "Quỹ dự phòng - Nền tảng của sự tự do tài chính",
-        "content": "Quỹ dự phòng là khoản tiền dành riêng để đối phó với các tình huống khẩn cấp như mất việc, ốm đau, hoặc các chi phí bất ngờ. Đây là bước đầu tiên và quan trọng nhất trong hành trình tài chính của bạn...",
-        "videoUrl": "https://youtube.com/watch?v=emergency-fund-basics",
-        "relatedActions": ["Tôi nên bắt đầu như thế nào?", "Làm sao để duy trì động lực?"]
-      }
-    }
-  }
-  \`\`\`
-
-- **Financial Input Example**:
-  \`\`\`json
-  {
-    "component_type": "financial_input",
-    "title": "Thu nhập hàng tháng của bạn là bao nhiều?",
-    "component_id": "financial_input_${timestamp}",
-    "context": {
-      "inputType": "income",
-      "placeholder": "Ví dụ: 25,000,000 VND",
-      "currency": "VND"
-    }
-  }
-  \`\`\`
-
-- **Multiple Choice Example**:
-  \`\`\`json
-  {
-    "component_type": "multiple_choice",
-    "title": "Mục tiêu tài chính chính của bạn là gì?",
-    "component_id": "multiple_choice_${timestamp}",
-    "context": {
-      "options": [
-        {"id": "emergency_fund", "label": "Xây dựng quỹ dự phòng", "value": "emergency_fund"},
-        {"id": "pay_debt", "label": "Trả hết nợ", "value": "pay_debt"},
-        {"id": "save_house", "label": "Tiết kiệm mua nhà", "value": "save_house"},
-        {"id": "invest_retirement", "label": "Đầu tư cho tương lai", "value": "invest_retirement"}
-      ]
-    }
-  }
-  \`\`\`
-`;
 }
 
 /**
@@ -719,9 +488,7 @@ export function validateComponentArguments(args: unknown): {
         "expense_categories requires categories array with at least 1 category"
       );
     }
-    if (context.allowAdditional === undefined) {
-      errors.push("expense_categories requires allowAdditional boolean flag");
-    }
+    // allowAdditional is now optional - component works fine without it
   }
 
   if (argObj.component_type === "goal_confirmation" && context) {
@@ -754,6 +521,18 @@ export function validateComponentArguments(args: unknown): {
           "education_content requires educationContent with type, title, and content"
         );
       }
+    }
+  }
+
+  if (argObj.component_type === "suggestions" && context) {
+    if (
+      !context.suggestions ||
+      !Array.isArray(context.suggestions) ||
+      context.suggestions.length < 1
+    ) {
+      errors.push(
+        "suggestions requires suggestions array with at least 1 suggestion"
+      );
     }
   }
 

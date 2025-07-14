@@ -8,7 +8,6 @@ interface LogEntry {
   userId: string;
   requestId: string;
   timestamp: string;
-  currentStep: string;
   promptLength: number;
   userMessage: string;
 }
@@ -51,11 +50,11 @@ class LogManager {
         const entry: LogEntry = JSON.parse(line);
         const time = new Date(entry.timestamp).toLocaleTimeString();
         const user = entry.userId.substring(0, 8);
-        const step = entry.currentStep;
+        // const step = entry.currentStep; // Removed currentStep tracking
         const length = entry.promptLength.toString();
         const preview = entry.userMessage.substring(0, 30) + '...';
         
-        console.log(time.padEnd(20) + user.padEnd(10) + step.padEnd(15) + length.padEnd(8) + preview);
+        console.log(time.padEnd(20) + user.padEnd(10) + length.padEnd(8) + preview); // Removed step column
       }
     } catch (error) {
       console.error('❌ Failed to show recent logs:', error);
@@ -75,7 +74,7 @@ class LogManager {
       console.log(`  Request ID: ${logData.requestId}`);
       console.log(`  User ID: ${logData.userId}`);
       console.log(`  Timestamp: ${logData.timestamp}`);
-      console.log(`  Current Step: ${logData.currentStep}`);
+              // console.log(`  Current Step: ${logData.currentStep}`); // Removed currentStep tracking
       console.log(`  Prompt Length: ${logData.promptLength} characters`);
       console.log(`  User Message: ${logData.userMessage}`);
       console.log(`  Conversation History: ${logData.conversationHistory?.length || 0} messages`);
@@ -106,7 +105,7 @@ class LogManager {
       
       for (const line of lines) {
         const entry: LogEntry = JSON.parse(line);
-        stepCounts[entry.currentStep] = (stepCounts[entry.currentStep] || 0) + 1;
+        // stepCounts[entry.currentStep] = (stepCounts[entry.currentStep] || 0) + 1; // Removed currentStep tracking
         lengthStats.push(entry.promptLength);
       }
       

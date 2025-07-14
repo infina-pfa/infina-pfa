@@ -138,14 +138,14 @@ export function OnboardingComponentRenderer({
       return (
         <Suggestions
           suggestions={
-            component.context.options?.map((option) => option.label) || []
+            component.context.suggestions?.map((suggestion) => suggestion.label) || []
           }
-          onSelect={(suggestion) =>
+          onSelect={(suggestionLabel) => {
             handleResponse({
-              selectedOption: suggestion,
+              selectedOption: suggestionLabel,
               completedAt: new Date(),
-            })
-          }
+            });
+          }}
         />
       );
 

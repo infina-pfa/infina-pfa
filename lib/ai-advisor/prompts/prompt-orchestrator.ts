@@ -18,7 +18,6 @@ interface PromptOrchestratorParams {
   userId: string;
   userProfile: Record<string, unknown>;
   conversationHistory: Array<{ role: string; content: string }>;
-  currentStep: string;
 }
 
 /**
@@ -28,7 +27,7 @@ interface PromptOrchestratorParams {
 export function generateStageSpecificPrompt(
   params: PromptOrchestratorParams
 ): string {
-  const { userId, userProfile, conversationHistory, currentStep } = params;
+  const { userId, userProfile, conversationHistory } = params;
 
   // Extract identified stage from user profile
   const identifiedStage = userProfile.identifiedStage as FinancialStage;
@@ -38,7 +37,6 @@ export function generateStageSpecificPrompt(
     identifiedStage,
     hasStage: !!identifiedStage,
     profileKeys: Object.keys(userProfile),
-    currentStep,
   });
 
   // If no stage identified yet, use the original onboarding prompt for stage identification
@@ -47,8 +45,7 @@ export function generateStageSpecificPrompt(
     return generateOnboardingSystemPrompt(
       userId,
       userProfile,
-      conversationHistory,
-      currentStep
+      conversationHistory
     );
   }
 
@@ -59,8 +56,7 @@ export function generateStageSpecificPrompt(
       return generateDebtStagePrompt(
         userId,
         userProfile,
-        conversationHistory,
-        currentStep
+        conversationHistory
       );
 
     case "start_saving":
@@ -68,8 +64,7 @@ export function generateStageSpecificPrompt(
       return generateStartSavingStagePrompt(
         userId,
         userProfile,
-        conversationHistory,
-        currentStep
+        conversationHistory
       );
 
     case "start_investing":
@@ -77,8 +72,7 @@ export function generateStageSpecificPrompt(
       return generateStartInvestingStagePrompt(
         userId,
         userProfile,
-        conversationHistory,
-        currentStep
+        conversationHistory
       );
 
     default:
@@ -89,8 +83,7 @@ export function generateStageSpecificPrompt(
       return generateOnboardingSystemPrompt(
         userId,
         userProfile,
-        conversationHistory,
-        currentStep
+        conversationHistory
       );
   }
 }

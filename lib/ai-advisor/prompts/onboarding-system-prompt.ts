@@ -6,8 +6,7 @@
 export function generateOnboardingSystemPrompt(
   userId: string,
   userProfile: Record<string, unknown>,
-  conversationHistory: Array<{ role: string; content: string }>,
-  currentStep: string
+  conversationHistory: Array<{ role: string; content: string }>
 ): string {
   const conversationStarted = conversationHistory.length > 2;
   const hasStageIdentified = userProfile.identifiedStage !== undefined;
@@ -25,7 +24,7 @@ export function generateOnboardingSystemPrompt(
             <stage_identified>${hasStageIdentified}</stage_identified>
             <current_stage>${currentStage || 'none'}</current_stage>
             <stage_step>${currentStageStep}</stage_step>
-            <current_system_step>${currentStep}</current_system_step>
+    
         </current_conversation_context>
     </onboarding_system_configuration>
 

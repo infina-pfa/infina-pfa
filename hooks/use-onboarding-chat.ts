@@ -446,7 +446,6 @@ export const useOnboardingChat = (
       message: initialMessage,
       conversationHistory,
       userProfile: initialState.userProfile,
-      currentStep: initialState.step,
     });
 
     setHasStartedAI(true);
@@ -553,7 +552,6 @@ export const useOnboardingChat = (
       message,
       conversationHistory,
       userProfile: state.userProfile,
-      currentStep: state.step,
     });
   };
 
@@ -566,7 +564,6 @@ export const useOnboardingChat = (
       timestamp: string;
     }>;
     userProfile: UserProfile;
-    currentStep: string;
   }) => {
     try {
       setIsAIThinking(true);
@@ -837,7 +834,6 @@ export const useOnboardingChat = (
             message: responseText,
             conversationHistory,
             userProfile: state.userProfile,
-            currentStep: state.step,
           });
           setHasStartedAI(true);
         } else {
@@ -847,7 +843,6 @@ export const useOnboardingChat = (
             message: responseText,
             conversationHistory,
             userProfile: state.userProfile,
-            currentStep: state.step,
           });
         }
       } catch (err) {
@@ -885,23 +880,16 @@ export const useOnboardingChat = (
     if (response.expenseBreakdown) {
       profileUpdates.expenseBreakdown = response.expenseBreakdown;
 
-      // Calculate total monthly expenses
+      // Calculate total monthly expenses from all categories
       const breakdown = response.expenseBreakdown;
       let total = 0;
 
-      // Add basic expense categories
-      if (breakdown.housing) total += breakdown.housing;
-      if (breakdown.food) total += breakdown.food;
-      if (breakdown.transportation) total += breakdown.transportation;
-      if (breakdown.other) total += breakdown.other;
-
-      // Add additional expenses if any
-      if (breakdown.additional && Array.isArray(breakdown.additional)) {
-        total += breakdown.additional.reduce(
-          (sum, item) => sum + (item.amount || 0),
-          0
-        );
-      }
+      // Sum all numeric values
+      Object.values(breakdown).forEach((value) => {
+        if (typeof value === 'number') {
+          total += value;
+        }
+      });
 
       profileUpdates.expenses = total;
     }
@@ -1020,24 +1008,35 @@ export const useOnboardingChat = (
       return `Selected stage: ${stageName}`;
     }
 
-    // Handle expense breakdown response
+    // Handle expense breakdown response with detailed breakdown
     if (response.expenseBreakdown) {
       const breakdown = response.expenseBreakdown;
+      const details: string[] = [];
       let total = 0;
 
-      if (breakdown.housing) total += breakdown.housing;
-      if (breakdown.food) total += breakdown.food;
-      if (breakdown.transportation) total += breakdown.transportation;
-      if (breakdown.other) total += breakdown.other;
-      if (breakdown.additional && Array.isArray(breakdown.additional)) {
-        total += breakdown.additional.reduce(
-          (sum, item) => sum + (item.amount || 0),
-          0
-        );
-      }
+      // Process all category expenses
+      Object.entries(breakdown).forEach(([key, value]) => {
+        if (typeof value === 'number' && value > 0) {
+          total += value;
+          const formattedValue = value.toLocaleString("vi-VN");
+          
+          // Map common category IDs to display names
+          const categoryNames: Record<string, string> = {
+            housing: "Nhà ở (thuê nhà/điện/nước)",
+            food: "Ăn uống",
+            transport: "Di chuyển",
+            other: "Chi tiêu khác (giải trí, mua sắm, v.v.)"
+          };
+          
+          const displayName = categoryNames[key] || key;
+          details.push(`${displayName}: ${formattedValue} VND`);
+        }
+      });
 
       const formattedTotal = total.toLocaleString("vi-VN");
-      return `Monthly expenses: ${formattedTotal} VND`;
+      const detailsText = details.length > 0 ? `\n- ${details.join('\n- ')}` : '';
+      
+      return `Chi phí hàng tháng:${detailsText}\n\nTổng cộng: ${formattedTotal} VND`;
     }
 
     // Handle savings capacity response
@@ -1048,9 +1047,18 @@ export const useOnboardingChat = (
 
     // Handle goal confirmation
     if (response.goalConfirmed !== undefined) {
+      // Use userMessage if available, otherwise fallback to simple message
+      if (response.userMessage) {
+        return response.userMessage;
+      }
       return response.goalConfirmed
         ? "Goal confirmed"
         : "Goal needs adjustment";
+    }
+
+    // Handle education content completion
+    if (response.educationCompleted) {
+      return response.textValue || "Đã hoàn thành nội dung giáo dục";
     }
 
     if (response.textValue) {

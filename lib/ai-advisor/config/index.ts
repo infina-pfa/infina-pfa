@@ -24,6 +24,20 @@ export const mcpConfig: MCPConfig = {
   bearerToken: process.env.MCP_BEARER_TOKEN
 };
 
+// Add onboarding-specific MCP configuration
+export const onboardingMcpConfig: MCPConfig = {
+  enabled: true,
+  serverUrl: process.env.ONBOARDING_MCP_SERVER_URL || "https://pfa-mcp.realstake.co/mcp/d02349d2-16a9-444e-862d-3eddd978e3ce/sse",
+  serverLabel: "onboarding-financial-tools",
+  timeout: 30000, // 30 seconds
+  retryAttempts: 2,
+  requireApproval: "never",
+  // Allow all tools from MCP server - no restrictions
+  allowedTools: undefined,
+  description: "Onboarding Financial Analysis Tools",
+  bearerToken: process.env.MCP_BEARER_TOKEN || "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+};
+
 export const openaiConfig: LLMConfig = {
   provider: 'openai',
   apiKey: process.env.OPENAI_API_KEY || "",

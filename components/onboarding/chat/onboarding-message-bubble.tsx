@@ -72,9 +72,9 @@ export function OnboardingMessageBubble({
             }`}
           >
             {/* Text content - only show if there's no component to avoid duplicate titles */}
-            {message.content && (
+            {message.content && !isComponent && (
               <div className="whitespace-pre-wrap text-sm leading-relaxed break-words">
-                {message.content}
+                {message.content as string}
               </div>
             )}
 

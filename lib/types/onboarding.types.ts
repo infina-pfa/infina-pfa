@@ -31,11 +31,10 @@ export interface UserProfile {
   savings?: number;
   // New expense breakdown for saving flow
   expenseBreakdown?: {
-    housing?: number; // Nhà ở (thuê nhà/điện/nước)
-    food?: number; // Ăn uống
-    transportation?: number; // Di chuyển
-    other?: number; // Chi tiêu khác (giải trí, mua sắm, v.v.)
-    additional?: Array<{ name: string; amount: number }>; // User can add more
+    housing?: number;
+    food?: number;
+    transport?: number;
+    other?: number;
   };
   // Savings goals and capacity
   monthlySavingsCapacity?: number;
@@ -93,7 +92,8 @@ export type ComponentType =
   | "expense_categories"
   | "savings_capacity"
   | "goal_confirmation"
-  | "education_content";
+  | "education_content"
+  | "suggestions";
 
 export interface OnboardingMessage {
   id: string;
@@ -169,7 +169,11 @@ export interface ComponentData {
 
   // Introduction template
   template?: string;
-  suggestions?: string[];
+  suggestions?: Array<{
+    id: string;
+    label: string;
+    value: string;
+  }>;
 
   // Stage selector
   stages?: Array<{
@@ -236,12 +240,34 @@ export interface ComponentResponse {
   expenseBreakdown?: {
     housing?: number;
     food?: number;
-    transportation?: number;
+    transport?: number;
     other?: number;
-    additional?: Array<{ name: string; amount: number }>;
   };
   savingsCapacity?: number;
   goalConfirmed?: boolean;
+  // Goal confirmation details
+  goalDetails?: {
+    amount: number;
+    timeframe: number;
+    monthlyTarget: number;
+    type?: string;
+  };
+  userAction?: "confirmed" | "requested_adjustment" | "cancelled";
+  userMessage?: string;
+  nextSteps?: string;
+  actionContext?: {
+    goalType?: string;
+    amount?: number;
+    monthlyTarget?: number;
+    timeframe?: number;
+    readyToStart?: boolean;
+    currentAmount?: number;
+    currentMonthlyTarget?: number;
+    currentTimeframe?: number;
+    needsAdjustment?: boolean;
+    adjustmentRequested?: boolean;
+  };
+  adjustmentReason?: string;
   educationCompleted?: boolean;
   completedAt: Date;
 }
@@ -279,11 +305,6 @@ export interface OnboardingService {
     response: ComponentResponse
   ): Promise<void>;
   updateUserProfile(updates: Partial<UserProfile>): Promise<void>;
-  analyzeFinancialStage(profile: UserProfile): Promise<{
-    stage: FinancialStage;
-    confidence: number;
-    reasoning: string;
-  }>;
   completeOnboarding(finalProfile: UserProfile): Promise<void>;
 
   // Chat history methods

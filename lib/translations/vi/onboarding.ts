@@ -223,6 +223,7 @@ export const onboardingVi = {
   watchOnYouTube: "Xem trên YouTube",
   whatWouldYouLikeToKnow: "Bạn muốn biết gì?",
   continueToNextStep: "Tiếp tục bước tiếp theo",
+  educationContentCompleted: "Đã đọc xong nội dung và sẵn sàng tiếp tục",
   educationTip: "Hãy dành thời gian để hiểu những khái niệm này - chúng là nền tảng cho thành công tài chính của bạn!",
   
   // Suggested Actions for Start Saving Flow

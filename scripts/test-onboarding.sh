@@ -43,7 +43,7 @@ fi
 echo -n "Testing /api/onboarding/ai-stream: "
 STREAM_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/api/onboarding/ai-stream \
   -H "Content-Type: application/json" \
-  -d '{"message": "test", "conversationHistory": [], "userProfile": {}, "currentStep": "ai_welcome"}')
+  -d '{"message": "test", "conversationHistory": [], "userProfile": {}}')
 
 if [ "$STREAM_STATUS" = "401" ]; then
     echo -e "${YELLOW}401 (Expected - needs auth)${NC}"
@@ -55,7 +55,6 @@ fi
 endpoints=(
     "/api/onboarding/responses"
     "/api/onboarding/profile"
-    "/api/onboarding/analyze-stage"
     "/api/onboarding/complete"
 )
 

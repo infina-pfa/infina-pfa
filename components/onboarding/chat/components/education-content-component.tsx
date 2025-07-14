@@ -9,7 +9,7 @@ import {
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Play, FileText, ExternalLink, CheckCircle } from "lucide-react";
+import { Play, FileText, CheckCircle } from "lucide-react";
 import { VideoMessage } from "@/components/chat";
 
 interface EducationContentComponentProps {
@@ -55,6 +55,7 @@ export function EducationContentComponent({
     try {
       await onResponse({
         educationCompleted: true,
+        textValue: t("educationContentCompleted"),
         completedAt: new Date(),
       });
     } catch (error) {
