@@ -25,3 +25,4 @@ export * from "./tool-layout";
 export * from "./tool-message";
 export * from "./tool-panel";
 export * from "./typing-indicator";
+export * from "./video-message";

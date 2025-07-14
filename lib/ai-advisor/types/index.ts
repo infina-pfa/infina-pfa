@@ -7,6 +7,12 @@ export interface ChatTool {
   keywords: string[];
 }
 
+export interface ChatComponent {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export interface ConversationMessage {
   id: string;
   content: string;
@@ -152,4 +158,5 @@ export enum UIActionType {
   OPEN_TOOL = "open_tool",
   SHOW_COMPONENT = "show_component",
   SHOW_SUGGESTION = "show_suggestion",
+  SHOW_VIDEO = "show_video",
 }

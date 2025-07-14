@@ -154,4 +154,10 @@ export const chatEn = {
     user: "User",
     ai: "AI",
   },
+
+  // Video components
+  videoLoadError: "Unable to load video. Please try again later.",
+  videoPlayError: "Unable to play video. Please try again.",
+  videoNotSupported: "Your browser does not support the video tag.",
+  clickToPlay: "Click to play video",
 };

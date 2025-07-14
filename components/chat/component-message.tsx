@@ -3,6 +3,7 @@
 import { ChatComponentId } from "@/lib/types/ai-streaming.types";
 import { ChatMessage } from "@/lib/types/chat.types";
 import { FinancialOverviewCard } from "./financial-overview-card";
+import { VideoMessage } from "./video-message";
 
 const today = new Date();
 const currentMonth = today.getMonth() + 1;
@@ -13,6 +14,7 @@ export function ComponentMessage({ message }: { message: ChatMessage }) {
     action: {
       payload: {
         componentId: ChatComponentId;
+        videoURL?: string;
       };
     };
   };
@@ -21,6 +23,13 @@ export function ComponentMessage({ message }: { message: ChatMessage }) {
     component?.action?.payload?.componentId === ChatComponentId.BUDGET_OVERVIEW
   ) {
     return <FinancialOverviewCard month={currentMonth} year={currentYear} />;
+  }
+
+  if (
+    component?.action?.payload?.componentId === ChatComponentId.VIDEO &&
+    component?.action?.payload?.videoURL
+  ) {
+    return <VideoMessage videoURL={component.action.payload.videoURL} />;
   }
 
   return null;

@@ -160,4 +160,10 @@ export const chatVi = {
     user: "Người dùng",
     ai: "AI",
   },
+
+  // Video components
+  videoLoadError: "Không thể tải video. Vui lòng thử lại sau.",
+  videoPlayError: "Không thể phát video. Vui lòng thử lại.",
+  videoNotSupported: "Trình duyệt của bạn không hỗ trợ thẻ video.",
+  clickToPlay: "Nhấn để phát video",
 };

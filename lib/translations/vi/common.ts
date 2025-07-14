@@ -121,4 +121,10 @@ export const commonVi = {
   question: "Câu hỏi",
   of: "trong",
   analyzing: "Đang phân tích",
+
+  // Video controls
+  play: "Phát",
+  pause: "Tạm dừng",
+  fullscreen: "Toàn màn hình",
+  exitFullscreen: "Thoát toàn màn hình",
 };

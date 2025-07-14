@@ -38,4 +38,10 @@ export const commonEn = {
   of: "of",
   analyzing: "Analyzing",
   retry: "Retry",
+
+  // Video controls
+  play: "Play",
+  pause: "Pause",
+  fullscreen: "Fullscreen",
+  exitFullscreen: "Exit Fullscreen",
 };
