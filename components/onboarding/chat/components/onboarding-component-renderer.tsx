@@ -32,7 +32,6 @@ export function OnboardingComponentRenderer({
   component,
   onResponse,
 }: OnboardingComponentRendererProps) {
-  console.log("🚀 ~ component:", component);
   const handleResponse = async (response: ComponentResponse) => {
     await onResponse(component.id || component.type, response);
   };
