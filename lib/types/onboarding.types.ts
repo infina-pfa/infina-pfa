@@ -130,7 +130,8 @@ export type OnboardingComponentType =
   | "goal_confirmation"
   | "education_content"
   | "suggestions"
-  | "infina_app_qr";
+  | "infina_app_qr"
+  | "finish_onboarding";
 
 export interface ComponentData {
   // Multiple choice

@@ -72,20 +72,18 @@ export function OnboardingMessageBubble({
               isAI ? "bg-[#F0F2F5] text-[#111827]" : "bg-[#0055FF] text-white"
             }`}
           >
-            {/* Text content - only show if there's no component to avoid duplicate titles */}
             {message.content && !isComponent && (
               <div className="break-words">
                 {isAI ? (
                   <MarkdownRenderer content={message.content as string} />
                 ) : (
                   <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {message.content as string}
+                    {message.content}
                   </div>
                 )}
               </div>
             )}
 
-            {/* Component content with fade-in animation */}
             {isComponent &&
               (message.component || message.metadata?.component) && (
                 <div
@@ -97,7 +95,8 @@ export function OnboardingMessageBubble({
                 >
                   <OnboardingComponentRenderer
                     component={
-                      (message.component || message.metadata?.component) as OnboardingComponent
+                      (message.component ||
+                        message.metadata?.component) as OnboardingComponent
                     }
                     onResponse={onComponentResponse}
                   />
@@ -105,7 +104,6 @@ export function OnboardingMessageBubble({
               )}
           </div>
 
-          {/* Timestamp */}
           <div
             className={`text-xs text-[#6B7280] mt-1 ${
               isAI ? "text-left" : "text-right"

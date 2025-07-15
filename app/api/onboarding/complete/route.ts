@@ -1,43 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    const { profile } = await request.json();
-
-    if (!profile) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Profile data is required",
-        },
-        { status: 400 }
-      );
-    }
-
     // Create Supabase client
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // Server Component context
-            }
-          },
-        },
-      }
-    );
+    const supabase = await createClient();
 
     // Get current user
     const {
@@ -57,11 +24,6 @@ export async function POST(request: NextRequest) {
 
     // Update or create user profile in the main users table
     const userUpdateData = {
-      name:
-        profile.name ||
-        user.user_metadata?.name ||
-        user.email?.split("@")[0] ||
-        "User",
       onboarding_completed_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -105,7 +67,6 @@ export async function POST(request: NextRequest) {
       .upsert(
         {
           user_id: user.id,
-          profile_data: profile,
           is_completed: true,
           completed_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -125,7 +86,6 @@ export async function POST(request: NextRequest) {
       message: "Onboarding completed successfully",
       data: {
         user_id: user.id,
-        profile: profile,
         completed_at: new Date().toISOString(),
       },
     });

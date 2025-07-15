@@ -1,15 +1,9 @@
 import OpenAI from "openai";
-import {
-  MCPConfig,
-} from "../types/index";
+import { MCPConfig } from "../types/index";
 import { LLMConfig } from "../config/index";
-import {
-  onboardingFunctionTools,
-} from "../tools/onboarding-definitions";
+import { onboardingFunctionTools } from "../tools/onboarding-definitions";
 // Note: Using custom onboarding stream handler instead of generic aiStreamingService
-import {
-  generateStageSpecificPrompt,
-} from "../prompts/prompt-orchestrator";
+import { generateStageSpecificPrompt } from "../prompts/prompt-orchestrator";
 import { SystemPromptLogger } from "@/lib/utils/system-prompt-logger";
 
 interface OnboardingRequestBody {
@@ -34,10 +28,7 @@ export class OnboardingOrchestratorService {
   private openaiClient: OpenAI;
   private mcpConfig: MCPConfig;
 
-  constructor(
-    openaiClient: OpenAI,
-    mcpConfig: MCPConfig
-  ) {
+  constructor(openaiClient: OpenAI, mcpConfig: MCPConfig) {
     this.openaiClient = openaiClient;
     this.mcpConfig = mcpConfig;
 
@@ -57,8 +48,7 @@ export class OnboardingOrchestratorService {
   ): Promise<ReadableStream> {
     console.log("🔄 OnboardingOrchestrator.processRequest started");
 
-    const { message, conversationHistory, userProfile, user_id } =
-      requestBody;
+    const { message, conversationHistory, userProfile, user_id } = requestBody;
 
     console.log("🚀 Onboarding AI Stream Function Called");
     console.log("👤 User ID:", user_id);
@@ -75,14 +65,13 @@ export class OnboardingOrchestratorService {
       conversationHistory: [], // Empty array - conversation history goes to input field instead
     });
 
-
-
-    // Log system prompt to file for debugging 
+    // Log system prompt to file for debugging
     const requestId = await SystemPromptLogger.logSystemPrompt({
       userId: user_id,
       userProfile,
-      conversationHistory: (conversationHistory || []).map(msg => ({
-        role: msg.sender === "user" ? "user" as const : "assistant" as const,
+      conversationHistory: (conversationHistory || []).map((msg) => ({
+        role:
+          msg.sender === "user" ? ("user" as const) : ("assistant" as const),
         content: msg.content,
       })),
       systemPrompt: systemInstructions,
@@ -97,10 +86,20 @@ export class OnboardingOrchestratorService {
       requestId,
     });
 
-    const onboardingTools = this.convertToolsForResponsesAPI(onboardingFunctionTools);
-    
+    const onboardingTools = this.convertToolsForResponsesAPI(
+      onboardingFunctionTools
+    );
+
     // Add MCP tool if enabled (use union type for function and MCP tools)
-    const allTools: Array<ReturnType<typeof this.convertToolsForResponsesAPI>[number] | { type: "mcp"; server_label: string; server_url: string; [key: string]: unknown }> = [...onboardingTools];
+    const allTools: Array<
+      | ReturnType<typeof this.convertToolsForResponsesAPI>[number]
+      | {
+          type: "mcp";
+          server_label: string;
+          server_url: string;
+          [key: string]: unknown;
+        }
+    > = [...onboardingTools];
     if (this.mcpConfig.enabled) {
       const mcpTool = {
         type: "mcp" as const,
@@ -110,18 +109,21 @@ export class OnboardingOrchestratorService {
         require_approval: this.mcpConfig.requireApproval,
         ...(this.mcpConfig.bearerToken && {
           headers: {
-            Authorization: `Bearer ${this.mcpConfig.bearerToken}`
-          }
-        })
+            Authorization: `Bearer ${this.mcpConfig.bearerToken}`,
+          },
+        }),
       };
       allTools.push(mcpTool);
     }
 
     // Prepare input for Responses API - include complete conversation history + current message
-    const completeConversationHistory = (conversationHistory || []).map((msg) => ({
-      role: msg.sender === "user" ? ("user" as const) : ("assistant" as const),
-      content: msg.content,
-    }));
+    const completeConversationHistory = (conversationHistory || []).map(
+      (msg) => ({
+        role:
+          msg.sender === "user" ? ("user" as const) : ("assistant" as const),
+        content: msg.content,
+      })
+    );
 
     const input = [
       ...completeConversationHistory,
@@ -129,13 +131,12 @@ export class OnboardingOrchestratorService {
     ];
 
     // Process OpenAI stream with MCP integration
-    
+
     return this.processOpenAIStreamWithMCP(
       systemInstructions,
       input,
       allTools,
-      llmConfig,
-      user_id
+      llmConfig
     );
   }
 
@@ -158,15 +159,18 @@ export class OnboardingOrchestratorService {
   private async processOpenAIStreamWithMCP(
     systemInstructions: string,
     input: Array<{ role: "user" | "assistant"; content: string }>,
-    allTools: Array<ReturnType<typeof this.convertToolsForResponsesAPI>[number] | { type: "mcp"; server_label: string; server_url: string; [key: string]: unknown }>,
-    llmConfig: LLMConfig,
-    userId: string
+    allTools: Array<
+      | ReturnType<typeof this.convertToolsForResponsesAPI>[number]
+      | {
+          type: "mcp";
+          server_label: string;
+          server_url: string;
+          [key: string]: unknown;
+        }
+    >,
+    llmConfig: LLMConfig
   ): Promise<ReadableStream> {
-
-
     try {
-      
-      
       // Create stream configuration with MCP support (MCP tools are in the tools array)
       const streamConfig = {
         model: llmConfig.model,
@@ -177,9 +181,7 @@ export class OnboardingOrchestratorService {
         temperature: llmConfig.temperature,
       };
 
-
       const stream = await this.openaiClient.responses.create(streamConfig);
-
 
       // Return custom onboarding stream with specialized tool handling
       return this.createOnboardingReadableStream(stream);
@@ -204,16 +206,19 @@ export class OnboardingOrchestratorService {
     return new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();
-        
+
         try {
           let responseContent = "";
-          const functionCalls: Record<string, {
-            id: string;
-            name: string;
-            arguments: string;
-            call_id: string;
-            status?: "new" | "in_progress" | "done";
-          }> = {};
+          const functionCalls: Record<
+            string,
+            {
+              id: string;
+              name: string;
+              arguments: string;
+              call_id: string;
+              status?: "new" | "in_progress" | "done";
+            }
+          > = {};
 
           // Generate unique response ID
           const responseId = `resp-${Date.now()}`;
@@ -316,26 +321,33 @@ export class OnboardingOrchestratorService {
               // Process any complete function calls with onboarding-specific logic
               for (const itemId in functionCalls) {
                 const call = functionCalls[itemId];
-                
+
                 if (call.status === "done") {
                   try {
-                    console.log(`🔧 Processing onboarding tool call: ${call.name}`);
-                    
+                    console.log(
+                      `🔧 Processing onboarding tool call: ${call.name}`
+                    );
+
                     // Parse tool arguments
                     let toolData: Record<string, unknown> = {};
                     if (call.arguments && call.arguments.trim().length > 0) {
                       try {
                         toolData = JSON.parse(call.arguments);
                       } catch (parseError) {
-                        console.error(`❌ Failed to parse arguments for ${call.name}:`, parseError);
+                        console.error(
+                          `❌ Failed to parse arguments for ${call.name}:`,
+                          parseError
+                        );
                         continue;
                       }
                     }
 
                     // Handle onboarding-specific tools
                     if (call.name === "show_onboarding_component") {
-                      const componentId = (toolData.component_id as string) || `${toolData.component_type}_${Date.now()}`;
-                      
+                      const componentId =
+                        (toolData.component_id as string) ||
+                        `${toolData.component_type}_${Date.now()}`;
+
                       const action = {
                         type: "show_component",
                         payload: {
@@ -346,20 +358,32 @@ export class OnboardingOrchestratorService {
                         },
                       };
 
-                      console.log("📤 Sent onboarding component action:", action.payload.componentType);
+                      console.log(
+                        "📤 Sent onboarding component action:",
+                        action.payload.componentType
+                      );
                       controller.enqueue(
                         encoder.encode(`data: ${JSON.stringify(action)}\n\n`)
                       );
                     } else if (call.name === "complete_onboarding") {
                       console.log("🏁 Triggering onboarding completion");
                       controller.enqueue(
-                        encoder.encode(`data: ${JSON.stringify({ type: "onboarding_complete" })}\n\n`)
+                        encoder.encode(
+                          `data: ${JSON.stringify({
+                            type: "onboarding_complete",
+                          })}\n\n`
+                        )
                       );
                     } else {
-                      console.log(`✅ Function call ${call.name} processed successfully`);
+                      console.log(
+                        `✅ Function call ${call.name} processed successfully`
+                      );
                     }
                   } catch (error) {
-                    console.error(`❌ Error processing tool call ${call.name}:`, error);
+                    console.error(
+                      `❌ Error processing tool call ${call.name}:`,
+                      error
+                    );
                   }
                 }
               }
@@ -396,4 +420,4 @@ export class OnboardingOrchestratorService {
   }
 
   // Note: Tool processing logic is now inline within the stream handler
-} 
+}

@@ -127,4 +127,5 @@ export const commonVi = {
   pause: "Tạm dừng",
   fullscreen: "Toàn màn hình",
   exitFullscreen: "Thoát toàn màn hình",
+  finishOnboarding: "Bắt đầu hành trình",
 };

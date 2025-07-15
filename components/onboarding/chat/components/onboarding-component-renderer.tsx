@@ -20,6 +20,7 @@ import { GoalConfirmationComponent } from "./goal-confirmation-component";
 import { EducationContentComponent } from "./education-content-component";
 import { Suggestions } from "./suggestions";
 import { InfinAppQR } from "./infina-app-qr";
+import { FinishOnboarding } from "./finish-onboarding";
 
 interface OnboardingComponentRendererProps {
   component: OnboardingComponent;
@@ -154,6 +155,9 @@ export function OnboardingComponentRenderer({
 
     case "infina_app_qr":
       return <InfinAppQR />;
+
+    case "finish_onboarding":
+      return <FinishOnboarding />;
 
     default:
       return (
