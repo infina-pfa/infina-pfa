@@ -1,10 +1,8 @@
 "use client";
 
 import { useChatFlow } from "@/hooks/use-chat-flow";
-import { useOnboardingCheck } from "@/hooks/use-onboarding-check";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { ChatToolId } from "@/lib/types/ai-streaming.types";
-import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { MessageList } from "./message-list";
@@ -15,13 +13,6 @@ import { TypingIndicator } from "./typing-indicator";
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
   const [isMobile, setIsMobile] = useState(false);
-
-  // Check onboarding status
-  const {
-    isLoading: onboardingLoading,
-    needsOnboarding,
-    error: onboardingError,
-  } = useOnboardingCheck();
 
   const chatFlow = useChatFlow();
   const {
@@ -62,8 +53,8 @@ export function ChatInterface() {
     }
   }, []);
 
-  // Loading state for onboarding check
-  if (onboardingLoading || chatLoading) {
+  // Loading state
+  if (chatLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
@@ -73,43 +64,6 @@ export function ChatInterface() {
           <p className="text-gray-600 font-nunito font-medium">
             {t("loading")}
           </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show onboarding flow if needed
-  if (needsOnboarding) {
-    return redirect("/onboarding");
-  }
-
-  // Show onboarding error if there's an issue
-  if (onboardingError) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-red-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <p className="text-red-600 font-nunito font-medium mb-4">
-            {onboardingError}
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg font-nunito font-medium hover:bg-red-700 transition-colors"
-          >
-            {t("retry")}
-          </button>
         </div>
       </div>
     );
