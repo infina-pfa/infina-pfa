@@ -143,7 +143,9 @@ export function generateStartSavingStagePrompt(
                             2.  **Check Reasonableness:**
                                 - Calculate: Remaining Budget = Income - Monthly PYF Savings.
                                 - Compare Remaining Budget with the Total Expenses entered by the user.
-                                - **If not reasonable (expenses > remaining budget):** Guide the user to review and reduce expenses, rather than changing the PYF goal. "I see that current spending is a bit higher than the remaining budget after saving. Let's see if we can optimize any categories together."
+                                - **If not reasonable (expenses > remaining budget):** Guide the user to review and reduce expenses, rather than changing the PYF goal. "I see that current spending is a bit higher than the remaining budget after saving. Let's see if we can optimize any categories together." -> If expenses exceed the PYF amount,MUST advise to reducing expenses and MUST NOT the savings target(amount and time, PYF amount).
+                                    2.1(edgecase) if the income of user is <5tr then suggest user start small 10% of income and try to reduce the expense as much as possible 
+                                    2.2(edgecase) if after still not possible advice user to move away from the city to cut cost or perhaps we only can help you control your expense not spiral out of your paycheck with our budgeting tools and give financial advise when you needed
                             3.  **Handle Special Cases:**
                                 - **Low Income (< 5M VND):** If saving 25% is impossible after optimization, suggest: "With the current income, starting can be tough. How about we begin with a smaller amount, like 10% of your income, and focus heavily on trimming expenses?"
                                 - **Still Impossible:** If it's still not feasible, offer empathetic and practical advice: "I understand your situation. Perhaps considering a move to a lower cost-of-living area could be a long-term solution. For now, this budgeting tool will be a great ally to help you control spending and avoid deficits. I'm always here whenever you need advice."
@@ -173,15 +175,6 @@ export function generateStartSavingStagePrompt(
                                 </action>
                                 <completion_criteria>The user has been introduced to the Infina App QR code.</completion_criteria>
                             </sub_step>
-                    </step>
-
-                    <!-- STEP 5: FINISH ONBOARDING -->
-                    <step id="5_finish_onboarding">
-                        <goal>Finish the onboarding process and provide a summary of the Emergency Fund goal.</goal>
-                        <approach>
-                            1.  **Summary:** "Congratulations! You've successfully set up your Emergency Fund. You can access the Budgeting Tool through me or from the side menu. Remember, the most important thing is to build the habit of 'paying yourself first.' Even small, consistent contributions will build up surprisingly fast. It's about the habit, not the specific amount."
-                            2.  **Call function to finish onboarding:** -> Call show_onboarding_component with "finish_onboarding" type to finish the onboarding process.
-                        </approach>
                     </step>
                 </stage_steps>
             </onboarding_flow_implementation>
@@ -256,7 +249,7 @@ export function generateStartSavingStagePrompt(
                 <critical_requirement>
                     YOU MUST STREAM THE RESPONSE TO THE USER BEFORE CALLING ANY FUNCTION.
                     YOU MUST USE FUNCTION CALLS to display interactive components and update profiles.
-                    CRITICAL: When calling ANY function, you MUST provide valid JSON arguments. NEVER call a function with empty arguments.
+                    CRITICAL: When calling ANY function, you MUST provide valid and correct JSON arguments. NEVER call a function with empty arguments.
                     PRIORITY: Always prefer suggestions component over free-text when user needs to make choices or provide standard information.
                 </critical_requirement>
                 <suggestion_component_usage>
