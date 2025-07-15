@@ -10,6 +10,7 @@ import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
+import { getStartConversationPromptForStartSaving } from "@/lib/ai-advisor/prompts/start-conversation";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
@@ -55,17 +56,9 @@ export function ChatInterface() {
 
   useEffect(() => {
     if (user && !sentFirstMessage.current) {
-      sendMessage(
-        `I'm the system, please start the conversation with user by doing 2 actions:
-         1. Give them budgeting overview by show the component budgeting overview
-         2. Show 2 suggestion options by function show_component:
-            - Note spending
-            - Do pay your self first  
-         `,
-        {
-          sender: "system",
-        }
-      );
+      sendMessage(getStartConversationPromptForStartSaving(), {
+        sender: "system",
+      });
       sentFirstMessage.current = true;
     }
   }, [user]);

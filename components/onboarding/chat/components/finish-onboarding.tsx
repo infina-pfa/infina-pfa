@@ -14,7 +14,7 @@ export function FinishOnboarding() {
     setIsLoading(true);
     await onboardingService.completeOnboarding();
     setIsLoading(false);
-    router.replace("/");
+    router.replace("/chat");
   };
 
   return (

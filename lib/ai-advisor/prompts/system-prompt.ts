@@ -120,6 +120,9 @@ export function generateSystemPrompt(
         <streaming_behavior>
             <rule id="stream_first">Always stream the text part of your response before calling a function.</rule>
             <rule id="function_at_end">Function calls should occur after streaming a useful, human-readable message.</rule>
+            <rule id="show_suggestions_component">
+              Always use function show_component to show the suggestions component.
+            </rule>
         </streaming_behavior>
         
         <response_format>
