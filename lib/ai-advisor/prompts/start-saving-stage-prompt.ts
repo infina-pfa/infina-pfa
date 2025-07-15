@@ -160,6 +160,15 @@ export function generateStartSavingStagePrompt(
                         </approach>
                         <completion_criteria>User understands HYSA and has received a product recommendation.</completion_criteria>
                     </step>
+
+                    <!-- STEP 5: FINISH ONBOARDING -->
+                    <step id="5_finish_onboarding">
+                        <goal>Finish the onboarding process and provide a summary of the Emergency Fund goal.</goal>
+                        <approach>
+                            1.  **Summary:** "Congratulations! You've successfully set up your Emergency Fund. You can access the Budgeting Tool through me or from the side menu. Remember, the most important thing is to build the habit of 'paying yourself first.' Even small, consistent contributions will build up surprisingly fast. It's about the habit, not the specific amount."
+                            2.  **Call function to finish onboarding:** -> Call show_onboarding_component with "finish_onboarding" type to finish the onboarding process.
+                        </approach>
+                    </step>
                 </stage_steps>
             </onboarding_flow_implementation>
 
