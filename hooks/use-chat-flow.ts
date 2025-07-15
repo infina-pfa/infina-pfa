@@ -7,6 +7,7 @@ import {
   AdvisorStreamRequest,
   ChatMessage,
   DEFAULT_CHAT_SUGGESTIONS,
+  MessageSender,
   UIAction,
 } from "@/lib/types/chat.types";
 import { useCallback, useState } from "react";
@@ -22,7 +23,10 @@ interface UseChatFlowReturn {
   conversationId: string | null;
 
   // Actions
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (
+    content: string,
+    options?: { isToolMessage?: boolean; sender?: MessageSender }
+  ) => Promise<void>;
   createNewSession: () => Promise<void>;
   clearError: () => void;
 
@@ -142,12 +146,8 @@ export const useChatFlow = (): UseChatFlowReturn => {
    */
   const sendMessage = async (
     content: string,
-    options?: { isToolMessage?: boolean }
+    options?: { isToolMessage?: boolean; sender?: MessageSender }
   ) => {
-    if (!user) {
-      return;
-    }
-
     // Hide suggestions after first message
     setShowSuggestions(false);
 
@@ -166,7 +166,8 @@ export const useChatFlow = (): UseChatFlowReturn => {
       // Step 2: Send user message and update state
       const userMessage = await messages.sendUserMessage(
         content,
-        conversationId
+        conversationId,
+        { sender: options?.sender }
       );
 
       if (!userMessage) {
@@ -198,11 +199,6 @@ export const useChatFlow = (): UseChatFlowReturn => {
           totalExpenses: 0,
           currentBudgets: 0,
           hasCompletedOnboarding: false,
-        },
-        learning: {
-          currentLevel: 1,
-          xp: 0,
-          currentGoal: "Getting started with financial planning",
         },
       };
 

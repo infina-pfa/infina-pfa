@@ -47,7 +47,8 @@ export const chatService = {
    */
   async sendUserMessage(
     content: string,
-    conversationId: string
+    conversationId: string,
+    options?: { sender?: MessageSender }
   ): Promise<ChatMessage> {
     try {
       if (!content.trim()) {
@@ -61,7 +62,7 @@ export const chatService = {
       const requestData = {
         content: content.trim(),
         conversation_id: conversationId,
-        sender: "user" as MessageSender,
+        sender: options?.sender || ("user" as MessageSender),
         type: "text" as MessageType,
       };
 

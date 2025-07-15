@@ -1,7 +1,11 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { chatService } from "@/lib/services/chat.service";
-import { ChatMessage, MessageType } from "@/lib/types/chat.types";
+import {
+  ChatMessage,
+  MessageSender,
+  MessageType,
+} from "@/lib/types/chat.types";
 
 interface UseChatMessagesReturn {
   // State
@@ -14,7 +18,8 @@ interface UseChatMessagesReturn {
   updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   sendUserMessage: (
     content: string,
-    conversationId: string
+    conversationId: string,
+    options?: { sender?: MessageSender }
   ) => Promise<ChatMessage | null>;
   saveAIMessage: (
     type: MessageType,
@@ -48,7 +53,8 @@ export const useChatMessages = (): UseChatMessagesReturn => {
   const sendUserMessage = useCallback(
     async (
       content: string,
-      conversationId: string
+      conversationId: string,
+      options?: { sender?: MessageSender }
     ): Promise<ChatMessage | null> => {
       setIsSending(true);
       setError(null);
@@ -56,7 +62,8 @@ export const useChatMessages = (): UseChatMessagesReturn => {
       try {
         const userMessage = await chatService.sendUserMessage(
           content,
-          conversationId
+          conversationId,
+          options
         );
         addMessage(userMessage);
         return userMessage;

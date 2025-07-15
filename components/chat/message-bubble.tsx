@@ -14,6 +14,10 @@ interface MessageBubbleProps {
 export function MessageBubble({ message, onToolClick }: MessageBubbleProps) {
   const isUser = message.sender === "user";
 
+  if (message.sender === "system") {
+    return null;
+  }
+
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2`}>
       <div

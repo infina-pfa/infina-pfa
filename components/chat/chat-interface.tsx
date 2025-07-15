@@ -1,9 +1,10 @@
 "use client";
 
+import { useAuth } from "@/hooks/use-auth";
 import { useChatFlow } from "@/hooks/use-chat-flow";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { ChatToolId } from "@/lib/types/ai-streaming.types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
@@ -13,6 +14,8 @@ import { TypingIndicator } from "./typing-indicator";
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
   const [isMobile, setIsMobile] = useState(false);
+  const { user } = useAuth();
+  const sentFirstMessage = useRef(false);
 
   const chatFlow = useChatFlow();
   const {
@@ -36,22 +39,28 @@ export function ChatInterface() {
   } = chatFlow;
 
   useEffect(() => {
-    // Check if we're on client-side
-    if (typeof window !== "undefined") {
-      const checkIsMobile = () => {
-        setIsMobile(window.innerWidth < 768);
-      };
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
 
-      // Initial check
-      checkIsMobile();
+    // Initial check
+    checkIsMobile();
 
-      // Add event listener for resize
-      window.addEventListener("resize", checkIsMobile);
+    // Add event listener for resize
+    window.addEventListener("resize", checkIsMobile);
 
-      // Cleanup
-      return () => window.removeEventListener("resize", checkIsMobile);
-    }
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
+
+  useEffect(() => {
+    if (user && !sentFirstMessage.current) {
+      sendMessage("Chào bạn, hôm nay chúng ta nên làm gì?", {
+        sender: "system",
+      });
+      sentFirstMessage.current = true;
+    }
+  }, [user]);
 
   // Loading state
   if (chatLoading) {
