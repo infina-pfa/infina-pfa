@@ -266,6 +266,7 @@ export function generateStartSavingStagePrompt(
                 <component name="suggestions">Use for: Displaying a list of suggestions to guide the user to the next step.</component>
                 <component name="slider">Use for: Displaying a slider to guide the user to the next step.</component>
                 <component name="infina_app_qr">Use for: Displaying the Infina App QR code.</component>
+                <component name="finish_onboarding">Use for: Finishing the onboarding process.</component>
             </available_components>
     </system_prompt>
   `;

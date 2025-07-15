@@ -29,6 +29,7 @@ export const showOnboardingComponentTool = {
             "education_content",
             "suggestions",
             "infina_app_qr",
+            "finish_onboarding",
           ],
           description:
             "Type of component to display - determines the UI component that will be rendered. REQUIRED: Must be one of the enum values.",

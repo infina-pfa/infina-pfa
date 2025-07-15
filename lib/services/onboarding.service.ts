@@ -1,8 +1,8 @@
-import { 
-  OnboardingState, 
+import {
+  OnboardingState,
   OnboardingService as OnboardingServiceInterface,
   ComponentResponse,
-  UserProfile
+  UserProfile,
 } from "@/lib/types/onboarding.types";
 import { apiClient } from "@/lib/api-client";
 
@@ -10,7 +10,7 @@ interface OnboardingChatMessage {
   id: string;
   conversation_id: string;
   user_id: string;
-  sender: 'user' | 'ai' | 'system';
+  sender: "user" | "ai" | "system";
   content: string;
   component_id?: string;
   metadata?: Record<string, unknown>;
@@ -46,7 +46,10 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
     }
   }
 
-  async saveUserResponse(componentId: string, response: ComponentResponse): Promise<void> {
+  async saveUserResponse(
+    componentId: string,
+    response: ComponentResponse
+  ): Promise<void> {
     try {
       const result = await apiClient.post("/onboarding/responses", {
         componentId,
@@ -75,14 +78,10 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
     }
   }
 
-
-
-  async completeOnboarding(finalProfile: UserProfile): Promise<void> {
+  async completeOnboarding(): Promise<void> {
     try {
-      const response = await apiClient.post("/onboarding/complete", { 
-        profile: finalProfile 
-      });
-      
+      const response = await apiClient.post("/onboarding/complete", {});
+
       if (!response.success) {
         throw new Error(response.error || "Failed to complete onboarding");
       }
@@ -97,21 +96,24 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
    */
   async saveChatMessage(
     conversationId: string,
-    sender: 'user' | 'ai' | 'system',
+    sender: "user" | "ai" | "system",
     content: string,
     componentId?: string,
     metadata?: Record<string, unknown>,
     customTimestamp?: string
   ): Promise<OnboardingChatMessage> {
     try {
-      const response = await apiClient.post<OnboardingChatMessage>("/onboarding/chat-history", {
-        conversationId,
-        sender,
-        content,
-        componentId,
-        metadata,
-        customTimestamp
-      });
+      const response = await apiClient.post<OnboardingChatMessage>(
+        "/onboarding/chat-history",
+        {
+          conversationId,
+          sender,
+          content,
+          componentId,
+          metadata,
+          customTimestamp,
+        }
+      );
 
       if (!response.success || !response.data) {
         throw new Error(response.error || "Failed to save chat message");
@@ -129,7 +131,7 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
    */
   async saveChatMessageAsync(
     conversationId: string,
-    sender: 'user' | 'ai' | 'system',
+    sender: "user" | "ai" | "system",
     content: string,
     componentId?: string,
     metadata?: Record<string, unknown>,
@@ -137,8 +139,8 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
   ): Promise<void> {
     try {
       // Dynamic import to avoid circular dependency
-      const { chatQueueService } = await import('./chat-queue.service');
-      
+      const { chatQueueService } = await import("./chat-queue.service");
+
       await chatQueueService.enqueueMessage(
         conversationId,
         sender,
@@ -147,7 +149,7 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
         metadata,
         customTimestamp
       );
-      
+
       console.log(`📤 Queued ${sender} message for background processing`);
     } catch (error) {
       console.error("Failed to queue chat message:", error);
@@ -177,14 +179,14 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
     failedMessages: number;
   }> {
     try {
-      const { chatQueueService } = await import('./chat-queue.service');
+      const { chatQueueService } = await import("./chat-queue.service");
       return chatQueueService.getQueueStatus();
     } catch (error) {
       console.error("Failed to get queue status:", error);
       return {
         queueSize: 0,
         isProcessing: false,
-        failedMessages: 0
+        failedMessages: 0,
       };
     }
   }
@@ -194,7 +196,7 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
    */
   async flushChatQueue(): Promise<void> {
     try {
-      const { chatQueueService } = await import('./chat-queue.service');
+      const { chatQueueService } = await import("./chat-queue.service");
       await chatQueueService.flush();
       console.log("✅ Chat queue flushed successfully");
     } catch (error) {
@@ -215,7 +217,9 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
         messages: OnboardingChatMessage[];
         conversation_id: string;
         total: number;
-      }>(`/onboarding/chat-history?conversationId=${conversationId}&limit=${limit}&offset=${offset}`);
+      }>(
+        `/onboarding/chat-history?conversationId=${conversationId}&limit=${limit}&offset=${offset}`
+      );
 
       if (!response.success || !response.data) {
         throw new Error(response.error || "Failed to load chat history");
@@ -223,7 +227,7 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
 
       return {
         messages: response.data.messages,
-        total: response.data.total
+        total: response.data.total,
       };
     } catch (error) {
       console.error("Failed to load chat history:", error);
@@ -242,4 +246,4 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
   }
 }
 
-export const onboardingService = new OnboardingServiceImpl(); 
+export const onboardingService = new OnboardingServiceImpl();

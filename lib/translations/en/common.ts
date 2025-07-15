@@ -44,4 +44,5 @@ export const commonEn = {
   pause: "Pause",
   fullscreen: "Fullscreen",
   exitFullscreen: "Exit Fullscreen",
+  finishOnboarding: "Start Onboarding",
 };
