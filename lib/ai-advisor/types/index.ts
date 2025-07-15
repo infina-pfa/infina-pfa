@@ -106,10 +106,31 @@ export interface UserContext {
     currentBudgets?: number;
     budgetCategories?: string[];
     budgets?: Array<{
+      id: string;
       name: string;
       budgeted: number;
       spent: number;
+      category: string;
     }>;
+    // Goals information
+    goals?: {
+      totalGoals?: number;
+      completedGoals?: number;
+      upcomingGoals?: number;
+      totalSaved?: number;
+      totalTarget?: number;
+      averageCompletion?: number;
+      activeGoals?: Array<{
+        id: string;
+        title: string;
+        currentAmount: number;
+        targetAmount: number | null;
+        progressPercentage: number;
+        isCompleted: boolean;
+        isDueSoon: boolean;
+        dueDate: string | null;
+      }>;
+    };
   };
 }
 

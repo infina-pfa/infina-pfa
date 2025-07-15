@@ -64,7 +64,6 @@ export const memoryConfig = {
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
   supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
   openaiKey: process.env.OPENAI_API_KEY || "",
-  similarityThreshold: 0.7,
   maxMemories: 10,
   cacheEnabled: true,
   backgroundPersist: true,

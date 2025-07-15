@@ -44,8 +44,10 @@ export class FinancialOverviewService {
       const startDate = new Date(year, month - 1, 1);
       const endDate = new Date(year, month, 0, 23, 59, 59);
 
-      // 1. Get income data for the month
-      const { data: incomeData, error: incomeError } = await supabase
+      // ========== CURRENT MONTH DATA ==========
+      
+      // 1. Get income data for the current month
+      const { data: currentMonthIncomeData, error: currentMonthIncomeError } = await supabase
         .from("transactions")
         .select("amount")
         .eq("user_id", user.id)
@@ -53,23 +55,23 @@ export class FinancialOverviewService {
         .gte("created_at", startDate.toISOString())
         .lte("created_at", endDate.toISOString());
 
-      if (incomeError) {
-        console.error("Error fetching income data:", incomeError);
+      if (currentMonthIncomeError) {
+        console.error("Error fetching current month income data:", currentMonthIncomeError);
         return NextResponse.json(
           {
             success: false,
-            error: "Failed to fetch income data",
+            error: "Failed to fetch current month income data",
           },
           { status: 500 }
         );
       }
 
-      // Calculate total income
-      const totalIncome =
-        incomeData?.reduce((sum, income) => sum + (income.amount || 0), 0) || 0;
+      // Calculate current month income
+      const currentMonthIncome =
+        currentMonthIncomeData?.reduce((sum, income) => sum + (income.amount || 0), 0) || 0;
 
-      // 2. Get expense data for the month
-      const { data: expenseData, error: expenseError } = await supabase
+      // 2. Get expense data for the current month
+      const { data: currentMonthExpenseData, error: currentMonthExpenseError } = await supabase
         .from("transactions")
         .select("amount")
         .eq("user_id", user.id)
@@ -77,23 +79,70 @@ export class FinancialOverviewService {
         .gte("created_at", startDate.toISOString())
         .lte("created_at", endDate.toISOString());
 
-      if (expenseError) {
-        console.error("Error fetching expense data:", expenseError);
+      if (currentMonthExpenseError) {
+        console.error("Error fetching current month expense data:", currentMonthExpenseError);
         return NextResponse.json(
           {
             success: false,
-            error: "Failed to fetch expense data",
+            error: "Failed to fetch current month expense data",
           },
           { status: 500 }
         );
       }
 
-      // Calculate total expenses
-      const totalExpense =
-        expenseData?.reduce((sum, expense) => sum + (expense.amount || 0), 0) ||
-        0;
+      // Calculate current month expenses
+      const currentMonthExpense =
+        currentMonthExpenseData?.reduce((sum, expense) => sum + (expense.amount || 0), 0) || 0;
 
-      // 3. Get budget data with spending information for the month
+      // ========== ALL-TIME DATA ==========
+      
+      // 3. Get all-time income data
+      const { data: allTimeIncomeData, error: allTimeIncomeError } = await supabase
+        .from("transactions")
+        .select("amount")
+        .eq("user_id", user.id)
+        .eq("type", "income");
+
+      if (allTimeIncomeError) {
+        console.error("Error fetching all-time income data:", allTimeIncomeError);
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Failed to fetch all-time income data",
+          },
+          { status: 500 }
+        );
+      }
+
+      // Calculate all-time income
+      const allTimeIncome =
+        allTimeIncomeData?.reduce((sum, income) => sum + (income.amount || 0), 0) || 0;
+
+      // 4. Get all-time expense data
+      const { data: allTimeExpenseData, error: allTimeExpenseError } = await supabase
+        .from("transactions")
+        .select("amount")
+        .eq("user_id", user.id)
+        .eq("type", "outcome");
+
+      if (allTimeExpenseError) {
+        console.error("Error fetching all-time expense data:", allTimeExpenseError);
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Failed to fetch all-time expense data",
+          },
+          { status: 500 }
+        );
+      }
+
+      // Calculate all-time expenses
+      const allTimeExpense =
+        allTimeExpenseData?.reduce((sum, expense) => sum + (expense.amount || 0), 0) || 0;
+
+      // ========== BUDGET DATA (CURRENT MONTH) ==========
+
+      // 5. Get budget data with spending information for the month
       const { data: budgets, error: budgetError } = await supabase
         .from("budgets")
         .select(
@@ -194,18 +243,91 @@ export class FinancialOverviewService {
         0
       );
 
-      // Prepare and return the response
+      // ========== GOALS DATA ==========
+
+      // 6. Get user goals data
+      const { data: goalsData, error: goalsError } = await supabase
+        .from("goals")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (goalsError) {
+        console.error("Error fetching goals data:", goalsError);
+        // Don't fail the entire request if goals fetch fails
+      }
+
+      // Process goals data
+      const goals = goalsData?.map((goal) => {
+        const progressPercentage = goal.target_amount > 0 
+          ? Math.round((goal.current_amount / goal.target_amount) * 100)
+          : 0;
+
+        // Check if goal is completed
+        const isCompleted = goal.target_amount > 0 && goal.current_amount >= goal.target_amount;
+
+        // Check if goal is due soon (within 30 days)
+        const isDueSoon = goal.due_date 
+          ? new Date(goal.due_date).getTime() - new Date().getTime() <= 30 * 24 * 60 * 60 * 1000
+          : false;
+
+        return {
+          id: goal.id,
+          title: goal.title,
+          description: goal.description,
+          currentAmount: goal.current_amount,
+          targetAmount: goal.target_amount,
+          dueDate: goal.due_date,
+          progressPercentage,
+          isCompleted,
+          isDueSoon,
+          createdAt: goal.created_at,
+        };
+      }) || [];
+
+      // Calculate goals statistics
+      const goalsStats = {
+        totalGoals: goals.length,
+        completedGoals: goals.filter(g => g.isCompleted).length,
+        upcomingGoals: goals.filter(g => g.isDueSoon && !g.isCompleted).length,
+        totalSaved: goals.reduce((sum, goal) => sum + goal.currentAmount, 0),
+        totalTarget: goals.reduce((sum, goal) => sum + (goal.targetAmount || 0), 0),
+        averageCompletion: goals.length > 0 
+          ? Math.round(goals.reduce((sum, goal) => sum + goal.progressPercentage, 0) / goals.length)
+          : 0,
+      };
+
+      // Prepare and return the updated response structure
       return {
         month: month,
         year: year,
-        totalIncome,
-        totalExpense,
-        balance: totalIncome - totalExpense,
+        // Current month data
+        currentMonth: {
+          totalIncome: currentMonthIncome,
+          totalExpense: currentMonthExpense,
+          balance: currentMonthIncome - currentMonthExpense,
+        },
+        // All-time data
+        allTime: {
+          totalIncome: allTimeIncome,
+          totalExpense: allTimeExpense,
+          balance: allTimeIncome - allTimeExpense,
+        },
+        // Legacy fields for backward compatibility (using current month data)
+        totalIncome: currentMonthIncome,
+        totalExpense: currentMonthExpense,
+        balance: currentMonthIncome - currentMonthExpense,
+        // Budget data
         budgets: {
           items: budgetsWithSpending,
           total: totalBudget,
           spent: totalBudgetSpent,
           remaining: totalBudget - totalBudgetSpent,
+        },
+        // Goals data
+        goals: {
+          items: goals,
+          stats: goalsStats,
         },
       };
     } catch (error) {

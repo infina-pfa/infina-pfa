@@ -1,7 +1,6 @@
 import { MemoryConfig } from '../types/memory';
 import { MemoryConfigFactory } from '../config/memory.config';
 import { MemoryPersistenceService } from './memory-persistence.service';
-import { EmbeddingService } from './embedding.service';
 import { MemoryExtractionService } from './memory-extraction.service';
 import { AsyncMemoryManager } from '../memory-manager';
 
@@ -21,13 +20,11 @@ export class MemoryManagerFactory {
       config.supabaseKey
     );
     
-    const embeddingService = new EmbeddingService(config.openaiKey);
     const extractionService = new MemoryExtractionService(config.openaiKey);
     
     return new AsyncMemoryManager(
       config,
       persistenceService,
-      embeddingService,
       extractionService
     );
   }

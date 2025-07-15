@@ -2,7 +2,7 @@ export interface Memory {
   id: string;
   user_id: string;
   content: string;
-  embedding: number[];
+  category?: string;
   metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
@@ -12,7 +12,6 @@ export interface MemoryConfig {
   supabaseUrl: string;
   supabaseKey: string;
   openaiKey: string;
-  similarityThreshold: number;
   maxMemories: number;
   cacheEnabled: boolean;
   backgroundPersist: boolean;

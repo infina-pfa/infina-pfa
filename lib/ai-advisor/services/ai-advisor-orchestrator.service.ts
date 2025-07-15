@@ -68,6 +68,18 @@ export class AIAdvisorOrchestratorService {
     type FinancialOverviewData = {
       month: number;
       year: number;
+      // New structure with separate current month and all-time data
+      currentMonth: {
+        totalIncome: number;
+        totalExpense: number;
+        balance: number;
+      };
+      allTime: {
+        totalIncome: number;
+        totalExpense: number;
+        balance: number;
+      };
+      // Legacy fields for backward compatibility
       totalIncome: number;
       totalExpense: number;
       balance: number;
@@ -84,6 +96,29 @@ export class AIAdvisorOrchestratorService {
         spent: number;
         remaining: number;
       };
+      // Goals data
+      goals: {
+        items: Array<{
+          id: string;
+          title: string;
+          description: string | null;
+          currentAmount: number;
+          targetAmount: number | null;
+          dueDate: string | null;
+          progressPercentage: number;
+          isCompleted: boolean;
+          isDueSoon: boolean;
+          createdAt: string;
+        }>;
+        stats: {
+          totalGoals: number;
+          completedGoals: number;
+          upcomingGoals: number;
+          totalSaved: number;
+          totalTarget: number;
+          averageCompletion: number;
+        };
+      };
     };
 
     // Check if we have valid data and transform it
@@ -98,18 +133,42 @@ export class AIAdvisorOrchestratorService {
       const data = financialOverviewResponse as FinancialOverviewData;
 
       financialData = {
-        totalIncome: data.totalIncome || 0,
-        totalExpenses: data.totalExpense || 0,
-        totalCurrentMonthIncome: data.totalIncome || 0,
-        totalCurrentMonthExpenses: data.totalExpense || 0,
+        // All-time totals
+        totalIncome: data.allTime?.totalIncome || 0,
+        totalExpenses: data.allTime?.totalExpense || 0,
+        // Current month totals
+        totalCurrentMonthIncome: data.currentMonth?.totalIncome || 0,
+        totalCurrentMonthExpenses: data.currentMonth?.totalExpense || 0,
+        // Budget info
         currentBudgets: data.budgets?.items?.length || 0,
         budgetCategories: data.budgets?.items?.map((b) => b.category) || [],
         budgets:
           data.budgets?.items?.map((budget) => ({
+            id: budget.id,
             name: budget.name,
             budgeted: budget.amount,
             spent: budget.spent,
+            category: budget.category,
           })) || [],
+        // Goals info
+        goals: {
+          totalGoals: data.goals?.stats?.totalGoals || 0,
+          completedGoals: data.goals?.stats?.completedGoals || 0,
+          upcomingGoals: data.goals?.stats?.upcomingGoals || 0,
+          totalSaved: data.goals?.stats?.totalSaved || 0,
+          totalTarget: data.goals?.stats?.totalTarget || 0,
+          averageCompletion: data.goals?.stats?.averageCompletion || 0,
+          activeGoals: data.goals?.items?.map((goal) => ({
+            id: goal.id,
+            title: goal.title,
+            currentAmount: goal.currentAmount,
+            targetAmount: goal.targetAmount,
+            progressPercentage: goal.progressPercentage,
+            isCompleted: goal.isCompleted,
+            isDueSoon: goal.isDueSoon,
+            dueDate: goal.dueDate,
+          })) || [],
+        },
       };
     }
 
@@ -153,10 +212,6 @@ export class AIAdvisorOrchestratorService {
           })
         );
 
-        console.log("🔄 Processing memory with history:", {
-          historyItems: memoryHistoryForMemory.length,
-          sampleItem: memoryHistoryForMemory[0] || "none",
-        });
 
         memoryContext = await processMemoryContext(
           this.memoryManager,
@@ -206,11 +261,6 @@ export class AIAdvisorOrchestratorService {
       getMcpToolsInfo()
     );
 
-    console.log("📝 System prompt generated:", {
-      promptLength: systemPrompt.length,
-      promptPreview: systemPrompt.substring(0, 200) + "...",
-    });
-
     // Prepare messages
     console.log("💬 Preparing messages for LLM...");
     const messages = this.prepareMessages(
@@ -218,12 +268,6 @@ export class AIAdvisorOrchestratorService {
       conversationHistory || [],
       message
     );
-
-    console.log("💬 Messages prepared:", {
-      messageCount: messages.length,
-      messageTypes: messages.map((m) => m.role),
-      totalLength: messages.reduce((sum, m) => sum + m.content.length, 0),
-    });
 
     // Process OpenAI stream (simplified - only OpenAI for now)
     console.log("🌊 Starting OpenAI stream processing...");
@@ -250,6 +294,7 @@ export class AIAdvisorOrchestratorService {
   ) {
     console.log("📋 Preparing user context...");
     const userContextInfo = prepareUserContext(userContext, userId, "");
+    console.log("userContextInfo:", userContextInfo);
 
     const combined = [memoryContext, userContextInfo]
       .filter(Boolean)
@@ -296,12 +341,6 @@ export class AIAdvisorOrchestratorService {
       { role: "user" as const, content: currentMessage },
     ];
 
-    console.log("💬 Message array built:", {
-      systemPromptLength: systemPrompt.length,
-      historyCount: historyMessages.length,
-      currentMessageLength: currentMessage.length,
-      totalMessages: messages.length,
-    });
 
     return messages;
   }
@@ -326,7 +365,7 @@ export class AIAdvisorOrchestratorService {
       hasApiKey: !!llmConfig.apiKey,
     });
 
-    console.log("🔧 All tools:", JSON.stringify(allTools));
+    // console.log("🔧 All tools:", JSON.stringify(allTools));
 
     try {
       console.log("📡 Creating OpenAI stream...");
@@ -344,7 +383,6 @@ export class AIAdvisorOrchestratorService {
         onResponsesCompleted: async (responseContent) => {
           if (memoryEnabled && this.memoryManager) {
             try {
-              console.log("🧠 Starting background memory extraction...");
               const memoryHistory = conversationHistory.map((msg) => ({
                 role: msg.sender === "user" ? "user" : "assistant",
                 content: msg.content,
@@ -357,9 +395,8 @@ export class AIAdvisorOrchestratorService {
                 message,
                 userId
               );
-              console.log("✅ Memory extraction completed");
             } catch (error) {
-              console.warn("⚠️ Memory extraction failed:", error);
+              console.error("⚠️ Memory extraction failed:", error);
             }
           }
         },
