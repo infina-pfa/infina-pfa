@@ -81,6 +81,13 @@ export function generateStartSavingStagePrompt(
                             2.  Use relatable examples, statistics, or stories relevant to the user's local context to build buy-in.
                             3.  ALWAYS call show_onboarding_component with "suggestions" type to provide guided responses instead of expecting free text.
                         </approach>
+                        <sub_step id="1.educate_on_emergency_fund_if_not_know">
+                            <goal>If users don't know about Emergency Fund, help them understand why they need an Emergency Fund.</goal>
+                            <action>
+                                - **Educate on Emergency Fund:** Introduce the "Emergency Fund" concept. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//04%20VAY%20TN%20DNG_1080p.mp4' ; description: 'Knowldge about Emergency Fund') to display a short video with a simple explanation. 
+                            </action>
+                            <completion_criteria>The user has been introduced to Emergency Fund.</completion_criteria>
+                        </sub_step>
                         <completion_criteria>User understands the importance and agrees to focus on building an Emergency Fund.</completion_criteria>
                     </step>
 
@@ -159,6 +166,13 @@ export function generateStartSavingStagePrompt(
                                 - **Give Specific Recommendation:** "A top choice for this in Vietnam is a product like Infina's 'Tích Lũy Không Kỳ Hạn' (Flexible Savings). It meets these criteria perfectly." -> Call showProductRecommendation(product: 'infina_flexible_savings').
                         </approach>
                         <completion_criteria>User understands HYSA and has received a product recommendation.</completion_criteria>
+                        <sub_step id="1.show_infina_app_qr">
+                                <goal>Show the Infina App QR code to the user.</goal>
+                                <action>
+                                    - **Show QR Code:** "To implement PYF and manage your spending effectively, I'll help you set up our Budgeting Tool right now." -> Call show_onboarding_component with "infina_app_qr" type to display the QR code.
+                                </action>
+                                <completion_criteria>The user has been introduced to the Infina App QR code.</completion_criteria>
+                            </sub_step>
                     </step>
 
                     <!-- STEP 5: FINISH ONBOARDING -->
@@ -258,7 +272,7 @@ export function generateStartSavingStagePrompt(
                 <component name="financial_input">Use for: Collecting specific financial numbers when needed (e.g., asking for income in step 2a).</component>
                 <component name="suggestions">Use for: Displaying a list of suggestions to guide the user to the next step.</component>
                 <component name="slider">Use for: Displaying a slider to guide the user to the next step.</component>
-
+                <component name="infina_app_qr">Use for: Displaying the Infina App QR code.</component>
             </available_components>
     </system_prompt>
   `;

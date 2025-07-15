@@ -19,6 +19,7 @@ import { SavingsCapacityComponent } from "./savings-capacity-component";
 import { GoalConfirmationComponent } from "./goal-confirmation-component";
 import { EducationContentComponent } from "./education-content-component";
 import { Suggestions } from "./suggestions";
+import { InfinAppQR } from "./infina-app-qr";
 
 interface OnboardingComponentRendererProps {
   component: OnboardingComponent;
@@ -138,7 +139,9 @@ export function OnboardingComponentRenderer({
       return (
         <Suggestions
           suggestions={
-            component.context.suggestions?.map((suggestion) => suggestion.label) || []
+            component.context.suggestions?.map(
+              (suggestion) => suggestion.label
+            ) || []
           }
           onSelect={(suggestionLabel) => {
             handleResponse({
@@ -148,6 +151,9 @@ export function OnboardingComponentRenderer({
           }}
         />
       );
+
+    case "infina_app_qr":
+      return <InfinAppQR />;
 
     default:
       return (

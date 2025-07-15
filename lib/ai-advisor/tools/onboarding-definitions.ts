@@ -28,6 +28,7 @@ export const showOnboardingComponentTool = {
             "goal_confirmation",
             "education_content",
             "suggestions",
+            "infina_app_qr",
           ],
           description:
             "Type of component to display - determines the UI component that will be rendered. REQUIRED: Must be one of the enum values.",
@@ -175,7 +176,16 @@ export const showOnboardingComponentTool = {
                 },
                 required: ["id", "label", "value"],
               },
-              description: "Quick suggestion buttons for user convenience (REQUIRED for suggestions component)",
+              description:
+                "Quick suggestion buttons for user convenience (REQUIRED for suggestions component)",
+            },
+
+            // Infina app QR - required for component_type: "infina_app_qr"
+
+            // Infina app QR - required for component_type: "infina_app_qr"
+            infinaAppQR: {
+              type: "string",
+              description: "Title for the Infina App QR code",
             },
 
             // NEW STAGE-FIRST COMPONENTS
