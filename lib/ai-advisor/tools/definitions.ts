@@ -50,6 +50,11 @@ export const componentTools: ChatComponent[] = [
     name: "Video",
     description: "Show a video to the user",
   },
+  {
+    id: ChatComponentId.SUGGESTIONS,
+    name: "Suggestions",
+    description: "Show suggestions to the user",
+  },
 ];
 
 export const mcpToolsList = [
@@ -126,11 +131,41 @@ export const functionTools: Tool[] = [
           enum: [
             ChatComponentId.BUDGET_OVERVIEW,
             ChatComponentId.BUDGET_DETAIL,
+            ChatComponentId.SUGGESTIONS,
           ],
         },
         title: {
           type: "string",
           description: "Title of the component",
+        },
+        context: {
+          type: "object",
+          description:
+            "Additional context or parameters for the component. REQUIRED FOR COMPONENTS: suggestions",
+          properties: {
+            suggestions: {
+              type: "array",
+              description: "Suggestions to the user",
+              items: {
+                type: "object",
+                properties: {
+                  id: {
+                    type: "string",
+                    description: "Unique suggestion identifier",
+                  },
+                  text: {
+                    type: "string",
+                    description: "Display text for the suggestion button",
+                  },
+                  description: {
+                    type: "string",
+                    description: "Optional additional description",
+                  },
+                },
+                required: ["id", "text"],
+              },
+            },
+          },
         },
       },
       required: ["component_id", "title"],

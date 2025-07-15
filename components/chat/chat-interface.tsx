@@ -55,9 +55,17 @@ export function ChatInterface() {
 
   useEffect(() => {
     if (user && !sentFirstMessage.current) {
-      sendMessage("Chào bạn, hôm nay chúng ta nên làm gì?", {
-        sender: "system",
-      });
+      sendMessage(
+        `I'm the system, please start the conversation with user by doing 2 actions:
+         1. Give them budgeting overview by show the component budgeting overview
+         2. Show 2 suggestion options by function show_component:
+            - Note spending
+            - Do pay your self first  
+         `,
+        {
+          sender: "system",
+        }
+      );
       sentFirstMessage.current = true;
     }
   }, [user]);
@@ -127,6 +135,7 @@ export function ChatInterface() {
           <MessageList
             messages={messages}
             onToolClick={(toolId) => setToolId(toolId as ChatToolId)}
+            onSendMessage={sendMessage}
           />
           {isThinking && <TypingIndicator />}
         </div>

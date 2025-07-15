@@ -7,9 +7,14 @@ import { MessageBubble } from "./message-bubble";
 interface MessageListProps {
   messages: ChatMessage[];
   onToolClick?: (toolId: string) => void;
+  onSendMessage?: (message: string) => void;
 }
 
-export function MessageList({ messages, onToolClick }: MessageListProps) {
+export function MessageList({
+  messages,
+  onToolClick,
+  onSendMessage,
+}: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -28,6 +33,7 @@ export function MessageList({ messages, onToolClick }: MessageListProps) {
           key={message.id}
           message={message}
           onToolClick={onToolClick}
+          onSendMessage={onSendMessage}
         />
       ))}
       <div ref={messagesEndRef} />

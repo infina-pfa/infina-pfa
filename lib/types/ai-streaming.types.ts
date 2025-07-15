@@ -27,6 +27,7 @@ export enum ChatComponentId {
   BUDGET_OVERVIEW = "budget-overview",
   BUDGET_DETAIL = "budget-detail",
   VIDEO = "video",
+  SUGGESTIONS = "suggestions",
 }
 
 export interface ChatTool {

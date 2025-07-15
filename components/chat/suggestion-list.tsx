@@ -1,10 +1,12 @@
 "use client";
 
 import { ChatSuggestion } from "@/lib/types/chat.types";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface SuggestionListProps {
   suggestions: ChatSuggestion[];
-  onSuggestionClick: (suggestion: string) => Promise<void>;
+  onSuggestionClick?: (suggestion: string) => void;
   isSubmitting: boolean;
 }
 
@@ -18,32 +20,34 @@ export function SuggestionList({
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-row flex-wrap gap-3">
+    <div className="space-y-2 px-2 sm:px-0 w-full">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-2">
         {suggestions.map((suggestion) => (
-          <button
+          <Button
             key={suggestion.id}
-            onClick={() => onSuggestionClick(suggestion.text)}
+            onClick={() => onSuggestionClick?.(suggestion.text)}
             disabled={isSubmitting}
-            className={`
-              p-4 text-left rounded-xl bg-white hover:bg-blue-50 
-              transition-colors text-sm font-nunito cursor-pointer
-              ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}
-            `}
+            variant="secondary"
+            size="default"
+            className={cn(
+              "w-full sm:w-auto h-auto text-left justify-start",
+              "font-nunito rounded-lg",
+              "bg-white hover:bg-[#F0F2F5]",
+              "shadow-none border-none",
+              suggestion.description && "flex flex-col items-start"
+            )}
           >
-            <div className="flex items-start gap-3">
-              <div className="flex-1">
-                <div className="font-semibold text-gray-900 mb-1">
-                  {suggestion.text}
-                </div>
-                {suggestion.description && (
-                  <div className="text-xs text-gray-600">
-                    {suggestion.description}
-                  </div>
-                )}
-              </div>
+            <div className="flex flex-col items-start">
+              <span className="font-semibold text-gray-900">
+                {suggestion.text}
+              </span>
+              {suggestion.description && (
+                <span className="text-xs text-gray-600 mt-1">
+                  {suggestion.description}
+                </span>
+              )}
             </div>
-          </button>
+          </Button>
         ))}
       </div>
     </div>

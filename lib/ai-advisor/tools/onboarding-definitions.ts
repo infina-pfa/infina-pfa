@@ -166,16 +166,16 @@ export const showOnboardingComponentTool = {
                     type: "string",
                     description: "Unique suggestion identifier",
                   },
-                  label: {
+                  text: {
                     type: "string",
                     description: "Display text for the suggestion button",
                   },
-                  value: {
+                  description: {
                     type: "string",
-                    description: "Value to be returned when selected",
+                    description: "Optional additional description",
                   },
                 },
-                required: ["id", "label", "value"],
+                required: ["id", "text"],
               },
               description:
                 "Quick suggestion buttons for user convenience (REQUIRED for suggestions component)",
