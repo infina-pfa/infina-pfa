@@ -110,13 +110,6 @@ export interface UserContext {
       budgeted: number;
       spent: number;
     }>;
-    hasCompletedOnboarding?: boolean;
-  };
-  learning?: {
-    currentLevel?: number;
-    xp?: number;
-    currentGoal?: string;
-    progress?: string;
   };
 }
 

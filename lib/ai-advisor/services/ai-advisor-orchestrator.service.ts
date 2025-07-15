@@ -22,6 +22,7 @@ import {
 import { generateSystemPrompt } from "../prompts/system-prompt";
 import { Message } from "openai/resources/beta/threads/messages.mjs";
 import { aiStreamingService } from "@/lib/services/ai-streaming.service";
+import { financialOverviewService } from "./financial-overview.service";
 
 /**
  * Main orchestrator service for AI Advisor stream processing
@@ -58,8 +59,67 @@ export class AIAdvisorOrchestratorService {
   ): Promise<ReadableStream> {
     console.log("🔄 Orchestrator.processRequest started");
 
-    const { message, conversationHistory, userContext, user_id, provider } =
-      requestBody;
+    const { message, conversationHistory, user_id, provider } = requestBody;
+
+    const financialOverviewResponse =
+      await financialOverviewService.getFinancialOverview(user_id);
+
+    // Define the expected financial data type
+    type FinancialOverviewData = {
+      month: number;
+      year: number;
+      totalIncome: number;
+      totalExpense: number;
+      balance: number;
+      budgets: {
+        items: Array<{
+          id: string;
+          name: string;
+          category: string;
+          amount: number;
+          spent: number;
+          remaining: number;
+        }>;
+        total: number;
+        spent: number;
+        remaining: number;
+      };
+    };
+
+    // Check if we have valid data and transform it
+    let financialData: UserContext["financial"] = undefined;
+
+    if (
+      financialOverviewResponse &&
+      typeof financialOverviewResponse === "object" &&
+      !("success" in financialOverviewResponse) &&
+      financialOverviewResponse !== null
+    ) {
+      const data = financialOverviewResponse as FinancialOverviewData;
+
+      financialData = {
+        totalIncome: data.totalIncome || 0,
+        totalExpenses: data.totalExpense || 0,
+        totalCurrentMonthIncome: data.totalIncome || 0,
+        totalCurrentMonthExpenses: data.totalExpense || 0,
+        currentBudgets: data.budgets?.items?.length || 0,
+        budgetCategories: data.budgets?.items?.map((b) => b.category) || [],
+        budgets:
+          data.budgets?.items?.map((budget) => ({
+            name: budget.name,
+            budgeted: budget.amount,
+            spent: budget.spent,
+          })) || [],
+      };
+    }
+
+    const userContext = {
+      financial: financialData,
+    };
+    console.log(
+      "🚀 ~ AIAdvisorOrchestratorService ~ userContext.financialData:",
+      financialData
+    );
 
     console.log("🚀 AI Advisor Stream Function Called");
     console.log("👤 User ID:", user_id);
@@ -244,128 +304,6 @@ export class AIAdvisorOrchestratorService {
     });
 
     return messages;
-  }
-
-  /**
-   * Safely parse function call arguments with comprehensive validation and error handling
-   */
-  private parseToolArguments(
-    callId: string,
-    argumentsStr: string
-  ): Record<string, unknown> {
-    // Trim whitespace and check for empty string
-    const trimmedArgs = argumentsStr.trim();
-
-    if (!trimmedArgs) {
-      console.log(
-        `🔧 Empty arguments for call ${callId}, using default empty object`
-      );
-      return {};
-    }
-
-    // Check if it looks like JSON (starts with { and ends with })
-    if (!trimmedArgs.startsWith("{") || !trimmedArgs.endsWith("}")) {
-      console.warn(`⚠️ Arguments for call ${callId} don't look like JSON:`, {
-        length: trimmedArgs.length,
-        starts_with: trimmedArgs.substring(0, 10),
-        ends_with: trimmedArgs.substring(Math.max(0, trimmedArgs.length - 10)),
-        full_args:
-          trimmedArgs.length < 200
-            ? trimmedArgs
-            : `${trimmedArgs.substring(0, 100)}...${trimmedArgs.substring(
-                trimmedArgs.length - 100
-              )}`,
-      });
-      return {};
-    }
-
-    try {
-      // Attempt to parse the JSON
-      const parsed = JSON.parse(trimmedArgs);
-
-      // Validate that it's an object
-      if (
-        typeof parsed !== "object" ||
-        parsed === null ||
-        Array.isArray(parsed)
-      ) {
-        console.warn(
-          `⚠️ Parsed arguments for call ${callId} is not a valid object:`,
-          typeof parsed
-        );
-        return {};
-      }
-
-      console.log(
-        `✅ Successfully parsed arguments for call ${callId}:`,
-        Object.keys(parsed)
-      );
-      return parsed as Record<string, unknown>;
-    } catch (error) {
-      console.error(`❌ JSON parsing failed for call ${callId}:`, {
-        error: error instanceof Error ? error.message : String(error),
-        argumentsLength: trimmedArgs.length,
-        argumentsPreview:
-          trimmedArgs.length < 200
-            ? trimmedArgs
-            : `${trimmedArgs.substring(0, 100)}...${trimmedArgs.substring(
-                trimmedArgs.length - 100
-              )}`,
-        startsWithBrace: trimmedArgs.startsWith("{"),
-        endsWithBrace: trimmedArgs.endsWith("}"),
-      });
-
-      // Try to extract any valid JSON-like properties as fallback
-      try {
-        const fallbackData = this.extractFallbackData(trimmedArgs);
-        if (Object.keys(fallbackData).length > 0) {
-          console.log(
-            `🔄 Using fallback data extraction for call ${callId}:`,
-            Object.keys(fallbackData)
-          );
-          return fallbackData;
-        }
-      } catch (fallbackError) {
-        console.warn(
-          `⚠️ Fallback extraction also failed for call ${callId}:`,
-          fallbackError
-        );
-      }
-
-      return {};
-    }
-  }
-
-  /**
-   * Attempt to extract data from malformed JSON as a fallback
-   */
-  private extractFallbackData(invalidJson: string): Record<string, unknown> {
-    const fallbackData: Record<string, unknown> = {};
-
-    // Try to extract common patterns using regex
-    const patterns = [
-      { key: "component_id", regex: /"component_id"\s*:\s*"([^"]+)"/i },
-      { key: "tool_id", regex: /"tool_id"\s*:\s*"([^"]+)"/i },
-      { key: "title", regex: /"title"\s*:\s*"([^"]+)"/i },
-      { key: "context", regex: /"context"\s*:\s*({[^}]*})/i },
-    ];
-
-    for (const pattern of patterns) {
-      const match = invalidJson.match(pattern.regex);
-      if (match && match[1]) {
-        try {
-          if (pattern.key === "context") {
-            fallbackData[pattern.key] = JSON.parse(match[1]);
-          } else {
-            fallbackData[pattern.key] = match[1];
-          }
-        } catch {
-          // Skip this field if parsing fails
-        }
-      }
-    }
-
-    return fallbackData;
   }
 
   /**

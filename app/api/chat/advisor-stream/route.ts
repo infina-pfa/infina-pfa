@@ -1,5 +1,3 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -19,6 +17,7 @@ import {
   validateInitialRequestBody,
   validateRequestBody,
 } from "@/lib/ai-advisor/utils/validation";
+import { createClient } from "@/lib/supabase/server";
 
 // Initialize OpenAI client
 const openaiClient = new OpenAI({
@@ -89,33 +88,7 @@ export async function POST(request: NextRequest) {
 
     // Create Supabase client for authentication
     console.log("🔐 Creating Supabase client for authentication...");
-    const cookieStore = await cookies();
-
-    console.log("🍪 Cookies available:", {
-      cookieCount: cookieStore.getAll().length,
-      cookieNames: cookieStore.getAll().map((c) => c.name),
-    });
-
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              );
-            } catch {
-              // Server Component context
-            }
-          },
-        },
-      }
-    );
+    const supabase = await createClient();
 
     // Get current user
     console.log("👤 Getting current user from Supabase...");
