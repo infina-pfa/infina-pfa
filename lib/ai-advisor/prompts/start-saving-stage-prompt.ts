@@ -115,14 +115,14 @@ export function generateStartSavingStagePrompt(
                                         - **If user enters a number of months:** Calculate the required monthly savings rate.
                                         - If the rate is >30% of income: Warn them that this is quite ambitious and may be difficult to sustain. Ask if they are sure or suggest a slightly longer, more sustainable timeline.
                                         - For low-income users (e.g., < 7 million VND in a major city): PAY SPEACIAL INTENTION TO THIS CASE and double-check that they feel comfortable with their chosen timeline.
+                                         - **Confirm:** "Great! Let's confirm the goal: save [Target Amount] in [Number of Months]-> MUST call show_onboarding_component with "goal_confirmation" type to display the goal confirmation component.
                                 </action>
                                 <completion_criteria>User has confirmed the target amount and timeline.</completion_criteria>
                             </sub_step>
 
-                            <sub_step id="2c_confirm_and_educate">
-                                <goal>Confirm the goal, introduce the PYF concept, and the budgeting tool.</goal>
+                            <sub_step id="2c_educate_on_pyf_and_introduce_tool">
+                                <goal>Introduce the PYF concept, and the budgeting tool.</goal>
                                 <action>
-                                    - **Confirm:** "Great! Let's confirm the goal: save [Target Amount] in [Number of Months]."
                                     - **Educate on PYF:** Introduce the "Pay Yourself First" concept as the method to achieve this goal. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//04%20VAY%20TN%20DNG_1080p.mp4' ; description: 'Knowledge about PYF') to display a short video with a simple explanation.
                                     - **Introduce Tool:** "To implement PYF and manage your spending effectively, I'll help you set up our Budgeting Tool right now."
                                 </action>
@@ -177,6 +177,16 @@ export function generateStartSavingStagePrompt(
                                 <completion_criteria>The user has been introduced to the Infina App QR code.</completion_criteria>
                             </sub_step>
                     </step>
+
+                    <!-- STEP 5: FINISH ONBOARDING -->
+                    <step id="5_finish_onboarding">
+                        <goal>Finish the onboarding process and provide a summary of the Emergency Fund goal.</goal>
+                        <approach>
+                            1.  **Summary:** "Congratulations! You've successfully set up your Emergency Fund. You can access the Budgeting Tool through me or from the side menu. Remember, the most important thing is to build the habit of 'paying yourself first.' Even small, consistent contributions will build up surprisingly fast. It's about the habit, not the specific amount." ->  you MUST stream the response to congratulate the user before calling the component "finish_onboarding".
+                            2.  **Call function to finish onboarding:** -> Call show_onboarding_component with "finish_onboarding" type to finish the onboarding process, remember that you need to call this function after the user has completed all the steps in the onboarding process
+                        </approach>
+                    </step>
+
                 </stage_steps>
             </onboarding_flow_implementation>
 
