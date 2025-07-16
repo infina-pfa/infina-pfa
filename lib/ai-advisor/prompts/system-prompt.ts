@@ -1,4 +1,4 @@
-import { isFirstDayOfMonth, isLastDayOfMonth } from "date-fns";
+import { getMockDateStage } from "../config/date-mock";
 
 /**
  * Generate system prompt for AI advisor
@@ -11,15 +11,15 @@ export function generateSystemPrompt(
 ): string {
   const today = new Date().toLocaleDateString("en-US");
   const getCurrentDateStage = () => {
-    const now = new Date();
-    if (isFirstDayOfMonth(now)) {
-      return "start_of_month";
-    } else if (isLastDayOfMonth(now)) {
-      return "end_of_month";
-    } else {
-      return "normal_day";
-    }
+    // Use mock config for testing
+    return getMockDateStage();
   };
+
+  //<today_date>${today} - ${getCurrentDateStage()}</today_date>
+  //<today_date>2025-07-01 - start_of_month</today_date>
+  //<today_date>2025-07-31 - end_of_month</today_date>
+  //<today_date>2025-07-16 - normal_day</today_date>
+
 
   return `
 <system_prompt>
@@ -64,6 +64,7 @@ export function generateSystemPrompt(
                 <scenario id="end_of_month">
                     <condition>If today is the last day of the month.</condition>
                     <action>
+                        1.  **Show the Budgeting Dashboard and Monthly Budget Analysis** to help the user control daily spending. 
                         1.  **Analyze the monthly budget:** Check if the user overspent.
                         2.  **IF (NOT OVERSPENT):**
                             - Congratulate them on excellent spending management.

@@ -29,3 +29,10 @@ export { useGoalCreateSWR } from "./use-goal-create";
 export { useGoalUpdateSWR } from "./use-goal-update";
 export { useGoalDeleteSWR } from "./use-goal-delete";
 export { useGoalManagementSWR } from "./use-goal-management";
+export { useGoalDashboardSWR } from "./use-goal-dashboard";
+export { usePayYourselfFirstSWR } from "./use-pay-yourself-first";
+
+// Chat component hooks
+export { useBudgetingDashboardSWR } from "./use-budgeting-dashboard";
+export { useMonthlyBudgetAnalysisSWR } from "./use-monthly-budget-analysis";
+export { useSurplusAllocationSWR } from "./use-surplus-allocation";

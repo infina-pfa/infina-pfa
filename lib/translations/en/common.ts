@@ -38,6 +38,12 @@ export const commonEn = {
   of: "of",
   analyzing: "Analyzing",
   retry: "Retry",
+  tryAgain: "Try Again",
+  processing: "Processing...",
+
+  // Time units
+  months: "months",
+  month: "month",
 
   // Video controls
   play: "Play",

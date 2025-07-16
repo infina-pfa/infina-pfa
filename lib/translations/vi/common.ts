@@ -38,6 +38,10 @@ export const commonVi = {
   saving: "Đang lưu...",
   creating: "Đang tạo...",
   updating: "Đang cập nhật...",
+
+  // Time units
+  months: "tháng",
+  month: "tháng",
   create: "Tạo",
   update: "Cập nhật",
   cancel: "Hủy",
