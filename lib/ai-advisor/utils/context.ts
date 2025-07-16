@@ -49,7 +49,8 @@ Thông tin người dùng:
 - Danh mục ngân sách: ${
         userContext.financial?.budgets
           ?.map(
-            (b) => `Tên:${b.name} - Ngân sách:${b.budgeted} - Đã chi:${b.spent}`
+            (b) =>
+              `Id: ${b.id} - Tên:${b.name} - Ngân sách:${b.budgeted} - Đã chi:${b.spent}`
           )
           .join(", ") || "Chưa có"
       }

@@ -141,7 +141,7 @@ export function OnboardingComponentRenderer({
         <Suggestions
           suggestions={
             component.context.suggestions?.map(
-              (suggestion) => suggestion.label
+              (suggestion) => suggestion.text
             ) || []
           }
           onSelect={(suggestionLabel) => {

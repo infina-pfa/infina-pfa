@@ -173,8 +173,8 @@ export interface ComponentData {
   template?: string;
   suggestions?: Array<{
     id: string;
-    label: string;
-    value: string;
+    text: string;
+    description?: string;
   }>;
 
   // Stage selector

@@ -106,6 +106,7 @@ export class AIAdvisorOrchestratorService {
         budgetCategories: data.budgets?.items?.map((b) => b.category) || [],
         budgets:
           data.budgets?.items?.map((budget) => ({
+            id: budget.id,
             name: budget.name,
             budgeted: budget.amount,
             spent: budget.spent,

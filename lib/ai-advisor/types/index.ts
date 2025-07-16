@@ -106,6 +106,7 @@ export interface UserContext {
     currentBudgets?: number;
     budgetCategories?: string[];
     budgets?: Array<{
+      id: string;
       name: string;
       budgeted: number;
       spent: number;
