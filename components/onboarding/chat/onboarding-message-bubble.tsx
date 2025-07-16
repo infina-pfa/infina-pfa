@@ -85,7 +85,8 @@ export function OnboardingMessageBubble({
             )}
 
             {isComponent &&
-              (message.component || message.metadata?.component) && (
+              (typeof message.component === "object" ||
+                typeof message.metadata?.component === "object") && (
                 <div
                   className={`transition-all duration-500 ease-out ${
                     showComponent
