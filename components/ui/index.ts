@@ -3,6 +3,7 @@ export * from "./app-layout";
 export * from "./avatar";
 export * from "./button";
 export * from "./card";
+export * from "./circular-progress";
 export * from "./dialog";
 export * from "./dropdown-menu";
 export * from "./fina-icon";

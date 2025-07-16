@@ -337,4 +337,97 @@ export const goalService = {
       };
     }
   },
+
+  /**
+   * Get emergency fund dashboard data
+   */
+  async getDashboardData(t?: TranslationFunction): Promise<{
+    currentAmount: number;
+    targetAmount: number;
+    monthsOfCoverage: number;
+    progressPercentage: number;
+    projectedCompletionDate: string;
+    monthlySavingsRate: number;
+  }> {
+    try {
+      const response = await apiClient.get<{
+        currentAmount: number;
+        targetAmount: number;
+        monthsOfCoverage: number;
+        progressPercentage: number;
+        projectedCompletionDate: string;
+        monthlySavingsRate: number;
+      }>("/goals/emergency-fund/dashboard");
+
+      if (response.success && response.data) {
+        return response.data;
+      }
+
+      throw new Error(response.error || "Failed to fetch dashboard data");
+    } catch (error) {
+      const appError = handleError(error, t);
+      throw new Error(appError.message);
+    }
+  },
+
+  /**
+   * Get pay yourself first confirmation data
+   */
+  async getPayYourselfFirstData(t?: TranslationFunction): Promise<{
+    recommendedAmount: number;
+    userInput: number;
+    status: 'pending' | 'completed' | 'postponed';
+    dueDate: string;
+  }> {
+    try {
+      const response = await apiClient.get<{
+        recommendedAmount: number;
+        userInput: number;
+        status: 'pending' | 'completed' | 'postponed';
+        dueDate: string;
+      }>("/goals/emergency-fund/pay-yourself-first");
+
+      if (response.success && response.data) {
+        return response.data;
+      }
+
+      throw new Error(response.error || "Failed to fetch pay yourself first data");
+    } catch (error) {
+      const appError = handleError(error, t);
+      throw new Error(appError.message);
+    }
+  },
+
+  /**
+   * Update emergency fund contribution
+   */
+  async updateEmergencyFundContribution(
+    data: {
+      amount: number;
+      status: 'completed' | 'postponed';
+      date: string;
+    },
+    t?: TranslationFunction
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await apiClient.post<{ success: boolean }>(
+        "/goals/emergency-fund/contribution",
+        data
+      );
+
+      if (response.success) {
+        return {
+          success: true,
+        };
+      }
+
+      throw new Error(response.error || "Failed to update contribution");
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        success: false,
+        error: appError.message,
+      };
+    }
+  },
 };

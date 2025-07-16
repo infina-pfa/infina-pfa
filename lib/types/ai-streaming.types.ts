@@ -28,6 +28,11 @@ export enum ChatComponentId {
   BUDGET_DETAIL = "budget-detail",
   VIDEO = "video",
   SUGGESTIONS = "suggestions",
+  GOAL_DASHBOARD = "goal-dashboard",
+  PAY_YOURSELF_FIRST_CONFIRMATION = "pay-yourself-first-confirmation",
+  BUDGETING_DASHBOARD = "budgeting-dashboard",
+  MONTHLY_BUDGET_ANALYSIS = "monthly-budget-analysis", 
+  SURPLUS_ALLOCATION = "surplus-allocation",
 }
 
 export interface ChatTool {

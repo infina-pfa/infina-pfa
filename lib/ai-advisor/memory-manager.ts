@@ -1,6 +1,5 @@
 import { Memory, MemoryConfig, ConversationMessage } from './types/memory';
 import { MemoryPersistenceService } from './services/memory-persistence.service';
-import { EmbeddingService } from './services/embedding.service';
 import { MemoryExtractionService } from './services/memory-extraction.service';
 
 /**
@@ -14,18 +13,15 @@ import { MemoryExtractionService } from './services/memory-extraction.service';
 export class AsyncMemoryManager {
   private config: MemoryConfig;
   private persistenceService: MemoryPersistenceService;
-  private embeddingService: EmbeddingService;
   private extractionService: MemoryExtractionService;
 
   constructor(
     config: MemoryConfig,
     persistenceService: MemoryPersistenceService,
-    embeddingService: EmbeddingService,
     extractionService: MemoryExtractionService
   ) {
     this.config = config;
     this.persistenceService = persistenceService;
-    this.embeddingService = embeddingService;
     this.extractionService = extractionService;
   }
 
@@ -35,16 +31,16 @@ export class AsyncMemoryManager {
   async addMemory(
     content: string,
     userId: string,
+    category?: string,
     metadata?: Record<string, unknown>
   ): Promise<void> {
-    console.log(`🧠 Generating embedding for new memory: "${content.substring(0, 50)}..."`);
-    const embedding = await this.embeddingService.generateEmbedding(content);
+    console.log(`🧠 Adding new memory: "${content.substring(0, 50)}..."`);
 
     const memory: Memory = {
       id: crypto.randomUUID(),
       user_id: userId,
       content,
-      embedding,
+      category,
       metadata,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -72,7 +68,7 @@ export class AsyncMemoryManager {
       for (const fact of facts) {
         if (typeof fact === 'string') {
           console.log(`✅ Extracted fact to remember: "${fact}"`);
-          await this.addMemory(fact, userId, {
+          await this.addMemory(fact, userId, undefined, {
             source: 'conversation_extraction',
             conversation_id: messages[0]?.role,
             timestamp: new Date().toISOString()
@@ -108,8 +104,7 @@ export class AsyncMemoryManager {
       for (const fact of extractionResult.facts) {
         if (typeof fact === 'object' && 'fact' in fact && 'category' in fact) {
           console.log(`✅ Extracted fact from last message: "${fact.fact}"`);
-          await this.addMemory(fact.fact, userId, {
-            category: fact.category,
+          await this.addMemory(fact.fact, userId, fact.category, {
             captured_at: new Date().toISOString()
           });
         }
