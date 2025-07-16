@@ -334,4 +334,35 @@ export const onboardingVi = {
   welcomeIconAlt: "Chào mừng đến với Infina PFA",
   introIconAlt: "Tổng quan tính năng Infina",
   successIconAlt: "Tài khoản đã được tạo thành công",
+
+  // Budget Category Education Component
+  budgetCategoryEducationTitle: "Hiểu về Ưu tiên Ngân sách",
+  budgetCategoryEducationSubtitle: "Học hệ thống 3 danh mục ưu tiên để quản lý tiền hiệu quả",
+  prioritySystemTitle: "Hệ thống Phân bổ Theo Ưu tiên",
+  prioritySystemDescription: "Chúng tôi phân bổ thu nhập theo thứ tự ưu tiên: Quỹ dự phòng trước, sau đó Chi phí sinh hoạt, cuối cùng là Chi tiêu tự do.",
+  budgetCategoriesTitle: "3 Danh mục Ngân sách",
+  keyLearningTitle: "Điểm Học Tập Chính",
+  keyLearning1: "Luôn ưu tiên quỹ dự phòng - đây là lưới an toàn tài chính của bạn",
+  keyLearning2: "Bao gồm chi phí sinh hoạt thiết yếu trước chi tiêu tùy ý",
+  keyLearning3: "Chi tiêu tự do không bao giờ vượt quá 2 lần quỹ dự phòng",
+  continueToAllocation: "Tiếp tục đến Phân bổ Ngân sách",
+  budgetCategoryEducationCompleted: "Đã hiểu về danh mục ngân sách!",
+
+  // Budget Allocation Tool Component
+  budgetAllocationTitle: "Phân bổ Ngân sách Hàng tháng",
+  budgetAllocationSubtitle: "Phân phối thu nhập qua 3 danh mục ưu tiên",
+  budgetAllocationCompleted: "Hoàn thành phân bổ ngân sách!",
+
+  // Philosophy Selection Component
+  philosophySelectionTitle: "Chọn Triết lý Lập Ngân sách",
+  philosophySelectionSubtitle: "Chọn phương pháp phù hợp nhất với lối sống và mục tiêu của bạn",
+  youSelected: "Bạn đã chọn:",
+  aiWillTailor: "Tôi sẽ điều chỉnh lời khuyên và tính năng để phù hợp với phương pháp bạn chọn. Bạn có thể thay đổi điều này sau trong cài đặt.",
+  philosophySelectionCompleted: "Hoàn thành chọn triết lý!",
+  philosophyChangeNote: "Đừng lo - bạn có thể thay đổi triết lý của mình bất cứ lúc nào trong cài đặt tài khoản.",
+  
+  // Component User Messages
+  budgetCategoryEducationUserMessage: "Tôi hiểu hệ thống 3 danh mục ưu tiên: Quỹ Dự phòng (Ưu tiên 1), Chi phí Sinh hoạt (Ưu tiên 2), và Chi tiêu Tự do (Ưu tiên 3). Tôi sẵn sàng phân bổ ngân sách theo hệ thống ưu tiên này.",
+  budgetAllocationUserMessage: "Tôi đã phân bổ ngân sách hàng tháng theo hệ thống ưu tiên. Tôi hiểu việc phân bổ này tuân theo nguyên tắc Quỹ Dự phòng trước, sau đó Chi phí Sinh hoạt, cuối cùng là Chi tiêu Tự do trong giới hạn 2 lần quỹ dự phòng.",
+  philosophySelectionUserMessage: "Tôi đã chọn triết lý lập ngân sách của mình và hiểu cách điều này sẽ ảnh hưởng đến lời khuyên và tính năng tôi nhận được. Tôi sẵn sàng tiến hành kế hoạch tài chính của mình.",
 };

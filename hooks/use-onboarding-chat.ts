@@ -1135,6 +1135,11 @@ export const useOnboardingChat = (
   };
 
   const getResponseText = (response: ComponentResponse): string => {
+    // First, check if response has a userMessage (our new detailed responses)
+    if (response.userMessage) {
+      return response.userMessage;
+    }
+    
     // Handle decision tree response
     if (response.determinedStage && response.answers) {
       const stageNames = {

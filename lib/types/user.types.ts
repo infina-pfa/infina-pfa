@@ -1,3 +1,6 @@
+// Budgeting style enum
+export type BudgetingStyle = "goal_focused" | "detail_tracker";
+
 // Database types - using direct type definitions to avoid schema constraints
 export interface User {
   id: string;
@@ -6,17 +9,20 @@ export interface User {
   name: string;
   user_id: string;
   total_asset_value: number;
+  budgeting_style?: BudgetingStyle;
 }
 
 export interface UserInsert {
   name: string;
   user_id: string;
   total_asset_value?: number;
+  budgeting_style?: BudgetingStyle;
 }
 
 export interface UserUpdate {
   name?: string;
   total_asset_value?: number;
+  budgeting_style?: BudgetingStyle;
   updated_at?: string;
 }
 
@@ -31,6 +37,7 @@ export interface UserProfile {
   name: string;
   user_id: string;
   total_asset_value: number;
+  budgeting_style?: BudgetingStyle;
   onboarding_completed_at?: string;
   financial_stage?: string;
   created_at: string;

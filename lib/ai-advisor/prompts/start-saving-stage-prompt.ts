@@ -128,31 +128,58 @@ export function generateStartSavingStagePrompt(
                                 </action>
                                 <completion_criteria>The goal has been created, and the user has been introduced to PYF.</completion_criteria>
                             </sub_step>
+
+                            <sub_step id="2c2_educate_budget_categories">
+                                <goal>Teach users how to setup budgets based on 3 priority categories.</goal>
+                                <action>
+                                    - **Educate on Budget Categories:** After introducing PYF, explain the 3-category priority system: 
+                                      1. "Quỹ dự phòng (Emergency Fund)" - Priority 1: This is your PYF amount, highest priority
+                                      2. "Living Expenses & Future Plans" - Priority 2: Fixed living costs plus any future planning expenses
+                                      3. "Free to Spend" - Priority 3: Discretionary spending (cannot exceed 2x emergency fund amount)
+                                    - **Show Interactive Education:** -> Call show_onboarding_component with "budget_category_education" type to display an interactive explanation of the priority system.
+                                    - **Explain Priority Logic:** "We'll help you allocate your income in this exact order - emergency fund first, then living expenses, and finally free spending money."
+                                </action>
+                                <completion_criteria>User understands the 3-category priority system for budget allocation.</completion_criteria>
+                            </sub_step>
                         </sub_steps>
                     </step>
 
-                    <!-- STEP 3: SETUP BUDGET -->
-                    <step id="3_setup_budget">
-                        <goal>Collect expense information to validate the goal's feasibility and set up the budgeting tool.</goal>
+                    <!-- STEP 3: PRIORITY-BASED BUDGET ALLOCATION -->
+                    <step id="3_priority_budget_allocation">
+                        <goal>Guide user through priority-based budget allocation after understanding their income and budget categories.</goal>
                         <approach>
-                            1.  **Collect Expenses:** Ask: "To make sure our plan is feasible, let's quickly look at your main expenses." -> Display expense_categories component with exactly 4 categories:
-                                - "housing": "Nhà ở (thuê nhà/điện/nước): khoảng bao nhiêu?"
-                                - "food": "Ăn uống: khoảng bao nhiêu?"
-                                - "transport": "Di chuyển: khoảng bao nhiêu?"
-                                - "other": "Chi tiêu khác (giải trí, mua sắm, v.v.): khoảng bao nhiêu?"
-                                User can input the expense amount for each category through chat one by one then update the expense amount for each category in the expense_form component.
-                            2.  **Check Reasonableness:**
-                                - Calculate: Remaining Budget = Income - Monthly PYF Savings.
-                                - Compare Remaining Budget with the Total Expenses entered by the user.
-                                - **If not reasonable (expenses > remaining budget):** Guide the user to review and reduce expenses, rather than changing the PYF goal. "I see that current spending is a bit higher than the remaining budget after saving. Let's see if we can optimize any categories together." -> If expenses exceed the PYF amount,ONLY advise to reducing expenses and MUST NOT the savings target(amount and time, PYF amount).
-                                    2.1(edgecase) if the income of user is <5tr then MUST suggest user start small 10% of income and try to reduce the expense as much as possible dont act like normal 
-                                    2.2(edgecase) if after still not possible advice user to move away from the city to cut cost or perhaps we only can help you control your expense not spiral out of your paycheck with our budgeting tools and give financial advise when you needed
-                            3.  **Handle Special Cases:**
-                                - **Low Income (< 5M VND):** If saving 25% is impossible after optimization, suggest: "With the current income, starting can be tough. How about we begin with a smaller amount, like 10% of your income, and focus heavily on trimming expenses?"
-                                - **Still Impossible:** If it's still not feasible, offer empathetic and practical advice: "I understand your situation. Perhaps considering a move to a lower cost-of-living area could be a long-term solution. For now, this budgeting tool will be a great ally to help you control spending and avoid deficits. I'm always here whenever you need advice."
-                            4.  **Finalize Setup:** "Congratulations, you've set up the Budgeting Tool! Next time, you can access it through me or from the side menu."
+                            1.  **Start Priority Allocation:** "Now that you understand the 3-category priority system, let's allocate your income step by step. Remember, we'll allocate to Emergency Fund first, then Living Expenses, and finally Free to Spend."
+                            2.  **Display Budget Allocation Tool:** -> Call show_onboarding_component with "budget_allocation_tool" type to display the interactive budget allocation interface.
+                            3.  **Guide Priority-Based Allocation:**
+                                - **Priority 1 - Emergency Fund (PYF):** "First, we'll allocate your PYF amount (the monthly savings toward your emergency fund goal). This is [calculated amount] based on your goal timeline."
+                                - **Priority 2 - Living Expenses & Future Plans:** "Next, let's allocate money for your essential living expenses and any future planning expenses. This includes housing, food, transport, and planned future expenses."
+                                - **Priority 3 - Free to Spend:** "Finally, the remaining amount goes to your discretionary spending. Remember, this cannot exceed 2x your emergency fund amount."
+                            4.  **Validate Allocation:**
+                                - **Check Total:** Ensure total allocation equals 100% of income
+                                - **Check Free to Spend Rule:** Ensure Free to Spend ≤ 2x Emergency Fund amount
+                                - **Check Feasibility:** If allocation seems unrealistic, guide user to adjust Living Expenses or extend emergency fund timeline
+                            5.  **Handle Special Cases:**
+                                - **Low Income (< 5M VND):** If standard allocation is impossible, suggest: "With your current income, let's start with a smaller emergency fund percentage (10%) and focus on optimizing your living expenses."
+                                - **Still Impossible:** If allocation is still not feasible, offer empathetic advice: "I understand your situation. Perhaps we need to focus on expense reduction strategies first. This budgeting tool will help you track and control spending while we work on increasing your income."
+                            6.  **Finalize Budget Creation:** Once allocation is confirmed, create the actual budgets in the system and confirm setup completion.
                         </approach>
-                        <completion_criteria>User has entered all 4 expense categories, the budget is confirmed as reasonable, and the user understands how to access the tool.</completion_criteria>
+                        <completion_criteria>User has completed priority-based budget allocation, allocation is validated and feasible, and budgets are created in the system.</completion_criteria>
+                    </step>
+
+                    <!-- STEP 3.5: PHILOSOPHY SELECTION -->
+                    <step id="3_5_select_budgeting_philosophy">
+                        <goal>Help user choose their budgeting philosophy and save preference to database.</goal>
+                        <approach>
+                            1.  **Introduce Philosophy Selection:** "Great! Now that we've set up your budget allocation, let's determine the best approach for managing your finances going forward. There are two main philosophies that can help you achieve your goals:"
+                            2.  **Present Two Philosophies with Detailed Explanation:**
+                                - **Philosophy 1 - Pay Yourself First (Goal-Focused):** "This approach focuses on consistently saving your emergency fund amount each month without getting bogged down in detailed tracking. Perfect if you're a busy professional who wants to save but prefers simple, goal-focused management. You'll check in weekly or monthly to ensure you're on track, and the system will focus on helping you hit your savings target."
+                                - **Philosophy 2 - Detail Tracker (Optimization-Focused):** "This approach involves tracking all your expenses daily to analyze spending patterns and find opportunities to save more. Perfect if you're detail-oriented and want to optimize your spending through data-driven insights. You'll spend 10-15 minutes daily logging expenses but gain comprehensive insights into your financial habits."
+                            3.  **Explain Impact Before Component:** "Your choice will determine how I interact with you going forward and what features I'll recommend. For example, with Pay Yourself First, I'll focus on simple savings goals and weekly check-ins. With Detail Tracker, I'll provide daily expense tracking and detailed analytics. You can always change this later in your settings."
+                            4.  **Display Philosophy Selection Component:** -> Call show_onboarding_component with "philosophy_selection" type to display the interactive philosophy selection interface.
+                            5.  **Save Philosophy:** Once user selects a philosophy, save it to the database in the users table, budgeting_style column with the appropriate enum value ('goal_focused' or 'detail_tracker').
+                            6.  **Confirm Selection:** "Perfect! I've saved your preference. Based on your choice, I'll tailor my advice and features to match your budgeting style."
+                        </approach>
+                        <completion_criteria>User has selected a budgeting philosophy, preference is saved to database, and user understands how this affects their experience.</completion_criteria>
                     </step>
                     
                     <!-- STEP 4: ADVISE ON STORAGE LOCATION -->
@@ -258,10 +285,11 @@ export function generateStartSavingStagePrompt(
             -->
             <function_calling_instructions>
                 <critical_requirement>
-                    YOU MUST STREAM THE RESPONSE TO THE USER BEFORE CALLING ANY FUNCTION.
+                    **RESPOND BEFORE ACTING (MANDATORY):** YOU MUST STREAM THE RESPONSE TO THE USER BEFORE CALLING ANY FUNCTION.
                     YOU MUST USE FUNCTION CALLS to display interactive components and update profiles.
                     CRITICAL: When calling ANY function, you MUST provide valid and correct JSON arguments. NEVER call a function with empty arguments.
                     PRIORITY: Always prefer suggestions component over free-text when user needs to make choices or provide standard information.
+                    EXAMPLE: Instead of immediately calling show_onboarding_component, first say "Let me help you understand the importance of an emergency fund..." and THEN call the component.
                 </critical_requirement>
                 <suggestion_component_usage>
                     The suggestions component is your primary tool for creating guided interactions. Use it for any scenario where user needs to make a choice from common options

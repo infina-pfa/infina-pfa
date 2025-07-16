@@ -201,4 +201,68 @@ export const budgetingEn = {
   surplusSelectAmount: "Use the slider to select how much to allocate",
   surplusOtherOptions: "Other Options",
   surplusSetGoals: "Set Goals",
+
+  // Budget Category Education Component
+  emergencyFundDescription: "Emergency Fund (PYF)",
+  emergencyFundPriorityDescription: "Your highest priority - this is your PYF amount for financial security",
+  emergencyFundRule: "Allocate first, never compromise this amount",
+  emergencyFundAllocationDescription: "Your financial safety net - highest priority",
+  
+  livingExpenses: "Living Expenses",
+  livingExpensesDescription: "Living Expenses & Future Plans",
+  livingExpensesPriorityDescription: "Essential living costs and planned future expenses",
+  livingExpensesRule: "Allocate after emergency fund - covers necessities and plans",
+  livingExpensesAllocationDescription: "Housing, food, transport, and planned expenses",
+  
+  freeToSpend: "Free to Spend",
+  freeToSpendDescription: "Free to Spend",
+  freeToSpendPriorityDescription: "Discretionary spending money for entertainment and wants",
+  freeToSpendRule: "Cannot exceed 2x your emergency fund amount",
+  freeToSpendAllocationDescription: "Entertainment, shopping, and discretionary spending",
+
+  // Budget Allocation Tool Component
+  monthlyIncome: "Monthly Income",
+  allocationProgress: "Allocation Progress",
+  categoryAllocation: "Category Allocation",
+  monthlyAmount: "Monthly Amount",
+  autoAdjust: "Auto",
+  totalMustBe100Percent: "Total allocation must equal 100%",
+  minimumEmergencyFund: "Emergency Fund should be at least 10% of your income",
+  allocationTips: "Allocation Tips",
+  tip1: "Emergency Fund should be at least 10% of your income",
+  tip2: "Free to Spend cannot exceed 2x your Emergency Fund amount",
+  tip3: "Living Expenses should cover all your essential needs",
+  confirmAllocation: "Confirm Budget Allocation",
+
+  // Philosophy Selection Component
+  goalFocusedTitle: "Pay Yourself First",
+  goalFocusedSubtitle: "Goal-Focused Approach",
+  goalFocusedDescription: "Focus on consistently saving your target amount each month. Perfect for those who want to build wealth without detailed daily tracking.",
+  goalFocusedFeature1: "Simple monthly savings goals",
+  goalFocusedFeature2: "Weekly or monthly check-ins",
+  goalFocusedFeature3: "Focus on emergency fund building",
+  goalFocusedFeature4: "Minimal daily tracking required",
+  goalFocusedBestFor1: "Busy professionals",
+  goalFocusedBestFor2: "Those who hate detailed tracking",
+  goalFocusedBestFor3: "Goal-oriented savers",
+  goalFocusedTime: "5-10 minutes per week",
+  goalFocusedTracking: "Basic",
+
+  detailTrackerTitle: "Detail Tracker",
+  detailTrackerSubtitle: "Optimization-Focused Approach",
+  detailTrackerDescription: "Track all expenses daily to analyze spending patterns and optimize your budget. Perfect for those who want to maximize savings through detailed analysis.",
+  detailTrackerFeature1: "Daily expense tracking",
+  detailTrackerFeature2: "Detailed spending analysis",
+  detailTrackerFeature3: "Budget optimization recommendations",
+  detailTrackerFeature4: "Category-wise insights",
+  detailTrackerBestFor1: "Detail-oriented people",
+  detailTrackerBestFor2: "Those who want to optimize spending",
+  detailTrackerBestFor3: "Data-driven decision makers",
+  detailTrackerTime: "10-15 minutes daily",
+  detailTrackerTracking: "Comprehensive",
+
+  confirmPhilosophy: "Confirm My Philosophy",
+  
+  // Emergency Fund Lock Message
+  emergencyFundLocked: "Locked - confirmed in previous step",
 }; 
