@@ -4,24 +4,30 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const startTime = Date.now(); // Start time
   try {
-      const supabase = await createClient()
-      
+    const supabase = await createClient();
+
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({
-        success: false,
-        error: "Authentication required"
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
+      );
     }
 
     // Get query parameters for filtering
     const { searchParams } = new URL(request.url);
-    const month = searchParams.get('month');
-    const year = searchParams.get('year');
-    const category = searchParams.get('category');
-    const withSpending = searchParams.get('withSpending') === 'true';
+    const month = searchParams.get("month");
+    const year = searchParams.get("year");
+    const category = searchParams.get("category");
+    const withSpending = searchParams.get("withSpending") === "true";
 
     // Build query - include spending data if requested
     let selectClause = "*";
@@ -67,57 +73,75 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error("Error fetching budgets:", error);
-      return NextResponse.json({
-        success: false,
-        error: "Failed to fetch budgets"
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to fetch budgets",
+        },
+        { status: 500 }
+      );
     }
 
     // If withSpending is requested, calculate spending data and totals
     if (withSpending && budgets) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const budgetsWithSpending = budgets.map((budget: any) => {
-        const spent = budget.budget_transactions?.reduce((total: number, bt: { transactions: { amount: number; type: string } | null }) => {
-          if (bt.transactions && bt.transactions.type === 'outcome') {
-            return total + bt.transactions.amount;
-          }
-          return total;
-        }, 0) || 0;
+        const spent =
+          budget.budget_transactions?.reduce(
+            (
+              total: number,
+              bt: { transactions: { amount: number; type: string } | null }
+            ) => {
+              if (bt.transactions && bt.transactions.type === "outcome") {
+                return total + bt.transactions.amount;
+              }
+              return total;
+            },
+            0
+          ) || 0;
 
         return {
           ...budget,
           spent,
-          remaining: budget.amount - spent
+          remaining: budget.amount - spent,
         };
       });
 
       // Calculate totals
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const totalBudget = budgetsWithSpending.reduce((sum: number, budget: any) => sum + budget.amount, 0);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const totalSpent = budgetsWithSpending.reduce((sum: number, budget: any) => sum + budget.spent, 0);
+
+      const totalBudget = budgetsWithSpending.reduce(
+        (sum: number, budget: any) => sum + budget.amount,
+        0
+      );
+
+      const totalSpent = budgetsWithSpending.reduce(
+        (sum: number, budget: any) => sum + budget.spent,
+        0
+      );
 
       return NextResponse.json({
         success: true,
         data: {
           budgets: budgetsWithSpending,
           totalBudget,
-          totalSpent
-        }
+          totalSpent,
+        },
       });
     }
 
     return NextResponse.json({
       success: true,
-      data: budgets || []
+      data: budgets || [],
     });
-
   } catch (error) {
     console.error("Error in budgets GET:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Internal server error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   } finally {
     const duration = Date.now() - startTime; // Calculate duration
     console.log(`GET /api/budgets duration: ${duration}ms`); // Log duration
@@ -127,16 +151,22 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const startTime = Date.now(); // Start time
   try {
-    const supabase = await createClient()
+    const supabase = await createClient();
 
     // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json({
-        success: false,
-        error: "Authentication required"
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required",
+        },
+        { status: 401 }
+      );
     }
 
     // Parse request body
@@ -145,24 +175,33 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!name?.trim()) {
-      return NextResponse.json({
-        success: false,
-        error: "Budget name is required"
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Budget name is required",
+        },
+        { status: 400 }
+      );
     }
 
     if (!month || month < 1 || month > 12) {
-      return NextResponse.json({
-        success: false,
-        error: "Valid month is required (1-12)"
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Valid month is required (1-12)",
+        },
+        { status: 400 }
+      );
     }
 
     if (!year || year < 2020) {
-      return NextResponse.json({
-        success: false,
-        error: "Valid year is required"
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Valid year is required",
+        },
+        { status: 400 }
+      );
     }
 
     // Check for duplicate budget name in the same month/year
@@ -176,10 +215,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingBudget) {
-      return NextResponse.json({
-        success: false,
-        error: "Budget with this name already exists for this month"
-      }, { status: 409 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Budget with this name already exists for this month",
+        },
+        { status: 409 }
+      );
     }
 
     // Create budget
@@ -200,25 +242,33 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("Error creating budget:", error);
-      return NextResponse.json({
-        success: false,
-        error: "Failed to create budget"
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Failed to create budget",
+        },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: budget
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        data: budget,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error in budgets POST:", error);
-    return NextResponse.json({
-      success: false,
-      error: "Internal server error"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   } finally {
     const duration = Date.now() - startTime; // Calculate duration
     console.log(`POST /api/budgets duration: ${duration}ms`); // Log duration
   }
-} 
+}
