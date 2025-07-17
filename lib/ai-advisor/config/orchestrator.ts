@@ -1,16 +1,25 @@
-import { BudgetStyle, FinancialStage } from "@/lib/types/user.types";
 import {
-  STAGE_CONFIGURATIONS,
-  StageToolConfiguration,
-} from "./stage-configurations";
+  debtUtils,
+  startInvestingUtils,
+  startSavingUtils,
+} from "@/lib/prompts";
+import { completeInteractPrompt } from "@/lib/prompts/core/complete-interact.prompt";
+import { guidingPrinciplePrompt } from "@/lib/prompts/core/guiding-principle.prompt";
+import { identityPrompt } from "@/lib/prompts/core/identity.prompt";
+import { responseInstructionPrompt } from "@/lib/prompts/core/response.prompt";
+import { BudgetStyle, FinancialStage } from "@/lib/types/user.types";
 import { buildFunctionTools } from "../../prompts/tools";
 import { Tool } from "../types";
-import { identityPrompt } from "@/lib/prompts/core/identity.prompt";
-import { guidingPrinciplePrompt } from "@/lib/prompts/core/guiding-principle.prompt";
-import { completeInteractPrompt } from "@/lib/prompts/core/complete-interact.prompt";
-import { responseInstructionPrompt } from "@/lib/prompts/core/response.prompt";
+import {
+  getStageConfigurations,
+  StageConfigurations,
+  StageToolConfiguration,
+} from "./stage-configurations";
 
 export class DynamicOrchestrator {
+  private static stageConfigurations: StageConfigurations =
+    getStageConfigurations(debtUtils, startSavingUtils, startInvestingUtils);
+
   /**
    * Get stage-specific prompt based on stage and budget style
    */
@@ -20,7 +29,7 @@ export class DynamicOrchestrator {
     context?: string,
     toolInfo?: string
   ): string {
-    const config = STAGE_CONFIGURATIONS[stage];
+    const config = this.stageConfigurations[stage];
     if (!config) {
       throw new Error(`No configuration found for stage: ${stage}`);
     }
@@ -35,7 +44,7 @@ export class DynamicOrchestrator {
     stage: FinancialStage,
     budgetStyle: BudgetStyle
   ): StageToolConfiguration {
-    const config = STAGE_CONFIGURATIONS[stage];
+    const config = this.stageConfigurations[stage];
     if (!config) {
       throw new Error(`No configuration found for stage: ${stage}`);
     }

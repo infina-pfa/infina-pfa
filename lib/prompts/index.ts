@@ -4,10 +4,10 @@ import * as startInvestingUtils from "./start-investing/utils";
 import * as startSavingUtils from "./start-saving/chat/utils";
 
 // Configuration management
-import { initializeStageConfigurations } from "../ai-advisor/config/stage-configurations";
+import { getStageConfigurations } from "../ai-advisor/config/stage-configurations";
 
 // Initialize stage configurations with all utilities
-initializeStageConfigurations(debtUtils, startSavingUtils, startInvestingUtils);
+getStageConfigurations(debtUtils, startSavingUtils, startInvestingUtils);
 
 // Re-export utilities for external use
 export { debtUtils, startInvestingUtils, startSavingUtils };

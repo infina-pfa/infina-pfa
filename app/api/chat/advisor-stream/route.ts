@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     const userProfile = await supabase
       .from("users")
       .select("*")
-      .eq("id", user.id)
+      .eq("user_id", user.id)
       .single();
 
     // Prepare request with user ID

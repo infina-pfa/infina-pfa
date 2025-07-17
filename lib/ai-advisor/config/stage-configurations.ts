@@ -61,46 +61,45 @@ export const STAGE_CONFIGURATIONS: StageConfigurations =
  * Initialize stage configurations with all stage-specific utilities
  * This function is called after all stage utilities are imported
  */
-export function initializeStageConfigurations(
+export function getStageConfigurations(
   debtUtils: StageUtilities,
   startSavingUtils: StageUtilities,
   startInvestingUtils: StageUtilities
-): void {
+): StageConfigurations {
+  const stageConfigurations: StageConfigurations = {} as StageConfigurations;
+
   if (debtUtils.getDebtPrompt && debtUtils.getDebtTools) {
-    (STAGE_CONFIGURATIONS as Record<string, StageConfig>)[FinancialStage.DEBT] =
-      {
-        prompts: {
-          [BudgetStyle.GOAL_FOCUSED]: (context?: string, toolInfo?: string) =>
-            debtUtils.getDebtPrompt!({
-              context,
-              toolInfo,
-              budgetStyle: BudgetStyle.GOAL_FOCUSED,
-            }),
-          [BudgetStyle.DETAIL_TRACKER]: (context?: string, toolInfo?: string) =>
-            debtUtils.getDebtPrompt!({
-              context,
-              toolInfo,
-              budgetStyle: BudgetStyle.DETAIL_TRACKER,
-            }),
-        },
-        tools: {
-          [BudgetStyle.GOAL_FOCUSED]: debtUtils.getDebtTools({
+    stageConfigurations[FinancialStage.DEBT] = {
+      prompts: {
+        [BudgetStyle.GOAL_FOCUSED]: (context?: string, toolInfo?: string) =>
+          debtUtils.getDebtPrompt!({
+            context,
+            toolInfo,
             budgetStyle: BudgetStyle.GOAL_FOCUSED,
           }),
-          [BudgetStyle.DETAIL_TRACKER]: debtUtils.getDebtTools({
+        [BudgetStyle.DETAIL_TRACKER]: (context?: string, toolInfo?: string) =>
+          debtUtils.getDebtPrompt!({
+            context,
+            toolInfo,
             budgetStyle: BudgetStyle.DETAIL_TRACKER,
           }),
-        },
-      };
+      },
+      tools: {
+        [BudgetStyle.GOAL_FOCUSED]: debtUtils.getDebtTools({
+          budgetStyle: BudgetStyle.GOAL_FOCUSED,
+        }),
+        [BudgetStyle.DETAIL_TRACKER]: debtUtils.getDebtTools({
+          budgetStyle: BudgetStyle.DETAIL_TRACKER,
+        }),
+      },
+    };
   }
 
   if (
     startSavingUtils.getStartSavingPrompt &&
     startSavingUtils.getStartSavingTools
   ) {
-    (STAGE_CONFIGURATIONS as Record<string, StageConfig>)[
-      FinancialStage.START_SAVING
-    ] = {
+    stageConfigurations[FinancialStage.START_SAVING] = {
       prompts: {
         [BudgetStyle.GOAL_FOCUSED]: (context?: string, toolInfo?: string) =>
           startSavingUtils.getStartSavingPrompt!({
@@ -130,9 +129,7 @@ export function initializeStageConfigurations(
     startInvestingUtils.getStartInvestingPrompt &&
     startInvestingUtils.getStartInvestingTools
   ) {
-    (STAGE_CONFIGURATIONS as Record<string, StageConfig>)[
-      FinancialStage.START_INVESTING
-    ] = {
+    stageConfigurations[FinancialStage.START_INVESTING] = {
       prompts: {
         [BudgetStyle.GOAL_FOCUSED]: (context?: string, toolInfo?: string) =>
           startInvestingUtils.getStartInvestingPrompt!({
@@ -158,6 +155,8 @@ export function initializeStageConfigurations(
       },
     };
   }
+
+  return stageConfigurations;
 }
 
 /**
