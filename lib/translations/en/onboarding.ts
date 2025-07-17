@@ -319,6 +319,8 @@ export const onboardingEn = {
   philosophySelectionTitle: "Choose Your Budgeting Philosophy",
   philosophySelectionSubtitle: "Select the approach that best fits your lifestyle and goals",
   youSelected: "You selected:",
+  philosophySelectionGoalFocused: "I've chosen the Pay Yourself First approach - a goal-focused method with a simple approach. I prefer tracking overview with 3 main budget categories rather than detailed expense tracking. This fits my busy schedule and helps me focus on building my emergency fund.",
+  philosophySelectionDetailTracker: "I've chosen the Detail Tracker method. I want to categorize and track every expense to understand my cash flow clearly. This will help me optimize my budget and find additional saving opportunities.",
   aiWillTailor: "I'll tailor my advice and features to match your chosen approach. You can change this later in your settings.",
   philosophySelectionCompleted: "Philosophy selection completed!",
   philosophyChangeNote: "Don't worry - you can change your philosophy anytime in your account settings.",
@@ -327,4 +329,7 @@ export const onboardingEn = {
   budgetCategoryEducationUserMessage: "I understand the 3-category priority system: Emergency Fund (Priority 1), Living Expenses (Priority 2), and Free to Spend (Priority 3). I'm ready to allocate my budget using this priority system.",
   budgetAllocationUserMessage: "I've allocated my monthly budget based on the priority system. I understand this allocation follows the principle of Emergency Fund first, then Living Expenses, and finally Free to Spend within the 2x emergency fund rule.",
   philosophySelectionUserMessage: "I've chosen my budgeting philosophy and understand how this will influence the advice and features I receive. I'm ready to proceed with my financial plan.",
+  expenseCategoriesUserMessage: "I've detailed my monthly living expenses across {{categoriesCount}} categories. Total monthly expenses: {{totalExpenses}} VND. This detailed breakdown will help set up comprehensive budget tracking with individual categories for each expense type.",
+  goalConfirmationUserMessage: "I have confirmed my Emergency Fund goal of {{amount}} VND within {{timeframe}} months with a monthly savings target of {{monthlyTarget}} VND/month. Please guide me through the next steps to start implementing this goal.",
+  goalAdjustmentUserMessage: "I want to adjust my emergency fund goal. The current goal of {{amount}} VND within {{timeframe}} months ({{monthlyTarget}} VND/month) is not suitable for my situation. Please help me recalculate with different parameters.",
 };

@@ -392,6 +392,15 @@ export const showOnboardingComponentTool = {
               type: "number",
               description: "Monthly target savings amount (REQUIRED for budget_allocation_tool)",
             },
+            budgetingStyle: {
+              type: "string",
+              enum: ["goal_focused", "detail_tracker"],
+              description: "User's chosen budgeting style (REQUIRED for budget_allocation_tool) - determines if simplified or detailed budget records are created",
+            },
+            expenseBreakdown: {
+              type: "object",
+              description: "Detailed expense breakdown by category (REQUIRED for budget_allocation_tool when budgetingStyle is 'detail_tracker')",
+            },
 
             // Philosophy selection - optional for component_type: "philosophy_selection"
             philosophyOptions: {
@@ -625,6 +634,12 @@ export function validateComponentArguments(args: unknown): {
     }
     if (!context.monthlyTargetSavings || typeof context.monthlyTargetSavings !== "number") {
       errors.push("budget_allocation_tool requires monthlyTargetSavings number in context");
+    }
+    if (!context.budgetingStyle || typeof context.budgetingStyle !== "string" || !["goal_focused", "detail_tracker"].includes(context.budgetingStyle)) {
+      errors.push("budget_allocation_tool requires budgetingStyle ('goal_focused' or 'detail_tracker') in context");
+    }
+    if (context.budgetingStyle === "detail_tracker" && (!context.expenseBreakdown || typeof context.expenseBreakdown !== "object")) {
+      errors.push("budget_allocation_tool with budgetingStyle 'detail_tracker' requires expenseBreakdown object in context");
     }
   }
 

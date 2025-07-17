@@ -55,7 +55,7 @@ export function OnboardingChatInterface({
           <div className="w-8 h-8 mx-auto mb-6">
             <div className="w-full h-full bg-blue-600 rounded-full animate-pulse"></div>
           </div>
-          <p className="text-gray-600 font-nunito font-medium">
+          <p className="text-gray-600 font-nunito font-medium text-sm sm:text-base">
             {t("loading")}
           </p>
         </div>
@@ -64,11 +64,11 @@ export function OnboardingChatInterface({
   }
 
   return (
-    <div className="flex h-full bg-gray-50 p-0 md:p-8">
+    <div className="flex h-full bg-gray-50 p-3 sm:p-4 md:p-8">
       <div className="flex-1 flex flex-col w-full">
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 p-6 mb-6">
+          <div className="bg-red-50 p-4 sm:p-6 mb-4 sm:mb-6 rounded-lg">
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <svg
@@ -84,7 +84,7 @@ export function OnboardingChatInterface({
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700 font-nunito font-medium">
+                <p className="text-xs sm:text-sm text-red-700 font-nunito font-medium">
                   {error}
                 </p>
               </div>
@@ -95,9 +95,9 @@ export function OnboardingChatInterface({
         {/* Messages Area */}
         <div
           ref={chatContainerRef}
-          className="flex-1 overflow-y-auto scrollbar-hide px-4 md:px-0"
+          className="flex-1 overflow-y-auto scrollbar-hide px-0"
         >
-          <div className="space-y-4 pb-4">
+          <div className="space-y-3 sm:space-y-4 pb-4">
             <AnimatePresence mode="popLayout">
               {messages.map((message) => (
                 <motion.div
@@ -133,7 +133,7 @@ export function OnboardingChatInterface({
         </div>
 
         {/* Input Area */}
-        <div className="px-4 md:px-0">
+        <div className="px-0 pt-3 sm:pt-4 border-t border-gray-200">
           <OnboardingChatInput
             onSendMessage={sendMessage}
             disabled={isAIThinking || isStreaming}

@@ -14,10 +14,7 @@ import {
   TrendingUp, 
   Eye,
   Calendar,
-  PiggyBank,
-  Calculator,
-  Star,
-  Zap
+  Star
 } from "lucide-react";
 
 interface PhilosophySelectionProps {
@@ -136,14 +133,22 @@ export default function PhilosophySelection({
       console.log("✅ Budgeting style saved successfully:", updatedUser.budgeting_style);
       
       // Then send response to chat component
+      // Create specific user message based on selection
+      const userMessage = selectedPhilosophy === "goal_focused" 
+        ? t("philosophySelectionGoalFocused", { 
+            ns: "onboarding", 
+            defaultValue: `Tôi đã chọn phương pháp ${selectedOption?.title} - phương pháp tập trung vào mục tiêu với cách tiếp cận đơn giản. Tôi thích theo dõi tổng quan với 3 danh mục ngân sách chính thay vì chi tiết từng khoản chi. Điều này phù hợp với lịch trình bận rộn của tôi và giúp tôi tập trung vào việc xây dựng quỹ dự phòng.` 
+          })
+        : t("philosophySelectionDetailTracker", { 
+            ns: "onboarding", 
+            defaultValue: `Tôi đã chọn phương pháp ${selectedOption?.title} - phương pháp theo dõi chi tiết. Tôi muốn phân loại và theo dõi từng khoản chi tiêu để hiểu rõ dòng tiền của mình. Điều này sẽ giúp tôi tối ưu hóa ngân sách và tìm cơ hội tiết kiệm thêm.` 
+          });
+
       await onResponse({
         selectedPhilosophy,
         budgetingStyle: selectedPhilosophy, // This matches what was saved to database
         completedAt: new Date(),
-        userMessage: t("philosophySelectionUserMessage", { 
-          ns: "onboarding", 
-          defaultValue: `I've chosen the ${selectedOption?.title} approach for my budgeting philosophy. This ${selectedOption?.subtitle.toLowerCase()} fits my lifestyle and goals. I understand this will influence how you provide advice and features, and I can change this later in my settings if needed.` 
-        }),
+        userMessage,
         philosophyDetails: {
           id: selectedPhilosophy,
           title: selectedOption?.title || "",
@@ -163,16 +168,16 @@ export default function PhilosophySelection({
   const selectedOption = philosophyOptions.find(option => option.id === selectedPhilosophy);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Title */}
       <div className="text-center space-y-2">
-        <h3 className="text-lg font-semibold text-[#111827] font-nunito">
+        <h3 className="text-base sm:text-lg font-semibold text-[#111827] font-nunito">
           {t("philosophySelectionTitle", { 
             ns: "onboarding", 
             defaultValue: "Choose Your Budgeting Philosophy" 
           })}
         </h3>
-        <p className="text-sm text-[#6B7280]">
+        <p className="text-xs sm:text-sm text-[#6B7280]">
           {t("philosophySelectionSubtitle", { 
             ns: "onboarding", 
             defaultValue: "Select the approach that best fits your lifestyle and goals" 
@@ -181,7 +186,7 @@ export default function PhilosophySelection({
       </div>
 
       {/* Philosophy Options */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {philosophyOptions.map((option) => {
           const IconComponent = option.icon;
           const isSelected = selectedPhilosophy === option.id;
@@ -189,7 +194,7 @@ export default function PhilosophySelection({
           return (
             <div
               key={option.id}
-              className={`relative p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+              className={`relative p-3 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                 isSelected 
                   ? "border-[#0055FF] bg-[#F8FAFF] shadow-sm" 
                   : "border-[#E5E7EB] bg-white hover:border-[#D1D5DB] hover:shadow-sm"
@@ -208,11 +213,11 @@ export default function PhilosophySelection({
               <div className="flex items-start space-x-4">
                 {/* Icon */}
                 <div 
-                  className="flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center"
+                  className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: option.backgroundColor }}
                 >
                   <IconComponent 
-                    className="w-7 h-7" 
+                    className="w-6 h-6 sm:w-7 sm:h-7" 
                     style={{ color: option.color }}
                   />
                 </div>
@@ -220,28 +225,28 @@ export default function PhilosophySelection({
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="mb-3">
-                    <h4 className="font-semibold text-[#111827] font-nunito text-lg">
+                    <h4 className="font-semibold text-[#111827] font-nunito text-base sm:text-lg">
                       {option.title}
                     </h4>
-                    <p className="text-sm text-[#6B7280] font-medium">
+                    <p className="text-xs sm:text-sm text-[#6B7280] font-medium">
                       {option.subtitle}
                     </p>
                   </div>
                   
-                  <p className="text-sm text-[#4B5563] mb-4 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#4B5563] mb-3 sm:mb-4 leading-relaxed">
                     {option.description}
                   </p>
 
                   {/* Features */}
                   <div className="mb-4">
-                    <h5 className="font-semibold text-[#111827] font-nunito text-sm mb-2">
+                    <h5 className="font-semibold text-[#111827] font-nunito text-xs sm:text-sm mb-2">
                       {t("keyFeatures", { ns: "common", defaultValue: "Key Features:" })}
                     </h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {option.features.map((feature, index) => (
                         <div key={index} className="flex items-center space-x-2">
                           <Star className="w-3 h-3 text-[#FF9800] flex-shrink-0" />
-                          <span className="text-xs text-[#4B5563]">{feature}</span>
+                          <span className="text-[10px] sm:text-xs text-[#4B5563]">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -249,14 +254,14 @@ export default function PhilosophySelection({
 
                   {/* Best For */}
                   <div className="mb-4">
-                    <h5 className="font-semibold text-[#111827] font-nunito text-sm mb-2">
+                    <h5 className="font-semibold text-[#111827] font-nunito text-xs sm:text-sm mb-2">
                       {t("bestFor", { ns: "common", defaultValue: "Best For:" })}
                     </h5>
                     <div className="flex flex-wrap gap-1">
                       {option.bestFor.map((item, index) => (
                         <span 
                           key={index} 
-                          className="px-2 py-1 bg-[#F3F4F6] text-[#4B5563] text-xs rounded-full"
+                          className="px-2 py-1 bg-[#F3F4F6] text-[#4B5563] text-[10px] sm:text-xs rounded-full"
                         >
                           {item}
                         </span>
@@ -265,14 +270,14 @@ export default function PhilosophySelection({
                   </div>
 
                   {/* Time Commitment & Tracking Level */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="flex items-center space-x-2">
                       <Clock className="w-4 h-4 text-[#6B7280]" />
                       <div>
-                        <p className="text-xs text-[#6B7280]">
+                        <p className="text-[10px] sm:text-xs text-[#6B7280]">
                           {t("timeCommitment", { ns: "common", defaultValue: "Time Commitment" })}
                         </p>
-                        <p className="text-xs font-semibold text-[#111827]">
+                        <p className="text-[10px] sm:text-xs font-semibold text-[#111827]">
                           {option.timeCommitment}
                         </p>
                       </div>
@@ -280,10 +285,10 @@ export default function PhilosophySelection({
                     <div className="flex items-center space-x-2">
                       <Eye className="w-4 h-4 text-[#6B7280]" />
                       <div>
-                        <p className="text-xs text-[#6B7280]">
+                        <p className="text-[10px] sm:text-xs text-[#6B7280]">
                           {t("trackingLevel", { ns: "common", defaultValue: "Tracking Level" })}
                         </p>
-                        <p className="text-xs font-semibold text-[#111827]">
+                        <p className="text-[10px] sm:text-xs font-semibold text-[#111827]">
                           {option.trackingLevel}
                         </p>
                       </div>
@@ -298,7 +303,7 @@ export default function PhilosophySelection({
 
       {/* Selection Summary */}
       {selectedOption && (
-        <div className="bg-[#F6F7F9] rounded-xl p-4 border border-[#E5E7EB]">
+        <div className="bg-[#F6F7F9] rounded-xl p-3 sm:p-4 border border-[#E5E7EB]">
           <div className="flex items-start space-x-3">
             <div 
               className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
@@ -310,10 +315,10 @@ export default function PhilosophySelection({
               />
             </div>
             <div>
-              <h4 className="font-semibold text-[#111827] font-nunito mb-1">
+              <h4 className="font-semibold text-[#111827] font-nunito mb-1 text-sm sm:text-base">
                 {t("youSelected", { ns: "common", defaultValue: "You selected:" })} {selectedOption.title}
               </h4>
-              <p className="text-sm text-[#4B5563] mb-2">
+              <p className="text-xs sm:text-sm text-[#4B5563] mb-2">
                 {t("aiWillTailor", { 
                   ns: "onboarding", 
                   defaultValue: "I'll tailor my advice and features to match your chosen approach. You can change this later in your settings." 
@@ -339,7 +344,7 @@ export default function PhilosophySelection({
         <Button
           onClick={handleSubmit}
           disabled={!selectedPhilosophy || isSubmitting}
-          className="w-full bg-[#0055FF] hover:bg-[#0044DD] text-white font-nunito disabled:bg-[#9CA3AF] disabled:cursor-not-allowed"
+          className="w-full bg-[#0055FF] hover:bg-[#0044DD] text-white font-nunito disabled:bg-[#9CA3AF] disabled:cursor-not-allowed h-12 sm:h-10 min-h-[48px] sm:min-h-0 text-sm sm:text-base"
         >
           {isSubmitting 
             ? t("submitting", { ns: "common", defaultValue: "Submitting..." })

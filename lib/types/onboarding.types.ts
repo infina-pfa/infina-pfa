@@ -235,6 +235,8 @@ export interface ComponentData {
   monthlyIncome?: number;
   emergencyFundTarget?: number;
   monthlyTargetSavings?: number;
+  budgetingStyle?: "goal_focused" | "detail_tracker";
+  expenseBreakdown?: Record<string, number>;
 
   // Philosophy selection
   philosophyOptions?: Array<{
@@ -330,6 +332,11 @@ export interface ComponentResponse {
     freeToSpend: number;
     totalPercentage: number;
   };
+  allocation?: {
+    emergencyFund: number;
+    livingExpenses: number;
+    freeToSpend: number;
+  };
   allocationDetails?: {
     monthlyAmounts: {
       emergencyFund: number;
@@ -341,6 +348,32 @@ export interface ComponentResponse {
       description: string;
     };
   };
+  monetaryValues?: {
+    emergencyFund: number;
+    livingExpenses: number;
+    freeToSpend: number;
+  };
+  budgetsCreated?: Array<{
+    id: string;
+    name: string;
+    category: string;
+    amount: number;
+    color: string;
+    icon: string;
+  }>;
+  budgetingStyle?: "goal_focused" | "detail_tracker";
+  allocationSummary?: {
+    total: string;
+    totalBudgets?: number;
+    categories: Array<{
+      name: string;
+      percentage: string;
+      amount: string;
+      priority: number;
+      locked: boolean;
+    }>;
+  };
+  monthlyIncome?: number;
   completedAt: Date;
 }
 

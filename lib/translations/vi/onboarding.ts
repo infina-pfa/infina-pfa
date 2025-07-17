@@ -357,6 +357,8 @@ export const onboardingVi = {
   philosophySelectionTitle: "Chọn Triết lý Lập Ngân sách",
   philosophySelectionSubtitle: "Chọn phương pháp phù hợp nhất với lối sống và mục tiêu của bạn",
   youSelected: "Bạn đã chọn:",
+  philosophySelectionGoalFocused: "Tôi đã chọn phương pháp Trả cho mình trước - phương pháp tập trung vào mục tiêu với cách tiếp cận đơn giản. Tôi thích theo dõi tổng quan với 3 danh mục ngân sách chính thay vì chi tiết từng khoản chi. Điều này phù hợp với lịch trình bận rộn của tôi và giúp tôi tập trung vào việc xây dựng quỹ dự phòng.",
+  philosophySelectionDetailTracker: "Tôi đã chọn phương pháp Theo dõi chi tiết. Tôi muốn phân loại và theo dõi từng khoản chi tiêu để hiểu rõ dòng tiền của mình. Điều này sẽ giúp tôi tối ưu hóa ngân sách và tìm cơ hội tiết kiệm thêm.",
   aiWillTailor: "Tôi sẽ điều chỉnh lời khuyên và tính năng để phù hợp với phương pháp bạn chọn. Bạn có thể thay đổi điều này sau trong cài đặt.",
   philosophySelectionCompleted: "Hoàn thành chọn triết lý!",
   philosophyChangeNote: "Đừng lo - bạn có thể thay đổi triết lý của mình bất cứ lúc nào trong cài đặt tài khoản.",
@@ -365,4 +367,7 @@ export const onboardingVi = {
   budgetCategoryEducationUserMessage: "Tôi hiểu hệ thống 3 danh mục ưu tiên: Quỹ Dự phòng (Ưu tiên 1), Chi phí Sinh hoạt (Ưu tiên 2), và Chi tiêu Tự do (Ưu tiên 3). Tôi sẵn sàng phân bổ ngân sách theo hệ thống ưu tiên này.",
   budgetAllocationUserMessage: "Tôi đã phân bổ ngân sách hàng tháng theo hệ thống ưu tiên. Tôi hiểu việc phân bổ này tuân theo nguyên tắc Quỹ Dự phòng trước, sau đó Chi phí Sinh hoạt, cuối cùng là Chi tiêu Tự do trong giới hạn 2 lần quỹ dự phòng.",
   philosophySelectionUserMessage: "Tôi đã chọn triết lý lập ngân sách của mình và hiểu cách điều này sẽ ảnh hưởng đến lời khuyên và tính năng tôi nhận được. Tôi sẵn sàng tiến hành kế hoạch tài chính của mình.",
+  expenseCategoriesUserMessage: "Tôi đã chi tiết hóa chi phí sinh hoạt hàng tháng qua {{categoriesCount}} danh mục. Tổng chi phí hàng tháng: {{totalExpenses}} VND. Việc phân tích chi tiết này sẽ giúp thiết lập theo dõi ngân sách toàn diện với các danh mục riêng cho từng loại chi phí.",
+  goalConfirmationUserMessage: "Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp {{amount}} VND trong {{timeframe}} tháng với mức tiết kiệm {{monthlyTarget}} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.",
+  goalAdjustmentUserMessage: "Tôi muốn điều chỉnh lại mục tiêu quỹ dự phòng khẩn cấp. Mục tiêu hiện tại {{amount}} VND trong {{timeframe}} tháng ({{monthlyTarget}} VND/tháng) chưa phù hợp với tình hình của tôi. Hãy giúp tôi tính toán lại với các thông số khác.",
 };
