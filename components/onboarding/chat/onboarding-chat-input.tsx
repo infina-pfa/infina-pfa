@@ -57,16 +57,16 @@ export function OnboardingChatInput({
           onKeyPress={handleKeyPress}
           placeholder={placeholder || t("typeYourMessage")}
           disabled={disabled || isSending}
-          className="h-12 sm:h-12 text-sm sm:text-base px-3 sm:px-4 rounded-xl border-none bg-[#F0F2F5] focus:bg-white focus:ring-2 focus:ring-[#0055FF] focus:ring-opacity-20 transition-all duration-200 min-h-[48px]"
+          className="h-11 sm:h-12 text-sm sm:text-base px-3 sm:px-4 rounded-xl border-none bg-[#F0F2F5] focus:bg-white focus:ring-2 focus:ring-[#0055FF] focus:ring-opacity-20 transition-all duration-200"
         />
       </div>
       
       <Button
         type="submit"
         disabled={!inputValue.trim() || disabled || isSending}
-        className="h-12 sm:h-12 px-3 sm:px-4 bg-[#0055FF] hover:bg-blue-700 text-white rounded-xl border-none shadow-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[48px] sm:min-w-[52px] min-h-[48px]"
+        className="h-11 sm:h-12 px-3 sm:px-4 bg-[#0055FF] hover:bg-blue-700 text-white rounded-xl border-none shadow-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[44px] sm:min-w-[48px]"
       >
-        <Send className="w-5 h-5 sm:w-5 sm:h-5" />
+        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
       </Button>
     </form>
   );

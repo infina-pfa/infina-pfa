@@ -14,30 +14,29 @@ import {
   processMemoryExtraction,
 } from "../handlers/memory-handler";
 import { prepareUserContext } from "../utils/context";
-import {
-  functionTools,
-  getToolsInfo,
-  getMcpToolsInfo,
-} from "../tools/definitions";
-import { generateSystemPrompt } from "../prompts/system-prompt";
 import { Message } from "openai/resources/beta/threads/messages.mjs";
 import { aiStreamingService } from "@/lib/services/ai-streaming.service";
 import { financialOverviewService } from "./financial-overview.service";
+import { BudgetStyle, FinancialStage, User } from "@/lib/types/user.types";
+import { DynamicOrchestrator } from "../config/orchestrator";
 
 /**
  * Main orchestrator service for AI Advisor stream processing
  * Handles the complete flow from request to response
  */
 export class AIAdvisorOrchestratorService {
+  private user: User;
   private openaiClient: OpenAI;
   private memoryManager: AsyncMemoryManager | null;
   private mcpConfig: MCPConfig;
 
   constructor(
+    user: User,
     openaiClient: OpenAI,
     memoryManager: AsyncMemoryManager | null,
     mcpConfig: MCPConfig
   ) {
+    this.user = user;
     this.openaiClient = openaiClient;
     this.memoryManager = memoryManager;
     this.mcpConfig = mcpConfig;
@@ -158,16 +157,17 @@ export class AIAdvisorOrchestratorService {
           totalSaved: data.goals?.stats?.totalSaved || 0,
           totalTarget: data.goals?.stats?.totalTarget || 0,
           averageCompletion: data.goals?.stats?.averageCompletion || 0,
-          activeGoals: data.goals?.items?.map((goal) => ({
-            id: goal.id,
-            title: goal.title,
-            currentAmount: goal.currentAmount,
-            targetAmount: goal.targetAmount,
-            progressPercentage: goal.progressPercentage,
-            isCompleted: goal.isCompleted,
-            isDueSoon: goal.isDueSoon,
-            dueDate: goal.dueDate,
-          })) || [],
+          activeGoals:
+            data.goals?.items?.map((goal) => ({
+              id: goal.id,
+              title: goal.title,
+              currentAmount: goal.currentAmount,
+              targetAmount: goal.targetAmount,
+              progressPercentage: goal.progressPercentage,
+              isCompleted: goal.isCompleted,
+              isDueSoon: goal.isDueSoon,
+              dueDate: goal.dueDate,
+            })) || [],
         },
       };
     }
@@ -212,7 +212,6 @@ export class AIAdvisorOrchestratorService {
           })
         );
 
-
         memoryContext = await processMemoryContext(
           this.memoryManager,
           message,
@@ -244,21 +243,39 @@ export class AIAdvisorOrchestratorService {
       memoryContext
     );
 
-    // Setup tools (simplified without MCP for now)
-    console.log("🛠️ Setting up tools...");
-    const allTools = functionTools;
-    console.log("🛠️ Tools configured:", {
-      toolCount: allTools.length,
-      toolNames: allTools.map((tool: Tool) => tool.type),
+    // Get user's financial stage and budget style
+    const userStage = this.user.financial_stage || FinancialStage.START_SAVING;
+    const userBudgetStyle = this.user.budget_style || BudgetStyle.GOAL_FOCUSED;
+
+    console.log("🎯 User stage and style:", {
+      financialStage: userStage,
+      budgetStyle: userBudgetStyle,
     });
 
-    // Generate system prompt
-    console.log("📝 Generating system prompt...");
-    const systemPrompt = generateSystemPrompt(
+    // Use dynamic orchestrator to get configuration
+    const llmConfiguration = DynamicOrchestrator.getLLMConfiguration(
+      userStage,
+      userBudgetStyle,
+      contexts.combined
+    );
+
+    console.log("🛠️ Dynamic tools configured:", {
+      toolCount: llmConfiguration.tools.length,
+      chatTools: llmConfiguration.stageTools.chatTools,
+      componentTools: llmConfiguration.stageTools.componentTools,
+      mcpTools: llmConfiguration.stageTools.mcpTools,
+    });
+
+    // Generate system prompt using dynamic orchestrator
+    const systemPrompt = DynamicOrchestrator.getSystemPrompt(
       user_id,
-      contexts.combined,
-      getToolsInfo(),
-      getMcpToolsInfo()
+      userStage,
+      userBudgetStyle,
+      {
+        memory: memoryContext,
+        user: contexts.user,
+        financial: JSON.stringify(financialData),
+      }
     );
 
     // Prepare messages
@@ -269,11 +286,11 @@ export class AIAdvisorOrchestratorService {
       message
     );
 
-    // Process OpenAI stream (simplified - only OpenAI for now)
+    // Process OpenAI stream using dynamic tools
     console.log("🌊 Starting OpenAI stream processing...");
     return this.processOpenAIStream(
       messages as unknown as Message[],
-      allTools,
+      llmConfiguration.tools,
       llmConfig,
       conversationHistory || [],
       message,
@@ -340,7 +357,6 @@ export class AIAdvisorOrchestratorService {
       ...historyMessages,
       { role: "user" as const, content: currentMessage },
     ];
-
 
     return messages;
   }

@@ -4,37 +4,38 @@ import { useAppTranslation } from "@/hooks/use-translation";
 import type { UserProfile } from "@/lib/types/user.types";
 
 interface UseUserProfileSWRReturn {
-  data: UserProfile | null;
-  error: string | null;
+  user: UserProfile | null;
   loading: boolean;
-  refetch: () => void;
+  error: string | null;
+  refetch: () => Promise<void>;
 }
 
 export function useUserProfileSWR(): UseUserProfileSWRReturn {
-  const { t } = useAppTranslation(["common"]);
+  const { t } = useAppTranslation(["common", "auth"]);
 
-  const {
-    data: response,
-    error,
-    isLoading,
-    mutate,
-  } = useSWR(
-    ["user", "profile"],
-    () => userService.getUserProfile(t),
+  const { data, error, isLoading, mutate } = useSWR(
+    ["user-profile"],
+    async () => {
+      const response = await userService.getUserProfile(t);
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      return response;
+    },
     {
-      refreshInterval: 0, // Don't auto-refresh user profile
-      revalidateOnFocus: false, // Don't revalidate on window focus
-      revalidateOnReconnect: true, // Revalidate on network reconnect
-      dedupingInterval: 5000, // Dedupe requests within 5 seconds
-      errorRetryCount: 3,
-      errorRetryInterval: 1000,
+      // Custom config for user profile data
+      revalidateOnFocus: true, // Revalidate when user focuses window
+      dedupingInterval: 30000, // User profile can be cached for 30 seconds
+      revalidateOnMount: true, // Always fetch fresh data on mount
     }
   );
 
   return {
-    data: response?.user || null,
-    error: response?.error || (error ? t("unknownError") : null),
+    user: data?.user || null,
     loading: isLoading,
-    refetch: mutate,
+    error: error?.message || null,
+    refetch: async () => {
+      await mutate();
+    },
   };
 }

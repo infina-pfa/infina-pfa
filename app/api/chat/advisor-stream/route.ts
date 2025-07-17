@@ -18,6 +18,7 @@ import {
   validateRequestBody,
 } from "@/lib/ai-advisor/utils/validation";
 import { createClient } from "@/lib/supabase/server";
+import { AsyncMemoryManager } from "@/lib/ai-advisor/memory-manager";
 
 // Initialize OpenAI client
 const openaiClient = new OpenAI({
@@ -25,7 +26,7 @@ const openaiClient = new OpenAI({
 });
 
 // Initialize AsyncMemoryManager using factory (with safe fallback)
-let memoryManager = null;
+let memoryManager: AsyncMemoryManager | null = null;
 if (memoryEnabled) {
   try {
     memoryManager = MemoryManagerFactory.createFromEnv();
@@ -42,17 +43,9 @@ if (memoryEnabled) {
 }
 
 // Initialize orchestrator service
-const orchestratorService = new AIAdvisorOrchestratorService(
-  openaiClient,
-  memoryManager,
-  mcpConfig
-);
 
 export async function POST(request: NextRequest) {
-  console.log("🚀 POST /api/chat/advisor-stream called");
-
   try {
-    console.log("📥 Parsing request body...");
     const requestBody = await request.json();
 
     console.log("📋 Raw request body received:", {
@@ -71,8 +64,6 @@ export async function POST(request: NextRequest) {
       provider: requestBody?.provider || "not specified",
     });
 
-    // Validate initial request body (before authentication)
-    console.log("🔍 Starting initial request validation...");
     const initialValidation = validateInitialRequestBody(requestBody);
     if (!initialValidation.isValid) {
       console.error(
@@ -84,25 +75,13 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.log("✅ Initial request validation passed");
 
-    // Create Supabase client for authentication
-    console.log("🔐 Creating Supabase client for authentication...");
     const supabase = await createClient();
 
-    // Get current user
-    console.log("👤 Getting current user from Supabase...");
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
-
-    console.log("🔐 Authentication result:", {
-      hasUser: !!user,
-      userId: user?.id ? `${user.id.substring(0, 8)}...` : "none",
-      userEmail: user?.email || "none",
-      authError: authError?.message || "none",
-    });
 
     if (authError || !user) {
       console.error(
@@ -114,6 +93,12 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    const userProfile = await supabase
+      .from("users")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
 
     // Prepare request with user ID
     console.log("📝 Preparing AI advisor request...");
@@ -174,6 +159,12 @@ export async function POST(request: NextRequest) {
     // Create a readable stream
     console.log("🌊 Creating readable stream...");
     let readable: ReadableStream | null = null;
+    const orchestratorService = new AIAdvisorOrchestratorService(
+      userProfile.data,
+      openaiClient,
+      memoryManager,
+      mcpConfig
+    );
     try {
       readable = await orchestratorService.processRequest(
         aiAdvisorRequest,

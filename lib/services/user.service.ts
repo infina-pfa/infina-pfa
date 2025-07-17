@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import { handleError } from "@/lib/error-handler";
-import { CreateUserRequest, UserProfile, UserResponse, UserCheckResponse, UserUpdate, BudgetingStyle } from "@/lib/types/user.types";
+import { CreateUserRequest, UserProfile, UserResponse, UserCheckResponse } from "@/lib/types/user.types";
 
 // Type for translation function
 type TranslationFunction = (key: string) => string;
@@ -90,7 +90,7 @@ export const userService = {
   /**
    * Update user profile
    */
-  async updateUserProfile(updates: UserUpdate, t?: TranslationFunction): Promise<UserResponse> {
+  async updateUserProfile(updates: Partial<CreateUserRequest>, t?: TranslationFunction): Promise<UserResponse> {
     try {
       const response = await apiClient.patch<UserProfile>('/users/profile', {
         ...updates,
@@ -105,33 +105,6 @@ export const userService = {
       }
 
       throw new Error(response.error || 'Failed to update user profile');
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        user: null,
-        error: appError.message,
-      };
-    }
-  },
-
-  /**
-   * Update user budgeting style
-   */
-  async updateBudgetingStyle(budgetingStyle: BudgetingStyle, t?: TranslationFunction): Promise<UserResponse> {
-    try {
-      const response = await apiClient.patch<UserProfile>('/users/profile', {
-        budgeting_style: budgetingStyle,
-        updated_at: new Date().toISOString(),
-      });
-
-      if (response.success && response.data) {
-        return {
-          user: response.data,
-          error: null,
-        };
-      }
-
-      throw new Error(response.error || 'Failed to update budgeting style');
     } catch (error) {
       const appError = handleError(error, t);
       return {

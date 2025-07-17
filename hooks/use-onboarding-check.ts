@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { userService } from "@/lib/services/user.service";
-import { UserProfile } from "@/lib/types/user.types";
+import { FinancialStage, UserProfile } from "@/lib/types/user.types";
 
 interface OnboardingCheckState {
   isLoading: boolean;
@@ -60,7 +60,7 @@ export const useOnboardingCheck = () => {
     }
   };
 
-  const markOnboardingComplete = (financialStage: string) => {
+  const markOnboardingComplete = (financialStage: FinancialStage) => {
     setState((prev) => ({
       ...prev,
       needsOnboarding: false,
