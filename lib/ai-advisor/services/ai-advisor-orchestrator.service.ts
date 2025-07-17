@@ -23,21 +23,26 @@ import { generateSystemPrompt } from "../prompts/system-prompt";
 import { Message } from "openai/resources/beta/threads/messages.mjs";
 import { aiStreamingService } from "@/lib/services/ai-streaming.service";
 import { financialOverviewService } from "./financial-overview.service";
+import { BudgetStyle, FinancialStage, User } from "@/lib/types/user.types";
+import { getStagePrompt } from "@/lib/prompts/system-prompt";
 
 /**
  * Main orchestrator service for AI Advisor stream processing
  * Handles the complete flow from request to response
  */
 export class AIAdvisorOrchestratorService {
+  private user: User;
   private openaiClient: OpenAI;
   private memoryManager: AsyncMemoryManager | null;
   private mcpConfig: MCPConfig;
 
   constructor(
+    user: User,
     openaiClient: OpenAI,
     memoryManager: AsyncMemoryManager | null,
     mcpConfig: MCPConfig
   ) {
+    this.user = user;
     this.openaiClient = openaiClient;
     this.memoryManager = memoryManager;
     this.mcpConfig = mcpConfig;
@@ -158,16 +163,17 @@ export class AIAdvisorOrchestratorService {
           totalSaved: data.goals?.stats?.totalSaved || 0,
           totalTarget: data.goals?.stats?.totalTarget || 0,
           averageCompletion: data.goals?.stats?.averageCompletion || 0,
-          activeGoals: data.goals?.items?.map((goal) => ({
-            id: goal.id,
-            title: goal.title,
-            currentAmount: goal.currentAmount,
-            targetAmount: goal.targetAmount,
-            progressPercentage: goal.progressPercentage,
-            isCompleted: goal.isCompleted,
-            isDueSoon: goal.isDueSoon,
-            dueDate: goal.dueDate,
-          })) || [],
+          activeGoals:
+            data.goals?.items?.map((goal) => ({
+              id: goal.id,
+              title: goal.title,
+              currentAmount: goal.currentAmount,
+              targetAmount: goal.targetAmount,
+              progressPercentage: goal.progressPercentage,
+              isCompleted: goal.isCompleted,
+              isDueSoon: goal.isDueSoon,
+              dueDate: goal.dueDate,
+            })) || [],
         },
       };
     }
@@ -211,7 +217,6 @@ export class AIAdvisorOrchestratorService {
             content: msg.content,
           })
         );
-
 
         memoryContext = await processMemoryContext(
           this.memoryManager,
@@ -341,7 +346,6 @@ export class AIAdvisorOrchestratorService {
       { role: "user" as const, content: currentMessage },
     ];
 
-
     return messages;
   }
 
@@ -410,5 +414,20 @@ export class AIAdvisorOrchestratorService {
       });
       throw error; // Re-throw to be caught by the outer try-catch
     }
+  }
+
+  private async getSystemPrompt() {
+    const user = await this.user;
+    const userContext = prepareUserContext(user, user.id, "");
+
+    const stagePrompt = getStagePrompt(
+      user.financial_stage || FinancialStage.START_SAVING,
+      {
+        context: userContext,
+        budgetStyle: user.budget_style || BudgetStyle.GOAL_FOCUSED,
+      }
+    );
+
+    return generateSystemPrompt(user.id, stagePrompt);
   }
 }

@@ -49,10 +49,7 @@ const orchestratorService = new AIAdvisorOrchestratorService(
 );
 
 export async function POST(request: NextRequest) {
-  console.log("🚀 POST /api/chat/advisor-stream called");
-
   try {
-    console.log("📥 Parsing request body...");
     const requestBody = await request.json();
 
     console.log("📋 Raw request body received:", {
@@ -71,8 +68,6 @@ export async function POST(request: NextRequest) {
       provider: requestBody?.provider || "not specified",
     });
 
-    // Validate initial request body (before authentication)
-    console.log("🔍 Starting initial request validation...");
     const initialValidation = validateInitialRequestBody(requestBody);
     if (!initialValidation.isValid) {
       console.error(
@@ -84,25 +79,13 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.log("✅ Initial request validation passed");
 
-    // Create Supabase client for authentication
-    console.log("🔐 Creating Supabase client for authentication...");
     const supabase = await createClient();
 
-    // Get current user
-    console.log("👤 Getting current user from Supabase...");
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
-
-    console.log("🔐 Authentication result:", {
-      hasUser: !!user,
-      userId: user?.id ? `${user.id.substring(0, 8)}...` : "none",
-      userEmail: user?.email || "none",
-      authError: authError?.message || "none",
-    });
 
     if (authError || !user) {
       console.error(
