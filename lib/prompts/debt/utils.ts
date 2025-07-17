@@ -4,10 +4,10 @@ import {
   MCPId,
 } from "@/lib/types/ai-streaming.types";
 import { BudgetStyle } from "@/lib/types/user.types";
-import { getDetailTrackerPrompt } from "./detail-tracker.prompt";
-import { getGoalFocusedPrompt } from "./goal-focus.prompt";
+import { getDetailTrackerDebtPrompt } from "./detail-tracker.prompt";
+import { getGoalFocusedDebtPrompt } from "./goal-focused.prompt";
 
-export const getStartSavingPrompt = (options?: {
+export const getDebtPrompt = (options?: {
   context?: string;
   toolInfo?: string;
   budgetStyle: BudgetStyle;
@@ -16,15 +16,15 @@ export const getStartSavingPrompt = (options?: {
 
   switch (budgetStyle) {
     case BudgetStyle.GOAL_FOCUSED:
-      return getGoalFocusedPrompt(context, toolInfo);
+      return getGoalFocusedDebtPrompt(context, toolInfo);
     case BudgetStyle.DETAIL_TRACKER:
-      return getDetailTrackerPrompt(context, toolInfo);
+      return getDetailTrackerDebtPrompt(context, toolInfo);
     default:
-      return getGoalFocusedPrompt(context, toolInfo);
+      return getGoalFocusedDebtPrompt(context, toolInfo);
   }
 };
 
-export const getStartSavingTools = (options?: { budgetStyle: BudgetStyle }) => {
+export const getDebtTools = (options?: { budgetStyle: BudgetStyle }) => {
   const { budgetStyle } = options || {};
 
   switch (budgetStyle) {
@@ -32,23 +32,27 @@ export const getStartSavingTools = (options?: { budgetStyle: BudgetStyle }) => {
       return {
         chatTools: [] as ChatToolId[],
         componentTools: [
-          ChatComponentId.VIDEO,
-          ChatComponentId.SUGGESTIONS,
           ChatComponentId.GOAL_DASHBOARD,
-          ChatComponentId.PAY_YOURSELF_FIRST_CONFIRMATION,
+          ChatComponentId.SUGGESTIONS,
+          ChatComponentId.VIDEO,
           ChatComponentId.BUDGETING_DASHBOARD,
         ],
         mcpTools: [MCPId.GENERAL] as MCPId[],
       };
     case BudgetStyle.DETAIL_TRACKER:
       return {
-        chatTools: [ChatToolId.BUDGET_TOOL, ChatToolId.SALARY_CALCULATOR],
+        chatTools: [
+          ChatToolId.BUDGET_TOOL,
+          ChatToolId.SALARY_CALCULATOR,
+          ChatToolId.LOAN_CALCULATOR,
+          ChatToolId.INTEREST_CALCULATOR,
+        ],
         componentTools: [
-          ChatComponentId.VIDEO,
-          ChatComponentId.SUGGESTIONS,
-          ChatComponentId.GOAL_DASHBOARD,
-          ChatComponentId.PAY_YOURSELF_FIRST_CONFIRMATION,
           ChatComponentId.BUDGETING_DASHBOARD,
+          ChatComponentId.MONTHLY_BUDGET_ANALYSIS,
+          ChatComponentId.SUGGESTIONS,
+          ChatComponentId.VIDEO,
+          ChatComponentId.GOAL_DASHBOARD,
         ],
         mcpTools: [MCPId.GENERAL] as MCPId[],
       };

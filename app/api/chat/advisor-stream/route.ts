@@ -18,6 +18,7 @@ import {
   validateRequestBody,
 } from "@/lib/ai-advisor/utils/validation";
 import { createClient } from "@/lib/supabase/server";
+import { AsyncMemoryManager } from "@/lib/ai-advisor/memory-manager";
 
 // Initialize OpenAI client
 const openaiClient = new OpenAI({
@@ -25,7 +26,7 @@ const openaiClient = new OpenAI({
 });
 
 // Initialize AsyncMemoryManager using factory (with safe fallback)
-let memoryManager = null;
+let memoryManager: AsyncMemoryManager | null = null;
 if (memoryEnabled) {
   try {
     memoryManager = MemoryManagerFactory.createFromEnv();
@@ -42,11 +43,6 @@ if (memoryEnabled) {
 }
 
 // Initialize orchestrator service
-const orchestratorService = new AIAdvisorOrchestratorService(
-  openaiClient,
-  memoryManager,
-  mcpConfig
-);
 
 export async function POST(request: NextRequest) {
   try {
@@ -97,6 +93,12 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    const userProfile = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", user.id)
+      .single();
 
     // Prepare request with user ID
     console.log("📝 Preparing AI advisor request...");
@@ -157,6 +159,12 @@ export async function POST(request: NextRequest) {
     // Create a readable stream
     console.log("🌊 Creating readable stream...");
     let readable: ReadableStream | null = null;
+    const orchestratorService = new AIAdvisorOrchestratorService(
+      userProfile.data,
+      openaiClient,
+      memoryManager,
+      mcpConfig
+    );
     try {
       readable = await orchestratorService.processRequest(
         aiAdvisorRequest,
