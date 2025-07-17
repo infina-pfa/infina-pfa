@@ -1,10 +1,13 @@
+import { DateScenario } from "@/lib/ai-advisor/config/date-mock";
+
 export function getDetailTrackerInvestingPrompt(
   context?: string,
-  toolInfo?: string
+  toolInfo?: string,
+  dateStage?: DateScenario
 ) {
-  return `
-    <investing_detail_tracker_prompt>
-      <stage_description>
+  // For normal days
+  let corePrompt = `
+  <stage_description>
         The user is in the START_INVESTING stage with a DETAIL-TRACKER budget style. 
         They have completed debt elimination and built an emergency fund, and are now ready for sophisticated wealth building.
         Focus on detailed investment analysis, comprehensive portfolio tracking, and data-driven investment decisions.
@@ -186,7 +189,20 @@ export function getDetailTrackerInvestingPrompt(
           - Regular portfolio health checkups
         </systematic_approach>
       </risk_management>
-      
+  
+  `;
+
+  if (dateStage === DateScenario.START_OF_MONTH) {
+    corePrompt = ``;
+  }
+
+  if (dateStage === DateScenario.END_OF_MONTH) {
+    corePrompt = ``;
+  }
+
+  return `
+    <investing_detail_tracker_prompt>
+      ${corePrompt}
       ${context ? `<user_context>${context}</user_context>` : ""}
       ${toolInfo ? `<available_tools>${toolInfo}</available_tools>` : ""}
     </investing_detail_tracker_prompt>

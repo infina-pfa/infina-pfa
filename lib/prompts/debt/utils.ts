@@ -6,6 +6,7 @@ import {
 import { BudgetStyle } from "@/lib/types/user.types";
 import { getDetailTrackerDebtPrompt } from "./detail-tracker.prompt";
 import { getGoalFocusedDebtPrompt } from "./goal-focused.prompt";
+import { getDateStage } from "@/lib/ai-advisor/config/date-mock";
 
 export const getDebtPrompt = (options?: {
   context?: string;
@@ -13,14 +14,15 @@ export const getDebtPrompt = (options?: {
   budgetStyle: BudgetStyle;
 }) => {
   const { context, toolInfo, budgetStyle } = options || {};
+  const dateStage = getDateStage();
 
   switch (budgetStyle) {
     case BudgetStyle.GOAL_FOCUSED:
-      return getGoalFocusedDebtPrompt(context, toolInfo);
+      return getGoalFocusedDebtPrompt(context, toolInfo, dateStage);
     case BudgetStyle.DETAIL_TRACKER:
-      return getDetailTrackerDebtPrompt(context, toolInfo);
+      return getDetailTrackerDebtPrompt(context, toolInfo, dateStage);
     default:
-      return getGoalFocusedDebtPrompt(context, toolInfo);
+      return getGoalFocusedDebtPrompt(context, toolInfo, dateStage);
   }
 };
 

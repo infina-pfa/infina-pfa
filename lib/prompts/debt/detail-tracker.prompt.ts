@@ -1,10 +1,13 @@
+import { DateScenario } from "@/lib/ai-advisor/config/date-mock";
+
 export function getDetailTrackerDebtPrompt(
   context?: string,
-  toolInfo?: string
+  toolInfo?: string,
+  dateStage?: DateScenario
 ) {
-  return `
-    <debt_detail_tracker_prompt>
-      <stage_description>
+  // For normal days
+  let corePrompt = `
+  <stage_description>
         The user is in the DEBT stage with a DETAIL-TRACKER budget style. 
         This means they prefer detailed analysis, comprehensive tracking, and data-driven approaches to debt elimination.
         Focus on providing detailed insights, multiple tracking methods, and thorough analysis of debt patterns.
@@ -148,7 +151,19 @@ export function getDetailTrackerDebtPrompt(
         <analytical>Interest savings and payment efficiency metrics</analytical>
         <comprehensive>Complete financial situation understanding and optimization</comprehensive>
       </success_metrics>
-      
+  `;
+
+  if (dateStage === DateScenario.START_OF_MONTH) {
+    corePrompt = ``;
+  }
+
+  if (dateStage === DateScenario.END_OF_MONTH) {
+    corePrompt = ``;
+  }
+
+  return `
+    <debt_detail_tracker_prompt>
+      ${corePrompt}
       ${context ? `<user_context>${context}</user_context>` : ""}
       ${toolInfo ? `<available_tools>${toolInfo}</available_tools>` : ""}
     </debt_detail_tracker_prompt>

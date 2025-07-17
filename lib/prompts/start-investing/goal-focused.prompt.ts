@@ -1,10 +1,13 @@
+import { DateScenario } from "@/lib/ai-advisor/config/date-mock";
+
 export function getGoalFocusedInvestingPrompt(
   context?: string,
-  toolInfo?: string
+  toolInfo?: string,
+  dateStage?: DateScenario
 ) {
-  return `
-    <investing_goal_focused_prompt>
-      <stage_description>
+  // For normal days
+  let corePrompt = `
+  <stage_description>
         The user is in the START_INVESTING stage with a GOAL-FOCUSED budget style. 
         They have completed debt elimination and built an emergency fund, and are now ready to begin wealth building.
         Focus on setting clear investment goals, understanding risk tolerance, and creating a strategic investment plan.
@@ -131,7 +134,20 @@ export function getGoalFocusedInvestingPrompt(
         <emergency_fund>Never invest emergency fund money</emergency_fund>
         <goal_prioritization>Focus on most important goals first</goal_prioritization>
       </risk_management>
-      
+  
+  `;
+
+  if (dateStage === DateScenario.START_OF_MONTH) {
+    corePrompt = ``;
+  }
+
+  if (dateStage === DateScenario.END_OF_MONTH) {
+    corePrompt = ``;
+  }
+
+  return `
+    <investing_goal_focused_prompt>
+      ${corePrompt}
       ${context ? `<user_context>${context}</user_context>` : ""}
       ${toolInfo ? `<available_tools>${toolInfo}</available_tools>` : ""}
     </investing_goal_focused_prompt>

@@ -1,7 +1,13 @@
-export function getGoalFocusedDebtPrompt(context?: string, toolInfo?: string) {
-  return `
-    <debt_goal_focused_prompt>
-      <stage_description>
+import { DateScenario } from "@/lib/ai-advisor/config/date-mock";
+
+export function getGoalFocusedDebtPrompt(
+  context?: string,
+  toolInfo?: string,
+  dateStage?: DateScenario
+) {
+  // For normal days
+  let corePrompt = `
+  <stage_description>
         The user is in the DEBT stage with a GOAL-FOCUSED budget style. 
         This means they prefer structured, goal-oriented approaches to debt elimination.
         Focus on clear milestones, progress tracking, and strategic debt payoff goals.
@@ -96,10 +102,22 @@ export function getGoalFocusedDebtPrompt(context?: string, toolInfo?: string) {
         <secondary>Interest savings achieved vs. minimum payments</secondary>
         <milestone>Achievement of debt-free target date</milestone>
         <preparation>Building foundation for emergency fund stage</preparation>
-      </success_metrics>
-      
+      </success_metrics>`;
+
+  if (dateStage === DateScenario.START_OF_MONTH) {
+    corePrompt = ``;
+  }
+
+  if (dateStage === DateScenario.END_OF_WEEK) {
+    corePrompt = ``;
+  }
+
+  return `
+    <debt_goal_focused_prompt>
+      ${corePrompt}
       ${context ? `<user_context>${context}</user_context>` : ""}
       ${toolInfo ? `<available_tools>${toolInfo}</available_tools>` : ""}
     </debt_goal_focused_prompt>
-  `;
+    
+    `;
 }
