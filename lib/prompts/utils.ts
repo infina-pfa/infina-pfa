@@ -3,29 +3,6 @@ import { ChatTool } from "../types/ai-streaming.types";
 import { BudgetStyle, FinancialStage } from "../types/user.types";
 import { getStartSavingPrompt } from "./start-saving/chat/utils";
 
-export function generateSystemPrompt(props: {
-  userId: string;
-  context?: {
-    memory?: string;
-  };
-  stagePrompt?: string;
-}) {
-  const { userId, context, stagePrompt } = props;
-  const today = new Date().toISOString();
-
-  return `
-  <today_date>${today}</today_date>
-  <user_context>
-    <user_id>${userId}</user_id>
-    <memory>${context?.memory}</memory>
-  </user_context>
-  <core_system_prompt>core_system_prompt</core_system_prompt>
-  <stage_prompt>
-  ${stagePrompt}
-  </stage_prompt>
-  `;
-}
-
 export function getToolsInfo(tools: ChatTool[]): string {
   return tools
     .map(

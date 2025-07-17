@@ -5,6 +5,10 @@ import {
 } from "./stage-configurations";
 import { buildFunctionTools } from "../../prompts/tools";
 import { Tool } from "../types";
+import { identityPrompt } from "@/lib/prompts/core/identity.prompt";
+import { guidingPrinciplePrompt } from "@/lib/prompts/core/guiding-principle.prompt";
+import { completeInteractPrompt } from "@/lib/prompts/core/complete-interact.prompt";
+import { responseInstructionPrompt } from "@/lib/prompts/core/response.prompt";
 
 export class DynamicOrchestrator {
   /**
@@ -101,6 +105,7 @@ export class DynamicOrchestrator {
     const today = new Date().toISOString();
 
     return `
+  <system_prompt>
     <today_date>${today}</today_date>
     <user_context>
       <user_id>${userId}</user_id>
@@ -111,9 +116,10 @@ export class DynamicOrchestrator {
       <financial_info>${context?.financial || ""}</financial_info>
     </user_context>
     <core_system_prompt>
-      You are Fina, an AI Personal Financial Advisor specialized in helping users with their specific financial stage and budget style preferences.
-      Always provide personalized, actionable, and empathetic financial guidance.
-      Follow the stage-specific instructions and use the appropriate tools for the user's current financial stage and budget style.
+      ${identityPrompt}
+      ${guidingPrinciplePrompt}
+      ${completeInteractPrompt}
+      ${responseInstructionPrompt}
     </core_system_prompt>
     <stage_specific_prompt>
       ${llmConfig.stagePrompt}
@@ -123,6 +129,7 @@ export class DynamicOrchestrator {
       <component_tools>${llmConfig.componentInfo}</component_tools>
       <mcp_tools>${llmConfig.mcpInfo}</mcp_tools>
     </tools_info>
+  </system_prompt>
     `;
   }
 
