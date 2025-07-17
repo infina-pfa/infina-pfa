@@ -32,6 +32,9 @@ export { useGoalManagementSWR } from "./use-goal-management";
 export { useGoalDashboardSWR } from "./use-goal-dashboard";
 export { usePayYourselfFirstSWR } from "./use-pay-yourself-first";
 
+// User hooks
+export { useUserProfileSWR } from "./use-user-profile";
+
 // Chat component hooks
 export { useBudgetingDashboardSWR } from "./use-budgeting-dashboard";
 export { useMonthlyBudgetAnalysisSWR } from "./use-monthly-budget-analysis";
