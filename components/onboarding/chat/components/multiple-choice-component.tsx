@@ -54,9 +54,9 @@ export function MultipleChoiceComponent({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Title */}
-      <h3 className="text-lg font-semibold text-[#111827] mb-3">
+      <h3 className="text-base sm:text-lg font-semibold text-[#111827] mb-2 sm:mb-3">
         {component.title}
       </h3>
 
@@ -71,7 +71,7 @@ export function MultipleChoiceComponent({
               key={option.id}
               onClick={() => handleOptionSelect(option.id)}
               disabled={isCompleted}
-              className={`w-full p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+              className={`w-full p-3 sm:p-4 rounded-xl border-2 text-left transition-all duration-200 ${
                 isSelected
                   ? "border-[#0055FF] bg-[#0055FF] bg-opacity-5"
                   : isDisabled
@@ -93,11 +93,11 @@ export function MultipleChoiceComponent({
 
                 {/* Option content */}
                 <div className="flex-1">
-                  <div className="font-medium text-[#111827] mb-1">
+                  <div className="font-medium text-[#111827] mb-1 text-sm sm:text-base">
                     {option.label}
                   </div>
                   {option.description && (
-                    <div className="text-sm text-[#6B7280]">
+                    <div className="text-xs sm:text-sm text-[#6B7280]">
                       {option.description}
                     </div>
                   )}
@@ -114,7 +114,7 @@ export function MultipleChoiceComponent({
           <Button
             onClick={handleSubmit}
             disabled={!selectedOption || isSubmitting}
-            className="w-full bg-[#0055FF] hover:bg-blue-700 text-white"
+            className="w-full bg-[#0055FF] hover:bg-blue-700 text-white h-12 sm:h-10 min-h-[48px] sm:min-h-0 text-sm sm:text-base"
           >
             {isSubmitting ? t("submitting") : t("continue")}
           </Button>
@@ -123,7 +123,7 @@ export function MultipleChoiceComponent({
 
       {/* Completed indicator */}
       {isCompleted && (
-        <div className="flex items-center space-x-2 text-[#2ECC71] text-sm">
+        <div className="flex items-center space-x-2 text-[#2ECC71] text-xs sm:text-sm">
           <CheckCircle className="w-4 h-4" />
           <span>{t("completed")}</span>
         </div>

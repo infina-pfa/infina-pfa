@@ -108,7 +108,13 @@ export function GoalConfirmationComponent({
           type: "emergency_fund"
         },
         userAction: "confirmed",
-        userMessage: `Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng với mức tiết kiệm ${formatCurrency(goalDetails.monthlyTarget)} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.`,
+        userMessage: t("goalConfirmationUserMessage", { 
+          ns: "onboarding",
+          amount: formatCurrency(goalDetails.amount),
+          timeframe: goalDetails.timeframe,
+          monthlyTarget: formatCurrency(goalDetails.monthlyTarget),
+          defaultValue: `Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng với mức tiết kiệm ${formatCurrency(goalDetails.monthlyTarget)} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.`
+        }),
         nextSteps: "guide_implementation",
         actionContext: {
           goalType: "emergency_fund",
@@ -133,7 +139,13 @@ export function GoalConfirmationComponent({
           type: "emergency_fund"
         },
         userAction: "confirmed",
-        userMessage: `Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng với mức tiết kiệm ${formatCurrency(goalDetails.monthlyTarget)} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.`,
+        userMessage: t("goalConfirmationUserMessage", { 
+          ns: "onboarding",
+          amount: formatCurrency(goalDetails.amount),
+          timeframe: goalDetails.timeframe,
+          monthlyTarget: formatCurrency(goalDetails.monthlyTarget),
+          defaultValue: `Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng với mức tiết kiệm ${formatCurrency(goalDetails.monthlyTarget)} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.`
+        }),
         nextSteps: "guide_implementation",
         actionContext: {
           goalType: "emergency_fund",
@@ -158,7 +170,13 @@ export function GoalConfirmationComponent({
       await onResponse({
         goalConfirmed: false,
         userAction: "requested_adjustment",
-        userMessage: `Tôi muốn điều chỉnh lại mục tiêu quỹ dự phòng khẩn cấp. Mục tiêu hiện tại ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng (${formatCurrency(goalDetails.monthlyTarget)} VND/tháng) chưa phù hợp với tình hình của tôi. Hãy giúp tôi tính toán lại với các thông số khác.`,
+        userMessage: t("goalAdjustmentUserMessage", { 
+          ns: "onboarding",
+          amount: formatCurrency(goalDetails.amount),
+          timeframe: goalDetails.timeframe,
+          monthlyTarget: formatCurrency(goalDetails.monthlyTarget),
+          defaultValue: `Tôi muốn điều chỉnh lại mục tiêu quỹ dự phòng khẩn cấp. Mục tiêu hiện tại ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng (${formatCurrency(goalDetails.monthlyTarget)} VND/tháng) chưa phù hợp với tình hình của tôi. Hãy giúp tôi tính toán lại với các thông số khác.`
+        }),
         adjustmentReason: "user_wants_different_parameters",
         nextSteps: "recalculate_goal",
         actionContext: {

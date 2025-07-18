@@ -54,9 +54,9 @@ export function TextInputComponent({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Title */}
-      <h3 className="text-lg font-semibold text-[#111827] mb-3">
+      <h3 className="text-base sm:text-lg font-semibold text-[#111827] mb-2 sm:mb-3">
         {component.title}
       </h3>
 
@@ -67,7 +67,7 @@ export function TextInputComponent({
           onChange={(e) => setTextValue(e.target.value)}
           placeholder={component.context.placeholder || t("enterYourAnswer")}
           disabled={isCompleted}
-          className="h-12 text-base"
+          className="h-12 text-sm sm:text-base min-h-[48px]"
         />
         
         {/* Character count */}
@@ -84,7 +84,7 @@ export function TextInputComponent({
           <Button
             onClick={handleSubmit}
             disabled={!isValid() || isSubmitting}
-            className="w-full bg-[#0055FF] hover:bg-blue-700 text-white"
+            className="w-full bg-[#0055FF] hover:bg-blue-700 text-white h-12 sm:h-10 min-h-[48px] sm:min-h-0 text-sm sm:text-base"
           >
             {isSubmitting ? t("submitting") : t("continue")}
           </Button>
@@ -93,7 +93,7 @@ export function TextInputComponent({
 
       {/* Completed indicator */}
       {isCompleted && (
-        <div className="flex items-center space-x-2 text-[#2ECC71] text-sm">
+        <div className="flex items-center space-x-2 text-[#2ECC71] text-xs sm:text-sm">
           <CheckCircle className="w-4 h-4" />
           <span>{t("completed")}</span>
         </div>

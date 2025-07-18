@@ -46,21 +46,21 @@ export function SliderComponent({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Title */}
-      <h3 className="text-lg font-semibold text-[#111827] mb-3">
+      <h3 className="text-base sm:text-lg font-semibold text-[#111827] mb-2 sm:mb-3">
         {component.title}
       </h3>
 
       {/* Current Value Display */}
       <div className="text-center">
-        <span className="text-2xl font-bold text-[#0055FF]">
+        <span className="text-xl sm:text-2xl font-bold text-[#0055FF]">
           {formatValue(sliderValue)}
         </span>
       </div>
 
       {/* Slider */}
-      <div className="px-4">
+      <div className="px-2 sm:px-4 py-2">
         <input
           type="range"
           min={range.min}
@@ -69,11 +69,11 @@ export function SliderComponent({
           value={sliderValue}
           onChange={(e) => setSliderValue(Number(e.target.value))}
           disabled={isCompleted}
-          className="w-full h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer slider"
+          className="w-full h-2 sm:h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer slider touch-manipulation"
         />
         
         {/* Range labels */}
-        <div className="flex justify-between text-sm text-[#6B7280] mt-2">
+        <div className="flex justify-between text-xs sm:text-sm text-[#6B7280] mt-3 sm:mt-2">
           <span>{formatValue(range.min)}</span>
           <span>{formatValue(range.max)}</span>
         </div>
@@ -85,7 +85,7 @@ export function SliderComponent({
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="w-full bg-[#0055FF] hover:bg-blue-700 text-white"
+            className="w-full bg-[#0055FF] hover:bg-blue-700 text-white h-12 sm:h-10 min-h-[48px] sm:min-h-0 text-sm sm:text-base"
           >
             {isSubmitting ? t("submitting") : t("continue")}
           </Button>
@@ -94,7 +94,7 @@ export function SliderComponent({
 
       {/* Completed indicator */}
       {isCompleted && (
-        <div className="flex items-center justify-center space-x-2 text-[#2ECC71] text-sm">
+        <div className="flex items-center justify-center space-x-2 text-[#2ECC71] text-xs sm:text-sm">
           <CheckCircle className="w-4 h-4" />
           <span>{t("completed")}</span>
         </div>
@@ -103,20 +103,44 @@ export function SliderComponent({
       <style jsx>{`
         .slider::-webkit-slider-thumb {
           appearance: none;
-          width: 20px;
-          height: 20px;
+          width: 44px;
+          height: 44px;
           background: #0055FF;
           border-radius: 50%;
           cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 85, 255, 0.2);
+          transition: transform 0.2s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:active {
+          transform: scale(1.1);
         }
         
         .slider::-moz-range-thumb {
-          width: 20px;
-          height: 20px;
+          width: 44px;
+          height: 44px;
           background: #0055FF;
           border-radius: 50%;
           cursor: pointer;
           border: none;
+          box-shadow: 0 2px 4px rgba(0, 85, 255, 0.2);
+          transition: transform 0.2s ease;
+        }
+        
+        .slider::-moz-range-thumb:active {
+          transform: scale(1.1);
+        }
+        
+        @media (min-width: 640px) {
+          .slider::-webkit-slider-thumb {
+            width: 24px;
+            height: 24px;
+          }
+          
+          .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+          }
         }
       `}</style>
     </div>

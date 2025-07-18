@@ -30,6 +30,10 @@ export const showOnboardingComponentTool = {
             "suggestions",
             "infina_app_qr",
             "finish_onboarding",
+            // Budget allocation enhancement components
+            "budget_category_education",
+            "budget_allocation_tool",
+            "philosophy_selection",
           ],
           description:
             "Type of component to display - determines the UI component that will be rendered. REQUIRED: Must be one of the enum values.",
@@ -350,6 +354,79 @@ export const showOnboardingComponentTool = {
               description:
                 "Educational content structure (REQUIRED for education_content)",
             },
+
+            // BUDGET ALLOCATION ENHANCEMENT COMPONENTS
+
+            // Budget category education - optional for component_type: "budget_category_education"
+            budgetCategories: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string", description: "Category identifier" },
+                  title: { type: "string", description: "Category title" },
+                  description: { type: "string", description: "Category description" },
+                  priority: { type: "number", description: "Priority level (1-3)" },
+                  rules: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Rules for this category",
+                  },
+                },
+                required: ["id", "title", "description", "priority"],
+              },
+              description:
+                "Budget categories for education (OPTIONAL for budget_category_education)",
+            },
+
+            // Budget allocation tool - required for component_type: "budget_allocation_tool"
+            monthlyIncome: {
+              type: "number",
+              description: "User's monthly income (REQUIRED for budget_allocation_tool)",
+            },
+            emergencyFundTarget: {
+              type: "number",
+              description: "Target emergency fund amount (REQUIRED for budget_allocation_tool)",
+            },
+            monthlyTargetSavings: {
+              type: "number",
+              description: "Monthly target savings amount (REQUIRED for budget_allocation_tool)",
+            },
+            budgetingStyle: {
+              type: "string",
+              enum: ["goal_focused", "detail_tracker"],
+              description: "User's chosen budgeting style (REQUIRED for budget_allocation_tool) - determines if simplified or detailed budget records are created",
+            },
+            expenseBreakdown: {
+              type: "object",
+              description: "Detailed expense breakdown by category (REQUIRED for budget_allocation_tool when budgetingStyle is 'detail_tracker')",
+            },
+
+            // Philosophy selection - optional for component_type: "philosophy_selection"
+            philosophyOptions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  id: {
+                    type: "string",
+                    enum: ["goal_focused", "detail_tracker"],
+                    description: "Philosophy identifier",
+                  },
+                  title: { type: "string", description: "Philosophy title" },
+                  description: { type: "string", description: "Philosophy description" },
+                  features: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "Key features of this philosophy",
+                  },
+                  timeCommitment: { type: "string", description: "Time commitment required" },
+                },
+                required: ["id", "title", "description"],
+              },
+              description:
+                "Philosophy options for selection (OPTIONAL for philosophy_selection)",
+            },
           },
         },
       },
@@ -546,6 +623,28 @@ export function validateComponentArguments(args: unknown): {
       );
     }
   }
+
+  // Budget allocation enhancement component validations
+  if (argObj.component_type === "budget_allocation_tool" && context) {
+    if (!context.monthlyIncome || typeof context.monthlyIncome !== "number") {
+      errors.push("budget_allocation_tool requires monthlyIncome number in context");
+    }
+    if (!context.emergencyFundTarget || typeof context.emergencyFundTarget !== "number") {
+      errors.push("budget_allocation_tool requires emergencyFundTarget number in context");
+    }
+    if (!context.monthlyTargetSavings || typeof context.monthlyTargetSavings !== "number") {
+      errors.push("budget_allocation_tool requires monthlyTargetSavings number in context");
+    }
+    if (!context.budgetingStyle || typeof context.budgetingStyle !== "string" || !["goal_focused", "detail_tracker"].includes(context.budgetingStyle)) {
+      errors.push("budget_allocation_tool requires budgetingStyle ('goal_focused' or 'detail_tracker') in context");
+    }
+    if (context.budgetingStyle === "detail_tracker" && (!context.expenseBreakdown || typeof context.expenseBreakdown !== "object")) {
+      errors.push("budget_allocation_tool with budgetingStyle 'detail_tracker' requires expenseBreakdown object in context");
+    }
+  }
+
+  // Budget category education and philosophy selection don't have required context
+  // Their context is optional for configuration but components work without it
 
   return { isValid: errors.length === 0, errors };
 }

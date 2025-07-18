@@ -131,7 +131,11 @@ export type OnboardingComponentType =
   | "education_content"
   | "suggestions"
   | "infina_app_qr"
-  | "finish_onboarding";
+  | "finish_onboarding"
+  // Budget allocation enhancement components
+  | "budget_category_education"
+  | "budget_allocation_tool"
+  | "philosophy_selection";
 
 export interface ComponentData {
   // Multiple choice
@@ -216,6 +220,32 @@ export interface ComponentData {
 
   // Education content
   educationContent?: EducationContent;
+
+  // Budget allocation enhancement components
+  // Budget category education
+  budgetCategories?: Array<{
+    id: string;
+    title: string;
+    description: string;
+    priority: number;
+    rules?: string[];
+  }>;
+
+  // Budget allocation tool
+  monthlyIncome?: number;
+  emergencyFundTarget?: number;
+  monthlyTargetSavings?: number;
+  budgetingStyle?: "goal_focused" | "detail_tracker";
+  expenseBreakdown?: Record<string, number>;
+
+  // Philosophy selection
+  philosophyOptions?: Array<{
+    id: "goal_focused" | "detail_tracker";
+    title: string;
+    description: string;
+    features?: string[];
+    timeCommitment?: string;
+  }>;
 }
 
 // New education content structure
@@ -274,6 +304,76 @@ export interface ComponentResponse {
   };
   adjustmentReason?: string;
   educationCompleted?: boolean;
+  // Budget category education response
+  understood?: boolean;
+  selectedCategory?: string;
+  learningContext?: {
+    prioritySystem?: string;
+    categories?: Array<{
+      name: string;
+      priority: number;
+      rule: string;
+    }>;
+    keyLearnings?: string[];
+  };
+  // Philosophy selection response
+  selectedPhilosophy?: "goal_focused" | "detail_tracker";
+  philosophyDetails?: {
+    id: string;
+    title: string;
+    description: string;
+    features?: string[];
+    timeCommitment?: string;
+  };
+  // Budget allocation response
+  budgetAllocation?: {
+    emergencyFund: number;
+    livingExpenses: number;
+    freeToSpend: number;
+    totalPercentage: number;
+  };
+  allocation?: {
+    emergencyFund: number;
+    livingExpenses: number;
+    freeToSpend: number;
+  };
+  allocationDetails?: {
+    monthlyAmounts: {
+      emergencyFund: number;
+      livingExpenses: number;
+      freeToSpend: number;
+    };
+    projectedTimeline?: {
+      emergencyFundMonths: number;
+      description: string;
+    };
+  };
+  monetaryValues?: {
+    emergencyFund: number;
+    livingExpenses: number;
+    freeToSpend: number;
+  };
+  budgetsCreated?: Array<{
+    id: string;
+    name: string;
+    category: string;
+    amount: number;
+    color: string;
+    icon: string;
+  }>;
+  budgetingStyle?: "goal_focused" | "detail_tracker";
+  allocationSummary?: {
+    total: string;
+    totalBudgets?: number;
+    categories: Array<{
+      name: string;
+      percentage: string;
+      amount: string;
+      priority: number;
+      locked: boolean;
+    }>;
+  };
+  monthlyIncome?: number;
   completedAt: Date;
 }
 

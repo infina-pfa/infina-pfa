@@ -244,4 +244,128 @@ export const budgetService = {
       };
     }
   },
+
+  /**
+   * Create priority-based budgets from allocation data
+   */
+  async createPriorityBasedBudgets(
+    allocation: {
+      emergencyFund: number;
+      livingExpenses: number;
+      freeToSpend: number;
+    },
+    monthlyIncome: number,
+    t?: TranslationFunction
+  ): Promise<{ budgets: BudgetWithSpending[]; error: string | null }> {
+    try {
+      // Calculate monetary values from percentages
+      const monetaryValues = {
+        emergencyFund: (monthlyIncome * allocation.emergencyFund) / 100,
+        livingExpenses: (monthlyIncome * allocation.livingExpenses) / 100,
+        freeToSpend: (monthlyIncome * allocation.freeToSpend) / 100,
+      };
+
+      // Define the priority-based budget categories
+      const budgetCategories = [
+        {
+          name: t ? t('emergencyFund', { ns: 'budgeting' }) : 'Emergency Fund',
+          category: 'savings',
+          amount: monetaryValues.emergencyFund,
+          color: '#0055FF',
+          description: t ? t('emergencyFundDescription', { ns: 'budgeting' }) : 'Priority 1: Emergency fund savings',
+          priority: 1,
+        },
+        {
+          name: t ? t('livingExpenses', { ns: 'budgeting' }) : 'Living Expenses',
+          category: 'essential',
+          amount: monetaryValues.livingExpenses,
+          color: '#2ECC71',
+          description: t ? t('livingExpensesDescription', { ns: 'budgeting' }) : 'Priority 2: Essential living costs and future plans',
+          priority: 2,
+        },
+        {
+          name: t ? t('freeToSpend', { ns: 'budgeting' }) : 'Free to Spend',
+          category: 'discretionary',
+          amount: monetaryValues.freeToSpend,
+          color: '#FF9800',
+          description: t ? t('freeToSpendDescription', { ns: 'budgeting' }) : 'Priority 3: Discretionary spending',
+          priority: 3,
+        },
+      ];
+
+      // Create all budgets in sequence
+      const createdBudgets: BudgetWithSpending[] = [];
+      const errors: string[] = [];
+
+      for (const budgetData of budgetCategories) {
+        const createRequest: CreateBudgetRequest = {
+          name: budgetData.name,
+          category: budgetData.category,
+          amount: budgetData.amount,
+          color: budgetData.color,
+          description: budgetData.description,
+          period: 'monthly',
+          isActive: true,
+          month: new Date().getMonth() + 1,
+          year: new Date().getFullYear(),
+        };
+
+        const result = await this.create(createRequest, t);
+        
+        if (result.error) {
+          errors.push(`Failed to create ${budgetData.name}: ${result.error}`);
+        } else if (result.budget) {
+          createdBudgets.push(result.budget);
+        }
+      }
+
+      // If there were errors creating some budgets, return partial success
+      if (errors.length > 0) {
+        return {
+          budgets: createdBudgets,
+          error: `Some budgets failed to create: ${errors.join(', ')}`,
+        };
+      }
+
+      return {
+        budgets: createdBudgets,
+        error: null,
+      };
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        budgets: [],
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Update user's budgeting philosophy
+   */
+  async updateBudgetingPhilosophy(
+    philosophy: 'goal_focused' | 'detail_tracker',
+    t?: TranslationFunction
+  ): Promise<{ success: boolean; error: string | null }> {
+    try {
+      const response = await apiClient.put<{ success: boolean }>('/user/budgeting-philosophy', {
+        budgetingStyle: philosophy,
+      });
+
+      if (response.success) {
+        return {
+          success: true,
+          error: null,
+        };
+      }
+
+      throw new Error(response.error || 'Failed to update budgeting philosophy');
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        success: false,
+        error: appError.message,
+      };
+    }
+  },
 }; 

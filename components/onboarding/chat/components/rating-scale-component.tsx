@@ -55,12 +55,12 @@ export function RatingScaleComponent({
           key={i}
           onClick={() => handleRatingSelect(i)}
           disabled={isCompleted}
-          className={`p-2 rounded-lg transition-all duration-200 ${
+          className={`p-3 sm:p-2 rounded-lg transition-all duration-200 -mx-1 sm:mx-0 ${
             isCompleted ? "cursor-default" : "cursor-pointer hover:bg-[#F0F2F5]"
           }`}
         >
           <Star
-            className={`w-8 h-8 transition-colors duration-200 ${
+            className={`w-11 h-11 sm:w-8 sm:h-8 transition-colors duration-200 ${
               isSelected
                 ? "text-[#FFC107] fill-[#FFC107]"
                 : "text-[#E5E7EB] hover:text-[#FFC107]"
@@ -73,20 +73,20 @@ export function RatingScaleComponent({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Title */}
-      <h3 className="text-lg font-semibold text-[#111827] mb-3">
+      <h3 className="text-base sm:text-lg font-semibold text-[#111827] mb-2 sm:mb-3">
         {component.title}
       </h3>
 
       {/* Rating Stars */}
-      <div className="flex items-center justify-center space-x-2 py-4">
+      <div className="flex items-center justify-center space-x-1 sm:space-x-2 py-2 sm:py-4">
         {renderStars()}
       </div>
 
       {/* Labels */}
       {scale.labels && scale.labels.length > 0 && (
-        <div className="flex justify-between text-sm text-[#6B7280] px-2">
+        <div className="flex justify-between text-xs sm:text-sm text-[#6B7280] px-4 sm:px-2">
           <span>{scale.labels[0]}</span>
           {scale.labels[scale.labels.length - 1] && (
             <span>{scale.labels[scale.labels.length - 1]}</span>
@@ -97,7 +97,7 @@ export function RatingScaleComponent({
       {/* Selected rating display */}
       {selectedRating !== null && (
         <div className="text-center">
-          <span className="text-lg font-semibold text-[#0055FF]">
+          <span className="text-base sm:text-lg font-semibold text-[#0055FF]">
             {selectedRating} / {scale.max}
           </span>
         </div>
@@ -109,7 +109,7 @@ export function RatingScaleComponent({
           <Button
             onClick={handleSubmit}
             disabled={selectedRating === null || isSubmitting}
-            className="w-full bg-[#0055FF] hover:bg-blue-700 text-white"
+            className="w-full bg-[#0055FF] hover:bg-blue-700 text-white h-12 sm:h-10 min-h-[48px] sm:min-h-0 text-sm sm:text-base"
           >
             {isSubmitting ? t("submitting") : t("continue")}
           </Button>
@@ -118,7 +118,7 @@ export function RatingScaleComponent({
 
       {/* Completed indicator */}
       {isCompleted && (
-        <div className="flex items-center justify-center space-x-2 text-[#2ECC71] text-sm">
+        <div className="flex items-center justify-center space-x-2 text-[#2ECC71] text-xs sm:text-sm">
           <CheckCircle className="w-4 h-4" />
           <span>{t("completed")}</span>
         </div>

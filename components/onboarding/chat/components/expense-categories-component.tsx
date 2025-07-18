@@ -169,7 +169,14 @@ export function ExpenseCategoriesComponent({
 
       await onResponse({
         expenseBreakdown,
+        budgetingStyle: "detail_tracker", // Mark this as detail tracker style
         completedAt: new Date(),
+        userMessage: t("expenseCategoriesUserMessage", { 
+          ns: "onboarding",
+          categoriesCount: categories.length,
+          totalExpenses: getTotalExpenses().toLocaleString(),
+          defaultValue: `I've detailed my monthly living expenses across ${categories.length} categories. Total monthly expenses: ${getTotalExpenses().toLocaleString()} VNĐ. This detailed breakdown will help set up comprehensive budget tracking with individual categories for each expense type.`
+        })
       });
     } catch (error) {
       console.error("Error submitting expense categories:", error);
@@ -179,16 +186,16 @@ export function ExpenseCategoriesComponent({
   };
 
   return (
-    <div className="space-y-4 font-nunito max-w-md mx-auto">
+    <div className="space-y-3 sm:space-y-4 font-nunito max-w-full sm:max-w-md mx-auto">
       {/* Compact Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#0055FF] mb-2">
-          <TrendingUp className="w-5 h-5 text-white" />
+        <div className="inline-flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#0055FF] mb-2">
+          <TrendingUp className="w-5 h-5 sm:w-5 sm:h-5 text-white" />
         </div>
-        <h3 className="text-base font-bold text-[#111827] leading-5">
+        <h3 className="text-base sm:text-lg font-bold text-[#111827] leading-5 sm:leading-6">
           {t("expenseCategoriesTitle", { defaultValue: "Chi tiết chi phí hàng tháng" })}
         </h3>
-        <p className="text-xs text-[#6B7280] leading-4">
+        <p className="text-xs sm:text-sm text-[#6B7280] leading-4">
           {t("expenseCategoriesDescription", { 
             defaultValue: "Nhập số tiền dự kiến cho từng danh mục" 
           })}
@@ -225,17 +232,17 @@ export function ExpenseCategoriesComponent({
                 {/* Compact Header */}
                 <div className="flex items-center gap-3 mb-3">
                   <div
-                    className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+                    className="flex-shrink-0 w-10 h-10 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: `${categoryColor}20` }}
                   >
                     <IconComponent
-                      className="w-4 h-4"
+                      className="w-5 h-5 sm:w-4 sm:h-4"
                       style={{ color: categoryColor }}
                     />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-semibold text-[#111827] leading-4">
+                    <h4 className="text-sm sm:text-base font-semibold text-[#111827] leading-4 sm:leading-5">
                       {category.name}
                       {category.required && (
                         <span className="text-[#F44336] ml-1 text-xs">*</span>
@@ -243,8 +250,8 @@ export function ExpenseCategoriesComponent({
                     </h4>
                     {hasValue && (
                       <div className="flex items-center gap-1 mt-1">
-                        <Check className="w-3 h-3 text-[#2ECC71]" />
-                        <span className="text-xs text-[#2ECC71]">
+                        <Check className="w-3 h-3 sm:w-3 sm:h-3 text-[#2ECC71]" />
+                        <span className="text-xs sm:text-xs text-[#2ECC71]">
                           {expenseValues[category.id].toLocaleString()} VNĐ
                         </span>
                       </div>
@@ -261,7 +268,7 @@ export function ExpenseCategoriesComponent({
                   onBlur={() => setFocusedCategory(null)}
                   placeholder={category.placeholder}
                   className={`
-                    text-sm h-9 bg-[#F9FAFB] border-0 border-b rounded-lg px-3 py-2
+                    text-sm sm:text-base h-12 sm:h-9 bg-[#F9FAFB] border-0 border-b rounded-lg px-3 py-2 min-h-[48px] sm:min-h-0
                     ${hasError
                       ? 'border-b-[#F44336] focus:border-b-[#F44336]'
                       : hasValue
@@ -272,7 +279,7 @@ export function ExpenseCategoriesComponent({
                 />
                 
                 {hasError && (
-                  <div className="flex items-center gap-1 text-xs text-[#F44336] mt-1">
+                  <div className="flex items-center gap-1 text-xs sm:text-xs text-[#F44336] mt-1">
                     <div className="w-3 h-3 rounded-full bg-[#F44336] flex items-center justify-center">
                       <span className="text-white text-[10px]">!</span>
                     </div>
@@ -287,22 +294,22 @@ export function ExpenseCategoriesComponent({
 
       {/* Compact Summary */}
       {getTotalExpenses() > 0 && (
-        <div className="bg-[#0055FF] rounded-xl p-3 text-white">
+        <div className="bg-[#0055FF] rounded-xl p-3 sm:p-4 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-white" />
+              <TrendingUp className="w-4 h-4 sm:w-4 sm:h-4 text-white" />
               <div>
-                <h4 className="font-semibold text-sm">
+                <h4 className="font-semibold text-sm sm:text-base">
                   {t("totalMonthlyExpenses", { defaultValue: "Tổng chi tiêu" })}
                 </h4>
-                <p className="text-xs text-white/80">
+                <p className="text-[10px] sm:text-xs text-white/80">
                   {getFilledCategoriesCount()}/{categories.length} danh mục
                 </p>
               </div>
             </div>
             
             <div className="text-right">
-              <div className="text-base font-bold">
+              <div className="text-sm sm:text-base font-bold">
                 {getTotalExpenses().toLocaleString()} VNĐ
               </div>
             </div>
@@ -326,7 +333,7 @@ export function ExpenseCategoriesComponent({
           onClick={handleSubmit}
           disabled={isSubmitting || getTotalExpenses() === 0}
           className={`
-            px-6 py-2 rounded-lg font-semibold text-sm transition-all duration-200
+            px-4 sm:px-6 py-3 sm:py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 min-h-[48px] sm:min-h-0
             ${getTotalExpenses() > 0 && !isSubmitting
               ? 'bg-[#0055FF] text-white hover:bg-[#0055FF]/90' 
               : 'bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed'
@@ -335,13 +342,13 @@ export function ExpenseCategoriesComponent({
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>{t("submitting", { defaultValue: "Đang xử lý..." })}</span>
+              <Loader2 className="w-4 h-4 sm:w-4 sm:h-4 animate-spin" />
+              <span className="text-sm sm:text-base">{t("submitting", { defaultValue: "Đang xử lý..." })}</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <span>{t("continue", { defaultValue: "Tiếp tục" })}</span>
-              <TrendingUp className="w-4 h-4" />
+              <span className="text-sm sm:text-base">{t("continue", { defaultValue: "Tiếp tục" })}</span>
+              <TrendingUp className="w-4 h-4 sm:w-4 sm:h-4" />
             </div>
           )}
         </Button>
