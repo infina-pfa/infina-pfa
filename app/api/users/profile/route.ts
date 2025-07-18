@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { BudgetingStyle } from "@/lib/types/user.types";
 
 export async function GET() {
   try {
@@ -43,7 +42,6 @@ export async function GET() {
             "User",
           email: user.email,
           total_asset_value: 0,
-          budgeting_style: null,
           onboarding_completed_at: null,
           financial_stage: null,
           created_at: user.created_at,
@@ -91,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { name, total_asset_value, budgeting_style } = body;
+    const { name, total_asset_value } = body;
 
     // Validate required fields
     if (!name?.trim()) {
@@ -104,31 +102,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate budgeting_style if provided
-    if (budgeting_style && !["goal_focused", "detail_tracker"].includes(budgeting_style)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid budgeting_style. Must be 'goal_focused' or 'detail_tracker'",
-        },
-        { status: 400 }
-      );
-    }
-
     // Create user profile
-    const insertData: any = {
-      user_id: user.id,
-      name: name.trim(),
-      total_asset_value: total_asset_value || 0,
-    };
-    
-    if (budgeting_style) {
-      insertData.budgeting_style = budgeting_style;
-    }
-
     const { data: userProfile, error } = await supabase
       .from("users")
-      .insert(insertData)
+      .insert({
+        user_id: user.id,
+        name: name.trim(),
+        total_asset_value: total_asset_value || 0,
+      })
       .select("*")
       .single();
 
@@ -200,20 +181,6 @@ export async function PATCH(request: NextRequest) {
 
     if (body.total_asset_value !== undefined) {
       updateData.total_asset_value = body.total_asset_value;
-    }
-
-    if (body.budgeting_style !== undefined) {
-      // Validate budgeting_style
-      if (body.budgeting_style && !["goal_focused", "detail_tracker"].includes(body.budgeting_style)) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: "Invalid budgeting_style. Must be 'goal_focused' or 'detail_tracker'",
-          },
-          { status: 400 }
-        );
-      }
-      updateData.budgeting_style = body.budgeting_style;
     }
 
     if (body.onboarding_completed_at !== undefined) {

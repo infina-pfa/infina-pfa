@@ -21,10 +21,6 @@ import { EducationContentComponent } from "./education-content-component";
 import { Suggestions } from "./suggestions";
 import { InfinAppQR } from "./infina-app-qr";
 import { FinishOnboarding } from "./finish-onboarding";
-// Budget allocation enhancement components
-import BudgetCategoryEducation from "./budget-category-education";
-import BudgetAllocationTool from "./budget-allocation-tool";
-import PhilosophySelection from "./philosophy-selection";
 
 interface OnboardingComponentRendererProps {
   component: OnboardingComponent;
@@ -162,30 +158,6 @@ export function OnboardingComponentRenderer({
 
     case "finish_onboarding":
       return <FinishOnboarding />;
-
-    case "budget_category_education":
-      return (
-        <BudgetCategoryEducation
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
-    case "budget_allocation_tool":
-      return (
-        <BudgetAllocationTool
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
-    case "philosophy_selection":
-      return (
-        <PhilosophySelection
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
 
     default:
       return (

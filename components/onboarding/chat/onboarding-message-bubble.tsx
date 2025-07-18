@@ -45,22 +45,22 @@ export function OnboardingMessageBubble({
       } mb-3 sm:mb-4 animate-fadeIn`}
     >
       <div
-        className={`flex max-w-[95%] sm:max-w-[90%] md:max-w-[80%] ${
+        className={`flex max-w-[90%] sm:max-w-[80%] ${
           isAI ? "flex-row" : "flex-row-reverse"
         }`}
       >
         {/* Avatar */}
         <div
-          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
             isAI
               ? "bg-[#0055FF] text-white mr-2 sm:mr-3"
               : "bg-[#F0F2F5] text-[#6B7280] ml-2 sm:ml-3"
           }`}
         >
           {isAI ? (
-            <Bot className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Bot className="w-3 h-3 sm:w-4 sm:h-4" />
           ) : (
-            <User className="w-4 h-4 sm:w-5 sm:h-5" />
+            <User className="w-3 h-3 sm:w-4 sm:h-4" />
           )}
         </div>
 
@@ -68,7 +68,7 @@ export function OnboardingMessageBubble({
         <div className="flex flex-col min-w-0 flex-1">
           {/* Message bubble */}
           <div
-            className={`px-3 py-3 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl ${
+            className={`px-3 py-2 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl ${
               isAI ? "bg-[#F0F2F5] text-[#111827]" : "bg-[#0055FF] text-white"
             }`}
           >
@@ -77,7 +77,7 @@ export function OnboardingMessageBubble({
                 {isAI ? (
                   <MarkdownRenderer content={message.content as string} />
                 ) : (
-                  <div className="whitespace-pre-wrap text-sm sm:text-base leading-relaxed">
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
                     {message.content}
                   </div>
                 )}
@@ -106,7 +106,7 @@ export function OnboardingMessageBubble({
           </div>
 
           <div
-            className={`text-[10px] sm:text-xs text-[#6B7280] mt-1 ${
+            className={`text-xs text-[#6B7280] mt-1 ${
               isAI ? "text-left" : "text-right"
             }`}
           >
