@@ -11,12 +11,16 @@ import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
 import { getStartConversationPromptForStartSaving } from "@/lib/ai-advisor/prompts/start-conversation";
+import { useOnboardingCheck } from "@/hooks/use-onboarding-check";
+import { redirect } from "next/navigation";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
   const [isMobile, setIsMobile] = useState(false);
   const { user } = useAuth();
   const sentFirstMessage = useRef(false);
+  const { needsOnboarding, isLoading: isOnboardingLoading } =
+    useOnboardingCheck();
 
   const chatFlow = useChatFlow();
   const {
@@ -77,6 +81,10 @@ export function ChatInterface() {
         </div>
       </div>
     );
+  }
+
+  if (needsOnboarding && !isOnboardingLoading) {
+    return redirect("/onboarding");
   }
 
   // Determine if tool panel is open and adjust layout

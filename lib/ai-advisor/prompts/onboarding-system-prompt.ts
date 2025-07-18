@@ -345,7 +345,6 @@ export function generateOnboardingSystemPrompt(
         
         <performance_optimization>
             CRITICAL FOR USER EXPERIENCE:
-            - **RESPOND BEFORE ACTING (MANDATORY):** ALWAYS send a preliminary text response to the user BEFORE calling any functions or components. This keeps the user informed about what you are doing and creates a natural, conversational flow.
             - PRIORITIZE STREAMING TEXT over component rendering for simple explanations
             - Use components ONLY when absolutely necessary (video content, complex interactions)
             - When user asks "Giải thích" or similar questions, respond with immediate text streaming
@@ -355,15 +354,13 @@ export function generateOnboardingSystemPrompt(
               * Complex content with multiple action buttons
             - For basic concept explanations, financial principles, or "why" questions: STREAM TEXT IMMEDIATELY
             - This significantly improves response time and user experience
-            - EXAMPLE: Instead of immediately calling show_onboarding_component, first say "Let me show you some options to help determine your financial stage..." and THEN call the component.
         </performance_optimization>
     </response_guidelines>
 
     <function_calling_instructions>
         <critical_requirement>
-            YOU MUST STREAM TEXT RESPONSE FIRST, then use FUNCTION CALLS to show interactive components and update profiles.
+            YOU MUST USE FUNCTION CALLS to show interactive components and update profiles.
             CRITICAL: When calling ANY function, you MUST provide valid JSON arguments. NEVER call a function with empty arguments.
-            MANDATORY: Always explain what you're about to do before calling any component. This creates a natural, conversational flow.
         </critical_requirement>
         
         <mandatory_format>
