@@ -9,7 +9,7 @@ import {
 } from "@/lib/types/ai-streaming.types";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
-
+import fs from "fs";
 export async function POST(request: NextRequest) {
   const {
     userId,
@@ -59,7 +59,13 @@ export async function POST(request: NextRequest) {
         and
         ${mcpIds.map((id) => MCP_TOOLS[id]).join("\n")}
         </tools>
-    </available_tools>`;
+    </available_tools>
+    
+    <multiple_tool_call_instructions>
+        When a user requests multiple tools or components in sequence (e.g., "open A then open B", "show X and Y", "mở tool A sau đó mở tool B"), Please combine multiple requests into a single call.
+        Examples:
+        - "Hãy mở tool budget-detail sau đó mở tool budget-overview" → You need response to the user first, then call show_component("budget-detail"), after that call show_component("budget-overview")
+    </multiple_tool_call_instructions>`;
 
   const response = await openai.responses.create({
     model: model,
@@ -67,7 +73,26 @@ export async function POST(request: NextRequest) {
     instructions: systemPrompt + toolInfo,
     temperature,
     tools: buildFunctionTools(chatToolIds, componentToolIds, mcpIds),
+    parallel_tool_calls:true,
+    tool_choice: "auto"
   });
+
+  // Debug logging
+  console.log("🔍 DEBUG INFO:");
+  console.log("Model:", model);
+  console.log("📤 User Message:", userMessage);
+  console.log("🛠️ Available Tools Count:", buildFunctionTools(chatToolIds, componentToolIds, mcpIds).length);
+  console.log("📊 Component Tool IDs:", componentToolIds);
+  console.log("🔧 Function Calls Made:", response.output.filter(item => item.type === "function_call").length);
+  console.log("📋 Function Calls Details:", response.output.filter(item => item.type === "function_call").map(fc => ({
+    name: fc.name,
+    arguments: fc.arguments
+  })));
+
+  //I need write all the response to a file
+  fs.writeFileSync("response.json", JSON.stringify(response, null, 2));
+
+  // console.log(response);
 
   return NextResponse.json({
     outputText: response.output_text,
