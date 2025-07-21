@@ -161,3 +161,47 @@ export interface CreateGoalTransactionWithdrawalResponse {
   };
   error: string | null;
 }
+
+// Goal Income Transactions List
+export interface GoalIncomeTransaction {
+  id: string;
+  goalTransactionId: string;
+  transactionId: string;
+  goalId: string;
+  // Transaction details
+  name: string;
+  amount: number;
+  description: string | null;
+  type: string;
+  recurring: number;
+  date: string;
+  createdAt: string;
+  // Goal details
+  goalTitle: string;
+  goalDescription: string | null;
+  goalCurrentAmount: number;
+  goalTargetAmount: number | null;
+}
+
+export interface GoalIncomeTransactionFilters {
+  month: number;
+  year: number;
+  goalId?: string;
+}
+
+export interface GoalIncomeTransactionsSummary {
+  month: number;
+  year: number;
+  totalAmount: number;
+  transactionCount: number;
+  uniqueGoals: number;
+}
+
+export interface GoalIncomeTransactionsResponse {
+  success: boolean;
+  data?: {
+    transactions: GoalIncomeTransaction[];
+    summary: GoalIncomeTransactionsSummary;
+  };
+  error: string | null;
+}

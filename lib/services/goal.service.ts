@@ -13,6 +13,8 @@ import {
   CreateGoalTransactionIncomeResponse,
   CreateGoalTransactionWithdrawalRequest,
   CreateGoalTransactionWithdrawalResponse,
+  GoalIncomeTransactionFilters,
+  GoalIncomeTransactionsResponse,
   Goal,
 } from "@/lib/types/goal.types";
 import { Transaction } from "../types/transaction.types";
@@ -417,6 +419,71 @@ export const goalService = {
 
       throw new Error(
         response.error || "Failed to create goal transaction withdrawal"
+      );
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        success: false,
+        data: undefined,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Get goal income transactions for a specific month and year
+   */
+  async getGoalIncomeTransactions(
+    filters: GoalIncomeTransactionFilters,
+    t?: TranslationFunction
+  ): Promise<GoalIncomeTransactionsResponse> {
+    try {
+      const params: Record<string, string> = {
+        month: filters.month.toString(),
+        year: filters.year.toString(),
+      };
+
+      if (filters.goalId) {
+        params.goalId = filters.goalId;
+      }
+
+      const response = await apiClient.get<{
+        transactions: Array<{
+          id: string;
+          goalTransactionId: string;
+          transactionId: string;
+          goalId: string;
+          name: string;
+          amount: number;
+          description: string | null;
+          type: string;
+          recurring: number;
+          date: string;
+          createdAt: string;
+          goalTitle: string;
+          goalDescription: string | null;
+          goalCurrentAmount: number;
+          goalTargetAmount: number | null;
+        }>;
+        summary: {
+          month: number;
+          year: number;
+          totalAmount: number;
+          transactionCount: number;
+          uniqueGoals: number;
+        };
+      }>("/goals/transactions/income", params);
+
+      if (response.success && response.data) {
+        return {
+          success: true,
+          data: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(
+        response.error || "Failed to fetch goal income transactions"
       );
     } catch (error) {
       const appError = handleError(error, t);

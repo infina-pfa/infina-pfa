@@ -33,6 +33,7 @@ export { useGoalDashboardSWR } from "./use-goal-dashboard";
 export { usePayYourselfFirstSWR } from "./use-pay-yourself-first";
 export { useGoalTransactionIncomeCreateSWR } from "./use-goal-transaction-income-create";
 export { useGoalTransactionWithdrawalCreateSWR } from "./use-goal-transaction-withdrawal-create";
+export { useGoalIncomeTransactionsSWR } from "./use-goal-income-transactions";
 
 // User hooks
 export { useUserProfileSWR } from "./use-user-profile";
