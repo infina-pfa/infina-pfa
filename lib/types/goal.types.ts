@@ -135,3 +135,29 @@ export interface CreateGoalTransactionIncomeResponse {
   };
   error: string | null;
 }
+
+// Goal Transaction Withdrawal creation
+export interface CreateGoalTransactionWithdrawalRequest {
+  goalId: string;
+  name: string;
+  amount: number;
+  description?: string;
+  date?: string;
+}
+
+export interface CreateGoalTransactionWithdrawalResponse {
+  success: boolean;
+  data?: {
+    transaction: Transaction;
+    goalTransaction: {
+      id: string;
+      goal_id: string;
+      transaction_id: string;
+      user_id: string;
+      created_at: string;
+      updated_at: string;
+    };
+    updatedCurrentAmount: number;
+  };
+  error: string | null;
+}

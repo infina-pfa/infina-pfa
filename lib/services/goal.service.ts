@@ -11,6 +11,8 @@ import {
   AddTransactionToGoalResponse,
   CreateGoalTransactionIncomeRequest,
   CreateGoalTransactionIncomeResponse,
+  CreateGoalTransactionWithdrawalRequest,
+  CreateGoalTransactionWithdrawalResponse,
   Goal,
 } from "@/lib/types/goal.types";
 import { Transaction } from "../types/transaction.types";
@@ -372,6 +374,49 @@ export const goalService = {
 
       throw new Error(
         response.error || "Failed to create goal transaction income"
+      );
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        success: false,
+        data: undefined,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Create a goal transaction withdrawal
+   * This creates a withdrawal transaction and reduces the goal's current amount
+   */
+  async createGoalTransactionWithdrawal(
+    data: CreateGoalTransactionWithdrawalRequest,
+    t?: TranslationFunction
+  ): Promise<CreateGoalTransactionWithdrawalResponse> {
+    try {
+      const response = await apiClient.post<{
+        transaction: Transaction;
+        goalTransaction: {
+          id: string;
+          goal_id: string;
+          transaction_id: string;
+          user_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        updatedCurrentAmount: number;
+      }>("/goals/transactions/withdraw", data);
+
+      if (response.success && response.data) {
+        return {
+          success: true,
+          data: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(
+        response.error || "Failed to create goal transaction withdrawal"
       );
     } catch (error) {
       const appError = handleError(error, t);

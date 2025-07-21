@@ -251,4 +251,41 @@ export const goalTransactionValidator = {
       dateValidator.validateNotInFuture(data.date, "Transaction");
     }
   },
+
+  /**
+   * Validate goal transaction withdrawal creation data
+   */
+  validateCreateGoalTransactionWithdrawal(data: {
+    goalId?: string;
+    name?: string;
+    amount?: number;
+    description?: string;
+    date?: string;
+  }): void {
+    // Validate goal ID
+    textValidator.validateNotEmpty(data.goalId, "Goal ID");
+
+    // Validate transaction name
+    textValidator.validateNotEmpty(data.name, "Transaction name");
+    if (data.name) {
+      textValidator.validateLength(data.name, 255, "Transaction name");
+    }
+
+    // Validate amount (must be positive for withdrawal)
+    amountValidator.validatePositive(data.amount, "Withdrawal");
+
+    // Validate description if provided
+    if (data.description) {
+      textValidator.validateLength(
+        data.description,
+        500,
+        "Transaction description"
+      );
+    }
+
+    // Validate date if provided (should not be in future)
+    if (data.date) {
+      dateValidator.validateNotInFuture(data.date, "Transaction");
+    }
+  },
 };
