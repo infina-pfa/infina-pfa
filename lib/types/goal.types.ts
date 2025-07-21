@@ -109,3 +109,29 @@ export interface AddTransactionToGoalResponse {
   goalTransaction: Transaction | null;
   error: string | null;
 }
+
+// Goal Transaction Income creation
+export interface CreateGoalTransactionIncomeRequest {
+  goalId: string;
+  name: string;
+  amount: number;
+  description?: string;
+  date?: string;
+}
+
+export interface CreateGoalTransactionIncomeResponse {
+  success: boolean;
+  data?: {
+    transaction: Transaction;
+    goalTransaction: {
+      id: string;
+      goal_id: string;
+      transaction_id: string;
+      user_id: string;
+      created_at: string;
+      updated_at: string;
+    };
+    updatedCurrentAmount: number;
+  };
+  error: string | null;
+}

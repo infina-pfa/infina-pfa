@@ -21,9 +21,14 @@ export const amountValidator = {
   /**
    * Validate amount with custom error message (allows zero)
    */
-  validatePositiveOrZero(amount: number | undefined | null, entityType: string): void {
+  validatePositiveOrZero(
+    amount: number | undefined | null,
+    entityType: string
+  ): void {
     if (!this.isPositiveOrZero(amount)) {
-      throw new Error(`${entityType} amount must be greater than or equal to 0`);
+      throw new Error(
+        `${entityType} amount must be greater than or equal to 0`
+      );
     }
   },
 
@@ -207,4 +212,43 @@ export const validateIncomeDescription = (
     return "Description cannot exceed 500 characters";
   }
   return null;
+};
+
+export const goalTransactionValidator = {
+  /**
+   * Validate goal transaction income creation data
+   */
+  validateCreateGoalTransactionIncome(data: {
+    goalId?: string;
+    name?: string;
+    amount?: number;
+    description?: string;
+    date?: string;
+  }): void {
+    // Validate goal ID
+    textValidator.validateNotEmpty(data.goalId, "Goal ID");
+
+    // Validate transaction name
+    textValidator.validateNotEmpty(data.name, "Transaction name");
+    if (data.name) {
+      textValidator.validateLength(data.name, 255, "Transaction name");
+    }
+
+    // Validate amount (must be positive for income)
+    amountValidator.validatePositive(data.amount, "Transaction");
+
+    // Validate description if provided
+    if (data.description) {
+      textValidator.validateLength(
+        data.description,
+        500,
+        "Transaction description"
+      );
+    }
+
+    // Validate date if provided (should not be in future)
+    if (data.date) {
+      dateValidator.validateNotInFuture(data.date, "Transaction");
+    }
+  },
 };

@@ -9,6 +9,8 @@ import {
   GoalStats,
   AddTransactionToGoalRequest,
   AddTransactionToGoalResponse,
+  CreateGoalTransactionIncomeRequest,
+  CreateGoalTransactionIncomeResponse,
   Goal,
 } from "@/lib/types/goal.types";
 import { Transaction } from "../types/transaction.types";
@@ -339,6 +341,49 @@ export const goalService = {
   },
 
   /**
+   * Create a goal transaction income
+   * This creates a transaction record first, then links it to the goal
+   */
+  async createGoalTransactionIncome(
+    data: CreateGoalTransactionIncomeRequest,
+    t?: TranslationFunction
+  ): Promise<CreateGoalTransactionIncomeResponse> {
+    try {
+      const response = await apiClient.post<{
+        transaction: Transaction;
+        goalTransaction: {
+          id: string;
+          goal_id: string;
+          transaction_id: string;
+          user_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        updatedCurrentAmount: number;
+      }>("/goals/transactions", data);
+
+      if (response.success && response.data) {
+        return {
+          success: true,
+          data: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(
+        response.error || "Failed to create goal transaction income"
+      );
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        success: false,
+        data: undefined,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
    * Get emergency fund dashboard data
    */
   async getDashboardData(t?: TranslationFunction): Promise<{
@@ -376,14 +421,14 @@ export const goalService = {
   async getPayYourselfFirstData(t?: TranslationFunction): Promise<{
     recommendedAmount: number;
     userInput: number;
-    status: 'pending' | 'completed' | 'postponed';
+    status: "pending" | "completed" | "postponed";
     dueDate: string;
   }> {
     try {
       const response = await apiClient.get<{
         recommendedAmount: number;
         userInput: number;
-        status: 'pending' | 'completed' | 'postponed';
+        status: "pending" | "completed" | "postponed";
         dueDate: string;
       }>("/goals/emergency-fund/pay-yourself-first");
 
@@ -391,7 +436,9 @@ export const goalService = {
         return response.data;
       }
 
-      throw new Error(response.error || "Failed to fetch pay yourself first data");
+      throw new Error(
+        response.error || "Failed to fetch pay yourself first data"
+      );
     } catch (error) {
       const appError = handleError(error, t);
       throw new Error(appError.message);
@@ -404,7 +451,7 @@ export const goalService = {
   async updateEmergencyFundContribution(
     data: {
       amount: number;
-      status: 'completed' | 'postponed';
+      status: "completed" | "postponed";
       date: string;
     },
     t?: TranslationFunction
