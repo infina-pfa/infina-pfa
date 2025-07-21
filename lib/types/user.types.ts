@@ -3,6 +3,7 @@ import type { Json } from "@/lib/supabase/database";
 export interface FinancialMetadata {
   currentWeekPlanedSpending: number;
   nextWeekPlanedSpending: number;
+  dateGetSalary: string;
 }
 
 export enum BudgetStyle {
