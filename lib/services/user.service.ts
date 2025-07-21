@@ -1,6 +1,12 @@
 import { apiClient } from "@/lib/api-client";
 import { handleError } from "@/lib/error-handler";
-import { CreateUserRequest, UserProfile, UserResponse, UserCheckResponse, UserUpdate, BudgetingStyle } from "@/lib/types/user.types";
+import {
+  CreateUserRequest,
+  UserProfile,
+  UserResponse,
+  UserCheckResponse,
+  UserUpdate,
+} from "@/lib/types/user.types";
 
 // Type for translation function
 type TranslationFunction = (key: string) => string;
@@ -12,7 +18,7 @@ export const userService = {
   async checkUserExists(): Promise<UserCheckResponse> {
     try {
       const response = await apiClient.get<UserProfile>(`/users/profile`);
-      
+
       if (response.success && response.data) {
         return {
           exists: true,
@@ -39,9 +45,12 @@ export const userService = {
   /**
    * Create a new user profile
    */
-  async createUser(request: CreateUserRequest, t?: TranslationFunction): Promise<UserResponse> {
+  async createUser(
+    request: CreateUserRequest,
+    t?: TranslationFunction
+  ): Promise<UserResponse> {
     try {
-      const response = await apiClient.post<UserProfile>('/users/profile', {
+      const response = await apiClient.post<UserProfile>("/users/profile", {
         name: request.name,
         total_asset_value: 0,
       });
@@ -53,7 +62,7 @@ export const userService = {
         };
       }
 
-      throw new Error(response.error || 'Failed to create user');
+      throw new Error(response.error || "Failed to create user");
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -68,7 +77,7 @@ export const userService = {
    */
   async getUserProfile(t?: TranslationFunction): Promise<UserResponse> {
     try {
-      const response = await apiClient.get<UserProfile>('/users/profile');
+      const response = await apiClient.get<UserProfile>("/users/profile");
 
       if (response.success && response.data) {
         return {
@@ -77,7 +86,7 @@ export const userService = {
         };
       }
 
-      throw new Error(response.error || 'Failed to get user profile');
+      throw new Error(response.error || "Failed to get user profile");
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -90,9 +99,12 @@ export const userService = {
   /**
    * Update user profile
    */
-  async updateUserProfile(updates: UserUpdate, t?: TranslationFunction): Promise<UserResponse> {
+  async updateUserProfile(
+    updates: UserUpdate,
+    t?: TranslationFunction
+  ): Promise<UserResponse> {
     try {
-      const response = await apiClient.patch<UserProfile>('/users/profile', {
+      const response = await apiClient.patch<UserProfile>("/users/profile", {
         ...updates,
         updated_at: new Date().toISOString(),
       });
@@ -104,7 +116,7 @@ export const userService = {
         };
       }
 
-      throw new Error(response.error || 'Failed to update user profile');
+      throw new Error(response.error || "Failed to update user profile");
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -117,9 +129,12 @@ export const userService = {
   /**
    * Update user budgeting style
    */
-  async updateBudgetingStyle(budgetingStyle: BudgetingStyle, t?: TranslationFunction): Promise<UserResponse> {
+  async updateBudgetingStyle(
+    budgetingStyle: "detail_tracker" | "goal_focused",
+    t?: TranslationFunction
+  ): Promise<UserResponse> {
     try {
-      const response = await apiClient.patch<UserProfile>('/users/profile', {
+      const response = await apiClient.patch<UserProfile>("/users/profile", {
         budgeting_style: budgetingStyle,
         updated_at: new Date().toISOString(),
       });
@@ -131,7 +146,7 @@ export const userService = {
         };
       }
 
-      throw new Error(response.error || 'Failed to update budgeting style');
+      throw new Error(response.error || "Failed to update budgeting style");
     } catch (error) {
       const appError = handleError(error, t);
       return {
@@ -140,4 +155,64 @@ export const userService = {
       };
     }
   },
-}; 
+
+  /**
+   * Update user financial stage
+   */
+  async updateFinancialStage(
+    financialStage: string,
+    t?: TranslationFunction
+  ): Promise<UserResponse> {
+    try {
+      const response = await apiClient.patch<UserProfile>("/users/profile", {
+        financial_stage: financialStage,
+        updated_at: new Date().toISOString(),
+      });
+
+      if (response.success && response.data) {
+        return {
+          user: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(response.error || "Failed to update financial stage");
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        user: null,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Update user financial metadata
+   */
+  async updateFinancialMetadata(
+    metadata: Record<string, unknown>,
+    t?: TranslationFunction
+  ): Promise<UserResponse> {
+    try {
+      const response = await apiClient.patch<UserProfile>("/users/profile", {
+        financial_metadata: metadata,
+        updated_at: new Date().toISOString(),
+      });
+
+      if (response.success && response.data) {
+        return {
+          user: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(response.error || "Failed to update financial metadata");
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        user: null,
+        error: appError.message,
+      };
+    }
+  },
+};

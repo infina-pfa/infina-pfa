@@ -469,6 +469,7 @@ export type Database = {
             | Database["public"]["Enums"]["budgeting_style"]
             | null;
           created_at: string;
+          financial_metadata: Json | null;
           financial_stage: string | null;
           id: string;
           name: string;
@@ -482,6 +483,7 @@ export type Database = {
             | Database["public"]["Enums"]["budgeting_style"]
             | null;
           created_at?: string;
+          financial_metadata?: Json | null;
           financial_stage?: string | null;
           id?: string;
           name: string;
@@ -495,6 +497,7 @@ export type Database = {
             | Database["public"]["Enums"]["budgeting_style"]
             | null;
           created_at?: string;
+          financial_metadata?: Json | null;
           financial_stage?: string | null;
           id?: string;
           name?: string;

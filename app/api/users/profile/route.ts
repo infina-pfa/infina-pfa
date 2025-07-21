@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { BudgetingStyle } from "@/lib/types/user.types";
 
 export async function GET() {
   try {
@@ -46,6 +45,7 @@ export async function GET() {
           budgeting_style: null,
           onboarding_completed_at: null,
           financial_stage: null,
+          financial_metadata: null,
           created_at: user.created_at,
           updated_at: user.updated_at,
         },
@@ -105,23 +105,32 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate budgeting_style if provided
-    if (budgeting_style && !["goal_focused", "detail_tracker"].includes(budgeting_style)) {
+    if (
+      budgeting_style &&
+      !["goal_focused", "detail_tracker"].includes(budgeting_style)
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid budgeting_style. Must be 'goal_focused' or 'detail_tracker'",
+          error:
+            "Invalid budgeting_style. Must be 'goal_focused' or 'detail_tracker'",
         },
         { status: 400 }
       );
     }
 
     // Create user profile
-    const insertData: any = {
+    const insertData: {
+      user_id: string;
+      name: string;
+      total_asset_value: number;
+      budgeting_style?: "detail_tracker" | "goal_focused" | null;
+    } = {
       user_id: user.id,
       name: name.trim(),
       total_asset_value: total_asset_value || 0,
     };
-    
+
     if (budgeting_style) {
       insertData.budgeting_style = budgeting_style;
     }
@@ -204,11 +213,15 @@ export async function PATCH(request: NextRequest) {
 
     if (body.budgeting_style !== undefined) {
       // Validate budgeting_style
-      if (body.budgeting_style && !["goal_focused", "detail_tracker"].includes(body.budgeting_style)) {
+      if (
+        body.budgeting_style &&
+        !["goal_focused", "detail_tracker"].includes(body.budgeting_style)
+      ) {
         return NextResponse.json(
           {
             success: false,
-            error: "Invalid budgeting_style. Must be 'goal_focused' or 'detail_tracker'",
+            error:
+              "Invalid budgeting_style. Must be 'goal_focused' or 'detail_tracker'",
           },
           { status: 400 }
         );
@@ -220,9 +233,13 @@ export async function PATCH(request: NextRequest) {
       updateData.onboarding_completed_at = body.onboarding_completed_at;
     }
 
+    if (body.financial_metadata !== undefined) {
+      updateData.financial_metadata = body.financial_metadata;
+    }
+
     if (body.profileData?.identifiedStage !== undefined) {
       // Validate financial_stage values
-      const validStages = ["debt", "no_saving", "start_investing"];
+      const validStages = ["debt", "start_saving", "start_investing"];
       if (!validStages.includes(body.profileData.identifiedStage)) {
         return NextResponse.json(
           {
@@ -235,6 +252,23 @@ export async function PATCH(request: NextRequest) {
         );
       }
       updateData.financial_stage = body.profileData.identifiedStage;
+    }
+
+    if (body.financial_stage !== undefined) {
+      // Direct financial_stage update
+      const validStages = ["debt", "start_saving", "start_investing"];
+      if (body.financial_stage && !validStages.includes(body.financial_stage)) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Invalid financial_stage. Must be one of: ${validStages.join(
+              ", "
+            )}`,
+          },
+          { status: 400 }
+        );
+      }
+      updateData.financial_stage = body.financial_stage;
     }
 
     if (body.updated_at !== undefined) {

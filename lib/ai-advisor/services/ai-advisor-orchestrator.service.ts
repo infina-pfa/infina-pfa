@@ -244,8 +244,8 @@ export class AIAdvisorOrchestratorService {
     );
 
     // Get user's financial stage and budget style
-    const userStage = this.user.financial_stage || FinancialStage.START_SAVING;
-    const userBudgetStyle = this.user.budget_style || BudgetStyle.GOAL_FOCUSED;
+    const userStage = this.user.financial_stage as FinancialStage;
+    const userBudgetStyle = this.user.budgeting_style as BudgetStyle;
 
     console.log("🎯 User stage and style:", {
       financialStage: userStage,

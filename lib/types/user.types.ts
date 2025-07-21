@@ -1,3 +1,10 @@
+import type { Json } from "@/lib/supabase/database";
+
+export interface FinancialMetadata {
+  currentWeekPlanedSpending: number;
+  nextWeekPlanedSpending: number;
+}
+
 export enum BudgetStyle {
   DETAIL_TRACKER = "detail_tracker",
   GOAL_FOCUSED = "goal_focused",
@@ -9,6 +16,7 @@ export enum FinancialStage {
   START_INVESTING = "start_investing",
 }
 
+// Database row type - matches exactly what comes from Supabase
 export interface User {
   id: string;
   created_at: string;
@@ -16,39 +24,48 @@ export interface User {
   name: string;
   user_id: string;
   total_asset_value: number;
-  onboarding_completed_at?: string;
-  financial_stage?: FinancialStage;
-  budget_style?: BudgetStyle;
+  onboarding_completed_at?: string | null;
+  financial_metadata?: Json | null;
+  financial_stage?: string | null;
+  budgeting_style?: "detail_tracker" | "goal_focused" | null;
 }
 
+// Insert type for creating users
 export interface UserInsert {
   name: string;
   user_id: string;
   total_asset_value?: number;
+  financial_metadata?: Json | null;
+  financial_stage?: string | null;
+  budgeting_style?: "detail_tracker" | "goal_focused" | null;
 }
 
+// Update type for updating users
 export interface UserUpdate {
   name?: string;
   total_asset_value?: number;
-  financial_stage?: FinancialStage;
-  budget_style?: BudgetStyle;
+  financial_stage?: string;
+  budgeting_style?: "detail_tracker" | "goal_focused";
+  financial_metadata?: Json | null;
+  onboarding_completed_at?: string | null;
   updated_at?: string;
 }
 
-// User creation request
+// User creation request from frontend
 export interface CreateUserRequest {
   name: string;
 }
 
-// User profile response
+// Client-side user profile with typed metadata
 export interface UserProfile {
   id: string;
   name: string;
   user_id: string;
   total_asset_value: number;
-  onboarding_completed_at?: string;
-  financial_stage?: FinancialStage;
-  budget_style?: BudgetStyle;
+  onboarding_completed_at?: string | null;
+  financial_stage?: string | null;
+  financial_metadata?: FinancialMetadata | null;
+  budgeting_style?: "detail_tracker" | "goal_focused" | null;
   created_at: string;
   updated_at: string;
 }
@@ -64,3 +81,7 @@ export interface UserCheckResponse {
   user: UserProfile | null;
   error: string | null;
 }
+
+// Legacy types for backward compatibility
+export type BudgetingStyle = "detail_tracker" | "goal_focused";
+export type FinancialStageType = "debt" | "start_saving" | "start_investing";
