@@ -15,6 +15,7 @@ import {
   StageConfigurations,
   StageToolConfiguration,
 } from "./stage-configurations";
+import fs from "fs";
 
 export class DynamicOrchestrator {
   private static stageConfigurations: StageConfigurations =
@@ -112,9 +113,8 @@ export class DynamicOrchestrator {
     );
 
     const today = new Date().toISOString();
-
-    return `
-  <system_prompt>
+    const system_prompt = `
+      <system_prompt>
     <today_date>${today}</today_date>
     <user_context>
       <user_id>${userId}</user_id>
@@ -139,7 +139,13 @@ export class DynamicOrchestrator {
       <mcp_tools>${llmConfig.mcpInfo}</mcp_tools>
     </tools_info>
   </system_prompt>
+
     `;
+    
+    //log the system prompt into new file to debug
+    fs.writeFileSync("system_prompt.txt", system_prompt);
+   
+    return system_prompt;
   }
 
   /**

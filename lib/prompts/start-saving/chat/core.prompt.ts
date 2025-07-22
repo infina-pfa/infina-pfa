@@ -501,6 +501,4 @@ export const coreSavingPrompt = `
             
         </mcp_intelligent_decision_making>
     </tool_usage_guidelines>
-
-
 `;
