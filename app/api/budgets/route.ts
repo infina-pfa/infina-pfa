@@ -110,11 +110,13 @@ export async function GET(request: NextRequest) {
       // Calculate totals
 
       const totalBudget = budgetsWithSpending.reduce(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (sum: number, budget: any) => sum + budget.amount,
         0
       );
 
       const totalSpent = budgetsWithSpending.reduce(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (sum: number, budget: any) => sum + budget.spent,
         0
       );

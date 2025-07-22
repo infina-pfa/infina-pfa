@@ -19,6 +19,7 @@ import {
 } from "@/lib/ai-advisor/utils/validation";
 import { createClient } from "@/lib/supabase/server";
 import { AsyncMemoryManager } from "@/lib/ai-advisor/memory-manager";
+import { UserProfile } from "@/lib/types/user.types";
 
 // Initialize OpenAI client
 const openaiClient = new OpenAI({
@@ -100,6 +101,14 @@ export async function POST(request: NextRequest) {
       .eq("user_id", user.id)
       .single();
 
+    if (!userProfile.data) {
+      console.error("❌ User profile not found");
+      return NextResponse.json(
+        { error: "User profile not found" },
+        { status: 404 }
+      );
+    }
+
     // Prepare request with user ID
     console.log("📝 Preparing AI advisor request...");
     const aiAdvisorRequest: RequestBody = {
@@ -160,7 +169,7 @@ export async function POST(request: NextRequest) {
     console.log("🌊 Creating readable stream...");
     let readable: ReadableStream | null = null;
     const orchestratorService = new AIAdvisorOrchestratorService(
-      userProfile.data,
+      userProfile.data as UserProfile,
       openaiClient,
       memoryManager,
       mcpConfig

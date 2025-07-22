@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { OnboardingComponent, ComponentResponse } from "@/lib/types/onboarding.types";
+import {
+  OnboardingComponent,
+  ComponentResponse,
+} from "@/lib/types/onboarding.types";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useBudgetAllocation } from "@/hooks/budgeting/use-budget-allocation";
 import { BudgetAllocationForm } from "./budget-allocation-form";
@@ -14,12 +17,12 @@ interface BudgetAllocationToolProps {
 
 /**
  * Refactored Budget Allocation Tool
- * 
+ *
  * This component has been refactored to follow SOLID principles:
  * - Logic moved to useBudgetAllocation hook
  * - UI separated into BudgetAllocationForm component
  * - Individual category cards extracted to BudgetCategoryCard
- * 
+ *
  * This makes the code more maintainable and testable.
  */
 export default function BudgetAllocationToolRefactored({
@@ -28,12 +31,16 @@ export default function BudgetAllocationToolRefactored({
 }: BudgetAllocationToolProps) {
   const { t } = useAppTranslation(["onboarding", "budgeting", "common"]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(!!component.response?.allocation);
+  const [isCompleted, setIsCompleted] = useState(
+    !!component.response?.allocation
+  );
 
   // Get data from component context (should be passed from previous steps)
   const monthlyIncome = component.context?.monthlyIncome || 10000000; // Default 10M VND for demo
-  const emergencyFundTarget = component.context?.emergencyFundTarget || monthlyIncome * 6; // Default 6 months of income
-  const monthlyTargetSavings = component.context?.monthlyTargetSavings || emergencyFundTarget / 24; // 24 months to reach target
+  const emergencyFundTarget =
+    component.context?.emergencyFundTarget || monthlyIncome * 6; // Default 6 months of income
+  const monthlyTargetSavings =
+    component.context?.monthlyTargetSavings || emergencyFundTarget / 24; // 24 months to reach target
   const budgetingStyle = component.context?.budgetingStyle || "goal_focused";
   const expenseBreakdown = component.context?.expenseBreakdown || {};
 
@@ -45,7 +52,8 @@ export default function BudgetAllocationToolRefactored({
     monthlyTargetSavings,
     budgetingStyle,
     expenseBreakdown,
-    hasExpenseBreakdown: !!expenseBreakdown && Object.keys(expenseBreakdown).length > 0,
+    hasExpenseBreakdown:
+      !!expenseBreakdown && Object.keys(expenseBreakdown).length > 0,
     expenseBreakdownKeys: Object.keys(expenseBreakdown),
   });
 
@@ -55,7 +63,6 @@ export default function BudgetAllocationToolRefactored({
     validationErrors,
     totalPercentage,
     isValid,
-    updateAllocation,
     handlePercentageChange,
     autoAdjustAllocation,
     calculateMonetaryValue,
@@ -100,8 +107,10 @@ export default function BudgetAllocationToolRefactored({
       };
 
       // Get user's budgeting style and expense breakdown from context
-      const contextBudgetingStyle = component.context?.budgetingStyle || "goal_focused";
-      const contextExpenseBreakdown = component.context?.expenseBreakdown || null;
+      const contextBudgetingStyle =
+        component.context?.budgetingStyle || "goal_focused";
+      const contextExpenseBreakdown =
+        component.context?.expenseBreakdown || null;
 
       console.log("🏗️ Budget allocation tool submission context:", {
         fullContext: component.context,
@@ -122,18 +131,24 @@ export default function BudgetAllocationToolRefactored({
       });
 
       // Create budget records in database via service layer
-      const allocationResult = await budgetAllocationService.createBudgetAllocation({
-        allocationData: allocation,
-        monthlyIncome,
-        budgetingStyle: contextBudgetingStyle,
-        expenseBreakdown: contextExpenseBreakdown,
-      });
+      const allocationResult =
+        await budgetAllocationService.createBudgetAllocation({
+          allocationData: allocation,
+          monthlyIncome,
+          budgetingStyle: contextBudgetingStyle,
+          expenseBreakdown: contextExpenseBreakdown,
+        });
 
       if (!allocationResult.success) {
-        throw new Error(allocationResult.error || "Failed to create budget records");
+        throw new Error(
+          allocationResult.error || "Failed to create budget records"
+        );
       }
 
-      console.log("✅ Budget records created successfully:", allocationResult.data);
+      console.log(
+        "✅ Budget records created successfully:",
+        allocationResult.data
+      );
 
       await onResponse({
         allocation,
@@ -148,9 +163,13 @@ export default function BudgetAllocationToolRefactored({
             allocationResult.data.totalBudgets
           } budget categories for me. Emergency Fund ${formatPercentage(
             allocation.emergencyFund
-          )}% (${formatCurrency(monetaryValues.emergencyFund)}), Living Expenses ${formatPercentage(
+          )}% (${formatCurrency(
+            monetaryValues.emergencyFund
+          )}), Living Expenses ${formatPercentage(
             allocation.livingExpenses
-          )}% (${formatCurrency(monetaryValues.livingExpenses)}), Free to Spend ${formatPercentage(
+          )}% (${formatCurrency(
+            monetaryValues.livingExpenses
+          )}), Free to Spend ${formatPercentage(
             allocation.freeToSpend
           )}% (${formatCurrency(monetaryValues.freeToSpend)}). This ${
             contextBudgetingStyle === "goal_focused" ? "simplified" : "detailed"
@@ -161,21 +180,30 @@ export default function BudgetAllocationToolRefactored({
           totalBudgets: allocationResult.data.totalBudgets,
           categories: [
             {
-              name: t("emergencyFund", { ns: "budgeting", defaultValue: "Emergency Fund" }),
+              name: t("emergencyFund", {
+                ns: "budgeting",
+                defaultValue: "Emergency Fund",
+              }),
               percentage: `${formatPercentage(allocation.emergencyFund)}%`,
               amount: formatCurrency(monetaryValues.emergencyFund),
               priority: 1,
               locked: true,
             },
             {
-              name: t("livingExpenses", { ns: "budgeting", defaultValue: "Living Expenses" }),
+              name: t("livingExpenses", {
+                ns: "budgeting",
+                defaultValue: "Living Expenses",
+              }),
               percentage: `${formatPercentage(allocation.livingExpenses)}%`,
               amount: formatCurrency(monetaryValues.livingExpenses),
               priority: 2,
               locked: false,
             },
             {
-              name: t("freeToSpend", { ns: "budgeting", defaultValue: "Free to Spend" }),
+              name: t("freeToSpend", {
+                ns: "budgeting",
+                defaultValue: "Free to Spend",
+              }),
               percentage: `${formatPercentage(allocation.freeToSpend)}%`,
               amount: formatCurrency(monetaryValues.freeToSpend),
               priority: 3,

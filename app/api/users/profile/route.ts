@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { name, total_asset_value, budgeting_style } = body;
+    const { name, total_asset_value, budgeting_style, financial_stage } = body;
 
     // Validate required fields
     if (!name?.trim()) {
@@ -125,6 +125,7 @@ export async function POST(request: NextRequest) {
       name: string;
       total_asset_value: number;
       budgeting_style?: "detail_tracker" | "goal_focused" | null;
+      financial_stage?: string | null;
     } = {
       user_id: user.id,
       name: name.trim(),
@@ -133,6 +134,10 @@ export async function POST(request: NextRequest) {
 
     if (budgeting_style) {
       insertData.budgeting_style = budgeting_style;
+    }
+
+    if (financial_stage) {
+      insertData.financial_stage = financial_stage;
     }
 
     const { data: userProfile, error } = await supabase

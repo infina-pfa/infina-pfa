@@ -200,7 +200,7 @@ const getCurrentWeekSpendingAmount = async (
   }
 };
 
-export const getCurrentMonthDepositToGoal = async (
+const getCurrentMonthDepositToGoal = async (
   supabaseClient: SupabaseClient<Database>,
   userId: string
 ): Promise<number> => {
