@@ -7,7 +7,12 @@ export const commonEn = {
   logout: "Logout",
   profile: "Profile",
   settings: "Settings",
-
+  "infina-advisor": "Financial Advisor",
+  goals: "Goals",
+  income: "Income",
+  budgeting: "Budgeting",
+  dashboard: "Dashboard",
+  tools: "Tools",
   // Common actions
   cancel: "Cancel",
   save: "Save",

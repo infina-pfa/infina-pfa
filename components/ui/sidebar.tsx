@@ -14,6 +14,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Target,
+  DollarSign,
 } from "lucide-react";
 import { FinaIcon } from "@/components/ui/fina-icon";
 import { useAppTranslation } from "@/hooks/use-translation";
@@ -21,7 +23,7 @@ import { usePathname } from "next/navigation";
 
 const navigationItems = [
   {
-    key: "fina",
+    key: "infina-advisor",
     href: "/chat",
     icon: Sparkles,
   },
@@ -29,6 +31,16 @@ const navigationItems = [
     key: "budgeting",
     href: "/budgeting",
     icon: Calculator,
+  },
+  {
+    key: "income",
+    href: "/income",
+    icon: DollarSign,
+  },
+  {
+    key: "goals",
+    href: "/goals",
+    icon: Target,
   },
   {
     key: "tools",
