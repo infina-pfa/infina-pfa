@@ -62,11 +62,12 @@ export function ChatInterface() {
     if (user && !sentFirstMessage.current) {
       const startConversation = async () => {
         const firstMessage = await startConversationService.getFirstMessage();
+        console.log("🚀 ~ startConversation ~ firstMessage:", firstMessage);
         sendMessage(firstMessage, {
           sender: "system",
         });
-        sentFirstMessage.current = true;
       };
+      sentFirstMessage.current = true;
       startConversation();
     }
   }, [user]);
