@@ -11,14 +11,18 @@ import {
   CreateGoalModal,
   EditGoalModal,
 } from "./";
+import { DepositGoalModal } from "./deposit-goal-modal";
+import { WithdrawGoalModal } from "./withdraw-goal-modal";
 
 export function GoalWidget() {
   const { t } = useAppTranslation(["goals", "common"]);
-  const { goals, loading } = useGoalManagementSWR();
+  const { goals, loading, refetch } = useGoalManagementSWR();
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
 
   // Calculate summary data
@@ -50,14 +54,23 @@ export function GoalWidget() {
     }
   };
 
-  // Handle delete goal
-  // const handleDeleteGoal = async (goalId: string) => {
-  //   try {
-  //     await deleteGoal(goalId);
-  //   } catch (error) {
-  //     console.error("Error deleting goal:", error);
-  //   }
-  // };
+  // Handle deposit to goal
+  const handleDepositGoal = (goalId: string) => {
+    const goal = goals.find((g) => g.id === goalId);
+    if (goal) {
+      setSelectedGoal(goal);
+      setIsDepositModalOpen(true);
+    }
+  };
+
+  // Handle withdraw from goal
+  const handleWithdrawGoal = (goalId: string) => {
+    const goal = goals.find((g) => g.id === goalId);
+    if (goal) {
+      setSelectedGoal(goal);
+      setIsWithdrawModalOpen(true);
+    }
+  };
 
   // Handle modal close
   const handleCloseCreateModal = () => {
@@ -69,6 +82,16 @@ export function GoalWidget() {
     setSelectedGoal(null);
   };
 
+  const handleCloseDepositModal = () => {
+    setIsDepositModalOpen(false);
+    setSelectedGoal(null);
+  };
+
+  const handleCloseWithdrawModal = () => {
+    setIsWithdrawModalOpen(false);
+    setSelectedGoal(null);
+  };
+
   // Handle modal success
   const handleCreateSuccess = () => {
     setIsCreateModalOpen(false);
@@ -77,6 +100,20 @@ export function GoalWidget() {
   const handleEditSuccess = () => {
     setIsEditModalOpen(false);
     setSelectedGoal(null);
+  };
+
+  const handleDepositSuccess = () => {
+    setIsDepositModalOpen(false);
+    setSelectedGoal(null);
+    // Trigger refetch to ensure UI updates with latest data
+    refetch();
+  };
+
+  const handleWithdrawSuccess = () => {
+    setIsWithdrawModalOpen(false);
+    setSelectedGoal(null);
+    // Trigger refetch to ensure UI updates with latest data
+    refetch();
   };
 
   return (
@@ -106,7 +143,8 @@ export function GoalWidget() {
           goals={goals}
           onCreateGoal={handleCreateGoal}
           onEditGoal={handleEditGoal}
-          // onDeleteGoal={handleDeleteGoal}
+          onDepositGoal={handleDepositGoal}
+          onWithdrawGoal={handleWithdrawGoal}
           loading={loading}
         />
 
@@ -131,6 +169,22 @@ export function GoalWidget() {
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
         onSuccess={handleEditSuccess}
+        goal={selectedGoal}
+      />
+
+      {/* Deposit Goal Modal */}
+      <DepositGoalModal
+        isOpen={isDepositModalOpen}
+        onClose={handleCloseDepositModal}
+        onSuccess={handleDepositSuccess}
+        goal={selectedGoal}
+      />
+
+      {/* Withdraw Goal Modal */}
+      <WithdrawGoalModal
+        isOpen={isWithdrawModalOpen}
+        onClose={handleCloseWithdrawModal}
+        onSuccess={handleWithdrawSuccess}
         goal={selectedGoal}
       />
     </div>

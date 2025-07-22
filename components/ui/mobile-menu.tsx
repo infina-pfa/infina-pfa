@@ -26,9 +26,9 @@ import { usePathname } from "next/navigation";
 
 const navigationItems = [
   {
-    key: "dashboard",
-    href: "/",
-    icon: Home,
+    key: "infina-advisor",
+    href: "/chat",
+    icon: MessageCircle,
   },
   {
     key: "budgeting",
@@ -44,11 +44,6 @@ const navigationItems = [
     key: "goals",
     href: "/goals",
     icon: Target,
-  },
-  {
-    key: "infina-advisor",
-    href: "/chat",
-    icon: MessageCircle,
   },
   {
     key: "tools",

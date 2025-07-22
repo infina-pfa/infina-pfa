@@ -18,6 +18,8 @@ export const goalsEn = {
   remaining: "Remaining",
   edit: "Edit",
   delete: "Delete",
+  deposit: "Deposit",
+  withdraw: "Withdraw",
 
   // Goal Transactions
   recentTransactions: "Recent Goal Transactions",
@@ -31,6 +33,7 @@ export const goalsEn = {
   createGoal: "Create Goal",
   editGoal: "Edit Goal",
   updateGoal: "Update Goal",
+  renameGoal: "Rename Goal",
   goalTitle: "Goal Title",
   description: "Description",
   goalTitlePlaceholder: "Enter goal title",
@@ -38,10 +41,25 @@ export const goalsEn = {
   targetAmountPlaceholder: "Enter target amount",
   descriptionPlaceholder: "Enter goal description (optional)",
 
+  // Deposit/Withdraw Modals
+  depositToGoal: "Deposit to {{goal}}",
+  withdrawFromGoal: "Withdraw from {{goal}}",
+  depositing: "Depositing...",
+  withdrawing: "Withdrawing...",
+  depositSuccess: "Successfully deposited {{amount}} to {{goal}}",
+  withdrawSuccess: "Successfully withdrew {{amount}} from {{goal}}",
+  depositFailed: "Failed to deposit to goal",
+  withdrawFailed: "Failed to withdraw from goal",
+  insufficientFunds: "Insufficient funds. Available: {{available}}",
+  availableBalance: "Available balance",
+  withdrawReason: "Why are you withdrawing?",
+  enterWithdrawReason: "Enter the reason for withdrawal",
+
   // Goal Dashboard Translations
   goalDashboardTitle: "Emergency Fund Progress",
   goalDashboardNoGoal: "No Emergency Fund Goal Yet",
-  goalDashboardCreateFirst: "Let's create your first emergency fund to secure your financial future",
+  goalDashboardCreateFirst:
+    "Let's create your first emergency fund to secure your financial future",
   goalDashboardProgress: "Complete",
   goalDashboardMonthsCoverage: "Coverage",
   goalDashboardMonthsCount_one: "{{count}} month",
@@ -50,7 +68,8 @@ export const goalsEn = {
   goalDashboardNotSet: "Not set",
   goalDashboardMonthlySavingsRate: "Monthly savings rate",
   goalDashboardAddMoney: "Add Money",
-  goalDashboardCompleted: "🎉 Congratulations! You've completed your emergency fund!",
+  goalDashboardCompleted:
+    "🎉 Congratulations! You've completed your emergency fund!",
   goalDashboardAlmostThere: "💪 Almost there! You're doing great!",
   goalDashboardHalfway: "🚀 Halfway to your goal! Keep it up!",
   goalDashboardGoodStart: "✨ Good start! You're building momentum!",
@@ -78,30 +97,38 @@ export const goalsEn = {
 
   // Pay Yourself First
   payYourselfFirstTitle: "Monthly Emergency Fund Contribution",
-  payYourselfFirstDescription: "Time to pay yourself first! How much did you transfer to your emergency fund this month?",
+  payYourselfFirstDescription:
+    "Time to pay yourself first! How much did you transfer to your emergency fund this month?",
   recommendedAmount: "Recommended: {{amount}}",
   recommendedContribution: "Recommended contribution",
   actualContribution: "How much did you transfer?",
   transferredButton: "Transferred",
-  notTransferredButton: "Not transferred", 
+  notTransferredButton: "Not transferred",
   remindLaterButton: "Remind me later",
-  contributionSuccess: "Great! Your emergency fund contribution has been recorded.",
+  contributionSuccess:
+    "Great! Your emergency fund contribution has been recorded.",
   contributionRecorded: "Contribution Recorded!",
   contributionPostponed: "No worries! We'll remind you later.",
   keepUpGoodWork: "Keep up the good work!",
-  everyContributionCounts: "Every contribution brings you closer to financial security.",
+  everyContributionCounts:
+    "Every contribution brings you closer to financial security.",
   enterAmount: "Enter amount",
   contributionPlaceholder: "Enter the amount you transferred",
 
   // AI Recommendations
-  noGoalReasoning: "Start with a small amount to build the habit. Consider setting up an emergency fund goal first.",
-  goalCompleteReasoning: "Congratulations! Your emergency fund goal is complete. Consider maintaining or increasing it based on your lifestyle changes.",
-  onTrackReasoning: "Based on your {{months}}-month timeline, contributing {{amount}} monthly will help you reach your goal on schedule.",
-  stretchedButFeasibleReasoning: "Contributing {{amount}} monthly is feasible based on your financial capacity, though it may take {{extraMonths}} extra months to reach your goal.",
-  challengingTimelineReasoning: "Your current timeline is ambitious. Consider contributing {{amount}} monthly, which aligns with your financial capacity, and potentially extending your goal deadline.",
+  noGoalReasoning:
+    "Start with a small amount to build the habit. Consider setting up an emergency fund goal first.",
+  goalCompleteReasoning:
+    "Congratulations! Your emergency fund goal is complete. Consider maintaining or increasing it based on your lifestyle changes.",
+  onTrackReasoning:
+    "Based on your {{months}}-month timeline, contributing {{amount}} monthly will help you reach your goal on schedule.",
+  stretchedButFeasibleReasoning:
+    "Contributing {{amount}} monthly is feasible based on your financial capacity, though it may take {{extraMonths}} extra months to reach your goal.",
+  challengingTimelineReasoning:
+    "Your current timeline is ambitious. Consider contributing {{amount}} monthly, which aligns with your financial capacity, and potentially extending your goal deadline.",
   aiRecommendationTitle: "💡 AI Recommendation",
   confidenceHigh: "High confidence",
-  confidenceMedium: "Medium confidence", 
+  confidenceMedium: "Medium confidence",
   confidenceLow: "Low confidence",
   alternativeAmounts: "Alternative amounts:",
   minRecommendation: "Conservative: {{amount}}",

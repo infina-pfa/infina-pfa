@@ -123,6 +123,15 @@ export const commonVi = {
   // Form fields
   description: "Mô tả",
   descriptionPlaceholder: "Nhập mô tả",
+  amount: "Số tiền",
+
+  // Transaction related
+  transactionName: "Tên giao dịch",
+  enterTransactionName: "Nhập tên giao dịch",
+  enterDescription: "Nhập mô tả (tùy chọn)",
+  nameRequired: "Tên là bắt buộc",
+  amountMustBePositive: "Số tiền phải lớn hơn 0",
+  reasonRequired: "Lý do là bắt buộc",
 
   // Question flow
   question: "Câu hỏi",

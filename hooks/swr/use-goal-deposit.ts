@@ -47,7 +47,7 @@ export const useGoalDeposit = () => {
       setError(null);
 
       const response = await apiClient.post<DepositResponse["data"]>(
-        `/api/goals/${goalId}/transactions/deposit`,
+        `/goals/${goalId}/transactions/deposit`,
         data
       );
 
@@ -57,6 +57,8 @@ export const useGoalDeposit = () => {
           mutate(`/api/goals/${goalId}`),
           mutate("/api/goals"),
           mutate(`/api/goals/${goalId}/transactions`),
+          mutate(["goals"]), // Add this to match the cache key used in useGoalListSWR
+          mutate(["goals", undefined]), // Also invalidate with undefined filters
         ]);
 
         return response.data;
