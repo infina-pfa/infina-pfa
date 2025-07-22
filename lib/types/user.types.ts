@@ -1,6 +1,5 @@
 export interface FinancialMetadata {
-  currentWeekPlanedSpending: number;
-  nextWeekPlanedSpending: number;
+  weekSpending: { week: number; allowToSpend: number }[];
   dateGetSalary: string;
   payYourselfFirstAmount: number;
   monthlyIncome: number;

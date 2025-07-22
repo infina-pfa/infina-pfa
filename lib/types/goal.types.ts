@@ -205,3 +205,10 @@ export interface GoalIncomeTransactionsResponse {
   };
   error: string | null;
 }
+
+export enum DateStage {
+  START_OF_MONTH = "start_of_month",
+  END_OF_MONTH = "end_of_month",
+  NORMAL_DAY = "normal_day",
+  END_OF_WEEK = "end_of_week",
+}

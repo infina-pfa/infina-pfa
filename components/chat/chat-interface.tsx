@@ -2,17 +2,17 @@
 
 import { useAuth } from "@/hooks/use-auth";
 import { useChatFlow } from "@/hooks/use-chat-flow";
+import { useOnboardingCheck } from "@/hooks/use-onboarding-check";
 import { useAppTranslation } from "@/hooks/use-translation";
+import { startConversationService } from "@/lib/ai-advisor/services/start-conversation.service";
 import { ChatToolId } from "@/lib/types/ai-streaming.types";
+import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
-import { getStartConversationPromptForStartSaving } from "@/lib/ai-advisor/prompts/start-conversation";
-import { useOnboardingCheck } from "@/hooks/use-onboarding-check";
-import { redirect } from "next/navigation";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
@@ -60,10 +60,14 @@ export function ChatInterface() {
 
   useEffect(() => {
     if (user && !sentFirstMessage.current) {
-      sendMessage(getStartConversationPromptForStartSaving(), {
-        sender: "system",
-      });
-      sentFirstMessage.current = true;
+      const startConversation = async () => {
+        const firstMessage = await startConversationService.getFirstMessage();
+        sendMessage(firstMessage, {
+          sender: "system",
+        });
+        sentFirstMessage.current = true;
+      };
+      startConversation();
     }
   }, [user]);
 
