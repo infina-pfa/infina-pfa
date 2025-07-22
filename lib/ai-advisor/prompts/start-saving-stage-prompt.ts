@@ -84,7 +84,7 @@ export function generateStartSavingStagePrompt(
                         <sub_step id="1.educate_on_emergency_fund_if_not_know">
                             <goal>If users don't know about Emergency Fund, help them understand why they need an Emergency Fund.</goal>
                             <action>
-                                - **Educate on Emergency Fund:** Introduce the "Emergency Fund" concept. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//Quy%20Du%20Phong.mp4' ; description: 'Knowldge about Emergency Fund') to display a short video with a simple explanation. 
+                                - **Educate on Emergency Fund:** Introduce the "Emergency Fund" concept. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//04%20VAY%20TN%20DNG_1080p.mp4' ; description: 'Knowldge about Emergency Fund') to display a short video with a simple explanation. 
                             </action>
                             <completion_criteria>The user has been introduced to Emergency Fund.</completion_criteria>
                         </sub_step>
@@ -114,7 +114,7 @@ export function generateStartSavingStagePrompt(
                                         - **If they don't know:** HIGHLY suggest a 12-month timeline, explaining this equates to saving 25% of their income each month.
                                         - **If user enters a number of months:** Calculate the required monthly savings rate.
                                         - If the rate is >30% of income: Warn them that this is quite ambitious and may be difficult to sustain. Ask if they are sure or suggest a slightly longer, more sustainable timeline.
-                                        - For low-income users (e.g., < 7 million VND in a major city): PAY SPEACIAL INTENTION TO THIS CASE and double-check that they feel comfortable with their chosen timeline.
+                                        - For low-income users (e.g., < 7 million VND in a major city): PAY SPECIAL ATTENTION TO THIS CASE and double-check that they feel comfortable with their chosen timeline.
                                          - **Confirm:** "Great! Let's confirm the goal: save [Target Amount] in [Number of Months]-> MUST call show_onboarding_component with "goal_confirmation" type to display the goal confirmation component.
                                 </action>
                                 <completion_criteria>User has confirmed the target amount and timeline.</completion_criteria>
@@ -123,38 +123,98 @@ export function generateStartSavingStagePrompt(
                             <sub_step id="2c_educate_on_pyf_and_introduce_tool">
                                 <goal>Introduce the PYF concept, and the budgeting tool.</goal>
                                 <action>
-                                    - **Educate on PYF:** Introduce the "Pay Yourself First" concept as the method to achieve this goal. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//PYF.mp4' ; description: 'Knowledge about PYF') to display a short video with a simple explanation.
+                                    - **Educate on PYF:** Introduce the "Pay Yourself First" concept as the method to achieve this goal. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//04%20VAY%20TN%20DNG_1080p.mp4' ; description: 'Knowledge about PYF') to display a short video with a simple explanation.
                                     - **Introduce Tool:** "To implement PYF and manage your spending effectively, I'll help you set up our Budgeting Tool right now."
                                 </action>
                                 <completion_criteria>The goal has been created, and the user has been introduced to PYF.</completion_criteria>
                             </sub_step>
+
+                            <sub_step id="2c2_select_budgeting_philosophy">
+                                <goal>Help user choose their budgeting philosophy after learning about PYF.</goal>
+                                <action>
+                                    - **Introduce Philosophy Selection:** "Great! Now that you understand Pay Yourself First, let's determine the best approach for managing your finances. There are two main philosophies that can help you achieve your goals:"
+                                    - **Present Two Philosophies with Detailed Explanation:**
+                                        - **Philosophy 1 - Goal-Focused Method (Simplicity):** "This approach focuses on high-level budget categories and simplicity. Perfect if you're a busy professional who wants to save but prefers simple, streamlined management. You'll work with just two main categories: living expenses and free spending money."
+                                        - **Philosophy 2 - Detail Tracker Method (Detailed Tracking):** "This approach involves tracking detailed expense categories to analyze spending patterns and find opportunities to save more. Perfect if you're detail-oriented and want to optimize your spending through comprehensive tracking. You'll manage specific categories like housing, food, transportation, etc."
+                                    - **Explain Impact:** "Your choice will determine how we set up your budget and what tracking approach I'll recommend going forward. You can always change this later in your settings."
+                                    - **Display Philosophy Selection Component:** -> Call show_onboarding_component with "philosophy_selection" type to display the interactive philosophy selection interface.
+                                    - **Save Philosophy:** Once user selects a philosophy, save it to the database in the users table, budgeting_style column with the appropriate enum value ('goal_focused' or 'detail_tracker').
+                                    - **Confirm Selection:** "Perfect! I've saved your preference. Now let's set up your budget based on your chosen approach."
+                                </action>
+                                <completion_criteria>User has selected a budgeting philosophy, preference is saved to database, and user understands how this affects their budget setup.</completion_criteria>
+                            </sub_step>
+
+                            <sub_step id="2c3_educate_budget_priorities">
+                                <goal>Teach users about budget priorities before allocation.</goal>
+                                <action>
+                                    - **Educate on Budget Priorities:** "Before we set up your budget, let's understand the priority system that will guide your financial decisions:"
+                                      1. "Emergency Fund" - Priority 1: This is your PYF amount, highest priority
+                                      2. "Living Expenses" - Priority 2: Essential costs for daily life
+                                      3. "Free to Spend" - Priority 3: Discretionary spending (should not exceed 2x emergency fund amount)
+                                    - **Show Interactive Education:** -> Call show_onboarding_component with "budget_priority_education" type to display an interactive explanation of the priority system.
+                                    - **Explain Next Steps:** "Based on your philosophy choice, we'll now set up your budget allocation. The approach will be tailored to your preference for either simplicity or detailed tracking."
+                                </action>
+                                <completion_criteria>User understands the budget priority system and is ready for philosophy-specific budget allocation.</completion_criteria>
+                            </sub_step>
                         </sub_steps>
                     </step>
 
-                    <!-- STEP 3: SETUP BUDGET -->
-                    <step id="3_setup_budget">
-                        <goal>Collect expense information to validate the goal's feasibility and set up the budgeting tool.</goal>
+                    <!-- STEP 3A: GOAL-FOCUSED BUDGET ALLOCATION -->
+                    <step id="3a_goal_focused_budget_allocation">
+                        <goal>Guide users who chose goal-focused philosophy through simplified budget allocation.</goal>
+                        <trigger_condition>User selected 'goal_focused' philosophy in step 2c2.</trigger_condition>
                         <approach>
-                            1.  **Collect Expenses:** Ask: "To make sure our plan is feasible, let's quickly look at your main expenses." -> Display expense_categories component with exactly 4 categories:
-                                - "housing": "Nhà ở (thuê nhà/điện/nước): khoảng bao nhiêu?"
-                                - "food": "Ăn uống: khoảng bao nhiêu?"
-                                - "transport": "Di chuyển: khoảng bao nhiêu?"
-                                - "other": "Chi tiêu khác (giải trí, mua sắm, v.v.): khoảng bao nhiêu?"
-                                User can input the expense amount for each category through chat one by one then update the expense amount for each category in the expense_form component.
-                            2.  **Check Reasonableness:**
-                                - Calculate: Remaining Budget = Income - Monthly PYF Savings.
-                                - Compare Remaining Budget with the Total Expenses entered by the user.
-                                - **If not reasonable (expenses > remaining budget):** Guide the user to review and reduce expenses, rather than changing the PYF goal. "I see that current spending is a bit higher than the remaining budget after saving. Let's see if we can optimize any categories together." -> If expenses exceed the PYF amount,ONLY advise to reducing expenses and MUST NOT the savings target(amount and time, PYF amount).
-                                    2.1(edgecase) if the income of user is <5tr then MUST suggest user start small 10% of income and try to reduce the expense as much as possible dont act like normal 
-                                    2.2(edgecase) if after still not possible advice user to move away from the city to cut cost or perhaps we only can help you control your expense not spiral out of your paycheck with our budgeting tools and give financial advise when you needed
-                            3.  **Handle Special Cases:**
-                                - **Low Income (< 5M VND):** If saving 25% is impossible after optimization, suggest: "With the current income, starting can be tough. How about we begin with a smaller amount, like 10% of your income, and focus heavily on trimming expenses?"
-                                - **Still Impossible:** If it's still not feasible, offer empathetic and practical advice: "I understand your situation. Perhaps considering a move to a lower cost-of-living area could be a long-term solution. For now, this budgeting tool will be a great ally to help you control spending and avoid deficits. I'm always here whenever you need advice."
-                            4.  **Finalize Setup:** "Congratulations, you've set up the Budgeting Tool! Next time, you can access it through me or from the side menu."
+                            1.  **Explain Simplified Approach:** "Since you chose the Goal-Focused method, we'll keep things simple with just two main budget categories plus your emergency fund."
+                            2.  **Display Budget Allocation Tool:** -> Call show_onboarding_component with "budget_allocation_tool" type. 
+                               CRITICAL: Pass context: {
+                                 monthlyIncome: [user's income from previous steps],
+                                 emergencyFundTarget: [calculated emergency fund target],
+                                 monthlyTargetSavings: [monthly savings target],
+                                 budgetingStyle: "goal_focused"
+                               }
+                            3.  **Tool Configuration for Goal-Focused:**
+                                - **Emergency Fund:** Pre-filled and locked (from previous goal setting)
+                                - **Living Expenses:** Single consolidated amount for all living costs
+                                - **Free to Spend:** Remaining amount for discretionary spending
+                                - **Validation:** Sum must equal user_income (living_expenses + free_to_spend + emergency_fund_amount)
+                            4.  **Guide Allocation:** "Adjust the amounts between Living Expenses and Free to Spend. Remember, your Free to Spend should ideally not exceed 2x your emergency fund amount for optimal financial health."
+                            5.  **Confirmation:** Await User Confirmation then ->"Perfect! Your simplified budget is now set up. This approach will help you focus on your emergency fund goal while keeping budget management simple."
                         </approach>
-                        <completion_criteria>User has entered all 4 expense categories, the budget is confirmed as reasonable, and the user understands how to access the tool.</completion_criteria>
+                        <completion_criteria>User has completed goal-focused budget allocation, budgets are created in system with simplified categories.</completion_criteria>
                     </step>
-                    
+
+                    <!-- STEP 3B: DETAIL TRACKER BUDGET ALLOCATION -->
+                    <step id="3b_detail_tracker_budget_allocation">
+                        <goal>Guide users who chose detail tracker philosophy through comprehensive budget allocation.</goal>
+                        <trigger_condition>User selected 'detail_tracker' philosophy in step 2c2.</trigger_condition>
+                        <approach>
+                            1.  **Explain Detailed Approach:** "Since you chose the Detail Tracker method, we'll set up comprehensive expense categories to give you complete visibility into your spending patterns."
+                            2.  **Collect Detailed Living Expenses:** -> Call show_onboarding_component with "expense_categories" type to display detailed expense form.
+                            3.  **Expense Categories to Collect:**
+                                - house_rent (Housing/Rent)
+                                - food (Food & Dining)
+                                - transportation (Transportation)
+                                - others (Other Living Expenses)
+                            4.  **Calculate Total Living Expenses:** Once form is submitted:
+                                - total_living_expenses = house_rent + food + transportation + others
+                                - Store this calculation for next step
+                            5.  **Display Pre-filled Budget Allocation Tool:** -> Call show_onboarding_component with "budget_allocation_tool" type with all values pre-filled and read-only. 
+                               CRITICAL: Pass context: {
+                                 monthlyIncome: [user's income from previous steps],
+                                 emergencyFundTarget: [calculated emergency fund target],
+                                 monthlyTargetSavings: [monthly savings target],
+                                 budgetingStyle: "detail_tracker",
+                                 expenseBreakdown: [expense breakdown object from expense_categories component response]
+                               }
+                            6.  **Auto-filled Values:**
+                                - **Emergency Fund:** Set to emergency_fund_amount (from prerequisites)
+                                - **Living Expenses:** Set to total_living_expenses (calculated in previous step)
+                                - **Free to Spend:** Automatically calculated as user_income - emergency_fund_amount - total_living_expenses
+                            7.  **User Review and confirmation:** "Please review your Monthly Budget Allocation. All amounts are calculated based on your detailed expense inputs."-> "Excellent! Your detailed budget tracking system is now active. This will give you comprehensive insights into your spending patterns."
+                        </approach>
+                        <completion_criteria>User has completed detail tracker budget allocation, detailed expense categories are created in system with comprehensive tracking setup.</completion_criteria>
+                    </step>
+
                     <!-- STEP 4: ADVISE ON STORAGE LOCATION -->
                     <step id="4_advise_storage_location">
                         <goal>Advise the user on the optimal place to keep their Emergency Fund using guided selection.</goal>
@@ -258,10 +318,11 @@ export function generateStartSavingStagePrompt(
             -->
             <function_calling_instructions>
                 <critical_requirement>
-                    YOU MUST STREAM THE RESPONSE TO THE USER BEFORE CALLING ANY FUNCTION.
+                    **RESPOND BEFORE ACTING (MANDATORY):** YOU MUST STREAM THE RESPONSE TO THE USER BEFORE CALLING ANY FUNCTION.
                     YOU MUST USE FUNCTION CALLS to display interactive components and update profiles.
                     CRITICAL: When calling ANY function, you MUST provide valid and correct JSON arguments. NEVER call a function with empty arguments.
                     PRIORITY: Always prefer suggestions component over free-text when user needs to make choices or provide standard information.
+                    EXAMPLE: Instead of immediately calling show_onboarding_component, first say "Let me help you understand the importance of an emergency fund..." and THEN call the component.
                 </critical_requirement>
                 <suggestion_component_usage>
                     The suggestions component is your primary tool for creating guided interactions. Use it for any scenario where user needs to make a choice from common options
@@ -269,16 +330,21 @@ export function generateStartSavingStagePrompt(
             </function_calling_instructions>
 
             <available_components>
-                <component name="expense_form">Use for: Structured expense collection (step 3).</component>
+                <component name="expense_form">Use for: Structured expense collection.</component>
                 <component name="goal_confirmation">Use for: Goal and timeline confirmation (step 2c).</component>
                 <component name="single_goal_view">Use for: Displaying the created goal (step 2c).</component>
                 <component name="education_content">Use for: Displaying educational content (video, text) (step 2c).</component>
                 <component name="financial_input">Use for: Collecting specific financial numbers when needed (e.g., asking for income in step 2a).</component>
                 <component name="suggestions">Use for: Displaying a list of suggestions to guide the user to the next step.</component>
                 <component name="slider">Use for: Displaying a slider to guide the user to the next step.</component>
+                <component name="philosophy_selection">Use for: Displaying philosophy selection interface (step 2c2).</component>
+                <component name="budget_priority_education">Use for: Interactive explanation of budget priority system (step 2c3).</component>
+                <component name="budget_allocation_tool">Use for: Budget allocation interface with different configurations for goal-focused vs detail-tracker (steps 3a, 3b). MUST pass context: {monthlyIncome, emergencyFundTarget, monthlyTargetSavings, budgetingStyle: "goal_focused"|"detail_tracker", expenseBreakdown: (if detail_tracker)}.</component>
+                <component name="expense_categories">Use for: Detailed expense category collection form for detail-tracker flow (step 3b). The response will contain expenseBreakdown object to pass to budget_allocation_tool.</component>
                 <component name="infina_app_qr">Use for: Displaying the Infina App QR code.</component>
-                                <component name="finish_onboarding">Use for: Finishing the onboarding process.</component>
+                <component name="finish_onboarding">Use for: Finishing the onboarding process.</component>
             </available_components>
     </system_prompt>
+    
   `;
 }
