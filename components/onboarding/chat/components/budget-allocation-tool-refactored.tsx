@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   OnboardingComponent,
   ComponentResponse,
@@ -35,14 +35,24 @@ export default function BudgetAllocationToolRefactored({
     !!component.response?.allocation
   );
 
-  // Get data from component context (should be passed from previous steps)
-  const monthlyIncome = component.context?.monthlyIncome || 10000000; // Default 10M VND for demo
-  const emergencyFundTarget =
-    component.context?.emergencyFundTarget || monthlyIncome * 6; // Default 6 months of income
-  const monthlyTargetSavings =
-    component.context?.monthlyTargetSavings || emergencyFundTarget / 24; // 24 months to reach target
-  const budgetingStyle = component.context?.budgetingStyle || "goal_focused";
-  const expenseBreakdown = component.context?.expenseBreakdown || {};
+  // Memoize context data to prevent recalculation on every render
+  const contextData = useMemo(() => {
+    const monthlyIncome = component.context?.monthlyIncome || 10000000; // Default 10M VND for demo
+    const emergencyFundTarget = component.context?.emergencyFundTarget || monthlyIncome * 6; // Default 6 months of income
+    const monthlyTargetSavings = component.context?.monthlyTargetSavings || emergencyFundTarget / 24; // 24 months to reach target
+    const budgetingStyle = component.context?.budgetingStyle || "goal_focused";
+    const expenseBreakdown = component.context?.expenseBreakdown || {};
+    
+    return {
+      monthlyIncome,
+      emergencyFundTarget,
+      monthlyTargetSavings,
+      budgetingStyle,
+      expenseBreakdown
+    };
+  }, [component.context]);
+
+  const { monthlyIncome, emergencyFundTarget, monthlyTargetSavings, budgetingStyle, expenseBreakdown } = contextData;
 
   // Debug logging for context data
   console.log("🔍 BudgetAllocationTool - Context data received:", {
@@ -85,8 +95,41 @@ export default function BudgetAllocationToolRefactored({
 
   // Format percentage
   const formatPercentage = useCallback((value: number) => {
-    return Math.round(value * 10) / 10;
+    return (Math.round(value * 10) / 10).toString();
   }, []);
+
+  // Memoize form props to prevent unnecessary re-renders
+  const formProps = useMemo(() => ({
+    monthlyIncome,
+    allocation,
+    validationErrors,
+    totalPercentage,
+    isValid,
+    isSubmitting,
+    isCompleted,
+    budgetingStyle,
+    expenseBreakdown,
+    onPercentageChange: handlePercentageChange,
+    onAutoAdjust: autoAdjustAllocation,
+    formatCurrency,
+    formatPercentage,
+    calculateMonetaryValue,
+  }), [
+    monthlyIncome,
+    allocation,
+    validationErrors,
+    totalPercentage,
+    isValid,
+    isSubmitting,
+    isCompleted,
+    budgetingStyle,
+    expenseBreakdown,
+    handlePercentageChange,
+    autoAdjustAllocation,
+    formatCurrency,
+    formatPercentage,
+    calculateMonetaryValue,
+  ]);
 
   // Handle submit
   const handleSubmit = useCallback(async () => {
@@ -106,17 +149,11 @@ export default function BudgetAllocationToolRefactored({
         freeToSpend: calculateMonetaryValue(allocation.freeToSpend),
       };
 
-      // Get user's budgeting style and expense breakdown from context
-      const contextBudgetingStyle =
-        component.context?.budgetingStyle || "goal_focused";
-      const contextExpenseBreakdown =
-        component.context?.expenseBreakdown || null;
-
       console.log("🏗️ Budget allocation tool submission context:", {
         fullContext: component.context,
-        budgetingStyle: contextBudgetingStyle,
-        expenseBreakdown: contextExpenseBreakdown,
-        hasExpenseBreakdown: !!contextExpenseBreakdown,
+        budgetingStyle,
+        expenseBreakdown,
+        hasExpenseBreakdown: !!expenseBreakdown,
         allocation,
         monthlyIncome,
         emergencyFundTarget,
@@ -126,8 +163,8 @@ export default function BudgetAllocationToolRefactored({
       console.log("🏗️ Creating budget records from allocation:", {
         allocation,
         monthlyIncome,
-        budgetingStyle: contextBudgetingStyle,
-        expenseBreakdown: contextExpenseBreakdown,
+        budgetingStyle,
+        expenseBreakdown,
       });
 
       // Create budget records in database via service layer
@@ -135,11 +172,11 @@ export default function BudgetAllocationToolRefactored({
         await budgetAllocationService.createBudgetAllocation({
           allocationData: allocation,
           monthlyIncome,
-          budgetingStyle: contextBudgetingStyle,
-          expenseBreakdown: contextExpenseBreakdown,
+          budgetingStyle,
+          expenseBreakdown,
         });
 
-      if (!allocationResult.success) {
+      if (!allocationResult.success || !allocationResult.data) {
         throw new Error(
           allocationResult.error || "Failed to create budget records"
         );
@@ -155,7 +192,7 @@ export default function BudgetAllocationToolRefactored({
         monthlyIncome,
         monetaryValues,
         budgetsCreated: allocationResult.data.budgets,
-        budgetingStyle: contextBudgetingStyle,
+        budgetingStyle,
         completedAt: new Date(),
         userMessage: t("budgetAllocationUserMessage", {
           ns: "onboarding",
@@ -172,7 +209,7 @@ export default function BudgetAllocationToolRefactored({
           )}), Free to Spend ${formatPercentage(
             allocation.freeToSpend
           )}% (${formatCurrency(monetaryValues.freeToSpend)}). This ${
-            contextBudgetingStyle === "goal_focused" ? "simplified" : "detailed"
+            budgetingStyle === "goal_focused" ? "simplified" : "detailed"
           } approach matches my preference for financial tracking.`,
         }),
         allocationSummary: {
@@ -225,7 +262,8 @@ export default function BudgetAllocationToolRefactored({
     validationErrors,
     allocation,
     calculateMonetaryValue,
-    component.context,
+    budgetingStyle,
+    expenseBreakdown,
     monthlyIncome,
     emergencyFundTarget,
     monthlyTargetSavings,
@@ -233,25 +271,13 @@ export default function BudgetAllocationToolRefactored({
     formatPercentage,
     onResponse,
     t,
+    component.context,
   ]);
 
   return (
     <BudgetAllocationForm
-      monthlyIncome={monthlyIncome}
-      allocation={allocation}
-      validationErrors={validationErrors}
-      totalPercentage={totalPercentage}
-      isValid={isValid}
-      isSubmitting={isSubmitting}
-      isCompleted={isCompleted}
-      budgetingStyle={budgetingStyle}
-      expenseBreakdown={expenseBreakdown}
-      onPercentageChange={handlePercentageChange}
-      onAutoAdjust={autoAdjustAllocation}
+      {...formProps}
       onSubmit={handleSubmit}
-      formatCurrency={formatCurrency}
-      formatPercentage={formatPercentage}
-      calculateMonetaryValue={calculateMonetaryValue}
     />
   );
 }
