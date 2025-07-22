@@ -1,9 +1,9 @@
-import type { Json } from "@/lib/supabase/database";
-
 export interface FinancialMetadata {
   currentWeekPlanedSpending: number;
   nextWeekPlanedSpending: number;
   dateGetSalary: string;
+  payYourselfFirstAmount: number;
+  monthlyIncome: number;
 }
 
 export enum BudgetStyle {
@@ -26,7 +26,7 @@ export interface User {
   user_id: string;
   total_asset_value: number;
   onboarding_completed_at?: string | null;
-  financial_metadata?: Json | null;
+  financial_metadata?: FinancialMetadata | null;
   financial_stage?: string | null;
   budgeting_style?: "detail_tracker" | "goal_focused" | null;
 }
@@ -36,7 +36,7 @@ export interface UserInsert {
   name: string;
   user_id: string;
   total_asset_value?: number;
-  financial_metadata?: Json | null;
+  financial_metadata?: FinancialMetadata | null;
   financial_stage?: string | null;
   budgeting_style?: "detail_tracker" | "goal_focused" | null;
 }
@@ -47,7 +47,7 @@ export interface UserUpdate {
   total_asset_value?: number;
   financial_stage?: string;
   budgeting_style?: "detail_tracker" | "goal_focused";
-  financial_metadata?: Json | null;
+  financial_metadata?: FinancialMetadata | null;
   onboarding_completed_at?: string | null;
   updated_at?: string;
 }

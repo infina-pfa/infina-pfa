@@ -1,10 +1,12 @@
+import { Database } from "@/lib/supabase/database";
 import { createClient } from "@/lib/supabase/server";
+import { FinancialMetadata } from "@/lib/types/user.types";
 import { NextResponse } from "next/server";
 
 export async function POST() {
   try {
     // Create Supabase client
-    const supabase = await createClient();
+    const supabase = await createClient<Database>();
 
     // Get current user
     const {
@@ -22,30 +24,62 @@ export async function POST() {
       );
     }
 
+    const goal = await supabase
+      .from("goals")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+    let payYourselfFirstAmount = 0;
+    let income = 0;
+    if (goal.data?.target_amount) {
+      const numberOfMonth = Math.floor(
+        (new Date(goal.data.due_date || "").getTime() -
+          new Date(goal.data.created_at || "").getTime()) /
+          (1000 * 60 * 60 * 24 * 30)
+      );
+      payYourselfFirstAmount = goal.data.target_amount / numberOfMonth;
+      income = goal.data.target_amount / 3;
+    }
+
     // Update or create user profile in the main users table
-    const userUpdateData = {
-      onboarding_completed_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
 
     // Check if user already exists
     const { data: existingUser } = await supabase
       .from("users")
-      .select("user_id")
+      .select("*")
       .eq("user_id", user.id)
       .single();
+
+    const financialMetadata =
+      existingUser?.financial_metadata as unknown as FinancialMetadata;
+
+    const userUpdateData = {
+      onboarding_completed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      financial_metadata: {
+        payYourselfFirstAmount,
+        monthlyIncome: income,
+        currentWeekPlanedSpending:
+          financialMetadata?.currentWeekPlanedSpending || 0,
+        nextWeekPlanedSpending: financialMetadata?.nextWeekPlanedSpending || 0,
+        dateGetSalary: financialMetadata?.dateGetSalary || null,
+      },
+    };
 
     let userResult;
     if (existingUser) {
       // Update existing user
       userResult = await supabase
         .from("users")
-        .update(userUpdateData)
+        .update({
+          ...userUpdateData,
+        })
         .eq("user_id", user.id);
     } else {
       // Create new user record
       userResult = await supabase.from("users").insert({
         user_id: user.id,
+        name: user.user_metadata.name,
         ...userUpdateData,
       });
     }

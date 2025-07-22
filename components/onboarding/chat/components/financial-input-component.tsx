@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { OnboardingComponent, ComponentResponse } from "@/lib/types/onboarding.types";
+import {
+  OnboardingComponent,
+  ComponentResponse,
+} from "@/lib/types/onboarding.types";
 import { Button } from "@/components/ui/button";
 import { MoneyInput } from "@/components/ui/money-input";
 import { CheckCircle } from "lucide-react";
@@ -27,7 +30,13 @@ export function FinancialInputComponent({
 
   const handleSubmit = async () => {
     const numericValue = parseFloat(financialValue);
-    if (!financialValue || numericValue < 0 || isNaN(numericValue) || isSubmitting) return;
+    if (
+      !financialValue ||
+      numericValue < 0 ||
+      isNaN(numericValue) ||
+      isSubmitting
+    )
+      return;
 
     setIsSubmitting(true);
     try {
@@ -60,7 +69,9 @@ export function FinancialInputComponent({
           label={t(`${inputType}Amount`)}
           value={financialValue}
           onChange={setFinancialValue}
-          placeholder={t(`enter${inputType.charAt(0).toUpperCase() + inputType.slice(1)}`)}
+          placeholder={t(
+            `enter${inputType.charAt(0).toUpperCase() + inputType.slice(1)}`
+          )}
           disabled={isCompleted}
         />
       </div>
@@ -87,4 +98,4 @@ export function FinancialInputComponent({
       )}
     </div>
   );
-} 
+}
