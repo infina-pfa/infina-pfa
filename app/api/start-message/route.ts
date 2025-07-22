@@ -63,7 +63,7 @@ const getStartMessageForGoalFocused = (props: {
 
   if (dateStageForGoalFocus === DateStage.START_OF_MONTH) {
     return `
-    Current PYF amount: ${props.currentPYFAmount}
+    User has done PYF with amount: ${props.currentPYFAmount}
     Must PYF amount: ${props.pyfAmount}
     
     I'm the system, please start the conversation with user by doing actions:
@@ -116,7 +116,7 @@ const getStartMessageForDetailTracker = (props: {
 
   if (dateStageForGoalFocus === DateStage.START_OF_MONTH) {
     return `
-      Current PYF amount: ${props.currentPYFAmount}
+      User has done PYF with amount: ${props.currentPYFAmount}
       Must PYF amount: ${props.pyfAmount}
       
       I'm the system, please start the conversation with user by doing actions:
@@ -310,8 +310,7 @@ export async function GET() {
         user.id
       ),
       thisWeekBudgetAmount:
-        financialMetadata.weekSpending[getWeekOfMonth(new Date()) - 1]
-          .allowToSpend,
+        financialMetadata.weekSpending[getWeekOfMonth(new Date()) - 1],
     });
   }
 

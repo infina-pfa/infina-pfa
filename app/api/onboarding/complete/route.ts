@@ -53,15 +53,18 @@ export async function POST() {
     const financialMetadata =
       existingUser?.financial_metadata as unknown as FinancialMetadata;
 
+    const weekSpending = Array.from(
+      { length: 4 },
+      () => (income - payYourselfFirstAmount) / 4
+    );
+
     const userUpdateData = {
       onboarding_completed_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       financial_metadata: {
         payYourselfFirstAmount,
         monthlyIncome: income,
-        currentWeekPlanedSpending:
-          financialMetadata?.currentWeekPlanedSpending || 0,
-        nextWeekPlanedSpending: financialMetadata?.nextWeekPlanedSpending || 0,
+        weekSpending: weekSpending,
         dateGetSalary: financialMetadata?.dateGetSalary || null,
       },
     };
