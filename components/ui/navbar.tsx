@@ -14,6 +14,7 @@ import {
   MessageCircle,
   Home,
   DollarSign,
+  Target,
 } from "lucide-react";
 import { FinaIcon } from "@/components/ui/fina-icon";
 import { useTranslation } from "react-i18next";
@@ -36,7 +37,12 @@ const navigationItems = [
     icon: DollarSign,
   },
   {
-    key: "fina",
+    key: "goals",
+    href: "/goals",
+    icon: Target,
+  },
+  {
+    key: "infina-advisor",
     href: "/chat",
     icon: MessageCircle,
   },

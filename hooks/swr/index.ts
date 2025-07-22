@@ -35,6 +35,10 @@ export { useGoalTransactionIncomeCreateSWR } from "./use-goal-transaction-income
 export { useGoalTransactionWithdrawalCreateSWR } from "./use-goal-transaction-withdrawal-create";
 export { useGoalIncomeTransactionsSWR } from "./use-goal-income-transactions";
 
+// Goal transaction hooks (RESTful endpoints)
+export { useGoalDeposit } from "./use-goal-deposit";
+export { useGoalWithdraw } from "./use-goal-withdraw";
+
 // User hooks
 export { useUserProfileSWR } from "./use-user-profile";
 

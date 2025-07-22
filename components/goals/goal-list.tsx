@@ -10,7 +10,8 @@ interface GoalListProps {
   goals: Goal[];
   onCreateGoal: () => void;
   onEditGoal: (goalId: string) => void;
-  // onDeleteGoal: (goalId: string) => void;
+  onDepositGoal: (goalId: string) => void;
+  onWithdrawGoal: (goalId: string) => void;
   loading?: boolean;
 }
 
@@ -18,7 +19,8 @@ export function GoalList({
   goals,
   onCreateGoal,
   onEditGoal,
-  // onDeleteGoal,
+  onDepositGoal,
+  onWithdrawGoal,
   loading = false,
 }: GoalListProps) {
   const { t } = useAppTranslation(["goals"]);
@@ -58,7 +60,8 @@ export function GoalList({
               key={goal.id}
               goal={goal}
               onEdit={() => onEditGoal(goal.id)}
-              // onDelete={() => onDeleteGoal(goal.id)}
+              onDeposit={onDepositGoal}
+              onWithdraw={onWithdrawGoal}
             />
           ))}
         </div>

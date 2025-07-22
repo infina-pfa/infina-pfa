@@ -81,7 +81,6 @@ export const goalService = {
       const response = await apiClient.get<Goal[]>("/goals", params);
 
       if (response.success && response.data) {
-        console.log("🚀 ~ response.data:", response.data);
         return {
           goals: response.data,
           error: null,

@@ -60,7 +60,7 @@ export function GoalTransactionList({
                   {transaction.description || transaction.name}
                 </p>
                 <p className="text-[12px] md:text-[14px] text-[#6B7280] font-nunito">
-                  {formatDateVN(transaction.created_at)}
+                  {formatDateVN(new Date(transaction.created_at))}
                 </p>
               </div>
               <p

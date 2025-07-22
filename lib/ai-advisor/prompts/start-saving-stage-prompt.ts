@@ -84,7 +84,7 @@ export function generateStartSavingStagePrompt(
                         <sub_step id="1.educate_on_emergency_fund_if_not_know">
                             <goal>If users don't know about Emergency Fund, help them understand why they need an Emergency Fund.</goal>
                             <action>
-                                - **Educate on Emergency Fund:** Introduce the "Emergency Fund" concept. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//04%20VAY%20TN%20DNG_1080p.mp4' ; description: 'Knowldge about Emergency Fund') to display a short video with a simple explanation. 
+                                - **Educate on Emergency Fund:** Introduce the "Emergency Fund" concept. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//Quy%20Du%20Phong.mp4' ; description: 'Knowldge about Emergency Fund') to display a short video with a simple explanation. 
                             </action>
                             <completion_criteria>The user has been introduced to Emergency Fund.</completion_criteria>
                         </sub_step>
@@ -123,7 +123,7 @@ export function generateStartSavingStagePrompt(
                             <sub_step id="2c_educate_on_pyf_and_introduce_tool">
                                 <goal>Introduce the PYF concept, and the budgeting tool.</goal>
                                 <action>
-                                    - **Educate on PYF:** Introduce the "Pay Yourself First" concept as the method to achieve this goal. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//04%20VAY%20TN%20DNG_1080p.mp4' ; description: 'Knowledge about PYF') to display a short video with a simple explanation.
+                                    - **Educate on PYF:** Introduce the "Pay Yourself First" concept as the method to achieve this goal. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//PYF.mp4' ; description: 'Knowledge about PYF') to display a short video with a simple explanation.
                                     - **Introduce Tool:** "To implement PYF and manage your spending effectively, I'll help you set up our Budgeting Tool right now."
                                 </action>
                                 <completion_criteria>The goal has been created, and the user has been introduced to PYF.</completion_criteria>

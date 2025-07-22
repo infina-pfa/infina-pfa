@@ -6,3 +6,5 @@ export { GoalWidget } from "./goal-widget";
 export { GoalModal } from "./goal-modal";
 export { CreateGoalModal } from "./create-goal-modal";
 export { EditGoalModal } from "./edit-goal-modal";
+export { DepositGoalModal } from "./deposit-goal-modal";
+export { WithdrawGoalModal } from "./withdraw-goal-modal";
