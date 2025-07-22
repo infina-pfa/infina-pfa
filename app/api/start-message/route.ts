@@ -307,7 +307,7 @@ export async function GET() {
       pyfAmount: financialMetadata.payYourselfFirstAmount,
       thisWeekSpendingAmount: await getCurrentWeekSpendingAmount(
         supabase,
-        user.id
+        user.user_id
       ),
       thisWeekBudgetAmount:
         financialMetadata.weekSpending[getWeekOfMonth(new Date()) - 1],

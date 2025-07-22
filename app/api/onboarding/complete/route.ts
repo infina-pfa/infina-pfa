@@ -53,9 +53,18 @@ export async function POST() {
     const financialMetadata =
       existingUser?.financial_metadata as unknown as FinancialMetadata;
 
+    const { data: budgetCategories } = await supabase
+      .from("budgets")
+      .select("*")
+      .eq("user_id", user.id);
+
+    const totalFlexibleBudget = budgetCategories
+      ?.filter((category) => category.category === "flexible")
+      .reduce((acc, curr) => acc + curr.amount, 0);
+
     const weekSpending = Array.from(
       { length: 4 },
-      () => (income - payYourselfFirstAmount) / 4
+      () => (totalFlexibleBudget || 0) / 4
     );
 
     const userUpdateData = {

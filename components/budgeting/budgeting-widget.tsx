@@ -85,7 +85,7 @@ export function BudgetingWidget({
       id: transaction.id,
       name: transaction.name,
       amount: transaction.amount,
-      date: formatDateVN(transaction.created_at),
+      date: formatDateVN(new Date(transaction.created_at)),
       category: transaction.budgetName || "Uncategorized",
       type: transaction.type,
       description: transaction.description,

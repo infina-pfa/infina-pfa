@@ -162,7 +162,7 @@ export default function TransactionsPage() {
                         id={expense.id}
                         name={expense.name}
                         amount={expense.amount}
-                        date={formatDateVN(expense.created_at)}
+                        date={formatDateVN(new Date(expense.created_at))}
                         budgetName={expense.budgetName}
                         budgetColor={expense.budgetColor}
                         description={expense.description}
