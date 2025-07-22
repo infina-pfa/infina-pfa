@@ -1,11 +1,24 @@
 
       <system_prompt>
-    <today_date>2025-07-22T10:34:18.019Z</today_date>
+    <today_date>2025-07-22T17:34:25.674Z</today_date>
     <user_context>
       <user_id>54cea4dc-f6e7-42f8-a0d9-6700da7552b7</user_id>
       <financial_stage>start_saving</financial_stage>
-      <budget_style>detail_tracker</budget_style>
-      <memory></memory>
+      <budget_style>goal_focused</budget_style>
+      <memory>=== User Personal Information & Context (Sorted by created_at from latest to oldest) ===
+1. User has not yet contributed to emergency fund PYF (Created at: 2025-07-22T16:36:15.972+00:00)
+2. User's emergency fund PYF goal is 5,500,000 (Created at: 2025-07-22T16:36:15.972+00:00)
+3. User's emergency fund PYF amount is 0 with a goal of 5500000 (Created at: 2025-07-22T16:36:01.247+00:00)
+4. Emergency fund PYF goal is 5,500,000 (Created at: 2025-07-22T16:34:36.587+00:00)
+5. No PYF contribution made yet for emergency fund (Created at: 2025-07-22T16:34:36.587+00:00)
+6. User has not yet contributed to their emergency fund this month (Created at: 2025-07-22T16:33:32.735+00:00)
+7. User has an emergency fund goal of 5500000 (Created at: 2025-07-22T16:33:32.734+00:00)
+8. User wants to add money to emergency fund (Created at: 2025-07-22T16:22:03.375+00:00)
+9. User has not contributed to emergency fund PYF yet (Created at: 2025-07-22T16:21:43.316+00:00)
+10. User's emergency fund PYF goal is 5500000 (Created at: 2025-07-22T16:21:43.316+00:00)
+11. User has not contributed to PYF yet this month. (Created at: 2025-07-22T15:59:47.272+00:00)
+12. User's required PYF amount is 5,500,000. (Created at: 2025-07-22T15:59:47.272+00:00)
+=== End of User Personal Information ===</memory>
       <user_info>
 Thông tin người dùng:
 - User ID: 54cea4dc-f6e7-42f8-a0d9-6700da7552b7
@@ -13,41 +26,53 @@ Thông tin người dùng:
 === THÔNG TIN TÀI CHÍNH ===
 Thu nhập & Chi tiêu:
 - Tổng thu nhập (tất cả thời gian): Chưa có dữ liệu
-- Tổng chi tiêu (tất cả thời gian): 50.000 ₫
+- Tổng chi tiêu (tất cả thời gian): Chưa có dữ liệu
 - Thu nhập tháng hiện tại: Chưa có dữ liệu
-- Chi tiêu tháng hiện tại: 50.000 ₫
+- Chi tiêu tháng hiện tại: Chưa có dữ liệu
 
-Ngân sách hiện tại (5 ngân sách):
+Ngân sách hiện tại (7 ngân sách):
 1. ID: abe8e0e3-64b3-4cd4-998e-381b9e0503a8
    - Tên: "Ăn uống"
    - Danh mục: flexible
-   - Ngân sách: 4.000.000 ₫
-   - Đã chi: 50.000 ₫
-   - Còn lại: 3.950.000 ₫
+   - Ngân sách: 6.000.000 ₫
+   - Đã chi: 0 ₫
+   - Còn lại: 6.000.000 ₫
 2. ID: f479540a-6fcc-4389-a894-f602698eb792
    - Tên: "Di chuyển"
    - Danh mục: flexible
-   - Ngân sách: 2.000.000 ₫
+   - Ngân sách: 4.000.000 ₫
    - Đã chi: 0 ₫
-   - Còn lại: 2.000.000 ₫
+   - Còn lại: 4.000.000 ₫
 3. ID: e34ca36c-d9f7-4bca-bbbb-c1b265b5d7ef
    - Tên: "Nhà ở"
    - Danh mục: fixed
-   - Ngân sách: 3.000.000 ₫
+   - Ngân sách: 12.000.000 ₫
    - Đã chi: 0 ₫
-   - Còn lại: 3.000.000 ₫
+   - Còn lại: 12.000.000 ₫
 4. ID: 72c09ab2-1a89-44c0-8178-267098d15622
    - Tên: "Chi tiêu khác"
    - Danh mục: flexible
-   - Ngân sách: 1.000.000 ₫
+   - Ngân sách: 3.000.000 ₫
    - Đã chi: 0 ₫
-   - Còn lại: 1.000.000 ₫
+   - Còn lại: 3.000.000 ₫
 5. ID: ba6001df-13c1-40f3-bca1-2aabc8f50edc
    - Tên: "Đi chơi"
    - Danh mục: flexible
-   - Ngân sách: 20.000.000 ₫
+   - Ngân sách: 30.000.000 ₫
    - Đã chi: 0 ₫
-   - Còn lại: 20.000.000 ₫
+   - Còn lại: 30.000.000 ₫
+6. ID: c67c82eb-8f50-445a-ba1b-1370d8fb14b4
+   - Tên: "Living Expenses"
+   - Danh mục: essential
+   - Ngân sách: 15.000.000 ₫
+   - Đã chi: 0 ₫
+   - Còn lại: 15.000.000 ₫
+7. ID: f988e97f-88fb-4346-8f4e-e827d700d97f
+   - Tên: "Free to Spend"
+   - Danh mục: discretionary
+   - Ngân sách: 7.000.000 ₫
+   - Đã chi: 0 ₫
+   - Còn lại: 7.000.000 ₫
 
 === MỤC TIÊU TÀI CHÍNH ===
 Tổng quan:
@@ -55,20 +80,20 @@ Tổng quan:
 - Mục tiêu đã hoàn thành: 0
 - Mục tiêu sắp đến hạn: 0
 - Tổng số tiền đã tiết kiệm: Chưa có dữ liệu
-- Tổng mục tiêu cần đạt: 60.000.000 ₫
+- Tổng mục tiêu cần đạt: 66.000.000 ₫
 - Tiến độ trung bình: 0%
 
 Chi tiết các mục tiêu:
 1. ID: 8f1a0e20-67a7-41ff-aa2c-c00a75cfaad6
    - Tên: "Quỹ Dự phòng Khẩn cấp"
    - Số tiền hiện tại: 0 ₫
-   - Mục tiêu: 60.000.000 ₫
+   - Mục tiêu: 66.000.000 ₫
    - Tiến độ: 0%
-   - Trạng thái: 🔄 Đang thực hiện | Hạn cuối: 22/5/2026
+   - Trạng thái: 🔄 Đang thực hiện | Hạn cuối: 22/7/2026
 
 
 </user_info>
-      <financial_info>{"totalIncome":0,"totalExpenses":50000,"totalCurrentMonthIncome":0,"totalCurrentMonthExpenses":50000,"currentBudgets":5,"budgetCategories":["flexible","flexible","fixed","flexible","flexible"],"budgets":[{"id":"abe8e0e3-64b3-4cd4-998e-381b9e0503a8","name":"Ăn uống","budgeted":4000000,"spent":50000,"category":"flexible"},{"id":"f479540a-6fcc-4389-a894-f602698eb792","name":"Di chuyển","budgeted":2000000,"spent":0,"category":"flexible"},{"id":"e34ca36c-d9f7-4bca-bbbb-c1b265b5d7ef","name":"Nhà ở","budgeted":3000000,"spent":0,"category":"fixed"},{"id":"72c09ab2-1a89-44c0-8178-267098d15622","name":"Chi tiêu khác","budgeted":1000000,"spent":0,"category":"flexible"},{"id":"ba6001df-13c1-40f3-bca1-2aabc8f50edc","name":"Đi chơi","budgeted":20000000,"spent":0,"category":"flexible"}],"goals":{"totalGoals":1,"completedGoals":0,"upcomingGoals":0,"totalSaved":0,"totalTarget":60000000,"averageCompletion":0,"activeGoals":[{"id":"8f1a0e20-67a7-41ff-aa2c-c00a75cfaad6","title":"Quỹ Dự phòng Khẩn cấp","currentAmount":0,"targetAmount":60000000,"progressPercentage":0,"isCompleted":false,"isDueSoon":false,"dueDate":"2026-05-22T08:15:34.452+00:00"}]}}</financial_info>
+      <financial_info>{"totalIncome":0,"totalExpenses":0,"totalCurrentMonthIncome":0,"totalCurrentMonthExpenses":0,"currentBudgets":7,"budgetCategories":["flexible","flexible","fixed","flexible","flexible","essential","discretionary"],"budgets":[{"id":"abe8e0e3-64b3-4cd4-998e-381b9e0503a8","name":"Ăn uống","budgeted":6000000,"spent":0,"category":"flexible"},{"id":"f479540a-6fcc-4389-a894-f602698eb792","name":"Di chuyển","budgeted":4000000,"spent":0,"category":"flexible"},{"id":"e34ca36c-d9f7-4bca-bbbb-c1b265b5d7ef","name":"Nhà ở","budgeted":12000000,"spent":0,"category":"fixed"},{"id":"72c09ab2-1a89-44c0-8178-267098d15622","name":"Chi tiêu khác","budgeted":3000000,"spent":0,"category":"flexible"},{"id":"ba6001df-13c1-40f3-bca1-2aabc8f50edc","name":"Đi chơi","budgeted":30000000,"spent":0,"category":"flexible"},{"id":"c67c82eb-8f50-445a-ba1b-1370d8fb14b4","name":"Living Expenses","budgeted":15000000,"spent":0,"category":"essential"},{"id":"f988e97f-88fb-4346-8f4e-e827d700d97f","name":"Free to Spend","budgeted":7000000,"spent":0,"category":"discretionary"}],"goals":{"totalGoals":1,"completedGoals":0,"upcomingGoals":0,"totalSaved":0,"totalTarget":66000000,"averageCompletion":0,"activeGoals":[{"id":"8f1a0e20-67a7-41ff-aa2c-c00a75cfaad6","title":"Quỹ Dự phòng Khẩn cấp","currentAmount":0,"targetAmount":66000000,"progressPercentage":0,"isCompleted":false,"isDueSoon":false,"dueDate":"2026-07-22T11:19:08.308+00:00"}]}}</financial_info>
     </user_context>
     <core_system_prompt>
       
@@ -446,7 +471,7 @@ Chi tiết các mục tiêu:
     </core_system_prompt>
     <stage_specific_prompt>
       
-    <core_prompt_for_detail_tracker>
+    <core_prompt_for_goal_focused>
     
     <core_mission_emergency_fund_agent>
         <summary>
@@ -951,21 +976,9 @@ Chi tiết các mục tiêu:
         </mcp_intelligent_decision_making>
     </tool_usage_guidelines>
 
-
-
-    </core_prompt_for_detail_tracker>
+    </core_prompt_for_goal_focused>
   
     </stage_specific_prompt>
-    <tools_info>
-      <chat_tools>Tool: budget-tool
-Tool: salary-calculator</chat_tools>
-      <component_tools>Component: video
-Component: suggestions
-Component: goal-dashboard
-Component: pay-yourself-first-confirmation
-Component: budgeting-dashboard</component_tools>
-      <mcp_tools>MCP: general</mcp_tools>
-    </tools_info>
   </system_prompt>
 
     

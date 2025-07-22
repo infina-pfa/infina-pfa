@@ -40,6 +40,8 @@ const getWeekOfMonth = (date: Date): number => {
 };
 
 const getDateStage = () => {
+  // //mocktest for date stage
+  // return DateStage.END_OF_MONTH;
   const now = new Date();
   if (isFirstDayOfMonth(now)) {
     return DateStage.START_OF_MONTH;
@@ -60,15 +62,25 @@ const getStartMessageForGoalFocused = (props: {
   thisWeekBudgetAmount: number;
 }) => {
   const dateStageForGoalFocus = getDateStage();
+  //const today in UTC+7 format with datetime yyyy-mm-dd hh:mm:ss
+  const today = new Date().toLocaleString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
+  //const today = "2025-07-01";
 
   if (dateStageForGoalFocus === DateStage.START_OF_MONTH) {
     return `
-    User has done PYF with amount: ${props.currentPYFAmount}
-    Must PYF amount: ${props.pyfAmount}
+    <User info>
+      User has done PYF with amount: ${props.currentPYFAmount}
+      Must PYF amount: ${props.pyfAmount}
+      Today is ${today}
+    </User info>
     
     I'm the system, please start the conversation with user by doing actions:
-    - The system tracks whether the user has confirmed their PYF contribution. If not confirmed, the AI continues to prompt daily until confirmation is received
-    - If the user has not confirmed PYF by the 5th day of the month, the AI asks for the reason to provide appropriate actionable suggestions:
+    1. Display the user's emergency fund goal dashboard to show their progress
+    2. Remind the user to "Pay Yourself First" (PYF) to their emergency fund and to allocate funds for essential monthly expenses (e.g., rent, electricity, recurring debt payments)
+    3. The system tracks whether the user has confirmed their PYF contribution. If not confirmed, the AI continues to prompt daily until confirmation is received
+    - If the user has not confirmed PYF by the 5th day of the month or later, the AI asks for the reason to provide appropriate actionable suggestions:
       - If the user states they haven't received their salary yet, the AI asks for their expected salary date and sets a reminder to prompt them again on that date.
       - If the user states they had an unexpected expense (e.g., paying off last month's debt) and therefore cannot PYF the agreed amount, the AI advises them to cut down on other budget categories instead of reducing their PYF contribution.
     `;
@@ -76,31 +88,46 @@ const getStartMessageForGoalFocused = (props: {
 
   if (dateStageForGoalFocus === DateStage.END_OF_MONTH) {
     return `
+    <User info>
     This week's spending: ${props.thisWeekSpendingAmount}
     This week's budget: ${props.thisWeekBudgetAmount}
+    </User info>
     
     I'm the system, please start the conversation with user by doing actions:
-    The AI asks the user for their total spending for the last week of the month.
-    If the user underspent their budget for the last week, the AI advises them to save the surplus amount to their emergency fund to achieve their goal faster.
-    If the user overspent their overall monthly budget, the AI deep dives into which budget categories were overspent and provides appropriate solutions based on the root cause. The AI also helps the user plan their budget for the next month based on the current month's data.
+    1. The AI asks the user for their total spending for the last week of the month.
+    2. If the user underspent their budget for the last week, the AI advises them to save the surplus amount to their emergency fund to achieve their goal faster.
+    3. If the user overspent their overall monthly budget, the AI deep dives into which budget categories were overspent and provides appropriate solutions based on the root cause. The AI also helps the user plan their budget for the next month based on the current month's data.
+    4. After talking with user, suggest that you can help them to plan and create the next month budget if they want. You need to wait user confirm the final plan before execute to call tool create_budget.
+      <other_rules>
+      - For any plan, you need list down all the budget categories and the amount for each category to user and wait for user confirm before execute to call tool create_budget.
+      </other_rules>
     `;
   }
 
   if (dateStageForGoalFocus === DateStage.END_OF_WEEK) {
     return `
+    <User info>
     This week's spending: ${props.thisWeekSpendingAmount}
     This week's budget: ${props.thisWeekBudgetAmount}
-    
-    The AI asks the user for their total spending for the past week and prompts them to plan their spendable amount for the upcoming week.
-    - If the user has underspent their weekly budget, the remaining amount is added to the next week's budget. For example, if the weekly budget was 1,100,000 VND and spending was 1,000,000 VND, the next week's budget becomes 1,200,000 VND.
-    - If the user has overspent their weekly budget, the excess amount is deducted from the next week's budget. For example, if the weekly budget was 1,100,000 VND and spending was 1,500,000 VND, the next week's budget becomes 800,000 VND. The AI advises the user to cook at home for savings and reduce unnecessary spending for that week.
-    - If the overspent amount is significantly large, the AI negotiates a revised plan with the user, which may involve deducting from each weekly budget for a set period. The AI emphasizes not dipping into the emergency fund (PYF amount).
+    </User info>
+    I'm the system, please start the conversation with user by doing actions:
+    1. The AI asks the user for their total spending for the past week and prompts them to plan their spendable amount for the upcoming week.
+    2. If the user has underspent their weekly budget, the remaining amount is added to the next week's budget (calling create_budget function, but you MUST wait for the confirmation of user before calling this function). For example, if the weekly budget was 1,100,000 VND and spending was 1,000,000 VND, the next week's budget becomes 1,200,000 VND.
+    3. If the user has overspent their weekly budget, the excess amount is deducted from the next week's budget (calling create_budget function, but you MUST wait for the confirmation of user before calling this function). For example, if the weekly budget was 1,100,000 VND and spending was 1,500,000 VND, the next week's budget becomes 800,000 VND. The AI advises the user to cook at home for savings and reduce unnecessary spending for that week.
+    4. If the overspent amount is significantly large, the AI negotiates a revised plan with the user, which may involve deducting from each weekly budget for a set period (calling create_budget function, but you MUST wait for the confirmation of user before calling this function). The AI emphasizes not dipping into the emergency fund (PYF amount).
+    5. This weekly review process continues until completed. If the user does not engage on Saturday or Sunday
+
+    <other_rules>
+     - For any plan, you need list down all the budget categories and the amount for each category to user and wait for user confirm before execute to call tool create_budget.
+    </other_rules>
     `;
   }
 
   return `
+    <User info>
     This week's spending: ${props.thisWeekSpendingAmount}
     This week's budget: ${props.thisWeekBudgetAmount}
+    </User info>
     I'm the system, please start the conversation with user by doing actions:
     - The AI reminds the user of their remaining budget for the current week.
     - If the current week's budget is lower than the default amount (due to previous overspending), the AI advises: "You should ask me before spending something to make sure you won't go over the budget this week."
@@ -111,16 +138,26 @@ const getStartMessageForGoalFocused = (props: {
 const getStartMessageForDetailTracker = (props: {
   currentPYFAmount: number;
   pyfAmount: number;
+  thisWeekSpendingAmount: number;
+  thisWeekBudgetAmount: number;
 }) => {
   const dateStageForGoalFocus = getDateStage();
-
+  const today = new Date().toLocaleString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
+  //const today = "2025-07-01";
   if (dateStageForGoalFocus === DateStage.START_OF_MONTH) {
     return `
-      User has done PYF with amount: ${props.currentPYFAmount}
-      Must PYF amount: ${props.pyfAmount}
+      <User info>
+        User has done PYF with amount: ${props.currentPYFAmount}
+        Must PYF amount: ${props.pyfAmount}
+        Today is ${today}
+      </User info>
       
       I'm the system, please start the conversation with user by doing actions:
-      - The system tracks whether the user has confirmed their PYF contribution. If not confirmed, the AI continues to prompt daily until confirmation is received
+      1. Display the user's emergency fund goal dashboard to show their progress
+      2. Remind the user to "Pay Yourself First" (PYF) to their emergency fund and to allocate funds for essential monthly expenses (e.g., rent, electricity, recurring debt payments)
+      3. The system tracks whether the user has confirmed their PYF contribution. If not confirmed, the AI continues to prompt daily until confirmation is received
       - If the user has not confirmed PYF by the 5th day of the month, the AI asks for the reason to provide appropriate actionable suggestions:
         - If the user states they haven't received their salary yet, the AI asks for their expected salary date and sets a reminder to prompt them again on that date.
         - If the user states they had an unexpected expense (e.g., paying off last month's debt) and therefore cannot PYF the agreed amount, the AI advises them to cut down on other budget categories instead of reducing their PYF contribution.
@@ -130,10 +167,32 @@ const getStartMessageForDetailTracker = (props: {
   if (dateStageForGoalFocus === DateStage.END_OF_MONTH) {
     return `
       I'm the system, please start the conversation with user by doing actions:
-      - The AI displays the budgeting dashboard.
-      - If the user has not overspent their overall monthly budget, the AI shows the Goal Dashboard and encourages the user to transfer any surplus amount to their emergency fund to accelerate goal achievement.
-      - If the user has overspent their overall monthly budget, the AI performs a deep dive to identify which budget categories were overspent. It then provides appropriate solutions based on the root cause of the overspending.
-      - The AI helps the user plan their budget for the next month based on the current month's spending data and performance.
+      1. The AI asks the user for their total spending for the last week of the month.
+      2. If the user underspent their budget for the last week, the AI advises them to save the surplus amount to their emergency fund to achieve their goal faster.
+      3. If the user overspent their overall monthly budget, the AI deep dives into which budget categories were overspent and provides appropriate solutions based on the root cause. The AI also helps the user plan their budget for the next month based on the current month's data.
+      4. After talking with user, suggest that you can help them to plan and create the next month budget if they want. You need to wait user confirm the final plan before execute to call tool create_budget.
+      <other_rules>
+      - For any plan, you need list down all the budget categories and the amount for each category to user and wait for user confirm before execute to call tool create_budget.
+      </other_rules>
+      `;
+  }
+
+  if (dateStageForGoalFocus === DateStage.END_OF_WEEK) {
+    return `
+      <User info>
+      This week's spending: ${props.thisWeekSpendingAmount}
+      This week's budget: ${props.thisWeekBudgetAmount}
+      </User info>
+      
+      I'm the system, please start the conversation with user by doing actions:
+      1. The AI asks the user for their total spending for the past week and prompts them to plan their spendable amount for the upcoming week.
+      2. If the user has underspent their weekly budget, the remaining amount is added to the next week's budget (calling create_budget function, but you MUST wait for the confirmation of user before calling this function). For example, if the weekly budget was 1,100,000 VND and spending was 1,000,000 VND, the next week's budget becomes 1,200,000 VND.
+      3. If the user has overspent their weekly budget, the excess amount is deducted from the next week's budget (calling create_budget function, but you MUST wait for the confirmation of user before calling this function). For example, if the weekly budget was 1,100,000 VND and spending was 1,500,000 VND, the next week's budget becomes 800,000 VND. The AI advises the user to cook at home for savings and reduce unnecessary spending for that week.
+      4. If the overspent amount is significantly large, the AI negotiates a revised plan with the user, which may involve deducting from each weekly budget for a set period (calling create_budget function, but you MUST wait for the confirmation of user before calling this function). The AI emphasizes not dipping into the emergency fund (PYF amount).
+      5. This weekly review process continues until completed. If the user does not engage on Saturday or Sunday.
+      <other_rules>
+      - For any plan, you need list down all the budget categories and the amount for each category to user and wait for user confirm before execute to call tool create_budget.
+      </other_rules>
       `;
   }
 
@@ -321,6 +380,12 @@ export async function GET() {
         user.user_id
       ),
       pyfAmount: financialMetadata.payYourselfFirstAmount,
+      thisWeekSpendingAmount: await getCurrentWeekSpendingAmount(
+        supabase,
+        user.user_id
+      ),
+      thisWeekBudgetAmount:
+        financialMetadata.weekSpending[getWeekOfMonth(new Date()) - 1],
     });
   }
 

@@ -133,11 +133,6 @@ export class DynamicOrchestrator {
     <stage_specific_prompt>
       ${llmConfig.stagePrompt}
     </stage_specific_prompt>
-    <tools_info>
-      <chat_tools>${llmConfig.toolsInfo}</chat_tools>
-      <component_tools>${llmConfig.componentInfo}</component_tools>
-      <mcp_tools>${llmConfig.mcpInfo}</mcp_tools>
-    </tools_info>
   </system_prompt>
 
     `;
