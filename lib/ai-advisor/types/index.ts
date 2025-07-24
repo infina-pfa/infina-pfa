@@ -99,6 +99,7 @@ export interface MCPError {
 
 export interface UserContext {
   financial?: {
+    pyfAmount?: number;
     totalIncome?: number;
     totalExpenses?: number;
     totalCurrentMonthIncome?: number;

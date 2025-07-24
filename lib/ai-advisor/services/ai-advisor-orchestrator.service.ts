@@ -16,7 +16,10 @@ import {
 import { prepareUserContext } from "../utils/context";
 import { Message } from "openai/resources/beta/threads/messages.mjs";
 import { aiStreamingService } from "@/lib/services/ai-streaming.service";
-import { financialOverviewService } from "./financial-overview.service";
+import {
+  financialOverviewService,
+  FinancialOverviewData,
+} from "./financial-overview.service";
 import { BudgetStyle, FinancialStage, User } from "@/lib/types/user.types";
 import { DynamicOrchestrator } from "../config/orchestrator";
 
@@ -63,63 +66,6 @@ export class AIAdvisorOrchestratorService {
     const financialOverviewResponse =
       await financialOverviewService.getFinancialOverview(user_id);
 
-    // Define the expected financial data type
-    type FinancialOverviewData = {
-      month: number;
-      year: number;
-      // New structure with separate current month and all-time data
-      currentMonth: {
-        totalIncome: number;
-        totalExpense: number;
-        balance: number;
-      };
-      allTime: {
-        totalIncome: number;
-        totalExpense: number;
-        balance: number;
-      };
-      // Legacy fields for backward compatibility
-      totalIncome: number;
-      totalExpense: number;
-      balance: number;
-      budgets: {
-        items: Array<{
-          id: string;
-          name: string;
-          category: string;
-          amount: number;
-          spent: number;
-          remaining: number;
-        }>;
-        total: number;
-        spent: number;
-        remaining: number;
-      };
-      // Goals data
-      goals: {
-        items: Array<{
-          id: string;
-          title: string;
-          description: string | null;
-          currentAmount: number;
-          targetAmount: number | null;
-          dueDate: string | null;
-          progressPercentage: number;
-          isCompleted: boolean;
-          isDueSoon: boolean;
-          createdAt: string;
-        }>;
-        stats: {
-          totalGoals: number;
-          completedGoals: number;
-          upcomingGoals: number;
-          totalSaved: number;
-          totalTarget: number;
-          averageCompletion: number;
-        };
-      };
-    };
-
     // Check if we have valid data and transform it
     let financialData: UserContext["financial"] = undefined;
 
@@ -133,6 +79,7 @@ export class AIAdvisorOrchestratorService {
 
       financialData = {
         // All-time totals
+        pyfAmount: data.pyfAmount || 0,
         totalIncome: data.allTime?.totalIncome || 0,
         totalExpenses: data.allTime?.totalExpense || 0,
         // Current month totals
@@ -164,7 +111,7 @@ export class AIAdvisorOrchestratorService {
               currentAmount: goal.currentAmount,
               targetAmount: goal.targetAmount,
               progressPercentage: goal.progressPercentage,
-              isCompleted: goal.isCompleted,
+              isCompleted: goal.isCompleted || false,
               isDueSoon: goal.isDueSoon,
               dueDate: goal.dueDate,
             })) || [],

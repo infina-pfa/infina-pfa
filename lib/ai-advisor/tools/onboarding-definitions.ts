@@ -33,7 +33,7 @@ export const showOnboardingComponentTool = {
             // Budget allocation enhancement components
             "budget_category_education",
             "budget_allocation_tool",
-            "philosophy_selection",
+            "free_to_spend_choice",
             "budget_summary",
           ],
           description:
@@ -469,8 +469,8 @@ export const showOnboardingComponentTool = {
                 "Detailed expense breakdown by category (REQUIRED for budget_allocation_tool when budgetingStyle is 'detail_tracker')",
             },
 
-            // Philosophy selection - optional for component_type: "philosophy_selection"
-            philosophyOptions: {
+            // Free to spend choice - optional for component_type: "free_to_spend_choice"
+            free_to_spend_choice: {
               type: "array",
               items: {
                 type: "object",
@@ -478,17 +478,20 @@ export const showOnboardingComponentTool = {
                   id: {
                     type: "string",
                     enum: ["goal_focused", "detail_tracker"],
-                    description: "Philosophy identifier",
+                    description: "Free to spend choice",
                   },
-                  title: { type: "string", description: "Philosophy title" },
+                  title: {
+                    type: "string",
+                    description: "Free to spend choice title",
+                  },
                   description: {
                     type: "string",
-                    description: "Philosophy description",
+                    description: "Free to spend choice description",
                   },
                   features: {
                     type: "array",
                     items: { type: "string" },
-                    description: "Key features of this philosophy",
+                    description: "Key features of this free to spend choice",
                   },
                   timeCommitment: {
                     type: "string",
@@ -498,7 +501,7 @@ export const showOnboardingComponentTool = {
                 required: ["id", "title", "description"],
               },
               description:
-                "Philosophy options for selection (OPTIONAL for philosophy_selection)",
+                "Free to spend choice options for selection (OPTIONAL for free_to_spend_choice)",
             },
           },
         },
