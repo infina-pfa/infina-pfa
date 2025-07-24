@@ -30,6 +30,13 @@ export function generateStartSavingStagePrompt(
                     <conversation_started>${conversationStarted}</conversation_started>
                     <current_step>${currentStageStep}</current_step>
                 </conversation_context>
+                <critical_requirement>
+                    **RESPOND BEFORE ACTING (MANDATORY):** YOU MUST STREAM THE RESPONSE TO THE USER BEFORE CALLING ANY FUNCTION.
+                    YOU MUST USE FUNCTION CALLS to display interactive components and update profiles.
+                    CRITICAL: When calling ANY function, you MUST provide valid and correct JSON arguments. NEVER call a function with empty arguments.
+                    PRIORITY: Always prefer suggestions component over free-text when user needs to make choices or provide standard information.
+                    EXAMPLE: Instead of immediately calling show_onboarding_component, first say "Let me help you understand the importance of an emergency fund..." and THEN call the component.
+                </critical_requirement>
             </core_configuration>
 
             <user_profile_context>
