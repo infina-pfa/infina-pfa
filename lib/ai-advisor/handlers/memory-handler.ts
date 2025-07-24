@@ -16,7 +16,7 @@ export async function processMemoryContext(
     // Fetch existing user memories for context
     const memoryContext = await memoryManager.fetchAllUserMemories(userId);
     
-    console.log("📚 Memory context length:", memoryContext.length);
+    // console.log("📚 Memory context length:", memoryContext.length); // Removed to reduce console noise
     return memoryContext;
   } catch (error) {
     console.error("❌ Error processing memory context:", error);

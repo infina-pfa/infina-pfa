@@ -122,10 +122,10 @@ export class AIAdvisorOrchestratorService {
     const userContext = {
       financial: financialData,
     };
-    console.log(
-      "🚀 ~ AIAdvisorOrchestratorService ~ userContext.financialData:",
-      financialData
-    );
+    // console.log(
+    //   "🚀 ~ AIAdvisorOrchestratorService ~ userContext.financialData:",
+    //   financialData
+    // ); // Removed excessive financial data logging
 
     console.log("🚀 AI Advisor Stream Function Called");
     console.log("👤 User ID:", user_id);
@@ -258,18 +258,16 @@ export class AIAdvisorOrchestratorService {
   ) {
     console.log("📋 Preparing user context...");
     const userContextInfo = prepareUserContext(userContext, userId, "");
-    console.log("userContextInfo:", userContextInfo);
-
     const combined = [memoryContext, userContextInfo]
       .filter(Boolean)
       .join("\n\n");
 
-    console.log("📚 Context Debug:", {
-      historyLength: conversationHistory.length,
-      userContextLength: userContextInfo.length,
-      memoryContextLength: memoryContext.length,
-      combinedContextLength: combined.length,
-    });
+    // console.log("📚 Context Debug:", {
+    //   historyLength: conversationHistory.length,
+    //   userContextLength: userContextInfo.length,
+    //   memoryContextLength: memoryContext.length,
+    //   combinedContextLength: combined.length,
+    // }); // Commented out to reduce console noise
 
     return {
       combined,

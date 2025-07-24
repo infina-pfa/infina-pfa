@@ -132,7 +132,6 @@ export class AsyncMemoryManager {
 ${memories.map((item, index) => `${index + 1}. ${item.content} (Created at: ${item.created_at})`).join('\n')}
 === End of User Personal Information ===`;
 
-      console.log("💾 Memory context:", memoryContext);
       return memoryContext;
     } catch (error) {
       console.error('Unexpected error fetching user memories:', error);

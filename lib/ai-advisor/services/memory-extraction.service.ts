@@ -17,6 +17,8 @@ export class MemoryExtractionService {
    */
   shouldSaveMemory(userMessage: string): boolean {
     const simplePatterns = [
+      /^I'm the system/i, 
+      /^i'm the system/i, 
       /^(hi|hello|hey|xin chào)/i,
       /^(bye|goodbye|tạm biệt)/i,
       /^(thanks|thank you|cảm ơn)/i,
