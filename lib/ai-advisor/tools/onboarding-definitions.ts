@@ -34,6 +34,7 @@ export const showOnboardingComponentTool = {
             "budget_category_education",
             "budget_allocation_tool",
             "philosophy_selection",
+            "budget_summary",
           ],
           description:
             "Type of component to display - determines the UI component that will be rendered. REQUIRED: Must be one of the enum values.",
@@ -365,8 +366,14 @@ export const showOnboardingComponentTool = {
                 properties: {
                   id: { type: "string", description: "Category identifier" },
                   title: { type: "string", description: "Category title" },
-                  description: { type: "string", description: "Category description" },
-                  priority: { type: "number", description: "Priority level (1-3)" },
+                  description: {
+                    type: "string",
+                    description: "Category description",
+                  },
+                  priority: {
+                    type: "number",
+                    description: "Priority level (1-3)",
+                  },
                   rules: {
                     type: "array",
                     items: { type: "string" },
@@ -379,27 +386,87 @@ export const showOnboardingComponentTool = {
                 "Budget categories for education (OPTIONAL for budget_category_education)",
             },
 
+            // Budget summary - required for component_type: "budget_summary"
+            budgetSummary: {
+              type: "object",
+              properties: {
+                monthlyIncome: {
+                  type: "number",
+                  description: "User's monthly income",
+                },
+                budgetCategories: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: {
+                        type: "string",
+                        description:
+                          "Category identifier (e.g., 'pyf', 'essential_expenses', 'free_to_spend')",
+                      },
+                      title: {
+                        type: "string",
+                        description: "Display title for the budget category",
+                      },
+                      description: {
+                        type: "string",
+                        description:
+                          "Description of what this budget category represents",
+                      },
+                      priority: {
+                        type: "number",
+                        description:
+                          "Priority level for display order (lower numbers shown first)",
+                      },
+                      amount: {
+                        type: "number",
+                        description:
+                          "Monetary value for this budget category (e.g., '6.900.000 VND')",
+                      },
+                    },
+                    required: [
+                      "id",
+                      "title",
+                      "description",
+                      "priority",
+                      "amount",
+                    ],
+                  },
+                  description:
+                    "Array of budget categories with their allocations and monetary values",
+                },
+              },
+              required: ["monthlyIncome", "budgetCategories"],
+              description:
+                "Budget summary configuration (REQUIRED for budget_summary component)",
+            },
+
             // Budget allocation tool - required for component_type: "budget_allocation_tool"
             monthlyIncome: {
               type: "number",
-              description: "User's monthly income (REQUIRED for budget_allocation_tool)",
+              description:
+                "User's monthly income (REQUIRED for budget_allocation_tool)",
             },
             emergencyFundTarget: {
               type: "number",
-              description: "Target emergency fund amount (REQUIRED for budget_allocation_tool)",
+              description:
+                "Target emergency fund amount (REQUIRED for budget_allocation_tool)",
             },
             monthlyTargetSavings: {
               type: "number",
-              description: "Monthly target savings amount (REQUIRED for budget_allocation_tool)",
+              description:
+                "Monthly target savings amount (REQUIRED for budget_allocation_tool)",
             },
             budgetingStyle: {
               type: "string",
               enum: ["goal_focused", "detail_tracker"],
-              description: "User's chosen budgeting style (REQUIRED for budget_allocation_tool) - determines if simplified or detailed budget records are created",
+              description:
+                "User's chosen budgeting style (REQUIRED for budget_allocation_tool) - determines if simplified or detailed budget records are created",
             },
             expenseBreakdown: {
               type: "object",
-              description: "Detailed expense breakdown by category (REQUIRED for budget_allocation_tool when budgetingStyle is 'detail_tracker')",
+              description:
+                "Detailed expense breakdown by category (REQUIRED for budget_allocation_tool when budgetingStyle is 'detail_tracker')",
             },
 
             // Philosophy selection - optional for component_type: "philosophy_selection"
@@ -414,13 +481,19 @@ export const showOnboardingComponentTool = {
                     description: "Philosophy identifier",
                   },
                   title: { type: "string", description: "Philosophy title" },
-                  description: { type: "string", description: "Philosophy description" },
+                  description: {
+                    type: "string",
+                    description: "Philosophy description",
+                  },
                   features: {
                     type: "array",
                     items: { type: "string" },
                     description: "Key features of this philosophy",
                   },
-                  timeCommitment: { type: "string", description: "Time commitment required" },
+                  timeCommitment: {
+                    type: "string",
+                    description: "Time commitment required",
+                  },
                 },
                 required: ["id", "title", "description"],
               },
@@ -627,19 +700,43 @@ export function validateComponentArguments(args: unknown): {
   // Budget allocation enhancement component validations
   if (argObj.component_type === "budget_allocation_tool" && context) {
     if (!context.monthlyIncome || typeof context.monthlyIncome !== "number") {
-      errors.push("budget_allocation_tool requires monthlyIncome number in context");
+      errors.push(
+        "budget_allocation_tool requires monthlyIncome number in context"
+      );
     }
-    if (!context.emergencyFundTarget || typeof context.emergencyFundTarget !== "number") {
-      errors.push("budget_allocation_tool requires emergencyFundTarget number in context");
+    if (
+      !context.emergencyFundTarget ||
+      typeof context.emergencyFundTarget !== "number"
+    ) {
+      errors.push(
+        "budget_allocation_tool requires emergencyFundTarget number in context"
+      );
     }
-    if (!context.monthlyTargetSavings || typeof context.monthlyTargetSavings !== "number") {
-      errors.push("budget_allocation_tool requires monthlyTargetSavings number in context");
+    if (
+      !context.monthlyTargetSavings ||
+      typeof context.monthlyTargetSavings !== "number"
+    ) {
+      errors.push(
+        "budget_allocation_tool requires monthlyTargetSavings number in context"
+      );
     }
-    if (!context.budgetingStyle || typeof context.budgetingStyle !== "string" || !["goal_focused", "detail_tracker"].includes(context.budgetingStyle)) {
-      errors.push("budget_allocation_tool requires budgetingStyle ('goal_focused' or 'detail_tracker') in context");
+    if (
+      !context.budgetingStyle ||
+      typeof context.budgetingStyle !== "string" ||
+      !["goal_focused", "detail_tracker"].includes(context.budgetingStyle)
+    ) {
+      errors.push(
+        "budget_allocation_tool requires budgetingStyle ('goal_focused' or 'detail_tracker') in context"
+      );
     }
-    if (context.budgetingStyle === "detail_tracker" && (!context.expenseBreakdown || typeof context.expenseBreakdown !== "object")) {
-      errors.push("budget_allocation_tool with budgetingStyle 'detail_tracker' requires expenseBreakdown object in context");
+    if (
+      context.budgetingStyle === "detail_tracker" &&
+      (!context.expenseBreakdown ||
+        typeof context.expenseBreakdown !== "object")
+    ) {
+      errors.push(
+        "budget_allocation_tool with budgetingStyle 'detail_tracker' requires expenseBreakdown object in context"
+      );
     }
   }
 

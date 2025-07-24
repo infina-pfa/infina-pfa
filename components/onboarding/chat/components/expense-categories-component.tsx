@@ -5,6 +5,8 @@ import { OnboardingComponent, ComponentResponse } from "@/lib/types/onboarding.t
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { MoneyInput } from "@/components/ui/money-input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { 
   Home, 
   Utensils, 
@@ -186,23 +188,23 @@ export function ExpenseCategoriesComponent({
   };
 
   return (
-    <div className="space-y-3 sm:space-y-4 font-nunito max-w-full sm:max-w-md mx-auto">
-      {/* Compact Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#0055FF] mb-2">
-          <TrendingUp className="w-5 h-5 sm:w-5 sm:h-5 text-white" />
+    <div className="space-y-4 font-nunito max-w-full sm:max-w-md mx-auto">
+      {/* Header */}
+      <div className="text-center space-y-3">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#0055FF] mb-2">
+          <TrendingUp className="w-6 h-6 text-white" />
         </div>
-        <h3 className="text-base sm:text-lg font-bold text-[#111827] leading-5 sm:leading-6">
+        <h3 className="text-lg font-bold text-[#111827]">
           {t("expenseCategoriesTitle", { defaultValue: "Chi tiết chi phí hàng tháng" })}
         </h3>
-        <p className="text-xs sm:text-sm text-[#6B7280] leading-4">
+        <p className="text-sm text-[#6B7280]">
           {t("expenseCategoriesDescription", { 
             defaultValue: "Nhập số tiền dự kiến cho từng danh mục" 
           })}
         </p>
       </div>
 
-      {/* Compact Categories */}
+      {/* Categories */}
       <div className="space-y-3">
         {categories.map((category) => {
           const IconComponent = getCategoryIcon(category.name, category.id);
@@ -212,46 +214,39 @@ export function ExpenseCategoriesComponent({
           const hasError = errors[category.id];
 
           return (
-            <div
+            <Card
               key={category.id}
               className={`
-                relative transition-all duration-200
-                ${isFocused ? 'transform scale-[1.01]' : ''}
+                p-4 transition-all duration-200 hover:bg-[#F9FAFB]
+                ${isFocused ? 'border-[#0055FF] shadow-sm transform scale-[1.01]' : 'border-[#E5E7EB]'}
+                ${hasError ? 'border-[#F44336] bg-[#F44336]/5' : ''}
+                ${hasValue ? 'border-[#2ECC71] bg-[#2ECC71]/5' : ''}
               `}
             >
-              {/* Compact Category Card */}
-              <div
-                className={`
-                  bg-white rounded-xl p-3 transition-all duration-200
-                  border border-[#E5E7EB] hover:border-[#0055FF]/30
-                  ${isFocused ? 'border-[#0055FF] shadow-sm' : ''}
-                  ${hasError ? 'border-[#F44336] bg-[#F44336]/5' : ''}
-                  ${hasValue ? 'border-[#2ECC71] bg-[#2ECC71]/5' : ''}
-                `}
-              >
-                {/* Compact Header */}
-                <div className="flex items-center gap-3 mb-3">
+              <CardContent className="p-0 space-y-3">
+                {/* Category Header */}
+                <div className="flex items-center gap-3">
                   <div
-                    className="flex-shrink-0 w-10 h-10 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center"
+                    className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: `${categoryColor}20` }}
                   >
                     <IconComponent
-                      className="w-5 h-5 sm:w-4 sm:h-4"
+                      className="w-5 h-5"
                       style={{ color: categoryColor }}
                     />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm sm:text-base font-semibold text-[#111827] leading-4 sm:leading-5">
+                    <h4 className="text-base font-semibold text-[#111827]">
                       {category.name}
                       {category.required && (
-                        <span className="text-[#F44336] ml-1 text-xs">*</span>
+                        <span className="text-[#F44336] ml-1 text-sm">*</span>
                       )}
                     </h4>
                     {hasValue && (
                       <div className="flex items-center gap-1 mt-1">
-                        <Check className="w-3 h-3 sm:w-3 sm:h-3 text-[#2ECC71]" />
-                        <span className="text-xs sm:text-xs text-[#2ECC71]">
+                        <Check className="w-4 h-4 text-[#2ECC71]" />
+                        <span className="text-sm text-[#2ECC71] font-medium">
                           {expenseValues[category.id].toLocaleString()} VNĐ
                         </span>
                       </div>
@@ -259,7 +254,7 @@ export function ExpenseCategoriesComponent({
                   </div>
                 </div>
 
-                {/* Compact Money Input */}
+                {/* Money Input */}
                 <MoneyInput
                   label=""
                   value={expenseValues[category.id] || 0}
@@ -268,7 +263,7 @@ export function ExpenseCategoriesComponent({
                   onBlur={() => setFocusedCategory(null)}
                   placeholder={category.placeholder}
                   className={`
-                    text-sm sm:text-base h-12 sm:h-9 bg-[#F9FAFB] border-0 border-b rounded-lg px-3 py-2 min-h-[48px] sm:min-h-0
+                    bg-[#F9FAFB] border-0 border-b-2 rounded-lg
                     ${hasError
                       ? 'border-b-[#F44336] focus:border-b-[#F44336]'
                       : hasValue
@@ -279,61 +274,59 @@ export function ExpenseCategoriesComponent({
                 />
                 
                 {hasError && (
-                  <div className="flex items-center gap-1 text-xs sm:text-xs text-[#F44336] mt-1">
-                    <div className="w-3 h-3 rounded-full bg-[#F44336] flex items-center justify-center">
-                      <span className="text-white text-[10px]">!</span>
+                  <div className="flex items-center gap-2 text-sm text-[#F44336] mt-2">
+                    <div className="w-4 h-4 rounded-full bg-[#F44336] flex items-center justify-center">
+                      <span className="text-white text-xs">!</span>
                     </div>
                     {errors[category.id]}
                   </div>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           );
         })}
       </div>
 
-      {/* Compact Summary */}
+      {/* Summary */}
       {getTotalExpenses() > 0 && (
-        <div className="bg-[#0055FF] rounded-xl p-3 sm:p-4 text-white">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 sm:w-4 sm:h-4 text-white" />
-              <div>
-                <h4 className="font-semibold text-sm sm:text-base">
-                  {t("totalMonthlyExpenses", { defaultValue: "Tổng chi tiêu" })}
-                </h4>
-                <p className="text-[10px] sm:text-xs text-white/80">
-                  {getFilledCategoriesCount()}/{categories.length} danh mục
-                </p>
+        <Card className="bg-[#0055FF] border-[#0055FF] text-white">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <TrendingUp className="w-5 h-5 text-white" />
+                <div>
+                  <h4 className="font-semibold text-base">
+                    {t("totalMonthlyExpenses", { defaultValue: "Tổng chi tiêu" })}
+                  </h4>
+                  <p className="text-sm text-white/80">
+                    {getFilledCategoriesCount()}/{categories.length} danh mục
+                  </p>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <div className="text-lg font-bold">
+                  {getTotalExpenses().toLocaleString()} VNĐ
+                </div>
               </div>
             </div>
-            
-            <div className="text-right">
-              <div className="text-sm sm:text-base font-bold">
-                {getTotalExpenses().toLocaleString()} VNĐ
-              </div>
-            </div>
-          </div>
 
-          {/* Compact Progress Bar */}
-          <div className="w-full bg-white/20 rounded-full h-1 mt-2">
-            <div
-              className="bg-white rounded-full h-1 transition-all duration-300"
-              style={{
-                width: `${Math.min((getFilledCategoriesCount() / categories.length) * 100, 100)}%`
-              }}
+            {/* Progress Bar */}
+            <Progress 
+              value={(getFilledCategoriesCount() / categories.length) * 100}
+              className="bg-white/20"
             />
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Compact Submit Button */}
-      <div className="flex justify-center pt-2">
+      {/* Submit Button */}
+      <div className="flex justify-center pt-4">
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting || getTotalExpenses() === 0}
           className={`
-            px-4 sm:px-6 py-3 sm:py-2 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 min-h-[48px] sm:min-h-0
+            px-6 py-3 rounded-lg font-semibold transition-all duration-200
             ${getTotalExpenses() > 0 && !isSubmitting
               ? 'bg-[#0055FF] text-white hover:bg-[#0055FF]/90' 
               : 'bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed'
@@ -342,13 +335,13 @@ export function ExpenseCategoriesComponent({
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 sm:w-4 sm:h-4 animate-spin" />
-              <span className="text-sm sm:text-base">{t("submitting", { defaultValue: "Đang xử lý..." })}</span>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>{t("submitting", { defaultValue: "Đang xử lý..." })}</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <span className="text-sm sm:text-base">{t("continue", { defaultValue: "Tiếp tục" })}</span>
-              <TrendingUp className="w-4 h-4 sm:w-4 sm:h-4" />
+              <span>{t("continue", { defaultValue: "Tiếp tục" })}</span>
+              <TrendingUp className="w-4 h-4" />
             </div>
           )}
         </Button>

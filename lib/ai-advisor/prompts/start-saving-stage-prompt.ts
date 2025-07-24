@@ -84,7 +84,7 @@ export function generateStartSavingStagePrompt(
                         <sub_step id="1.educate_on_emergency_fund_if_not_know">
                             <goal>If users don't know about Emergency Fund, help them understand why they need an Emergency Fund.</goal>
                             <action>
-                                - **Educate on Emergency Fund:** Introduce the "Emergency Fund" concept. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//04%20VAY%20TN%20DNG_1080p.mp4' ; description: 'Knowldge about Emergency Fund') to display a short video with a simple explanation. 
+                                - **Educate on Emergency Fund:** Introduce the "Emergency Fund" concept. -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//Quy%20Du%20Phong.mp4' ; description: 'Knowldge about Emergency Fund') to display a short video with a simple explanation. 
                             </action>
                             <completion_criteria>The user has been introduced to Emergency Fund.</completion_criteria>
                         </sub_step>
@@ -123,7 +123,7 @@ export function generateStartSavingStagePrompt(
                             <sub_step id="2c_educate_on_budget_and_pyf">
                                 <goal>Explain why Budget and PYF are needed.</goal>
                                 <action>
-                                    - **Educate on Budget + PYF:** "Now that we have your goal set, let me explain why you need a Budget and Pay Yourself First strategy to achieve it." -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//04%20VAY%20TN%20DNG_1080p.mp4' ; description: 'Knowledge about Budget and PYF') to display a video explaining the importance of budgeting and PYF.
+                                    - **Educate on Budget + PYF:** "Now that we have your goal set, let me explain why you need a Budget and Pay Yourself First strategy to achieve it." -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//PYF.mp4' ; description: 'Knowledge about Budget and PYF') to display a video explaining the importance of budgeting and PYF.
                                 </action>
                                 <completion_criteria>User understands why Budget and PYF are essential for achieving their emergency fund goal.</completion_criteria>
                             </sub_step>
@@ -131,7 +131,7 @@ export function generateStartSavingStagePrompt(
                             <sub_step id="2c2_explain_three_expense_categories">
                                 <goal>Explain the three categories of expenses.</goal>
                                 <action>
-                                    - **Educate on Three Categories:** "Your budget will be organized into three main categories. Let me explain each one:" -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//04%20VAY%20TN%20DNG_1080p.mp4' ; description: 'Knowledge about the three expense categories') to display a video explaining the categories.
+                                    - **Educate on Three Categories:** "Your budget will be organized into three main categories. Let me explain each one:" -> Call showEducationContent(videoUrl: 'https://ygazqublzhudcfjaccdu.supabase.co/storage/v1/object/public/videos//PYF.mp4' ; description: 'Knowledge about the three expense categories') to display a video explaining the categories.
                                     - **Explain Each Category:**
                                         1. **Pay Yourself First(PYF):** "This is your emergency fund contribution - the percentage we just calculated in your goal. This gets paid first, before anything else."
                                         2. **Essential Expenses:** "These are your planned monthly expenses that don't change much - like rent, utilities, groceries, and transportation. We'll collect these details next."

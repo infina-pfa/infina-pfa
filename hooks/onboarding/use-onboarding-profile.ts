@@ -31,8 +31,6 @@ export const useOnboardingProfile = ({
   const createBudgetsFromExpenseBreakdown = useCallback(
     async (expenseBreakdown: Record<string, number>) => {
       try {
-        console.log("🏗️ Creating budgets from expense breakdown:", expenseBreakdown);
-
         // Get current month and year
         const now = new Date();
         const month = now.getMonth() + 1; // JavaScript months are 0-based
@@ -54,21 +52,45 @@ export const useOnboardingProfile = ({
             icon: "home",
             color: "#0055FF",
           },
+          rent: {
+            name: i18n.language === "vi" ? "Thuê nhà" : "Rent",
+            category: "fixed",
+            icon: "home",
+            color: "#0055FF",
+          },
           food: {
             name: i18n.language === "vi" ? "Ăn uống" : "Food",
-            category: "flexible",
+            category: "fixed",
+            icon: "food",
+            color: "#2ECC71",
+          },
+          food_grocery: {
+            name: i18n.language === "vi" ? "Ăn uống" : "Food",
+            category: "fixed",
             icon: "food",
             color: "#2ECC71",
           },
           transport: {
             name: i18n.language === "vi" ? "Di chuyển" : "Transportation",
-            category: "flexible",
+            category: "fixed",
+            icon: "car",
+            color: "#FF9800",
+          },
+          transportation: {
+            name: i18n.language === "vi" ? "Di chuyển" : "Transportation",
+            category: "fixed",
+            icon: "car",
+            color: "#FF9800",
+          },
+          utilities: {
+            name: i18n.language === "vi" ? "Điện, nước, internet" : "Utilities",
+            category: "fixed",
             icon: "car",
             color: "#FF9800",
           },
           other: {
             name: i18n.language === "vi" ? "Chi tiêu khác" : "Other Expenses",
-            category: "flexible",
+            category: "fixed",
             icon: "other",
             color: "#F44336",
           },
@@ -76,7 +98,10 @@ export const useOnboardingProfile = ({
 
         // Get existing budgets first to check for duplicates
         console.log("🔍 Checking for existing budgets...");
-        const existingBudgetsResponse = await budgetService.getAll({ month, year });
+        const existingBudgetsResponse = await budgetService.getAll({
+          month,
+          year,
+        });
         const existingBudgets = existingBudgetsResponse.budgets || [];
 
         // Create/update budgets for each category
@@ -97,15 +122,21 @@ export const useOnboardingProfile = ({
                   existingBudget.id
                 );
 
-                const updateResult = await budgetService.update(existingBudget.id, {
-                  amount,
-                  category: mapping.category,
-                  icon: mapping.icon,
-                  color: mapping.color,
-                });
+                const updateResult = await budgetService.update(
+                  existingBudget.id,
+                  {
+                    amount,
+                    category: mapping.category,
+                    icon: mapping.icon,
+                    color: mapping.color,
+                  }
+                );
 
                 if (updateResult.budget) {
-                  console.log(`✅ Budget updated for ${categoryId}:`, updateResult.budget);
+                  console.log(
+                    `✅ Budget updated for ${categoryId}:`,
+                    updateResult.budget
+                  );
                 } else {
                   console.error(
                     `❌ Failed to update budget for ${categoryId}:`,
@@ -124,12 +155,18 @@ export const useOnboardingProfile = ({
                   amount,
                 };
 
-                console.log(`📊 Creating new budget for ${categoryId}:`, budgetData);
+                console.log(
+                  `📊 Creating new budget for ${categoryId}:`,
+                  budgetData
+                );
 
                 const result = await budgetService.create(budgetData);
 
                 if (result.budget) {
-                  console.log(`✅ Budget created for ${categoryId}:`, result.budget);
+                  console.log(
+                    `✅ Budget created for ${categoryId}:`,
+                    result.budget
+                  );
                 } else {
                   console.error(
                     `❌ Failed to create budget for ${categoryId}:`,
@@ -144,9 +181,14 @@ export const useOnboardingProfile = ({
         // Wait for all budget operations to complete
         await Promise.all(budgetPromises);
 
-        console.log("🎉 Successfully processed all budgets from expense breakdown");
+        console.log(
+          "🎉 Successfully processed all budgets from expense breakdown"
+        );
       } catch (error) {
-        console.error("❌ Error creating budgets from expense breakdown:", error);
+        console.error(
+          "❌ Error creating budgets from expense breakdown:",
+          error
+        );
         // Don't throw error to avoid disrupting the onboarding flow
       }
     },
@@ -159,10 +201,13 @@ export const useOnboardingProfile = ({
 
       // Handle decision tree response
       if (response.determinedStage && response.answers) {
-        profileUpdates.identifiedStage = response.determinedStage as FinancialStage;
+        profileUpdates.identifiedStage =
+          response.determinedStage as FinancialStage;
         profileUpdates.stageConfirmed = true;
 
-        console.log(`✅ Decision tree determined stage: ${response.determinedStage}`);
+        console.log(
+          `✅ Decision tree determined stage: ${response.determinedStage}`
+        );
         console.log(`📋 User answers:`, response.answers);
         console.log(`🧠 Reasoning:`, response.reasoning);
       }
@@ -254,7 +299,8 @@ export const useOnboardingProfile = ({
           /tiêu.*?(\d+(?:\.\d+)?)\s*(?:triệu|tr)|spend.*?(\d+(?:\.\d+)?)\s*(?:million|mil)/i
         );
         if (expenseMatch) {
-          const expenses = parseFloat(expenseMatch[1] || expenseMatch[2]) * 1000000;
+          const expenses =
+            parseFloat(expenseMatch[1] || expenseMatch[2]) * 1000000;
           profileUpdates.expenses = expenses;
         }
       }

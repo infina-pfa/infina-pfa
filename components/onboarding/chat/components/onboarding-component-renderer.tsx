@@ -25,6 +25,7 @@ import { FinishOnboarding } from "./finish-onboarding";
 import BudgetCategoryEducation from "./budget-category-education";
 import BudgetAllocationTool from "./budget-allocation-tool";
 import PhilosophySelection from "./philosophy-selection";
+import BudgetSummaryComponent from "./budget-summary-component";
 
 interface OnboardingComponentRendererProps {
   component: OnboardingComponent;
@@ -182,6 +183,14 @@ export function OnboardingComponentRenderer({
     case "philosophy_selection":
       return (
         <PhilosophySelection
+          component={component}
+          onResponse={handleResponse}
+        />
+      );
+
+    case "budget_summary":
+      return (
+        <BudgetSummaryComponent
           component={component}
           onResponse={handleResponse}
         />
