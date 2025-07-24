@@ -111,8 +111,10 @@ export class DynamicOrchestrator {
       budgetStyle,
       context?.user
     );
-
-    const today = new Date().toISOString();
+    //get today in VN time, UTC +7 timezone
+    const today = new Date().toLocaleDateString("vi-VN", {
+      timeZone: "Asia/Ho_Chi_Minh",
+    });
     const system_prompt = `
       <system_prompt>
     <today_date>${today}</today_date>
@@ -122,7 +124,6 @@ export class DynamicOrchestrator {
       <budget_style>${budgetStyle}</budget_style>
       <memory>${context?.memory || ""}</memory>
       <user_info>${context?.user || ""}</user_info>
-      <financial_info>${context?.financial || ""}</financial_info>
     </user_context>
     <core_system_prompt>
       ${identityPrompt}

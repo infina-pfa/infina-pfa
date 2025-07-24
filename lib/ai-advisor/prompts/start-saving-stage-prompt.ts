@@ -177,7 +177,7 @@ export function generateStartSavingStagePrompt(
                                 
                                 **Case 1: Essential Expenses >= 100% of Income**
                                 - "I notice your essential expenses equal or exceed your entire income. Let's analyze whether everything is truly required."
-                                - Analyze each expense category and provide recommendations for reduction
+                                - Analyze each expense category and provide recommendations for reduction essential expenses to have room for Emergency Fund/PYF.
                                 - If user cannot reduce Essential Expenses: "I'm sorry, but we can't help you achieve your goal with current expenses. Consider find the way to reduce your essential expenses or increasing your salary or moving to a location with lower living costs."
                                 
                                 **Case 2: PYF + Essential Expenses >= 100% of Income**
