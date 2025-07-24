@@ -35,7 +35,7 @@ export function getDateStage(): DateScenario {
 
 // CHANGE THIS TO TEST DIFFERENT SCENARIOS
 //export const MOCK_DATE_SCENARIO: DateScenario = null;
-export const MOCK_DATE_SCENARIO: DateScenario = DateScenario.START_OF_MONTH;
+export const MOCK_DATE_SCENARIO: DateScenario | null = null;
 //export const MOCK_DATE_SCENARIO: DateScenario = 'end_of_month';
 //export const MOCK_DATE_SCENARIO: DateScenario = 'normal_day';
 

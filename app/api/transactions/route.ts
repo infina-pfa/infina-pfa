@@ -1,6 +1,31 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
+// Define interfaces for transaction data structure
+interface BudgetInfo {
+  name?: string;
+  color?: string;
+}
+
+interface BudgetTransaction {
+  budget_id: string;
+  budgets?: BudgetInfo;
+}
+
+interface Transaction {
+  id: string;
+  name: string;
+  amount: number;
+  description: string | null;
+  type: "income" | "outcome" | "transfer";
+  recurring: number;
+  created_at: string;
+  updated_at: string;
+  user_id: string | null;
+  category?: string;
+  budget_transactions: BudgetTransaction[];
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -75,7 +100,7 @@ export async function GET(request: NextRequest) {
         `
         )
         .eq("user_id", user.id)
-        .eq("type", type || "outcome")
+        .eq("type", (type || "outcome") as "income" | "outcome" | "transfer")
         .order("created_at", { ascending: false });
 
       // Apply limit if provided
@@ -103,7 +128,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform data to include budget name and color
-    const transformedData = data?.map((transaction) => {
+    const transformedData = data?.map((transaction: Transaction) => {
       // For transactions with budget info
       if (
         transaction.budget_transactions &&
@@ -191,10 +216,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (!amount || amount < 0) {
-      return NextResponse.json({
-        success: false,
-        error: "Amount must be greater than or equal to 0"
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Amount must be greater than or equal to 0",
+        },
+        { status: 400 }
+      );
     }
 
     if (!type || !["income", "outcome", "transfer"].includes(type)) {

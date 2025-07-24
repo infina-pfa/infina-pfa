@@ -75,7 +75,7 @@ class ChatMessageManagerService {
     componentId?: string,
     metadata?: Record<string, unknown>,
     customTimestamp?: string,
-    order: number
+    order?: number
   ): Promise<void> {
     try {
       // Wait for any previous saves to complete to maintain order
@@ -127,7 +127,7 @@ class ChatMessageManagerService {
     componentId?: string,
     metadata?: Record<string, unknown>,
     customTimestamp?: string,
-    order: number
+    order?: number
   ): Promise<void> {
     try {
       // Add order to metadata for proper sequencing

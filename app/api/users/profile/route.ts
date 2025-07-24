@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+// Define Json type to match Supabase's Json type
+type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
+// Define interface for database user
+interface DbUser {
+  user_id: string;
+  name: string;
+  total_asset_value: number;
+  budgeting_style?: "detail_tracker" | "goal_focused" | null;
+  financial_stage?: string | null;
+  financial_metadata?: Json;
+  onboarding_completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export async function GET() {
   try {
     // Create Supabase client
@@ -315,18 +331,43 @@ export async function PATCH(request: NextRequest) {
     } else {
       console.log("🚀 ~ PATCH ~ updateData:", updateData);
       // Create new user profile if it doesn't exist
-      const insertData = {
+      const insertData: DbUser = {
         user_id: user.id,
         name:
-          updateData.name ||
+          (updateData.name as string) ||
           user.user_metadata?.name ||
           user.user_metadata?.full_name ||
           user.email?.split("@")[0] ||
           "User",
-        total_asset_value: updateData.total_asset_value || 0,
-        ...updateData,
+        total_asset_value:
+          typeof updateData.total_asset_value === "number"
+            ? updateData.total_asset_value
+            : 0,
         created_at: new Date().toISOString(),
       };
+
+      // Add optional fields if they exist in updateData
+      if (updateData.budgeting_style !== undefined) {
+        insertData.budgeting_style = updateData.budgeting_style as
+          | "detail_tracker"
+          | "goal_focused"
+          | null;
+      }
+
+      if (updateData.financial_stage !== undefined) {
+        insertData.financial_stage = updateData.financial_stage as
+          | string
+          | null;
+      }
+
+      if (updateData.financial_metadata !== undefined) {
+        insertData.financial_metadata = updateData.financial_metadata as Json;
+      }
+
+      if (updateData.onboarding_completed_at !== undefined) {
+        insertData.onboarding_completed_at =
+          updateData.onboarding_completed_at as string | null;
+      }
 
       const { data, error } = await supabase
         .from("users")
