@@ -275,6 +275,8 @@ export interface UseAIAdvisorStreamProcessorOptions {
 export interface UseAIAdvisorStreamProcessorReturn {
   isProcessing: boolean;
   isStreaming: boolean;
+  isMCPLoading: boolean;
+  mcpLoadingMessage: string;
   processStreamData: (
     conversationId: string,
     readableStream: ReadableStream<Uint8Array>
