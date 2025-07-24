@@ -180,7 +180,7 @@ export function OnboardingComponentRenderer({
         />
       );
 
-    case "philosophy_selection":
+    case "free_to_spend_choice":
       return (
         <PhilosophySelection
           component={component}

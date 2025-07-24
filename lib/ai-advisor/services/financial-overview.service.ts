@@ -1,4 +1,6 @@
+import { Database } from "@/lib/supabase/database";
 import { createClient } from "@/lib/supabase/server";
+import { FinancialMetadata } from "@/lib/types/user.types";
 import { formatCurrency } from "@/lib/utils";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -40,10 +42,10 @@ export interface GoalItem {
   title: string;
   description: string | null;
   currentAmount: number;
-  targetAmount: number;
+  targetAmount: number | null;
   dueDate: string | null;
   progressPercentage: number;
-  isCompleted: boolean;
+  isCompleted: boolean | null;
   isDueSoon: boolean;
   createdAt: string;
 }
@@ -65,6 +67,7 @@ export interface GoalsSummary {
 export interface FinancialOverviewData {
   month: number;
   year: number;
+  pyfAmount: number;
   // Current month data
   currentMonth: FinancialSummary;
   // All-time data
@@ -83,7 +86,7 @@ export class FinancialOverviewService {
   async getFinancialOverview(
     userId: string,
     options?: { month?: number; year?: number },
-    _supabase?: SupabaseClient
+    _supabase?: SupabaseClient<Database>
   ): Promise<FinancialOverviewData | null> {
     const startTime = Date.now(); // Start time
     try {
@@ -316,13 +319,15 @@ export class FinancialOverviewService {
       const goals =
         goalsData?.map((goal) => {
           const progressPercentage =
-            goal.target_amount > 0
+            goal.target_amount && goal.target_amount > 0
               ? Math.round((goal.current_amount / goal.target_amount) * 100)
               : 0;
 
           // Check if goal is completed
           const isCompleted =
-            goal.target_amount > 0 && goal.current_amount >= goal.target_amount;
+            !!goal.target_amount &&
+            goal.target_amount > 0 &&
+            goal.current_amount >= goal.target_amount;
 
           // Check if goal is due soon (within 30 days)
           const isDueSoon = goal.due_date
@@ -364,10 +369,25 @@ export class FinancialOverviewService {
             : 0,
       };
 
+      let pyfAmount = 0;
+      const userProfile = await supabase
+        .from("users")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+
+      const financialMetadata = userProfile.data
+        ?.financial_metadata as unknown as FinancialMetadata;
+
+      if (financialMetadata) {
+        pyfAmount = financialMetadata.payYourselfFirstAmount || 0;
+      }
+
       // Prepare and return the updated response structure
       return {
         month: month,
         year: year,
+        pyfAmount: pyfAmount,
         // Current month data
         currentMonth: {
           totalIncome: currentMonthIncome,
@@ -489,7 +509,9 @@ export class FinancialOverviewService {
       goals.items.forEach((goal, index) => {
         text += `${index + 1}. ${goal.title}\n`;
         text += `   - Current: ${formatCurrency(goal.currentAmount)}\n`;
-        text += `   - Target: ${formatCurrency(goal.targetAmount)}\n`;
+        text += `   - Target: ${
+          goal.targetAmount ? formatCurrency(goal.targetAmount) : "N/A"
+        }\n`;
         text += `   - Progress: ${goal.progressPercentage}%\n`;
         text += `   - Status: ${
           goal.isCompleted ? "Completed" : "In Progress"
@@ -561,7 +583,7 @@ export class FinancialOverviewService {
       text += `⏰ REMINDER: ${upcomingGoals.length} goal(s) due soon:\n`;
       upcomingGoals.forEach((goal) => {
         text += `   - ${goal.title}: ${formatCurrency(
-          goal.targetAmount - goal.currentAmount
+          goal.targetAmount ? goal.targetAmount - goal.currentAmount : 0
         )} needed\n`;
       });
     }
