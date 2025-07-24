@@ -74,7 +74,7 @@ export const useBudgetForm = ({
     year: new Date().getFullYear(),
     color: BUDGET_COLORS[0],
     icon: "wallet",
-    category: "general",
+    category: "flexible",
     amount: 0,
   });
 
@@ -102,7 +102,7 @@ export const useBudgetForm = ({
         year: budget.year,
         color: budget.color || BUDGET_COLORS[0],
         icon: budget.icon || "wallet",
-        category: budget.category || "general",
+        category: budget.category || "flexible",
         amount: budget.amount,
       });
       setValidationErrors({});
