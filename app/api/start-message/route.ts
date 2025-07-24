@@ -89,6 +89,8 @@ const getStartMessageForGoalFocused = (props: {
   if (dateStageForGoalFocus === DateStage.END_OF_MONTH) {
     return `
     <User info>
+    User has done PYF with amount: ${props.currentPYFAmount}
+      Must PYF amount: ${props.pyfAmount}
     This week's spending: ${props.thisWeekSpendingAmount}
     This week's budget: ${props.thisWeekBudgetAmount}
     </User info>
@@ -107,6 +109,8 @@ const getStartMessageForGoalFocused = (props: {
   if (dateStageForGoalFocus === DateStage.END_OF_WEEK) {
     return `
     <User info>
+    User has done PYF with amount: ${props.currentPYFAmount}
+      Must PYF amount: ${props.pyfAmount}
     This week's spending: ${props.thisWeekSpendingAmount}
     This week's budget: ${props.thisWeekBudgetAmount}
     </User info>
@@ -125,6 +129,8 @@ const getStartMessageForGoalFocused = (props: {
 
   return `
     <User info>
+    User has done PYF with amount: ${props.currentPYFAmount}
+      Must PYF amount: ${props.pyfAmount}
     This week's spending: ${props.thisWeekSpendingAmount}
     This week's budget: ${props.thisWeekBudgetAmount}
     </User info>
@@ -149,6 +155,8 @@ const getStartMessageForDetailTracker = (props: {
   if (dateStageForGoalFocus === DateStage.START_OF_MONTH) {
     return `
       <User info>
+      User has done PYF with amount: ${props.currentPYFAmount}
+      Must PYF amount: ${props.pyfAmount}
         User has done PYF with amount: ${props.currentPYFAmount}
         Must PYF amount: ${props.pyfAmount}
         Today is ${today}
@@ -180,6 +188,8 @@ const getStartMessageForDetailTracker = (props: {
   if (dateStageForGoalFocus === DateStage.END_OF_WEEK) {
     return `
       <User info>
+      User has done PYF with amount: ${props.currentPYFAmount}
+      Must PYF amount: ${props.pyfAmount}
       This week's spending: ${props.thisWeekSpendingAmount}
       This week's budget: ${props.thisWeekBudgetAmount}
       </User info>
@@ -197,6 +207,12 @@ const getStartMessageForDetailTracker = (props: {
   }
 
   return `
+      <User info>
+      User has done PYF with amount: ${props.currentPYFAmount}
+      Must PYF amount: ${props.pyfAmount}
+      This week's spending: ${props.thisWeekSpendingAmount}
+      This week's budget: ${props.thisWeekBudgetAmount}
+      </User info>
       I'm the system, please start the conversation with user by doing actions:
       - The AI displays the budgeting dashboard to help the user control their spending after saving.
       - The AI asks the user to log their spending for the day: "What did you spend today?

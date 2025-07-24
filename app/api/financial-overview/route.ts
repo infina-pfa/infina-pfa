@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
       .select("amount")
       .eq("user_id", user.id)
       .eq("type", "income")
+      .eq("name", "user income")
       .gte("created_at", startDate.toISOString())
       .lte("created_at", endDate.toISOString());
 

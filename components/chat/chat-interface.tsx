@@ -21,6 +21,7 @@ export function ChatInterface() {
   const sentFirstMessage = useRef(false);
   const { needsOnboarding, isLoading: isOnboardingLoading } =
     useOnboardingCheck();
+  const [isGettingFirstMessage, setIsGettingFirstMessage] = useState(true);
 
   const chatFlow = useChatFlow();
   const {
@@ -61,11 +62,13 @@ export function ChatInterface() {
   useEffect(() => {
     if (user && !sentFirstMessage.current) {
       const startConversation = async () => {
+        setIsGettingFirstMessage(true);
         const firstMessage = await startConversationService.getFirstMessage();
         console.log("🚀 ~ startConversation ~ firstMessage:", firstMessage);
         sendMessage(firstMessage, {
           sender: "system",
         });
+        setIsGettingFirstMessage(false);
       };
       sentFirstMessage.current = true;
       startConversation();
@@ -73,7 +76,7 @@ export function ChatInterface() {
   }, [user]);
 
   // Loading state
-  if (chatLoading) {
+  if (chatLoading || isGettingFirstMessage) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">

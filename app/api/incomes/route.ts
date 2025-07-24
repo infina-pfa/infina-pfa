@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
       .select("*")
       .eq("user_id", user.id)
       .eq("type", "income")
+      .eq("name", "user income")
       .order("created_at", { ascending: false });
 
     // Apply date filters
