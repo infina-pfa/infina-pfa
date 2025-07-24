@@ -1,5 +1,4 @@
 export interface FinancialMetadata {
-  weekSpending: number[]; // 4 weeks data: [500000, 600000, 700000, 800000]
   dateGetSalary: string;
   payYourselfFirstAmount: number;
   monthlyIncome: number;

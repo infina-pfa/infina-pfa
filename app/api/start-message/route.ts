@@ -60,6 +60,7 @@ const getStartMessageForGoalFocused = (props: {
   pyfAmount: number;
   thisWeekSpendingAmount: number;
   thisWeekBudgetAmount: number;
+  monthlySpendingAmount: number;
 }) => {
   const dateStageForGoalFocus = getDateStage();
   //const today in UTC+7 format with datetime yyyy-mm-dd hh:mm:ss
@@ -93,6 +94,7 @@ const getStartMessageForGoalFocused = (props: {
       Must PYF amount: ${props.pyfAmount}
     This week's spending: ${props.thisWeekSpendingAmount}
     This week's budget: ${props.thisWeekBudgetAmount}
+    This month's total spending: ${props.monthlySpendingAmount}
     </User info>
     
     I'm the system, please start the conversation with user by doing actions:
@@ -113,6 +115,7 @@ const getStartMessageForGoalFocused = (props: {
       Must PYF amount: ${props.pyfAmount}
     This week's spending: ${props.thisWeekSpendingAmount}
     This week's budget: ${props.thisWeekBudgetAmount}
+    This month's total spending: ${props.monthlySpendingAmount}
     </User info>
     I'm the system, please start the conversation with user by doing actions:
     1. The AI asks the user for their total spending for the past week and prompts them to plan their spendable amount for the upcoming week.
@@ -133,6 +136,7 @@ const getStartMessageForGoalFocused = (props: {
       Must PYF amount: ${props.pyfAmount}
     This week's spending: ${props.thisWeekSpendingAmount}
     This week's budget: ${props.thisWeekBudgetAmount}
+    This month's total spending: ${props.monthlySpendingAmount}
     </User info>
     I'm the system, please start the conversation with user by doing actions:
     - The AI reminds the user of their remaining budget for the current week.
@@ -146,6 +150,7 @@ const getStartMessageForDetailTracker = (props: {
   pyfAmount: number;
   thisWeekSpendingAmount: number;
   thisWeekBudgetAmount: number;
+  monthlySpendingAmount: number;
 }) => {
   const dateStageForGoalFocus = getDateStage();
   const today = new Date().toLocaleString("vi-VN", {
@@ -174,6 +179,14 @@ const getStartMessageForDetailTracker = (props: {
 
   if (dateStageForGoalFocus === DateStage.END_OF_MONTH) {
     return `
+      <User info>
+      User has done PYF with amount: ${props.currentPYFAmount}
+      Must PYF amount: ${props.pyfAmount}
+      This week's spending: ${props.thisWeekSpendingAmount}
+      This week's budget: ${props.thisWeekBudgetAmount}
+      This month's total spending: ${props.monthlySpendingAmount}
+      </User info>
+      
       I'm the system, please start the conversation with user by doing actions:
       1. The AI asks the user for their total spending for the last week of the month.
       2. If the user underspent their budget for the last week, the AI advises them to save the surplus amount to their emergency fund to achieve their goal faster.
@@ -192,6 +205,7 @@ const getStartMessageForDetailTracker = (props: {
       Must PYF amount: ${props.pyfAmount}
       This week's spending: ${props.thisWeekSpendingAmount}
       This week's budget: ${props.thisWeekBudgetAmount}
+      This month's total spending: ${props.monthlySpendingAmount}
       </User info>
       
       I'm the system, please start the conversation with user by doing actions:
@@ -212,11 +226,90 @@ const getStartMessageForDetailTracker = (props: {
       Must PYF amount: ${props.pyfAmount}
       This week's spending: ${props.thisWeekSpendingAmount}
       This week's budget: ${props.thisWeekBudgetAmount}
+      This month's total spending: ${props.monthlySpendingAmount}
       </User info>
       I'm the system, please start the conversation with user by doing actions:
       - The AI displays the budgeting dashboard to help the user control their spending after saving.
       - The AI asks the user to log their spending for the day: "What did you spend today?
       `;
+};
+
+const getFreeToSpendAmount = async (
+  supabaseClient: SupabaseClient<Database>,
+  userId: string
+): Promise<{ budgetAmount: number; spentAmount: number }> => {
+  const { data: freeToSpend, error } = await supabaseClient
+    .from("budgets")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("category", "flexible")
+    .eq("month", new Date().getMonth() + 1)
+    .eq("year", new Date().getFullYear())
+    .single();
+
+  if (error) {
+    console.error("Error fetching free to spend amount:", error);
+    return { budgetAmount: 0, spentAmount: 0 };
+  }
+
+  // Get all spending of free to spend for this month
+  const now = new Date();
+  const monthStart = startOfMonth(now);
+  const monthEnd = endOfMonth(now);
+
+  // Get all transactions for this specific budget ID in the current month
+  const { data: budgetTransactions, error: transactionError } =
+    await supabaseClient
+      .from("budget_transactions")
+      .select(
+        `
+      budget_id,
+      transaction_id,
+      transactions!inner(
+        amount,
+        type,
+        created_at
+      )
+    `
+      )
+      .eq("user_id", userId)
+      .eq("budget_id", freeToSpend.id) // Use specific budget ID instead of category
+      .eq("transactions.type", "outcome") // Only spending transactions
+      .gte("transactions.created_at", monthStart.toISOString())
+      .lte("transactions.created_at", monthEnd.toISOString());
+
+  if (transactionError) {
+    console.error(
+      "Error fetching free to spend transactions:",
+      transactionError
+    );
+  }
+
+  // Calculate total spending for the month
+  const totalSpending =
+    budgetTransactions?.reduce((sum, budgetTransaction) => {
+      const transaction = budgetTransaction.transactions;
+      if (
+        transaction &&
+        typeof transaction === "object" &&
+        "amount" in transaction
+      ) {
+        return sum + Math.abs(transaction.amount); // Use absolute value for spending
+      }
+      return sum;
+    }, 0) || 0;
+
+  // Log the total spending for debugging
+  console.log(
+    `Total free to spend for month: ${
+      freeToSpend?.amount || 0
+    }, Total spent: ${totalSpending}`
+  );
+
+  return {
+    budgetAmount: freeToSpend?.amount || 0,
+    spentAmount: totalSpending,
+  };
 };
 
 const getCurrentWeekSpendingAmount = async (
@@ -352,6 +445,8 @@ const getCurrentMonthDepositToGoal = async (
   }
 };
 
+const date = new Date();
+
 export async function GET() {
   const supabase = await createClient<Database>();
 
@@ -376,6 +471,17 @@ export async function GET() {
   const financialMetadata =
     user.financial_metadata as unknown as FinancialMetadata;
 
+  const { budgetAmount: freeToSpendAmount, spentAmount } =
+    await getFreeToSpendAmount(supabase, user.user_id);
+  console.log(
+    "freeToSpendAmount",
+    freeToSpendAmount,
+    spentAmount,
+    getWeekOfMonth(date)
+  );
+  const remainingFreeToSpendThisWeek =
+    (freeToSpendAmount * getWeekOfMonth(date)) / 4 - spentAmount;
+
   if (user.budgeting_style === "goal_focused") {
     startMessage = getStartMessageForGoalFocused({
       currentPYFAmount: await getCurrentMonthDepositToGoal(
@@ -387,8 +493,8 @@ export async function GET() {
         supabase,
         user.user_id
       ),
-      thisWeekBudgetAmount:
-        financialMetadata.weekSpending[getWeekOfMonth(new Date()) - 1],
+      thisWeekBudgetAmount: remainingFreeToSpendThisWeek,
+      monthlySpendingAmount: freeToSpendAmount,
     });
   }
 
@@ -403,8 +509,8 @@ export async function GET() {
         supabase,
         user.user_id
       ),
-      thisWeekBudgetAmount:
-        financialMetadata.weekSpending[getWeekOfMonth(new Date()) - 1],
+      thisWeekBudgetAmount: remainingFreeToSpendThisWeek,
+      monthlySpendingAmount: freeToSpendAmount,
     });
   }
 
