@@ -218,10 +218,11 @@ export function generateStartSavingStagePrompt(
                                        - Re-calculate and re-validate with new amounts
                                     
                                     4. **Track Optimization Attempts:**
-                                       - Keep count of optimization rounds (maximum 3-4 attempts). you need try your best to help user reduce the essential expenses as best as possible until user can't reduce anymore.
+                                       - Keep count of optimization rounds (maximum 3-4 attempts). you need try your best to help user reduce the essential expenses as best as possible until user essential expenses is less than 100% of Income
                                        - If expenses still don't work after 3-4 optimization rounds can't reduce anymore, you MUST: 
                                          + Proceed to sub-step 4.2 (Only for case PYF + Essential Expenses <= 100% of Income) 
                                          + Declare unable to help (If essential expenses still >= 100% of Income)
+                                         + If essential expenses+ PYF is less than 100% of Income, you need to proceed to sub-step 4.4 (Show Successful Budget Summary)
 
                                     5. **Ask user confirm the optimized amounts:**
                                        - Call show_onboarding_component type "expense_categories" with the optimized amounts, and ask user to confirm the optimized amounts. -> remember that you MUST provide valid and correct JSON argument,you MUST provide the IDs in ['rent', 'food', 'transport', 'utilities'] and MUST provide the defaultValue in this case is the "optimized amounts".
