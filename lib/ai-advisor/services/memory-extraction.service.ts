@@ -130,9 +130,13 @@ export class MemoryExtractionService {
         - FAMILY_CONTEXT  
 
         ### EXCLUSIONS  – Ignore & do NOT store
-        • Routine transactions, daily expenses, exact balances, budgets.  
+        • Routine transactions, daily expenses, exact balances, budgets,   
         • Purely educational questions, greetings, thanks, apologies.  
         • Any sentence that only confirms something *you* just said.
+        • Any sentence that is not related to the user's personal information or financial context.
+        • For emergency fund, you must not to save memory
+        • For user request AI to help record daily transaction with CRUD function, you must not to save memory
+    
 
         ### EXTRACTION RULES
         • **One fact = one sentence = one category.**  
