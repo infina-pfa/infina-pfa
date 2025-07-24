@@ -58,13 +58,15 @@ export async function POST() {
       .select("*")
       .eq("user_id", user.id);
 
-    const totalFlexibleBudget = budgetCategories
-      ?.filter((category) => category.category === "flexible")
+    const totalFixedBudget = budgetCategories
+      ?.filter((category) => category.category === "fixed")
       .reduce((acc, curr) => acc + curr.amount, 0);
 
-    const weekSpending = Array.from(
-      { length: 4 },
-      () => (totalFlexibleBudget || 0) / 4
+    const weekSpending = Array.from({ length: 4 }, () =>
+      Math.max(
+        (income - (totalFixedBudget || 0) - payYourselfFirstAmount) / 4,
+        0
+      )
     );
 
     const userUpdateData = {
