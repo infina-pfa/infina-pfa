@@ -222,12 +222,12 @@ export function generateStartSavingStagePrompt(
                                     
                                     3. **Guide User Through Expense Re-input:**
                                        - If user chooses optimization: "Let's update your expenses with the optimized amounts"
-                                       - -> Call show_onboarding_component with "expense_categories" type to allow re-input of optimized expenses
+                                       - Ask user the optimized amounts for the expense categories need to adjust (Just need input text, don't show any UI component)
                                        - Re-calculate and re-validate with new amounts
                                     
                                     4. **Track Optimization Attempts:**
-                                       - Keep count of optimization rounds (maximum 2-3 attempts)
-                                       - If expenses still don't work after 2-3 optimization rounds, proceed to sub-step 4.2 or declare unable to help
+                                       - Keep count of optimization rounds (maximum 3-4 attempts)
+                                       - If expenses still don't work after 3-4 optimization rounds, proceed to sub-step 4.2 or declare unable to help
                                 </action>
                                 <completion_criteria>User has either successfully optimized expenses to make budget work, OR exhausted optimization options.</completion_criteria>
                             </sub_step>
@@ -240,9 +240,9 @@ export function generateStartSavingStagePrompt(
                                        - "I can see you've worked hard to optimize your expenses. Let's explore adjusting your emergency fund timeline."
                                     
                                     2. **Present Emergency Fund Adjustment Options:**
-                                       - Calculate alternative PYF percentages that would work (e.g., 15%, 10%, 5%)
+                                       - Calculate alternative PYF percentages that would work (Suggest the amount based on the income - Essential Expenses)
                                        - Show impact on timeline: "Reducing to X% would extend your emergency fund timeline to Y months"
-                                       - -> Call show_onboarding_component with "suggestions" type with specific percentage options
+                                       - -> Call show_onboarding_component with "suggestions" type with specific amount options 
                                     
                                     3. **Show Clear Consequences:**
                                        - Explain risks: "Reducing your emergency fund contribution means longer time to financial security"
