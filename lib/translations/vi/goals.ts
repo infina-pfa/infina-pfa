@@ -61,9 +61,6 @@ export const goalsVi = {
   goalDashboardCreateFirst:
     "Hãy tạo quỹ khẩn cấp đầu tiên để bảo đảm tương lai tài chính của bạn",
   goalDashboardProgress: "Hoàn thành",
-  goalDashboardMonthsCoverage: "Bao phủ",
-  goalDashboardMonthsCount_one: "{{count}} tháng",
-  goalDashboardMonthsCount_other: "{{count}} tháng",
   goalDashboardProjectedCompletion: "Dự kiến hoàn thành",
   goalDashboardNotSet: "Chưa thiết lập",
   goalDashboardMonthlySavingsRate: "Tỷ lệ tiết kiệm hàng tháng",

@@ -77,14 +77,19 @@ const getStartMessageForGoalFocused = (props: {
       Today is ${today}
     </User info>
     
-    I'm the system, please start the conversation with user by doing actions:
-    1. Display the user's emergency fund goal dashboard to show their progress
-    2. Remind the user to "Pay Yourself First" (PYF) to their emergency fund and to allocate funds for essential monthly expenses (e.g., rent, electricity, recurring debt payments)
-    3. The system tracks whether the user has confirmed their PYF contribution. If not confirmed, the AI continues to prompt daily until confirmation is received
-    - If the user has not confirmed PYF by the 5th day of the month or later, the AI asks for the reason to provide appropriate actionable suggestions:
-      - If the user states they haven't received their salary yet, the AI asks for their expected salary date and sets a reminder to prompt them again on that date.
-      - If the user states they had an unexpected expense (e.g., paying off last month's debt) and therefore cannot PYF the agreed amount, the AI advises them to cut down on other budget categories instead of reducing their PYF contribution.
-    `;
+      I'm the system, please start the conversation with user by doing actions based on 2 scenarios:
+      <scenario 1 trigger="User has done PYF with amount less than must PYF amount">
+      1. Remind the user to "Pay Yourself First" (PYF): The amount of PYF is not enough, you need to remind the user to PYF more with the amount of ${props.pyfAmount - props.currentPYFAmount}
+      2. Display the user's emergency fund goal dashboard to show their progress
+      3. If the user has not confirmed PYF by the 5th day of the month, the AI asks for the reason to provide appropriate actionable suggestions:
+        3.1 If the user states they haven't received their salary yet, the AI asks for their expected salary date and sets a reminder to prompt them again on that date.
+        3.2 If the user states they had an unexpected expense (e.g., paying off last month's debt) and therefore cannot PYF the agreed amount, the AI advises them to cut down on other budget categories instead of reducing their PYF contribution.
+    
+      <scenario 2 trigger="User has done PYF with amount equal or greater than must PYF amount">
+       1. Congratulate the user for their PYF contribution and remind them to continue saving (Not need to show the goal_dashboard).
+       2. Ask user: "How can I help you today?"
+       
+       `;
   }
 
   if (dateStageForGoalFocus === DateStage.END_OF_MONTH) {
@@ -167,14 +172,19 @@ const getStartMessageForDetailTracker = (props: {
         Today is ${today}
       </User info>
       
-      I'm the system, please start the conversation with user by doing actions:
-      1. Display the user's emergency fund goal dashboard to show their progress
-      2. Remind the user to "Pay Yourself First" (PYF) to their emergency fund and to allocate funds for essential monthly expenses (e.g., rent, electricity, recurring debt payments)
-      3. The system tracks whether the user has confirmed their PYF contribution. If not confirmed, the AI continues to prompt daily until confirmation is received
-      - If the user has not confirmed PYF by the 5th day of the month, the AI asks for the reason to provide appropriate actionable suggestions:
-        - If the user states they haven't received their salary yet, the AI asks for their expected salary date and sets a reminder to prompt them again on that date.
-        - If the user states they had an unexpected expense (e.g., paying off last month's debt) and therefore cannot PYF the agreed amount, the AI advises them to cut down on other budget categories instead of reducing their PYF contribution.
-      `;
+      I'm the system, please start the conversation with user by doing actions based on 2 scenarios:
+      <scenario 1 trigger="User has done PYF with amount less than must PYF amount">
+      1. Remind the user to "Pay Yourself First" (PYF): The amount of PYF is not enough, you need to remind the user to PYF more with the amount of ${props.pyfAmount - props.currentPYFAmount}
+      2. Display the user's emergency fund goal dashboard to show their progress
+      3. If the user has not confirmed PYF by the 5th day of the month, the AI asks for the reason to provide appropriate actionable suggestions:
+        3.1 If the user states they haven't received their salary yet, the AI asks for their expected salary date and sets a reminder to prompt them again on that date.
+        3.2 If the user states they had an unexpected expense (e.g., paying off last month's debt) and therefore cannot PYF the agreed amount, the AI advises them to cut down on other budget categories instead of reducing their PYF contribution.
+    
+      <scenario 2 trigger="User has done PYF with amount equal or greater than must PYF amount">
+       1. Congratulate the user for their PYF contribution and remind them to continue saving (Not need to show the goal_dashboard).
+       2. Ask user: "How can I help you today?"
+
+        `;
   }
 
   if (dateStageForGoalFocus === DateStage.END_OF_MONTH) {
@@ -371,7 +381,7 @@ const getCurrentWeekSpendingAmount = async (
   }
 };
 
-const getCurrentMonthDepositToGoal = async (
+const getCurrentMonthNetAmountToGoal = async (
   supabaseClient: SupabaseClient<Database>,
   userId: string
 ): Promise<number> => {
@@ -395,7 +405,7 @@ const getCurrentMonthDepositToGoal = async (
     const monthStart = startOfMonth(now);
     const monthEnd = endOfMonth(now);
 
-    // Step 3: Query goal_transactions joined with transactions for income transactions
+    // Step 3: Query goal_transactions joined with transactions for all transaction types
     const { data: goalTransactions, error: transactionError } =
       await supabaseClient
         .from("goal_transactions")
@@ -412,35 +422,40 @@ const getCurrentMonthDepositToGoal = async (
         )
         .eq("user_id", userId)
         .eq("goal_id", firstGoal.id)
-        .eq("transactions.type", "income") // Only income transactions
         .gte("transactions.created_at", monthStart.toISOString())
         .lte("transactions.created_at", monthEnd.toISOString());
 
     if (transactionError) {
       console.error(
-        "Error fetching goal income transactions:",
+        "Error fetching goal transactions:",
         transactionError
       );
       return 0;
     }
 
-    // Step 4: Sum all income amounts for the goal in current month
-    const totalDeposits =
+    // Step 4: Sum all transactions for the goal in current month
+    // If type = "income" then +amount, if type = "outcome" then -amount
+    const netAmount =
       goalTransactions?.reduce((sum, goalTransaction) => {
         const transaction = goalTransaction.transactions;
         if (
           transaction &&
           typeof transaction === "object" &&
-          "amount" in transaction
+          "amount" in transaction &&
+          "type" in transaction
         ) {
-          return sum + Math.abs(transaction.amount); // Use absolute value for deposits
+          if (transaction.type === "income") {
+            return sum + Math.abs(transaction.amount); // Positive for income
+          } else if (transaction.type === "outcome") {
+            return sum - Math.abs(transaction.amount); // Negative for outcome
+          }
         }
         return sum;
       }, 0) || 0;
 
-    return totalDeposits;
+    return netAmount;
   } catch (error) {
-    console.error("Error in getCurrentMonthDepositToGoal:", error);
+    console.error("Error in getCurrentMonthNetAmountToGoal:", error);
     return 0;
   }
 };
@@ -484,7 +499,7 @@ export async function GET() {
 
   if (user.budgeting_style === "goal_focused") {
     startMessage = getStartMessageForGoalFocused({
-      currentPYFAmount: await getCurrentMonthDepositToGoal(
+      currentPYFAmount: await getCurrentMonthNetAmountToGoal(
         supabase,
         user.user_id
       ),
@@ -500,7 +515,7 @@ export async function GET() {
 
   if (user.budgeting_style === "detail_tracker") {
     startMessage = getStartMessageForDetailTracker({
-      currentPYFAmount: await getCurrentMonthDepositToGoal(
+      currentPYFAmount: await getCurrentMonthNetAmountToGoal(
         supabase,
         user.user_id
       ),
