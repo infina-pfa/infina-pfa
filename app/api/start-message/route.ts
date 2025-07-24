@@ -215,12 +215,14 @@ const getCurrentWeekSpendingAmount = async (
     const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
 
     // Query budget_transactions joined with transactions for the current week
+    // and only include transactions for budgets with category "flexible"
     const { data: budgetTransactions, error } = await supabaseClient
       .from("budget_transactions")
       .select(
         `
         budget_id,
         transaction_id,
+        budgets!inner(category),
         transactions!inner(
           amount,
           type,
@@ -230,6 +232,7 @@ const getCurrentWeekSpendingAmount = async (
       )
       .eq("user_id", userId)
       .eq("transactions.type", "outcome") // Only spending transactions
+      .eq("budgets.category", "flexible") // Only flexible budgets
       .gte("transactions.created_at", weekStart.toISOString())
       .lte("transactions.created_at", weekEnd.toISOString());
 
