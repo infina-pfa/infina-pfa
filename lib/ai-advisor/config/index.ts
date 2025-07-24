@@ -26,7 +26,7 @@ export const mcpConfig: MCPConfig = {
 
 // Add onboarding-specific MCP configuration
 export const onboardingMcpConfig: MCPConfig = {
-  enabled: true,
+  enabled: false, // ❌ TEMPORARILY DISABLED
   serverUrl: process.env.ONBOARDING_MCP_SERVER_URL || "https://pfa-mcp.realstake.co/mcp/d02349d2-16a9-444e-862d-3eddd978e3ce/sse",
   serverLabel: "onboarding-financial-tools",
   timeout: 30000, // 30 seconds
