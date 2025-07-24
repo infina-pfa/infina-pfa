@@ -67,14 +67,8 @@ export const useOnboardingProfile = ({
           utilities: {
             name: i18n.language === "vi" ? "Điện, nước, internet" : "Utilities",
             category: "fixed",
-            icon: "car",
-            color: "#FF9800",
-          },
-          other: {
-            name: i18n.language === "vi" ? "Chi tiêu khác" : "Other Expenses",
-            category: "fixed",
-            icon: "other",
-            color: "#F44336",
+            icon: "utilities",
+            color: "#FFC107",
           },
         };
 

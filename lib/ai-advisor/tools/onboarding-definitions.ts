@@ -280,6 +280,10 @@ export const showOnboardingComponentTool = {
                     type: "boolean",
                     description: "Whether this category is required",
                   },
+                  defaultValue: {
+                    type: "number",
+                    description: "Default amount value for this category (optional)",
+                  },
                 },
                 required: ["id", "name", "placeholder", "required"],
               },

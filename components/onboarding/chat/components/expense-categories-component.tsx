@@ -36,6 +36,7 @@ interface ExpenseCategory {
   name: string;
   placeholder: string;
   required: boolean;
+  defaultValue?: number;
 }
 
 // Helper function to get icon for category
@@ -178,7 +179,15 @@ export function ExpenseCategoriesComponent({
   const categories = (component.context.categories || []) as ExpenseCategory[];
 
   const [expenseValues, setExpenseValues] = useState<Record<string, number>>(
-    {}
+    () => {
+      const initialValues: Record<string, number> = {};
+      categories.forEach((category) => {
+        if (category.defaultValue && category.defaultValue > 0) {
+          initialValues[category.id] = category.defaultValue;
+        }
+      });
+      return initialValues;
+    }
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
