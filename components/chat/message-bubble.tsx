@@ -9,10 +9,19 @@ import { ComponentMessage } from "./component-message";
 interface MessageBubbleProps {
   message: ChatMessage;
   onToolClick?: (toolId: string) => void;
+  onSendMessage?: (message: string) => void;
 }
 
-export function MessageBubble({ message, onToolClick }: MessageBubbleProps) {
+export function MessageBubble({
+  message,
+  onToolClick,
+  onSendMessage,
+}: MessageBubbleProps) {
   const isUser = message.sender === "user";
+
+  if (message.sender === "system") {
+    return null;
+  }
 
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2`}>
@@ -33,7 +42,7 @@ export function MessageBubble({ message, onToolClick }: MessageBubbleProps) {
           )}
 
           {message.type === "component" && (
-            <ComponentMessage message={message} />
+            <ComponentMessage message={message} onSendMessage={onSendMessage} />
           )}
 
           <MessageTimestamp timestamp={message.created_at} isUser={isUser} />

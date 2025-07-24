@@ -69,13 +69,13 @@ export const budgetValidationRules = {
   
   amount: {
     required: true,
-    min: 0.01,
+    min: 0,
     max: 999999999.99,
     custom: (value: string) => {
       if (!value) return null;
       const num = parseFloat(value);
       if (isNaN(num)) return 'Must be a valid number';
-      if (num <= 0) return 'Amount must be greater than 0';
+      if (num < 0) return 'Amount must be greater than or equal to 0';
       return null;
     }
   } as ValidationRule,

@@ -90,6 +90,37 @@ export const chatEn = {
   noMessages: "No messages yet",
   typingIndicator: "Finny is typing...",
 
+  // Onboarding Stage Identification
+  onboarding: {
+    welcomeMessage:
+      "Hello! I'm Fina, your AI financial advisor 🤝\n\nI'm here to help you take control of your financial future and provide specific guidance that fits your current financial situation.\n\n✨ To help you best, let me know what stage you're at in your financial journey:",
+    questionsIntro:
+      "I'll ask you 2 quick questions to accurately determine your financial priority:",
+
+    // Questions
+    debtQuestion:
+      "Do you have any debt, such as credit card balances or personal loans, with interest rates higher than 8%?",
+    emergencyFundQuestion:
+      "If you lost your main source of income today, do you have enough cash in easily accessible savings accounts to cover all essential living expenses for at least three months?",
+
+    // Answer options
+    yes: "Yes",
+    no: "No",
+
+    // Stage confirmations
+    debtStageConfirmation:
+      "Based on your answers, you're in the **Debt Management** stage. Your priority should be paying off high-interest debt first.",
+    noSavingStageConfirmation:
+      "Based on your answers, you're in the **Emergency Fund Building** stage. Your priority should be building a 3-6 month emergency fund.",
+    investingStageConfirmation:
+      "Based on your answers, you're in the **Investment Ready** stage. You can start focusing on long-term wealth building through investing.",
+
+    // Actions
+    getStarted: "Let's get started!",
+    continue: "Continue",
+    analysisComplete: "Analysis complete! Let's start your financial journey.",
+  },
+
   // AI Advisor Context
   aiAdvisorContext: {
     title: "Finny - Your Financial Advisor",
@@ -123,4 +154,10 @@ export const chatEn = {
     user: "User",
     ai: "AI",
   },
+
+  // Video components
+  videoLoadError: "Unable to load video. Please try again later.",
+  videoPlayError: "Unable to play video. Please try again.",
+  videoNotSupported: "Your browser does not support the video tag.",
+  clickToPlay: "Click to play video",
 };

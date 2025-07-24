@@ -88,7 +88,7 @@ EXAMPLES of good responses:
 Generate a welcoming message based on their current spending situation.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-2025-04-14",
       messages: [
         { role: "system", content: systemPrompt },
         { 

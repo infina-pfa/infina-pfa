@@ -1,22 +1,31 @@
 "use client";
 
+import { useAuth } from "@/hooks/use-auth";
 import { useChatFlow } from "@/hooks/use-chat-flow";
+import { useOnboardingCheck } from "@/hooks/use-onboarding-check";
 import { useAppTranslation } from "@/hooks/use-translation";
+import { startConversationService } from "@/lib/ai-advisor/services/start-conversation.service";
+import { ChatToolId } from "@/lib/types/ai-streaming.types";
+import { redirect } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { ChatInput } from "./chat-input";
 import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
-import { useEffect, useState } from "react";
-import { ChatToolId } from "@/lib/types/ai-streaming.types";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
   const [isMobile, setIsMobile] = useState(false);
+  const { user } = useAuth();
+  const sentFirstMessage = useRef(false);
+  const { needsOnboarding, isLoading: isOnboardingLoading } =
+    useOnboardingCheck();
 
+  const chatFlow = useChatFlow();
   const {
     messages,
-    isLoading,
+    isLoading: chatLoading,
     error,
     isThinking,
     isStreaming,
@@ -32,27 +41,39 @@ export function ChatInterface() {
     onSuggestionClick,
     conversationId,
     sendMessage,
-  } = useChatFlow();
+  } = chatFlow;
 
   useEffect(() => {
-    // Check if we're on client-side
-    if (typeof window !== "undefined") {
-      const checkIsMobile = () => {
-        setIsMobile(window.innerWidth < 768);
-      };
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
 
-      // Initial check
-      checkIsMobile();
+    // Initial check
+    checkIsMobile();
 
-      // Add event listener for resize
-      window.addEventListener("resize", checkIsMobile);
+    // Add event listener for resize
+    window.addEventListener("resize", checkIsMobile);
 
-      // Cleanup
-      return () => window.removeEventListener("resize", checkIsMobile);
-    }
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (user && !sentFirstMessage.current) {
+      const startConversation = async () => {
+        const firstMessage = await startConversationService.getFirstMessage();
+        console.log("🚀 ~ startConversation ~ firstMessage:", firstMessage);
+        sendMessage(firstMessage, {
+          sender: "system",
+        });
+      };
+      sentFirstMessage.current = true;
+      startConversation();
+    }
+  }, [user]);
+
+  // Loading state
+  if (chatLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
@@ -65,6 +86,10 @@ export function ChatInterface() {
         </div>
       </div>
     );
+  }
+
+  if (needsOnboarding && !isOnboardingLoading) {
+    return redirect("/onboarding");
   }
 
   // Determine if tool panel is open and adjust layout
@@ -116,6 +141,7 @@ export function ChatInterface() {
           <MessageList
             messages={messages}
             onToolClick={(toolId) => setToolId(toolId as ChatToolId)}
+            onSendMessage={sendMessage}
           />
           {isThinking && <TypingIndicator />}
         </div>
@@ -148,7 +174,7 @@ export function ChatInterface() {
         }}
         chatFlowState={{
           messages,
-          isLoading,
+          isLoading: chatLoading,
           error,
           isThinking,
           isStreaming,

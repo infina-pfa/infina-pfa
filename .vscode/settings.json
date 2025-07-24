@@ -20,5 +20,17 @@
     "fs",
     "http",
     "net"
-  ]
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/CVS": true,
+    "**/.retool_types/**": true,
+    "**/*tsconfig.json": true,
+    ".cache": true,
+    "retool.config.json": true
+  }
 }

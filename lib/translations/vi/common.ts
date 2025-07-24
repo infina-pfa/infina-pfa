@@ -6,8 +6,11 @@ export const commonVi = {
   about: "Giới thiệu",
   contact: "Liên hệ",
   fina: "Fina",
+  "infina-advisor": "Cố vấn tài chính",
   advisor: "Tư vấn",
   budgeting: "Ngân sách",
+  income: "Thu nhập",
+  goals: "Mục tiêu",
   chat: "Trò chuyện",
   tools: "Công cụ",
   dashboard: "Bảng điều khiển",
@@ -38,6 +41,10 @@ export const commonVi = {
   saving: "Đang lưu...",
   creating: "Đang tạo...",
   updating: "Đang cập nhật...",
+
+  // Time units
+  months: "tháng",
+  month: "tháng",
   create: "Tạo",
   update: "Cập nhật",
   cancel: "Hủy",
@@ -116,4 +123,25 @@ export const commonVi = {
   // Form fields
   description: "Mô tả",
   descriptionPlaceholder: "Nhập mô tả",
+  amount: "Số tiền",
+
+  // Transaction related
+  transactionName: "Tên giao dịch",
+  enterTransactionName: "Nhập tên giao dịch",
+  enterDescription: "Nhập mô tả (tùy chọn)",
+  nameRequired: "Tên là bắt buộc",
+  amountMustBePositive: "Số tiền phải lớn hơn 0",
+  reasonRequired: "Lý do là bắt buộc",
+
+  // Question flow
+  question: "Câu hỏi",
+  of: "trong",
+  analyzing: "Đang phân tích",
+
+  // Video controls
+  play: "Phát",
+  pause: "Tạm dừng",
+  fullscreen: "Toàn màn hình",
+  exitFullscreen: "Thoát toàn màn hình",
+  finishOnboarding: "Bắt đầu hành trình",
 };

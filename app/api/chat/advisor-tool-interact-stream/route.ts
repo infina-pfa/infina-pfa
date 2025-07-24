@@ -203,7 +203,13 @@ export async function POST(request: NextRequest) {
       const stream = await aiStreamingService.createStream(messages);
 
       // Return the readable stream
-      return aiStreamingService.createReadableStream(stream);
+      const readableStream = aiStreamingService.createReadableStream(stream);
+      return new Response(readableStream, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+        },
+      });
     } catch (error) {
       if (error instanceof Error) {
         return chatErrorHandler.openAIError(error);

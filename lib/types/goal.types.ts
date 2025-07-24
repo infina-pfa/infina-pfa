@@ -109,3 +109,106 @@ export interface AddTransactionToGoalResponse {
   goalTransaction: Transaction | null;
   error: string | null;
 }
+
+// Goal Transaction Income creation
+export interface CreateGoalTransactionIncomeRequest {
+  goalId: string;
+  name: string;
+  amount: number;
+  description?: string;
+  date?: string;
+}
+
+export interface CreateGoalTransactionIncomeResponse {
+  success: boolean;
+  data?: {
+    transaction: Transaction;
+    goalTransaction: {
+      id: string;
+      goal_id: string;
+      transaction_id: string;
+      user_id: string;
+      created_at: string;
+      updated_at: string;
+    };
+    updatedCurrentAmount: number;
+  };
+  error: string | null;
+}
+
+// Goal Transaction Withdrawal creation
+export interface CreateGoalTransactionWithdrawalRequest {
+  goalId: string;
+  name: string;
+  amount: number;
+  description?: string;
+  date?: string;
+}
+
+export interface CreateGoalTransactionWithdrawalResponse {
+  success: boolean;
+  data?: {
+    transaction: Transaction;
+    goalTransaction: {
+      id: string;
+      goal_id: string;
+      transaction_id: string;
+      user_id: string;
+      created_at: string;
+      updated_at: string;
+    };
+    updatedCurrentAmount: number;
+  };
+  error: string | null;
+}
+
+// Goal Income Transactions List
+export interface GoalIncomeTransaction {
+  id: string;
+  goalTransactionId: string;
+  transactionId: string;
+  goalId: string;
+  // Transaction details
+  name: string;
+  amount: number;
+  description: string | null;
+  type: string;
+  recurring: number;
+  date: string;
+  createdAt: string;
+  // Goal details
+  goalTitle: string;
+  goalDescription: string | null;
+  goalCurrentAmount: number;
+  goalTargetAmount: number | null;
+}
+
+export interface GoalIncomeTransactionFilters {
+  month: number;
+  year: number;
+  goalId?: string;
+}
+
+export interface GoalIncomeTransactionsSummary {
+  month: number;
+  year: number;
+  totalAmount: number;
+  transactionCount: number;
+  uniqueGoals: number;
+}
+
+export interface GoalIncomeTransactionsResponse {
+  success: boolean;
+  data?: {
+    transactions: GoalIncomeTransaction[];
+    summary: GoalIncomeTransactionsSummary;
+  };
+  error: string | null;
+}
+
+export enum DateStage {
+  START_OF_MONTH = "start_of_month",
+  END_OF_MONTH = "end_of_month",
+  NORMAL_DAY = "normal_day",
+  END_OF_WEEK = "end_of_week",
+}

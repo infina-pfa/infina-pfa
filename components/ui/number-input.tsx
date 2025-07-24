@@ -44,7 +44,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         if (value || value === 0) {
           const numericValue =
             typeof value === "string" ? parseFormattedNumber(value) : value;
-          setDisplayValue(numericValue > 0 ? formatNumber(numericValue) : "");
+          setDisplayValue(numericValue >= 0 ? formatNumber(numericValue) : "");
         } else {
           setDisplayValue("");
         }
@@ -98,7 +98,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       if (value || value === 0) {
         const numericValue =
           typeof value === "string" ? parseFormattedNumber(value) : value;
-        setDisplayValue(numericValue > 0 ? formatNumber(numericValue) : "");
+        setDisplayValue(numericValue >= 0 ? formatNumber(numericValue) : "");
       } else {
         setDisplayValue("");
       }

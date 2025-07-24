@@ -111,6 +111,7 @@ export async function GET(request: NextRequest) {
             date: gt.transactions.created_at,
             type: gt.transactions.type,
             description: gt.transactions.description,
+            created_at: gt.transactions.created_at,
           })) || [];
 
         // Calculate progress percentage efficiently

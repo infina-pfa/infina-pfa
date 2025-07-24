@@ -25,11 +25,6 @@ export const useSimpleChatSession = (): UseSimpleChatSessionReturn => {
 
   const createConversation = useCallback(
     async (title?: string): Promise<string | null> => {
-      if (!user) {
-        setError(t("conversationCreateFailed"));
-        return null;
-      }
-
       setIsCreating(true);
       setError(null);
 

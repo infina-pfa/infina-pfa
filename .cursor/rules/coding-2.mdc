@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+<!Rule 1: OpenAI API Implementation> 
+
+For any request that requires implement related to OpenAI API, you must use the Responses endpoint. You are strictly prohibited from using the Chat Completion endpoint(You can search the latest document from OpenAI if needed).
+
+<!Rule 2: Information Gaps> 
+
+If a request is ambiguous, or if you lack the necessary information or context to proceed, first use the Web Search tool to find the required knowledge. If the search does not yield a satisfactory answer, then ask me for clarification before attempting to implement the solution.
+
+<!Rule 3: Version Control> 
+
+Never use git commit, git push, or git pull automatically. Always present the commands to me first and wait for my explicit approval before executing them.

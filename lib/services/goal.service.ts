@@ -9,6 +9,12 @@ import {
   GoalStats,
   AddTransactionToGoalRequest,
   AddTransactionToGoalResponse,
+  CreateGoalTransactionIncomeRequest,
+  CreateGoalTransactionIncomeResponse,
+  CreateGoalTransactionWithdrawalRequest,
+  CreateGoalTransactionWithdrawalResponse,
+  GoalIncomeTransactionFilters,
+  GoalIncomeTransactionsResponse,
   Goal,
 } from "@/lib/types/goal.types";
 import { Transaction } from "../types/transaction.types";
@@ -75,7 +81,6 @@ export const goalService = {
       const response = await apiClient.get<Goal[]>("/goals", params);
 
       if (response.success && response.data) {
-        console.log("🚀 ~ response.data:", response.data);
         return {
           goals: response.data,
           error: null,
@@ -329,6 +334,252 @@ export const goalService = {
       throw new Error(
         response.error || "Failed to remove transaction from goal"
       );
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        success: false,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Create a goal transaction income
+   * This creates a transaction record first, then links it to the goal
+   */
+  async createGoalTransactionIncome(
+    data: CreateGoalTransactionIncomeRequest,
+    t?: TranslationFunction
+  ): Promise<CreateGoalTransactionIncomeResponse> {
+    try {
+      const response = await apiClient.post<{
+        transaction: Transaction;
+        goalTransaction: {
+          id: string;
+          goal_id: string;
+          transaction_id: string;
+          user_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        updatedCurrentAmount: number;
+      }>("/goals/transactions", data);
+
+      if (response.success && response.data) {
+        return {
+          success: true,
+          data: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(
+        response.error || "Failed to create goal transaction income"
+      );
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        success: false,
+        data: undefined,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Create a goal transaction withdrawal
+   * This creates a withdrawal transaction and reduces the goal's current amount
+   */
+  async createGoalTransactionWithdrawal(
+    data: CreateGoalTransactionWithdrawalRequest,
+    t?: TranslationFunction
+  ): Promise<CreateGoalTransactionWithdrawalResponse> {
+    try {
+      const response = await apiClient.post<{
+        transaction: Transaction;
+        goalTransaction: {
+          id: string;
+          goal_id: string;
+          transaction_id: string;
+          user_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        updatedCurrentAmount: number;
+      }>("/goals/transactions/withdraw", data);
+
+      if (response.success && response.data) {
+        return {
+          success: true,
+          data: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(
+        response.error || "Failed to create goal transaction withdrawal"
+      );
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        success: false,
+        data: undefined,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Get goal income transactions for a specific month and year
+   */
+  async getGoalIncomeTransactions(
+    filters: GoalIncomeTransactionFilters,
+    t?: TranslationFunction
+  ): Promise<GoalIncomeTransactionsResponse> {
+    try {
+      const params: Record<string, string> = {
+        month: filters.month.toString(),
+        year: filters.year.toString(),
+      };
+
+      if (filters.goalId) {
+        params.goalId = filters.goalId;
+      }
+
+      const response = await apiClient.get<{
+        transactions: Array<{
+          id: string;
+          goalTransactionId: string;
+          transactionId: string;
+          goalId: string;
+          name: string;
+          amount: number;
+          description: string | null;
+          type: string;
+          recurring: number;
+          date: string;
+          createdAt: string;
+          goalTitle: string;
+          goalDescription: string | null;
+          goalCurrentAmount: number;
+          goalTargetAmount: number | null;
+        }>;
+        summary: {
+          month: number;
+          year: number;
+          totalAmount: number;
+          transactionCount: number;
+          uniqueGoals: number;
+        };
+      }>("/goals/transactions/income", params);
+
+      if (response.success && response.data) {
+        return {
+          success: true,
+          data: response.data,
+          error: null,
+        };
+      }
+
+      throw new Error(
+        response.error || "Failed to fetch goal income transactions"
+      );
+    } catch (error) {
+      const appError = handleError(error, t);
+      return {
+        success: false,
+        data: undefined,
+        error: appError.message,
+      };
+    }
+  },
+
+  /**
+   * Get emergency fund dashboard data
+   */
+  async getDashboardData(t?: TranslationFunction): Promise<{
+    currentAmount: number;
+    targetAmount: number;
+    monthsOfCoverage: number;
+    progressPercentage: number;
+    projectedCompletionDate: string;
+    monthlySavingsRate: number;
+  }> {
+    try {
+      const response = await apiClient.get<{
+        currentAmount: number;
+        targetAmount: number;
+        monthsOfCoverage: number;
+        progressPercentage: number;
+        projectedCompletionDate: string;
+        monthlySavingsRate: number;
+      }>("/goals/emergency-fund/dashboard");
+
+      if (response.success && response.data) {
+        return response.data;
+      }
+
+      throw new Error(response.error || "Failed to fetch dashboard data");
+    } catch (error) {
+      const appError = handleError(error, t);
+      throw new Error(appError.message);
+    }
+  },
+
+  /**
+   * Get pay yourself first confirmation data
+   */
+  async getPayYourselfFirstData(t?: TranslationFunction): Promise<{
+    recommendedAmount: number;
+    userInput: number;
+    status: "pending" | "completed" | "postponed";
+    dueDate: string;
+  }> {
+    try {
+      const response = await apiClient.get<{
+        recommendedAmount: number;
+        userInput: number;
+        status: "pending" | "completed" | "postponed";
+        dueDate: string;
+      }>("/goals/emergency-fund/pay-yourself-first");
+
+      if (response.success && response.data) {
+        return response.data;
+      }
+
+      throw new Error(
+        response.error || "Failed to fetch pay yourself first data"
+      );
+    } catch (error) {
+      const appError = handleError(error, t);
+      throw new Error(appError.message);
+    }
+  },
+
+  /**
+   * Update emergency fund contribution
+   */
+  async updateEmergencyFundContribution(
+    data: {
+      amount: number;
+      status: "completed" | "postponed";
+      date: string;
+    },
+    t?: TranslationFunction
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await apiClient.post<{ success: boolean }>(
+        "/goals/emergency-fund/contribution",
+        data
+      );
+
+      if (response.success) {
+        return {
+          success: true,
+        };
+      }
+
+      throw new Error(response.error || "Failed to update contribution");
     } catch (error) {
       const appError = handleError(error, t);
       return {

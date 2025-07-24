@@ -6,39 +6,39 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { userService } from "@/lib/services/user.service";
-import { useOnboarding } from "@/hooks/use-onboarding";
-import { WelcomeStep } from "@/components/onboarding/welcome-step";
-import { NameStep } from "@/components/onboarding/name-step";
-import { LoadingStep } from "@/components/onboarding/loading-step";
+import { OnboardingChatInterface } from "@/components/onboarding/chat/onboarding-chat-interface";
+import { useAppTranslation } from "@/hooks/use-translation";
 
 export default function OnboardingPage() {
   const { user, loading: authLoading } = useAuthContext();
   const router = useRouter();
+  const { t } = useAppTranslation(["onboarding", "common"]);
 
-  // Initialize onboarding hook
-  const { step, name, loading, error, nextStep, updateName, createUser } =
-    useOnboarding();
-
-  // Check if user already has a profile
+  // Check if user has completed onboarding
   useEffect(() => {
-    const checkUserProfile = async () => {
+    const checkOnboardingStatus = async () => {
       if (!user?.id) return;
 
       try {
         const result = await userService.checkUserExists();
 
-        if (result.exists && result.user) {
-          // User already has a profile, redirect to chat
+        if (
+          result.exists &&
+          result.user &&
+          result.user.onboarding_completed_at
+        ) {
+          // User has completed onboarding, redirect to chat
           router.push("/chat");
         }
+        // If user exists but hasn't completed onboarding, continue with onboarding
       } catch (error) {
-        console.error("Error checking user profile:", error);
+        console.error("Error checking onboarding status:", error);
         // Continue with onboarding if there's an error
       }
     };
 
     if (user && !authLoading) {
-      checkUserProfile();
+      checkOnboardingStatus();
     }
   }, [user, authLoading, router]);
 
@@ -58,35 +58,16 @@ export default function OnboardingPage() {
     );
   }
 
-  const renderStep = () => {
-    switch (step) {
-      case "welcome":
-        return <WelcomeStep onNext={nextStep} />;
-
-      case "name":
-        return (
-          <NameStep
-            name={name}
-            onNameChange={updateName}
-            onSubmit={createUser}
-            loading={loading}
-            error={error}
-          />
-        );
-
-      case "loading":
-        return <LoadingStep />;
-
-      default:
-        return <WelcomeStep onNext={nextStep} />;
-    }
+  const handleOnboardingComplete = () => {
+    // Navigate to chat after successful onboarding
+    router.push("/chat");
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F7F9] font-nunito">
+    <div className="min-h-screen bg-[#F6F7F9] font-nunito flex flex-col">
       {/* Header - following landing page design */}
-      <header className="bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-4">
+      <header className="bg-white shadow-sm flex-shrink-0">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center">
             {/* Logo - same as landing page */}
             <Link href="/" className="flex items-center space-x-2">
@@ -95,7 +76,7 @@ export default function OnboardingPage() {
                 alt="Infina"
                 width={100}
                 height={30}
-                className="h-auto w-auto"
+                className="h-auto w-auto max-h-[24px] sm:max-h-[30px]"
                 priority
               />
             </Link>
@@ -103,9 +84,29 @@ export default function OnboardingPage() {
         </div>
       </header>
 
-      {/* Main Content - following landing page layout */}
-      <main className="max-w-6xl mx-auto px-6 py-16 lg:py-20">
-        <div className="max-w-2xl mx-auto">{renderStep()}</div>
+      {/* Main Content - Full height chat interface */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col max-w-5xl w-full mx-auto">
+          <div className="flex-1 bg-white sm:rounded-t-2xl sm:mt-4 shadow-sm flex flex-col overflow-hidden">
+            {/* Header - Reduced padding on mobile */}
+            <div className="text-center px-4 pt-6 pb-4 sm:px-8 sm:pt-8 sm:pb-6 flex-shrink-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#111827] mb-2 sm:mb-4">
+                {t("onboardingTitle")}
+              </h1>
+              <p className="text-base sm:text-lg text-[#6B7280] max-w-2xl mx-auto">
+                {t("onboardingSubtitle")}
+              </p>
+            </div>
+
+            {/* Chat Interface - Takes remaining space */}
+            <div className="flex-1 px-4 pb-4 sm:px-8 sm:pb-6 overflow-hidden">
+              <OnboardingChatInterface
+                userId={user.id}
+                onComplete={handleOnboardingComplete}
+              />
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

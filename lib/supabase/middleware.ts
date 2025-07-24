@@ -82,6 +82,13 @@ export const updateSession = async (request: NextRequest) => {
   //   }
   // }
 
+  if (
+    pathname.startsWith("/api/chat/prompt-test") &&
+    process.env.ENV === "development"
+  ) {
+    return supabaseResponse;
+  }
+
   // If user is not authenticated and trying to access protected pages, redirect to sign-in
   if (!user) {
     const isPublicPage =

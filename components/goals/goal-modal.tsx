@@ -98,26 +98,28 @@ export function GoalModal({
 
             {/* Current Amount */}
 
-            {/* Target Amount */}
-            <div>
-              <MoneyInput
-                label={t("targetAmount")}
-                value={formData.target_amount || 0}
-                onChange={(value) =>
-                  handleInputChange(
-                    "target_amount",
-                    parseFormattedNumber(value.toString())
-                  )
-                }
-                onBlur={() => handleFieldBlur("target_amount")}
-                error={
-                  touched.target_amount
-                    ? validationErrors.target_amount
-                    : undefined
-                }
-                placeholder={t("targetAmountPlaceholder")}
-              />
-            </div>
+            {/* Target Amount - Only show in create mode */}
+            {mode === "create" && (
+              <div>
+                <MoneyInput
+                  label={t("targetAmount")}
+                  value={formData.target_amount || 0}
+                  onChange={(value) =>
+                    handleInputChange(
+                      "target_amount",
+                      parseFormattedNumber(value.toString())
+                    )
+                  }
+                  onBlur={() => handleFieldBlur("target_amount")}
+                  error={
+                    touched.target_amount
+                      ? validationErrors.target_amount
+                      : undefined
+                  }
+                  placeholder={t("targetAmountPlaceholder")}
+                />
+              </div>
+            )}
 
             {/* <div>
               <MoneyInput
@@ -139,45 +141,49 @@ export function GoalModal({
               />
             </div> */}
 
-            {/* Due Date */}
-            <div>
-              <label className="block text-[14px] text-[#111827] mb-1">
-                {t("dueDate")}
-              </label>
-              <Input
-                type="date"
-                value={formData.due_date || ""}
-                onChange={(e) => handleInputChange("due_date", e.target.value)}
-                onBlur={() => handleFieldBlur("due_date")}
-                className="h-12"
-              />
-              {touched.due_date && validationErrors.due_date && (
-                <p className="text-[#DC2626] text-[12px] mt-1">
-                  {validationErrors.due_date}
-                </p>
-              )}
-            </div>
+            {/* Due Date - Only show in create mode */}
+            {mode === "create" && (
+              <div>
+                <label className="block text-[14px] text-[#111827] mb-1">
+                  {t("dueDate")}
+                </label>
+                <Input
+                  type="date"
+                  value={formData.due_date || ""}
+                  onChange={(e) => handleInputChange("due_date", e.target.value)}
+                  onBlur={() => handleFieldBlur("due_date")}
+                  className="h-12"
+                />
+                {touched.due_date && validationErrors.due_date && (
+                  <p className="text-[#DC2626] text-[12px] mt-1">
+                    {validationErrors.due_date}
+                  </p>
+                )}
+              </div>
+            )}
 
-            {/* Description */}
-            <div>
-              <label className="block text-[14px] text-[#111827] mb-1">
-                {t("description")}
-              </label>
-              <textarea
-                value={formData.description || ""}
-                onChange={(e) =>
-                  handleInputChange("description", e.target.value)
-                }
-                onBlur={() => handleFieldBlur("description")}
-                className="w-full p-3 bg-transparent border border-[#E5E7EB] rounded-lg focus:border-[#0055FF] focus:outline-none text-[16px] min-h-[100px]"
-                placeholder={t("descriptionPlaceholder")}
-              />
-              {touched.description && validationErrors.description && (
-                <p className="text-[#DC2626] text-[12px] mt-1">
-                  {validationErrors.description}
-                </p>
-              )}
-            </div>
+            {/* Description - Only show in create mode */}
+            {mode === "create" && (
+              <div>
+                <label className="block text-[14px] text-[#111827] mb-1">
+                  {t("description")}
+                </label>
+                <textarea
+                  value={formData.description || ""}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
+                  onBlur={() => handleFieldBlur("description")}
+                  className="w-full p-3 bg-transparent border border-[#E5E7EB] rounded-lg focus:border-[#0055FF] focus:outline-none text-[16px] min-h-[100px]"
+                  placeholder={t("descriptionPlaceholder")}
+                />
+                {touched.description && validationErrors.description && (
+                  <p className="text-[#DC2626] text-[12px] mt-1">
+                    {validationErrors.description}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Actions */}
             <DialogFooter className="flex flex-col sm:flex-row-reverse sm:justify-start gap-3 pt-4">
@@ -190,7 +196,7 @@ export function GoalModal({
                   ? t("saving", { ns: "common" })
                   : mode === "create"
                   ? t("createGoal")
-                  : t("updateGoal")}
+                  : t("renameGoal")}
               </Button>
               <Button
                 type="button"

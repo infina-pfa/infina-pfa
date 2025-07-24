@@ -29,3 +29,20 @@ export { useGoalCreateSWR } from "./use-goal-create";
 export { useGoalUpdateSWR } from "./use-goal-update";
 export { useGoalDeleteSWR } from "./use-goal-delete";
 export { useGoalManagementSWR } from "./use-goal-management";
+export { useGoalDashboardSWR } from "./use-goal-dashboard";
+export { usePayYourselfFirstSWR } from "./use-pay-yourself-first";
+export { useGoalTransactionIncomeCreateSWR } from "./use-goal-transaction-income-create";
+export { useGoalTransactionWithdrawalCreateSWR } from "./use-goal-transaction-withdrawal-create";
+export { useGoalIncomeTransactionsSWR } from "./use-goal-income-transactions";
+
+// Goal transaction hooks (RESTful endpoints)
+export { useGoalDeposit } from "./use-goal-deposit";
+export { useGoalWithdraw } from "./use-goal-withdraw";
+
+// User hooks
+export { useUserProfileSWR } from "./use-user-profile";
+
+// Chat component hooks
+export { useBudgetingDashboardSWR } from "./use-budgeting-dashboard";
+export { useMonthlyBudgetAnalysisSWR } from "./use-monthly-budget-analysis";
+export { useSurplusAllocationSWR } from "./use-surplus-allocation";
