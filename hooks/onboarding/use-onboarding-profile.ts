@@ -52,13 +52,13 @@ export const useOnboardingProfile = ({
             icon: "home",
             color: "#0055FF",
           },
-          food_grocery: {
+          food: {
             name: i18n.language === "vi" ? "Ăn uống" : "Food",
             category: "fixed",
             icon: "food",
             color: "#2ECC71",
           },
-          transportation: {
+          transport: {
             name: i18n.language === "vi" ? "Di chuyển" : "Transportation",
             category: "fixed",
             icon: "car",

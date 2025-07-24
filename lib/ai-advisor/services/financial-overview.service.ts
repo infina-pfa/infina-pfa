@@ -164,6 +164,7 @@ export class FinancialOverviewService {
           .from("transactions")
           .select("amount")
           .eq("user_id", userId)
+          .eq("name", "user income")
           .eq("type", "income");
 
       if (allTimeIncomeError) {
