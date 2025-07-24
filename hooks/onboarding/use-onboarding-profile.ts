@@ -46,35 +46,17 @@ export const useOnboardingProfile = ({
             color: string;
           }
         > = {
-          housing: {
-            name: i18n.language === "vi" ? "Nhà ở" : "Housing",
-            category: "fixed",
-            icon: "home",
-            color: "#0055FF",
-          },
           rent: {
             name: i18n.language === "vi" ? "Thuê nhà" : "Rent",
             category: "fixed",
             icon: "home",
             color: "#0055FF",
           },
-          food: {
-            name: i18n.language === "vi" ? "Ăn uống" : "Food",
-            category: "fixed",
-            icon: "food",
-            color: "#2ECC71",
-          },
           food_grocery: {
             name: i18n.language === "vi" ? "Ăn uống" : "Food",
             category: "fixed",
             icon: "food",
             color: "#2ECC71",
-          },
-          transport: {
-            name: i18n.language === "vi" ? "Di chuyển" : "Transportation",
-            category: "fixed",
-            icon: "car",
-            color: "#FF9800",
           },
           transportation: {
             name: i18n.language === "vi" ? "Di chuyển" : "Transportation",
