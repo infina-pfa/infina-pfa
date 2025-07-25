@@ -46,3 +46,7 @@ next-env.d.ts
 /logs/
 logs/
 *.log
+
+# ignore files:
+system_prompt.txt
+ecosystem.config.js
