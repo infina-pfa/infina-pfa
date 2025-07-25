@@ -18,6 +18,7 @@ graph TD
     AIService --> Backend
     Backend --> Database[(PostgreSQL Database)]
     AIService --> AIModels[(AI Models)]
+    AIService --> AIDatabase[(AI Context Database)]
 ```
 
 ## Web Application
@@ -27,7 +28,8 @@ graph TD
 - **Framework**: NextJS
 - **Authentication**: Supabase authentication
 - **State Management**: React Context, SWR for data fetching
-- **UI Components**: Custom component library with responsive design
+- **UI Components**: Custom component library based on shadcn with design guidelines
+- **Styling**: Tailwind CSS
 
 ### Key Features
 
@@ -43,7 +45,9 @@ graph TD
 - Interactive chat interface with AI financial advisor
 - Voice interaction capabilities (future)
 - Dynamic form components for data collection
-- Visualization tools for financial data
+- Advanced visualization components for financial data presentation
+- Interactive charts and graphs for budget analysis
+- Timeline visualizations for financial goals
 - Personalized recommendations display
 
 #### Financial Management UI
@@ -157,6 +161,7 @@ graph TD
 - **Language**: Python
 - **AI Framework**: OpenAI API
 - **API Framework**: FastAPI or Flask
+- **Database**: Dedicated database for context storage and conversation history
 
 ### Responsibilities
 
@@ -199,7 +204,7 @@ graph TD
 - Regular security reviews of code and infrastructure
 - Clear user data handling policies in Terms of Service
 
-## Scalability Strategy
+## Scalability Strategy (Not in phase)
 
 ### AWS ECS Implementation
 
