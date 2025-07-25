@@ -6,9 +6,8 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import {
   endOfMonth,
   endOfWeek,
-  isFirstDayOfMonth,
-  isLastDayOfMonth,
   isWeekend,
+  lastDayOfMonth,
   startOfMonth,
   startOfWeek,
 } from "date-fns";
@@ -43,10 +42,14 @@ const getDateStage = () => {
   // //mocktest for date stage
   // return DateStage.END_OF_MONTH;
   const now = new Date();
-  if (isFirstDayOfMonth(now)) {
+  const lastDateOfMonth = lastDayOfMonth(now);
+  if (now.getDate() >= 1 && now.getDate() <= 3) {
     return DateStage.START_OF_MONTH;
   }
-  if (isLastDayOfMonth(now)) {
+  if (
+    now.getDate() <= lastDateOfMonth.getDate() &&
+    now.getDate() >= lastDateOfMonth.getDate() - 3
+  ) {
     return DateStage.END_OF_MONTH;
   }
   if (isWeekend(now)) {
@@ -79,7 +82,9 @@ const getStartMessageForGoalFocused = (props: {
     
       I'm the system, please start the conversation with user by doing actions based on 2 scenarios:
       <scenario 1 trigger="User has done PYF with amount less than must PYF amount">
-      1. Remind the user to "Pay Yourself First" (PYF): The amount of PYF is not enough, you need to remind the user to PYF more with the amount of ${props.pyfAmount - props.currentPYFAmount}
+      1. Remind the user to "Pay Yourself First" (PYF): The amount of PYF is not enough, you need to remind the user to PYF more with the amount of ${
+        props.pyfAmount - props.currentPYFAmount
+      }
       2. Display the user's emergency fund goal dashboard to show their progress
       3. If the user has not confirmed PYF by the 5th day of the month, the AI asks for the reason to provide appropriate actionable suggestions:
         3.1 If the user states they haven't received their salary yet, the AI asks for their expected salary date and sets a reminder to prompt them again on that date.
@@ -174,7 +179,9 @@ const getStartMessageForDetailTracker = (props: {
       
       I'm the system, please start the conversation with user by doing actions based on 2 scenarios:
       <scenario 1 trigger="User has done PYF with amount less than must PYF amount">
-      1. Remind the user to "Pay Yourself First" (PYF): The amount of PYF is not enough, you need to remind the user to PYF more with the amount of ${props.pyfAmount - props.currentPYFAmount}
+      1. Remind the user to "Pay Yourself First" (PYF): The amount of PYF is not enough, you need to remind the user to PYF more with the amount of ${
+        props.pyfAmount - props.currentPYFAmount
+      }
       2. Display the user's emergency fund goal dashboard to show their progress
       3. If the user has not confirmed PYF by the 5th day of the month, the AI asks for the reason to provide appropriate actionable suggestions:
         3.1 If the user states they haven't received their salary yet, the AI asks for their expected salary date and sets a reminder to prompt them again on that date.
@@ -426,10 +433,7 @@ const getCurrentMonthNetAmountToGoal = async (
         .lte("transactions.created_at", monthEnd.toISOString());
 
     if (transactionError) {
-      console.error(
-        "Error fetching goal transactions:",
-        transactionError
-      );
+      console.error("Error fetching goal transactions:", transactionError);
       return 0;
     }
 
