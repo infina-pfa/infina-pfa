@@ -70,8 +70,10 @@ jobs:
               npm install
               npm run build
               
-              pm2 restart infina-pfa
-              
+              pm2 stop infina-pfa
+              pm2 delete infina-pfa
+              pm2 start ecosystem.config.js
+              pm2 save
               echo "=== Deployment completed successfully at $(date) ==="
 
       # Stop VPN connection using stored client ID (always run, even on failure)
