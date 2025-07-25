@@ -62,7 +62,7 @@ jobs:
               npm install
               npm run build
               pm2 restart infina-pfa 
-              echo "Deployment completed!"
+              echo "Deployment completed!!"
 
       - name: Stop VPN
         if: ${{ always() }}
