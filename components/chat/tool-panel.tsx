@@ -21,6 +21,8 @@ interface ChatFlowState {
   error: string | null;
   isThinking: boolean;
   isStreaming: boolean;
+  isMCPLoading: boolean;
+  mcpLoadingMessage: string;
   showSuggestions: boolean;
   clearError: () => void;
   inputValue: string;

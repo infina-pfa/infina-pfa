@@ -31,6 +31,7 @@ export const useAIAdvisorStreamProcessor = ({
 }: UseAIAdvisorStreamProcessorOptions): UseAIAdvisorStreamProcessorReturn => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isMCPLoading, setIsMCPLoading] = useState(false);
   const conversationIdRef = useRef<string>("");
 
   // Refs to track current streaming states
@@ -216,6 +217,18 @@ export const useAIAdvisorStreamProcessor = ({
           break;
         }
 
+        case ResponseDataEvent.MCP_TOOL_CALLING: {
+          setIsMCPLoading(true);
+          break;
+        }
+
+        case ResponseDataEvent.MCP_TOOL_CALL_DONE:
+        case ResponseDataEvent.MCP_TOOL_CALL_FAILED: {
+          setIsMCPLoading(false);
+          break;
+        }
+
+
         case ResponseDataEvent.RESPONSE_COMPLETED: {
           // Clean up any remaining streaming messages
           if (currentTextMessageRef.current) {
@@ -362,6 +375,7 @@ export const useAIAdvisorStreamProcessor = ({
   const reset = useCallback(() => {
     setIsProcessing(false);
     setIsStreaming(false);
+    setIsMCPLoading(false);
     currentTextMessageRef.current = null;
     currentToolMessageRef.current = null;
     responseIdRef.current = "";
@@ -370,6 +384,8 @@ export const useAIAdvisorStreamProcessor = ({
   return {
     isProcessing,
     isStreaming,
+    isMCPLoading,
+    mcpLoadingMessage: "Fina đang xử lý...bạn đợi Fina một chút nhé ^^",
     processStreamData,
     processStreamEvent,
     reset,

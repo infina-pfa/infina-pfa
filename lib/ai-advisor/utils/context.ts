@@ -12,9 +12,18 @@ export function prepareUserContext(
     ? `
 Thông tin người dùng:
 - User ID: ${userId}
+- Pay Yourself First Amount: ${
+        userContext.financial?.pyfAmount
+          ? new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(userContext.financial.pyfAmount)
+          : "Chưa có dữ liệu"
+      }
 
 === THÔNG TIN TÀI CHÍNH ===
 Thu nhập & Chi tiêu:
+
 - Tổng thu nhập (tất cả thời gian): ${
         userContext.financial?.totalIncome
           ? new Intl.NumberFormat("vi-VN", {

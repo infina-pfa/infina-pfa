@@ -1,26 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { OnboardingComponent, ComponentResponse } from "@/lib/types/onboarding.types";
+import {
+  OnboardingComponent,
+  ComponentResponse,
+} from "@/lib/types/onboarding.types";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { MoneyInput } from "@/components/ui/money-input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Home, 
-  Utensils, 
-  Car, 
-  ShoppingCart, 
-  Zap, 
-  Heart, 
-  GraduationCap, 
-  Gamepad2, 
-  Plane, 
+import {
+  Home,
+  Utensils,
+  Car,
+  ShoppingCart,
+  Zap,
+  Heart,
+  GraduationCap,
+  Gamepad2,
+  Plane,
   MoreHorizontal,
   TrendingUp,
   Check,
-  Loader2
+  Loader2,
 } from "lucide-react";
 
 interface ExpenseCategoriesComponentProps {
@@ -33,41 +36,85 @@ interface ExpenseCategory {
   name: string;
   placeholder: string;
   required: boolean;
+  defaultValue?: number;
 }
 
 // Helper function to get icon for category
 const getCategoryIcon = (categoryName: string, categoryId: string) => {
   const name = categoryName.toLowerCase();
   const id = categoryId.toLowerCase();
-  
-  if (name.includes('nhà') || name.includes('thuê') || name.includes('house') || name.includes('rent') || id.includes('housing')) {
+
+  if (
+    name.includes("nhà") ||
+    name.includes("thuê") ||
+    name.includes("house") ||
+    name.includes("rent") ||
+    id.includes("housing")
+  ) {
     return Home;
   }
-  if (name.includes('ăn') || name.includes('thức ăn') || name.includes('food') || id.includes('food')) {
+  if (
+    name.includes("ăn") ||
+    name.includes("thức ăn") ||
+    name.includes("food") ||
+    id.includes("food")
+  ) {
     return Utensils;
   }
-  if (name.includes('xe') || name.includes('giao thông') || name.includes('transport') || id.includes('transport')) {
+  if (
+    name.includes("xe") ||
+    name.includes("giao thông") ||
+    name.includes("transport") ||
+    id.includes("transport")
+  ) {
     return Car;
   }
-  if (name.includes('mua sắm') || name.includes('shopping') || id.includes('shopping')) {
+  if (
+    name.includes("mua sắm") ||
+    name.includes("shopping") ||
+    id.includes("shopping")
+  ) {
     return ShoppingCart;
   }
-  if (name.includes('điện') || name.includes('nước') || name.includes('utility') || id.includes('utility')) {
+  if (
+    name.includes("điện") ||
+    name.includes("nước") ||
+    name.includes("utility") ||
+    id.includes("utility")
+  ) {
     return Zap;
   }
-  if (name.includes('sức khỏe') || name.includes('y tế') || name.includes('health') || id.includes('health')) {
+  if (
+    name.includes("sức khỏe") ||
+    name.includes("y tế") ||
+    name.includes("health") ||
+    id.includes("health")
+  ) {
     return Heart;
   }
-  if (name.includes('học') || name.includes('giáo dục') || name.includes('education') || id.includes('education')) {
+  if (
+    name.includes("học") ||
+    name.includes("giáo dục") ||
+    name.includes("education") ||
+    id.includes("education")
+  ) {
     return GraduationCap;
   }
-  if (name.includes('giải trí') || name.includes('entertainment') || id.includes('entertainment')) {
+  if (
+    name.includes("giải trí") ||
+    name.includes("entertainment") ||
+    id.includes("entertainment")
+  ) {
     return Gamepad2;
   }
-  if (name.includes('du lịch') || name.includes('travel') || id.includes('travel')) {
+  if (
+    name.includes("du lịch") ||
+    name.includes("travel") ||
+    id.includes("travel")
+  ) {
     return Plane;
   }
-  
+
   return MoreHorizontal;
 };
 
@@ -75,36 +122,52 @@ const getCategoryIcon = (categoryName: string, categoryId: string) => {
 const getCategoryColor = (categoryName: string, categoryId: string) => {
   const name = categoryName.toLowerCase();
   const id = categoryId.toLowerCase();
-  
-  if (name.includes('nhà') || name.includes('thuê') || id.includes('housing')) {
-    return '#0055FF'; // Primary Blue
+
+  if (name.includes("nhà") || name.includes("thuê") || id.includes("housing")) {
+    return "#0055FF"; // Primary Blue
   }
-  if (name.includes('ăn') || name.includes('thức ăn') || id.includes('food')) {
-    return '#FF9800'; // Orange
+  if (name.includes("ăn") || name.includes("thức ăn") || id.includes("food")) {
+    return "#FF9800"; // Orange
   }
-  if (name.includes('xe') || name.includes('giao thông') || id.includes('transport')) {
-    return '#2ECC71'; // Green
+  if (
+    name.includes("xe") ||
+    name.includes("giao thông") ||
+    id.includes("transport")
+  ) {
+    return "#2ECC71"; // Green
   }
-  if (name.includes('mua sắm') || id.includes('shopping')) {
-    return '#FFC107'; // Yellow
+  if (name.includes("mua sắm") || id.includes("shopping")) {
+    return "#FFC107"; // Yellow
   }
-  if (name.includes('điện') || name.includes('nước') || id.includes('utility')) {
-    return '#FFC107'; // Yellow
+  if (
+    name.includes("điện") ||
+    name.includes("nước") ||
+    id.includes("utility")
+  ) {
+    return "#FFC107"; // Yellow
   }
-  if (name.includes('sức khỏe') || name.includes('y tế') || id.includes('health')) {
-    return '#2ECC71'; // Green
+  if (
+    name.includes("sức khỏe") ||
+    name.includes("y tế") ||
+    id.includes("health")
+  ) {
+    return "#2ECC71"; // Green
   }
-  if (name.includes('học') || name.includes('giáo dục') || id.includes('education')) {
-    return '#0055FF'; // Blue
+  if (
+    name.includes("học") ||
+    name.includes("giáo dục") ||
+    id.includes("education")
+  ) {
+    return "#0055FF"; // Blue
   }
-  if (name.includes('giải trí') || id.includes('entertainment')) {
-    return '#F44336'; // Red
+  if (name.includes("giải trí") || id.includes("entertainment")) {
+    return "#F44336"; // Red
   }
-  if (name.includes('du lịch') || id.includes('travel')) {
-    return '#FF9800'; // Orange
+  if (name.includes("du lịch") || id.includes("travel")) {
+    return "#FF9800"; // Orange
   }
-  
-  return '#6B7280'; // Gray
+
+  return "#6B7280"; // Gray
 };
 
 export function ExpenseCategoriesComponent({
@@ -112,34 +175,47 @@ export function ExpenseCategoriesComponent({
   onResponse,
 }: ExpenseCategoriesComponentProps) {
   const { t } = useAppTranslation(["onboarding", "common"]);
-  
+
   const categories = (component.context.categories || []) as ExpenseCategory[];
-  
-  const [expenseValues, setExpenseValues] = useState<Record<string, number>>({});
+
+  const [expenseValues, setExpenseValues] = useState<Record<string, number>>(
+    () => {
+      const initialValues: Record<string, number> = {};
+      categories.forEach((category) => {
+        if (category.defaultValue && category.defaultValue > 0) {
+          initialValues[category.id] = category.defaultValue;
+        }
+      });
+      return initialValues;
+    }
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [focusedCategory, setFocusedCategory] = useState<string | null>(null);
 
   const handleExpenseChange = (categoryId: string, value: number) => {
-    setExpenseValues(prev => ({
+    setExpenseValues((prev) => ({
       ...prev,
-      [categoryId]: value
+      [categoryId]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[categoryId]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [categoryId]: ""
+        [categoryId]: "",
       }));
     }
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
-    categories.forEach(category => {
-      if (category.required && (!expenseValues[category.id] || expenseValues[category.id] <= 0)) {
+
+    categories.forEach((category) => {
+      if (
+        category.required &&
+        (!expenseValues[category.id] || expenseValues[category.id] <= 0)
+      ) {
         newErrors[category.id] = t("fieldRequired");
       }
     });
@@ -149,11 +225,14 @@ export function ExpenseCategoriesComponent({
   };
 
   const getTotalExpenses = () => {
-    return Object.values(expenseValues).reduce((sum, value) => sum + (value || 0), 0);
+    return Object.values(expenseValues).reduce(
+      (sum, value) => sum + (value || 0),
+      0
+    );
   };
 
   const getFilledCategoriesCount = () => {
-    return Object.values(expenseValues).filter(value => value > 0).length;
+    return Object.values(expenseValues).filter((value) => value > 0).length;
   };
 
   const handleSubmit = async () => {
@@ -163,7 +242,7 @@ export function ExpenseCategoriesComponent({
     try {
       // Build expense breakdown using actual category IDs from context
       const expenseBreakdown: Record<string, number> = {};
-      
+
       // Map actual category IDs to their values
       categories.forEach((category) => {
         expenseBreakdown[category.id] = expenseValues[category.id] || 0;
@@ -173,12 +252,31 @@ export function ExpenseCategoriesComponent({
         expenseBreakdown,
         budgetingStyle: "detail_tracker", // Mark this as detail tracker style
         completedAt: new Date(),
-        userMessage: t("expenseCategoriesUserMessage", { 
+        userMessage: t("expenseCategoriesUserMessage", {
           ns: "onboarding",
           categoriesCount: categories.length,
           totalExpenses: getTotalExpenses().toLocaleString(),
-          defaultValue: `I've detailed my monthly living expenses across ${categories.length} categories. Total monthly expenses: ${getTotalExpenses().toLocaleString()} VNĐ. This detailed breakdown will help set up comprehensive budget tracking with individual categories for each expense type.`
-        })
+          categories: categories
+            .map(
+              (cat) =>
+                `${cat.name}: ${(
+                  expenseValues[cat.id] || 0
+                ).toLocaleString()} VNĐ`
+            )
+            .join(", "),
+          defaultValue: `I've detailed my monthly living expenses across ${
+            categories.length
+          } categories. Total monthly expenses: ${getTotalExpenses().toLocaleString()} VNĐ. Breakdown: ${categories
+            .map(
+              (cat) =>
+                `${cat.name}: ${(
+                  expenseValues[cat.id] || 0
+                ).toLocaleString()} VNĐ`
+            )
+            .join(
+              ", "
+            )}. This detailed breakdown will help set up comprehensive budget tracking with individual categories for each expense type.`,
+        }),
       });
     } catch (error) {
       console.error("Error submitting expense categories:", error);
@@ -195,11 +293,13 @@ export function ExpenseCategoriesComponent({
           <TrendingUp className="w-6 h-6 text-white" />
         </div>
         <h3 className="text-lg font-bold text-[#111827]">
-          {t("expenseCategoriesTitle", { defaultValue: "Chi tiết chi phí hàng tháng" })}
+          {t("expenseCategoriesTitle", {
+            defaultValue: "Chi tiết chi phí hàng tháng",
+          })}
         </h3>
         <p className="text-sm text-[#6B7280]">
-          {t("expenseCategoriesDescription", { 
-            defaultValue: "Nhập số tiền dự kiến cho từng danh mục" 
+          {t("expenseCategoriesDescription", {
+            defaultValue: "Nhập số tiền dự kiến cho từng danh mục",
           })}
         </p>
       </div>
@@ -218,9 +318,13 @@ export function ExpenseCategoriesComponent({
               key={category.id}
               className={`
                 p-4 transition-all duration-200 hover:bg-[#F9FAFB]
-                ${isFocused ? 'border-[#0055FF] shadow-sm transform scale-[1.01]' : 'border-[#E5E7EB]'}
-                ${hasError ? 'border-[#F44336] bg-[#F44336]/5' : ''}
-                ${hasValue ? 'border-[#2ECC71] bg-[#2ECC71]/5' : ''}
+                ${
+                  isFocused
+                    ? "border-[#0055FF] shadow-sm transform scale-[1.01]"
+                    : "border-[#E5E7EB]"
+                }
+                ${hasError ? "border-[#F44336] bg-[#F44336]/5" : ""}
+                ${hasValue ? "border-[#2ECC71] bg-[#2ECC71]/5" : ""}
               `}
             >
               <CardContent className="p-0 space-y-3">
@@ -258,21 +362,24 @@ export function ExpenseCategoriesComponent({
                 <MoneyInput
                   label=""
                   value={expenseValues[category.id] || 0}
-                  onChange={(value) => handleExpenseChange(category.id, parseInt(value) || 0)}
+                  onChange={(value) =>
+                    handleExpenseChange(category.id, parseInt(value) || 0)
+                  }
                   onFocus={() => setFocusedCategory(category.id)}
                   onBlur={() => setFocusedCategory(null)}
                   placeholder={category.placeholder}
                   className={`
                     bg-[#F9FAFB] border-0 border-b-2 rounded-lg
-                    ${hasError
-                      ? 'border-b-[#F44336] focus:border-b-[#F44336]'
-                      : hasValue
-                      ? 'border-b-[#2ECC71] focus:border-b-[#2ECC71]'
-                      : 'border-b-[#E5E7EB] focus:border-b-[#0055FF]'
+                    ${
+                      hasError
+                        ? "border-b-[#F44336] focus:border-b-[#F44336]"
+                        : hasValue
+                        ? "border-b-[#2ECC71] focus:border-b-[#2ECC71]"
+                        : "border-b-[#E5E7EB] focus:border-b-[#0055FF]"
                     }
                   `}
                 />
-                
+
                 {hasError && (
                   <div className="flex items-center gap-2 text-sm text-[#F44336] mt-2">
                     <div className="w-4 h-4 rounded-full bg-[#F44336] flex items-center justify-center">
@@ -296,14 +403,16 @@ export function ExpenseCategoriesComponent({
                 <TrendingUp className="w-5 h-5 text-white" />
                 <div>
                   <h4 className="font-semibold text-base">
-                    {t("totalMonthlyExpenses", { defaultValue: "Tổng chi tiêu" })}
+                    {t("totalMonthlyExpenses", {
+                      defaultValue: "Tổng chi tiêu",
+                    })}
                   </h4>
                   <p className="text-sm text-white/80">
                     {getFilledCategoriesCount()}/{categories.length} danh mục
                   </p>
                 </div>
               </div>
-              
+
               <div className="text-right">
                 <div className="text-lg font-bold">
                   {getTotalExpenses().toLocaleString()} VNĐ
@@ -312,7 +421,7 @@ export function ExpenseCategoriesComponent({
             </div>
 
             {/* Progress Bar */}
-            <Progress 
+            <Progress
               value={(getFilledCategoriesCount() / categories.length) * 100}
               className="bg-white/20"
             />
@@ -327,9 +436,10 @@ export function ExpenseCategoriesComponent({
           disabled={isSubmitting || getTotalExpenses() === 0}
           className={`
             px-6 py-3 rounded-lg font-semibold transition-all duration-200
-            ${getTotalExpenses() > 0 && !isSubmitting
-              ? 'bg-[#0055FF] text-white hover:bg-[#0055FF]/90' 
-              : 'bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed'
+            ${
+              getTotalExpenses() > 0 && !isSubmitting
+                ? "bg-[#0055FF] text-white hover:bg-[#0055FF]/90"
+                : "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
             }
           `}
         >
@@ -348,4 +458,4 @@ export function ExpenseCategoriesComponent({
       </div>
     </div>
   );
-} 
+}

@@ -236,7 +236,7 @@ export async function POST(request: NextRequest) {
         year,
         color: color || "#0055FF",
         icon: icon || "wallet",
-        category: category || "general",
+        category: category || "flexible",
         amount: amount || 0,
       })
       .select("*")

@@ -14,6 +14,8 @@ interface ChatFlowState {
   error: string | null;
   isThinking: boolean;
   isStreaming: boolean;
+  isMCPLoading: boolean;
+  mcpLoadingMessage: string;
   showSuggestions: boolean;
   clearError: () => void;
   inputValue: string;
@@ -47,6 +49,8 @@ export function ToolChatInterface({ chatFlowState }: ToolChatInterfaceProps) {
     error,
     isThinking,
     isStreaming,
+    isMCPLoading,
+    mcpLoadingMessage,
     showSuggestions,
     clearError,
     inputValue,
@@ -115,6 +119,18 @@ export function ToolChatInterface({ chatFlowState }: ToolChatInterfaceProps) {
             // Note: No onToolClick prop passed to prevent tool-in-tool opening
           />
           {isThinking && <TypingIndicator />}
+          {isMCPLoading && (
+            <div className="flex justify-start mb-6 px-6">
+              <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 rounded-2xl rounded-bl-sm">
+                <div className="w-4 h-4">
+                  <div className="w-full h-full bg-blue-600 rounded-full animate-pulse"></div>
+                </div>
+                <span className="text-blue-700 font-nunito text-sm font-medium">
+                  {mcpLoadingMessage}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Input Area */}

@@ -21,6 +21,7 @@ export function ChatInterface() {
   const sentFirstMessage = useRef(false);
   const { needsOnboarding, isLoading: isOnboardingLoading } =
     useOnboardingCheck();
+  const [isGettingFirstMessage, setIsGettingFirstMessage] = useState(true);
 
   const chatFlow = useChatFlow();
   const {
@@ -29,6 +30,8 @@ export function ChatInterface() {
     error,
     isThinking,
     isStreaming,
+    isMCPLoading,
+    mcpLoadingMessage,
     showSuggestions,
     clearError,
     toolId,
@@ -61,11 +64,13 @@ export function ChatInterface() {
   useEffect(() => {
     if (user && !sentFirstMessage.current) {
       const startConversation = async () => {
+        setIsGettingFirstMessage(true);
         const firstMessage = await startConversationService.getFirstMessage();
         console.log("🚀 ~ startConversation ~ firstMessage:", firstMessage);
         sendMessage(firstMessage, {
           sender: "system",
         });
+        setIsGettingFirstMessage(false);
       };
       sentFirstMessage.current = true;
       startConversation();
@@ -73,7 +78,7 @@ export function ChatInterface() {
   }, [user]);
 
   // Loading state
-  if (chatLoading) {
+  if (chatLoading || isGettingFirstMessage) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
@@ -144,6 +149,18 @@ export function ChatInterface() {
             onSendMessage={sendMessage}
           />
           {isThinking && <TypingIndicator />}
+          {isMCPLoading && (
+            <div className="flex justify-start mb-6 px-6">
+              <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 rounded-2xl rounded-bl-sm">
+                <div className="w-4 h-4">
+                  <div className="w-full h-full bg-blue-600 rounded-full animate-pulse"></div>
+                </div>
+                <span className="text-blue-700 font-nunito text-sm font-medium">
+                  {mcpLoadingMessage}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Input Area */}
@@ -178,6 +195,8 @@ export function ChatInterface() {
           error,
           isThinking,
           isStreaming,
+          isMCPLoading,
+          mcpLoadingMessage,
           showSuggestions,
           clearError,
           inputValue,

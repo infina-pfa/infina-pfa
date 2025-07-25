@@ -61,9 +61,6 @@ export const goalsEn = {
   goalDashboardCreateFirst:
     "Let's create your first emergency fund to secure your financial future",
   goalDashboardProgress: "Complete",
-  goalDashboardMonthsCoverage: "Coverage",
-  goalDashboardMonthsCount_one: "{{count}} month",
-  goalDashboardMonthsCount_other: "{{count}} months",
   goalDashboardProjectedCompletion: "Projected completion",
   goalDashboardNotSet: "Not set",
   goalDashboardMonthlySavingsRate: "Monthly savings rate",

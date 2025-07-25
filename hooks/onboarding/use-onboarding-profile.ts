@@ -46,12 +46,6 @@ export const useOnboardingProfile = ({
             color: string;
           }
         > = {
-          housing: {
-            name: i18n.language === "vi" ? "Nhà ở" : "Housing",
-            category: "fixed",
-            icon: "home",
-            color: "#0055FF",
-          },
           rent: {
             name: i18n.language === "vi" ? "Thuê nhà" : "Rent",
             category: "fixed",
@@ -64,19 +58,7 @@ export const useOnboardingProfile = ({
             icon: "food",
             color: "#2ECC71",
           },
-          food_grocery: {
-            name: i18n.language === "vi" ? "Ăn uống" : "Food",
-            category: "fixed",
-            icon: "food",
-            color: "#2ECC71",
-          },
           transport: {
-            name: i18n.language === "vi" ? "Di chuyển" : "Transportation",
-            category: "fixed",
-            icon: "car",
-            color: "#FF9800",
-          },
-          transportation: {
             name: i18n.language === "vi" ? "Di chuyển" : "Transportation",
             category: "fixed",
             icon: "car",
@@ -85,14 +67,8 @@ export const useOnboardingProfile = ({
           utilities: {
             name: i18n.language === "vi" ? "Điện, nước, internet" : "Utilities",
             category: "fixed",
-            icon: "car",
-            color: "#FF9800",
-          },
-          other: {
-            name: i18n.language === "vi" ? "Chi tiêu khác" : "Other Expenses",
-            category: "fixed",
-            icon: "other",
-            color: "#F44336",
+            icon: "utilities",
+            color: "#FFC107",
           },
         };
 

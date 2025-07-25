@@ -2,14 +2,12 @@
 
 import useSWR from "swr";
 import { goalService } from "@/lib/services/goal.service";
-import { budgetService } from "@/lib/services/budget.service";
 import { userContextService } from "@/lib/services/user-context.service";
 import { useAppTranslation } from "@/hooks/use-translation";
 
 interface GoalDashboardData {
   currentAmount: number;
   targetAmount: number;
-  monthsOfCoverage: number;
   progressPercentage: number;
   projectedCompletionDate: string;
   monthlySavingsRate: number;
@@ -44,9 +42,8 @@ export function useGoalDashboardSWR(): UseGoalDashboardSWRReturn {
         const currentYear = currentDate.getFullYear();
 
         // Fetch all required data in parallel
-        const [goalsResponse, budgetsResponse, financialOverview] = await Promise.all([
+        const [goalsResponse, financialOverview] = await Promise.all([
           goalService.getAllWithTransactions({}, t),
-          budgetService.getAllWithSpending({ month: currentMonth, year: currentYear }, t),
           userContextService.getFinancialOverview(currentMonth, currentYear, t).catch(() => null)
         ]);
 
@@ -67,7 +64,6 @@ export function useGoalDashboardSWR(): UseGoalDashboardSWRReturn {
           return {
             currentAmount: 0,
             targetAmount: 0,
-            monthsOfCoverage: 0,
             progressPercentage: 0,
             projectedCompletionDate: "",
             monthlySavingsRate: 0,
@@ -82,11 +78,8 @@ export function useGoalDashboardSWR(): UseGoalDashboardSWRReturn {
         const remainingAmount = Math.max(0, targetAmount - currentAmount);
         const progressPercentage = targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
 
-        // Calculate real monthly expenses from budget data
-        const totalMonthlyExpenses = budgetsResponse?.totalSpent || budgetsResponse?.totalBudget || 0;
-        
-        // Calculate months of coverage based on actual monthly expenses
-        const monthsOfCoverage = totalMonthlyExpenses > 0 ? currentAmount / totalMonthlyExpenses : 0;
+
+
 
         // Calculate monthly savings rate intelligently
         let monthlySavingsRate = 0;
@@ -128,7 +121,6 @@ export function useGoalDashboardSWR(): UseGoalDashboardSWRReturn {
         return {
           currentAmount,
           targetAmount,
-          monthsOfCoverage: Math.round(monthsOfCoverage * 10) / 10, // Round to 1 decimal
           progressPercentage: Math.round(progressPercentage * 10) / 10, // Round to 1 decimal
           projectedCompletionDate,
           monthlySavingsRate,

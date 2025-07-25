@@ -62,12 +62,30 @@ export async function POST() {
       ?.filter((category) => category.category === "fixed")
       .reduce((acc, curr) => acc + curr.amount, 0);
 
-    const weekSpending = Array.from({ length: 4 }, () =>
-      Math.max(
-        (income - (totalFixedBudget || 0) - payYourselfFirstAmount) / 4,
-        0
-      )
-    );
+    const freeToSpend =
+      income - (totalFixedBudget || 0) - payYourselfFirstAmount;
+    // Create a new budget category for free to spend
+    await supabase
+      .from("budgets")
+      .insert({
+        user_id: user.id,
+        category: "flexible",
+        amount: freeToSpend,
+        month: new Date().getMonth() + 1,
+        year: new Date().getFullYear(),
+        name: "Tự do chi tiêu",
+        color: "#0055FF",
+        icon: "other",
+      })
+      .select();
+    await supabase.from("transactions").insert({
+      name: "user income",
+      user_id: user.id,
+      amount: income,
+      description: "Lương",
+      type: "income",
+      recurring: 30,
+    });
 
     const userUpdateData = {
       onboarding_completed_at: new Date().toISOString(),
@@ -75,7 +93,6 @@ export async function POST() {
       financial_metadata: {
         payYourselfFirstAmount,
         monthlyIncome: income,
-        weekSpending: weekSpending,
         dateGetSalary: financialMetadata?.dateGetSalary || null,
       },
     };

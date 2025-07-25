@@ -135,7 +135,7 @@ export type OnboardingComponentType =
   // Budget allocation enhancement components
   | "budget_category_education"
   | "budget_allocation_tool"
-  | "philosophy_selection"
+  | "free_to_spend_choice"
   | "budget_summary";
 
 export interface ComponentData {

@@ -335,7 +335,6 @@ export const userContextService = {
    * @returns Formatted context string
    */
   formatUserContext(userId: string, userContext?: UserContext): string {
-    console.log("🚀 ~ formatUserContext ~ userContext:", userContext);
     if (!userContext) {
       return `
 Thông tin người dùng:

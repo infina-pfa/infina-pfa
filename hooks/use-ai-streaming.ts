@@ -12,6 +12,8 @@ interface UseAIStreamingReturn {
   // State
   isStreaming: boolean;
   isThinking: boolean;
+  isMCPLoading: boolean;
+  mcpLoadingMessage: string;
   currentStreamingMessage: ChatMessage | null;
   error: string | null;
 
@@ -146,6 +148,8 @@ export const useAIStreaming = (
   return {
     isStreaming,
     isThinking,
+    isMCPLoading: aiAdvisorProcessor.isMCPLoading,
+    mcpLoadingMessage: aiAdvisorProcessor.mcpLoadingMessage,
     currentStreamingMessage,
     error,
     startStreaming,

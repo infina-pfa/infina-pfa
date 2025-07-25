@@ -19,6 +19,8 @@ interface UseChatFlowReturn {
   error: string | null;
   isThinking: boolean;
   isStreaming: boolean;
+  isMCPLoading: boolean;
+  mcpLoadingMessage: string;
   showSuggestions: boolean;
   conversationId: string | null;
 
@@ -245,6 +247,8 @@ export const useChatFlow = (): UseChatFlowReturn => {
     error,
     isThinking: aiStreaming.isThinking,
     isStreaming: aiStreaming.isStreaming,
+    isMCPLoading: aiStreaming.isMCPLoading,
+    mcpLoadingMessage: aiStreaming.mcpLoadingMessage,
     showSuggestions,
     conversationId: conversation?.id || null,
 
