@@ -2,7 +2,29 @@
 
 ## System Overview
 
-Infina Personal Financial Advisor is a comprehensive financial management platform with AI-powered advisory capabilities. The system consists of three main components:
+Infina Personal Financial Advisor is a comprehensive financial management platform with AI-powered advisory capabilities. The system is designed to support both current and future financial management features through a scalable, extensible architecture.
+
+### Core Capabilities
+
+**Current Features:**
+
+- AI-powered financial advice and planning
+- Budget management and expense tracking
+- Financial goal setting and tracking
+- Income management
+- Basic financial reporting and analytics
+
+**Planned Future Features:**
+
+- Asset management (stocks, funds, gold, real estate)
+- High-yield savings partner integrations
+- Third-party application integrations
+- Investment advisory services
+- Comprehensive financial analytics
+
+### System Components
+
+The platform consists of three main components:
 
 1. **Web Application**: User-facing NextJS application
 2. **Back-end Application**: NestJS service with business logic and data management
@@ -19,6 +41,9 @@ graph TD
     Backend --> Database[(PostgreSQL Database)]
     AIService --> AIModels[(AI Models)]
     AIService --> AIDatabase[(AI Context Database)]
+    Backend --> PartnerAPIs[Partner APIs]
+    Backend --> MarketData[Market Data Services]
+    ThirdPartyApps[Third-Party Apps] --> Backend
 ```
 
 ## Web Application
@@ -46,16 +71,18 @@ graph TD
 - Voice interaction capabilities (future)
 - Dynamic form components for data collection
 - Advanced visualization components for financial data presentation
-- Interactive charts and graphs for budget analysis
-- Timeline visualizations for financial goals
+- Interactive charts and graphs for financial analysis
+- Timeline visualizations for financial goals and projections
 - Personalized recommendations display
 
 #### Financial Management UI
 
-- Dashboard with financial overview
+- Dashboard with comprehensive financial overview
 - Budget management interfaces
 - Goal tracking and visualization
 - Income and expense management
+- Asset portfolio management (future)
+- Investment performance tracking (future)
 - Reports and analytics
 
 ### User Experience
@@ -64,6 +91,7 @@ graph TD
 - Accessibility compliance
 - Internationalization support
 - Guided user onboarding
+- Personalized user journeys based on financial stage
 
 ## Back-end Application
 
@@ -79,6 +107,7 @@ graph TD
 
 - Domain-Driven Design (DDD)
 - Clean Architecture principles
+- Event-driven architecture for cross-domain communication
 
 ### Core Modules
 
@@ -95,6 +124,7 @@ graph TD
 - Authentication and authorization
 - Preferences and settings
 - Activity tracking
+- Financial risk profile assessment (future)
 
 #### Budgeting Module
 
@@ -110,6 +140,27 @@ graph TD
 - Milestone management
 - Achievement recognition
 
+#### Asset Management Module (Future)
+
+- Multi-asset class portfolio tracking
+- Asset performance monitoring
+- Transaction history
+- Asset allocation analysis
+
+#### Investment Module (Future)
+
+- Investment recommendations
+- Portfolio performance tracking
+- Market data integration
+- Risk assessment
+
+#### Partner Integration Module (Future)
+
+- API adapters for financial partners
+- Account linking and management
+- Transaction synchronization
+- Offer management
+
 #### Debt Module (Future)
 
 - Debt tracking and management
@@ -123,6 +174,7 @@ graph TD
 - OpenAPI/Swagger documentation
 - Versioned endpoints
 - Rate limiting and throttling
+- OAuth2 support for third-party integrations (future)
 
 ### Error Handling
 
@@ -135,24 +187,28 @@ graph TD
 - Query optimization
 - Selective data fetching
 - Pagination for large datasets
+- Caching strategies for frequently accessed data
 
 ### Testing Strategy
 
 - Unit tests for domain logic
 - Integration tests for API endpoints
 - End-to-end tests for critical flows
+- Performance testing for high-load scenarios
 
 ### Data Management
 
 - Comprehensive validation
 - Audit trails for financial operations
 - Data retention policies
+- Data aggregation for analytics
 
 ### Background Processing
 
 - Queue-based task processing
 - Scheduled jobs for recurring operations
 - Retry mechanisms for failed operations
+- Batch processing for data-intensive operations
 
 ## AI Service
 
@@ -177,6 +233,15 @@ graph TD
 - Personalized financial recommendations
 - Dynamic tool usage based on user needs
 - Memory management for long-term user context
+- Domain-specific knowledge for various financial topics
+
+### Future AI Capabilities
+
+- Investment strategy recommendations
+- Asset allocation optimization
+- Risk assessment and management
+- Market trend analysis
+- Financial education and coaching
 
 ## Security Considerations
 
@@ -186,6 +251,7 @@ graph TD
 - **Back-end**: JWT-based authentication with role-based access control
 - **API Security**: Rate limiting, request validation, and API keys for service-to-service communication
 - **AI Service**: Secure API endpoints with authentication tokens
+- **Partner Integrations**: OAuth2 and secure credential management (future)
 
 ### Data Protection
 
@@ -194,6 +260,7 @@ graph TD
   - Account numbers and financial institution details
   - Transaction history details
   - Personal financial goals and debt information
+  - Investment account information (future)
 - Secure storage of user financial profiles
 - Data masking for logs and non-production environments
 - Secure storage of API keys and credentials using AWS Secrets Manager
@@ -203,8 +270,10 @@ graph TD
 - Basic data privacy practices following industry standards
 - Regular security reviews of code and infrastructure
 - Clear user data handling policies in Terms of Service
+- Financial advisory regulations compliance (future)
+- Investment service regulations compliance (future)
 
-## Scalability Strategy (Not in phase)
+## Scalability Strategy
 
 ### AWS ECS Implementation
 
@@ -215,17 +284,26 @@ graph TD
 
 ### Database Scaling
 
-- Read replicas for high-traffic read operations when needed
+- Read replicas for high-traffic read operations
 - Connection pooling to optimize database performance
-- Monitoring database performance for future optimization
+- Monitoring database performance for optimization
+- Database sharding for future growth (if needed)
 
-### Caching Strategy (Future Phase)
+### Caching Strategy
 
 - Initial focus on architecture and functionality
-- Identified future caching points:
+- Redis implementation for frequently accessed data
+- Identified caching points:
   - Frequent API responses
   - User profile data
   - Common financial calculations
+  - Market data (future)
+
+### Integration Scaling
+
+- API gateway for managing multiple partner integrations
+- Queue-based processing for high-volume partner data
+- Throttling and backpressure mechanisms for traffic spikes
 
 ## Monitoring & Observability
 
@@ -242,12 +320,14 @@ graph TD
 - Application health checks
 - Error logging with appropriate severity levels
 - Correlation IDs for request tracing
+- Business metrics dashboards for key performance indicators
 
 ### Alerting
 
 - Critical error notifications via email
 - Service availability alerts
 - Basic dashboard for system status overview
+- Anomaly detection for unusual patterns
 
 ## Deployment Pipeline
 
@@ -271,18 +351,77 @@ graph TD
 - Infrastructure as Code
 - Blue/green deployment strategy
 
-## Future Considerations
+## Extensibility Framework
 
-### Feature Roadmap
+### Domain Extension Pattern
 
-- Advanced financial analytics
-- Integration with banking institutions
-- Mobile application
-- Expanded AI capabilities
+- New financial domains can be added as bounded contexts
+- Consistent API patterns across domains
+- Shared common services and utilities
+- Domain-specific data models and business logic
 
-### Technical Debt Management
+### Partner Integration Framework
+
+- Standardized adapter pattern for new partners
+- Credential management system
+- Webhook processing infrastructure
+- Partner-specific rate limiting and monitoring
+
+### Third-Party Application Support
+
+- API documentation and developer portal (future)
+- SDK development for common platforms
+- OAuth2 authentication for third-party apps
+- Usage monitoring and analytics
+
+### Data Exchange Standards
+
+- Consistent data formats across services
+- Standardized event schemas
+- Versioned API contracts
+- Data transformation services
+
+## Implementation Roadmap
+
+### Phase 1: Core Financial Management
+
+- Basic budgeting and expense tracking
+- Financial goal setting
+- AI-powered financial advice
+- Core user experience
+
+### Phase 2: Enhanced Analytics
+
+- Advanced reporting
+- Trend analysis
+- Personalized insights
+- Improved AI recommendations
+
+### Phase 3: Asset Management
+
+- Multi-asset portfolio tracking
+- Performance monitoring
+- Basic investment insights
+- Asset allocation visualization
+
+### Phase 4: Partner Integrations
+
+- High-yield savings partners
+- Investment platform connections
+- Banking integrations
+- Insurance partner offerings
+
+### Phase 5: Advanced Investment Advisory
+
+- Automated investment recommendations
+- Risk-adjusted portfolio optimization
+- Market analysis and insights
+- Comprehensive wealth management
+
+## Technical Debt Management
 
 - Regular refactoring cycles
 - Performance optimization phases
 - Documentation updates
 - Security reviews
+- Architecture evolution planning
