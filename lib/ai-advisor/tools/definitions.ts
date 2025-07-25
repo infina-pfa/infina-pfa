@@ -60,11 +60,7 @@ export const componentTools: ChatComponent[] = [
     name: "Goal Dashboard",
     description: "Show emergency fund progress and goal tracking dashboard",
   },
-  {
-    id: ChatComponentId.PAY_YOURSELF_FIRST_CONFIRMATION,
-    name: "Pay Yourself First Confirmation",
-    description: "Confirm monthly emergency fund contribution with input field and action buttons",
-  },
+
   {
     id: ChatComponentId.BUDGETING_DASHBOARD,
     name: "Budgeting Dashboard",
@@ -75,11 +71,7 @@ export const componentTools: ChatComponent[] = [
     name: "Monthly Budget Analysis",
     description: "End-of-month analysis of budget performance, overspent categories, and spending comparison",
   },
-  {
-    id: ChatComponentId.SURPLUS_ALLOCATION,
-    name: "Surplus Allocation",
-    description: "Allocate surplus money from monthly budget to emergency fund with interactive controls",
-  },
+
 ];
 
 export const mcpToolsList = [
@@ -158,10 +150,8 @@ export const functionTools: Tool[] = [
             ChatComponentId.BUDGET_DETAIL,
             ChatComponentId.SUGGESTIONS,
             ChatComponentId.GOAL_DASHBOARD,
-            ChatComponentId.PAY_YOURSELF_FIRST_CONFIRMATION,
             ChatComponentId.BUDGETING_DASHBOARD,
             ChatComponentId.MONTHLY_BUDGET_ANALYSIS,
-            ChatComponentId.SURPLUS_ALLOCATION,
           ],
         },
         title: {

@@ -66,10 +66,8 @@ export const buildFunctionTools = (
               ChatComponentId.BUDGET_DETAIL,
               ChatComponentId.SUGGESTIONS,
               ChatComponentId.GOAL_DASHBOARD,
-              //ChatComponentId.PAY_YOURSELF_FIRST_CONFIRMATION,
               ChatComponentId.BUDGETING_DASHBOARD,
               ChatComponentId.MONTHLY_BUDGET_ANALYSIS,
-              //ChatComponentId.SURPLUS_ALLOCATION,
             ],
           },
           title: {
