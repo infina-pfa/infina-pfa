@@ -46,14 +46,41 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           timeout: 300s
           command_timeout: 600s
+          debug: true  # Enable SSH debug output
           script: |
+              set -x  # Enable bash verbose mode
+              echo "=== Starting deployment process ==="
+              echo "Current time: $(date)"
+              echo "Current user: $(whoami)"
+              echo "Current directory: $(pwd)"
+              
               cd /home/ubuntu/infina-pfa
-              git checkout develop
+              echo "Changed to project directory: $(pwd)"
+              
+              echo "=== Git operations ==="
+              git checkout main
+              echo "Git status after checkout:"
+              git status
+              
               git pull origin main
+              echo "Git log after pull:"
+              git log --oneline -5
+              
+              echo "=== Node.js operations ==="
+              echo "Node version: $(node --version)"
+              echo "NPM version: $(npm --version)"
+              
               npm install
+              echo "NPM install completed"
+              
               npm run build
-              pm2 restart infina-pfa 
-              echo "Deployment completed!!"
+              echo "Build completed"
+              
+              echo "=== PM2 operations ==="
+              pm2 restart infina-pfa
+              pm2 list
+              
+              echo "=== Deployment completed successfully at $(date) ==="
 
       # Stop VPN connection using stored client ID (always run, even on failure)
       - name: Stop VPN Connection Manually
