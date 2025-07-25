@@ -66,19 +66,11 @@ jobs:
               echo "Git log after pull:"
               git log --oneline -5
               
-              echo "=== Node.js operations ==="
-              echo "Node version: $(node --version)"
-              echo "NPM version: $(npm --version)"
-              
+
               npm install
-              echo "NPM install completed"
-              
               npm run build
-              echo "Build completed"
               
-              echo "=== PM2 operations ==="
               pm2 restart infina-pfa
-              pm2 list
               
               echo "=== Deployment completed successfully at $(date) ==="
 
