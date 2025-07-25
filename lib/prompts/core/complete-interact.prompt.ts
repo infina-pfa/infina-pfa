@@ -15,7 +15,6 @@ export const completeInteractPrompt = `
             </ai_response_stream>
             <ai_tool_calls>
                 - component_use: "GOAL_DASHBOARD"
-                - component_use: "PAY_YOURSELF_FIRST_CONFIRMATION"
             </ai_tool_calls>
         </example>
         <example name="Normal Day Scenario (Log Expense)">
@@ -257,7 +256,6 @@ export const completeInteractPrompt = `
                 "Great! I've recorded your monthly salary of 20 million VND. Following the 'Pay Yourself First' principle,..
             </ai_response_stream>
             <ai_tool_calls>
-                - component_use: "PAY_YOURSELF_FIRST_CONFIRMATION"
             </ai_tool_calls>
         </example>
 

@@ -17,9 +17,9 @@ export * from "./message-bubble";
 export * from "./message-list";
 export * from "./message-timestamp";
 export * from "./monthly-budget-analysis-message";
-export * from "./pay-yourself-first-confirmation-message";
+
 export * from "./suggestion-list";
-export * from "./surplus-allocation-message";
+
 export * from "./text-message";
 export * from "./tool-button";
 export * from "./tool-card";

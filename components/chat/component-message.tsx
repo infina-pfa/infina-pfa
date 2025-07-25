@@ -6,10 +6,8 @@ import { FinancialOverviewCard } from "./financial-overview-card";
 import { VideoMessage } from "./video-message";
 import { SuggestionList } from "./suggestion-list";
 import { GoalDashboardMessage } from "./goal-dashboard-message";
-import { PayYourselfFirstConfirmationMessage } from "./pay-yourself-first-confirmation-message";
 import { BudgetingDashboardMessage } from "./budgeting-dashboard-message";
 import { MonthlyBudgetAnalysisMessage } from "./monthly-budget-analysis-message";
-import { SurplusAllocationMessage } from "./surplus-allocation-message";
 import { BudgetDetailMessage } from "./budget-detail-message";
 
 
@@ -71,20 +69,12 @@ export function ComponentMessage({
     return <GoalDashboardMessage onSendMessage={onSendMessage} />;
   }
 
-  if (componentId === ChatComponentId.PAY_YOURSELF_FIRST_CONFIRMATION) {
-    return <PayYourselfFirstConfirmationMessage onSendMessage={onSendMessage} />;
-  }
-
   if (componentId === ChatComponentId.BUDGETING_DASHBOARD) {
     return <BudgetingDashboardMessage onSendMessage={onSendMessage} />;
   }
 
   if (componentId === ChatComponentId.MONTHLY_BUDGET_ANALYSIS) {
     return <MonthlyBudgetAnalysisMessage onSendMessage={onSendMessage} />;
-  }
-
-  if (componentId === ChatComponentId.SURPLUS_ALLOCATION) {
-    return <SurplusAllocationMessage onSendMessage={onSendMessage} />;
   }
 
   return null;
