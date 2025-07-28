@@ -36,7 +36,7 @@ The platform consists of three main components:
 graph TD
     User[User] --> WebApp[Web Application]
     WebApp --> Backend[Back-end Application]
-    WebApp --> AIService[AI Service]
+    Backend --> AIService[AI Service]
     AIService --> Backend
     Backend --> Database[(PostgreSQL Database)]
     AIService --> AIModels[(AI Models)]
@@ -109,6 +109,68 @@ graph TD
 - Clean Architecture principles
 - Event-driven architecture for cross-domain communication
 
+### Architecture Layers
+
+#### Domain Layer
+
+- Core business entities
+- Domain services
+- Business rules and validation
+- Value objects and aggregates
+
+#### Application Layer (Use Cases)
+
+- Application services
+- Command and query handlers
+- Business workflows
+
+#### Infrastructure Layer
+
+- **Data Persistence**:
+
+  - Repository implementations
+  - ORM configurations
+  - Query optimizations
+  - Database migrations
+
+- **Authentication & Authorization**:
+
+  - JWT
+  - Role-based access control
+  - Permission management
+  - Security utilities
+
+- **External Communication**:
+
+  - API clients for external services
+  - Webhook handlers
+  - Email services
+  - Notification services
+
+- **Multi-Tenant Infrastructure**: (future)
+
+  - Tenant isolation layer
+  - Tenant-specific database routing
+  - Tenant configuration management
+  - Cross-tenant security boundaries
+
+- **Integration Infrastructure**:
+  - Unified authentication service (future)
+  - Platform-specific API optimizations (future)
+  - Account linking mechanisms
+  - Partner embedding support
+  - White-labeling system
+  - OAuth2 authorization server
+  - API versioning management
+  - Integration health monitoring
+
+#### Presentation Layer
+
+- REST API controllers
+- GraphQL resolvers
+- WebSocket handlers
+- Request/response transformers
+
 ### Core Modules
 
 #### Common Module
@@ -121,10 +183,8 @@ graph TD
 #### User Module
 
 - User profile management
-- Authentication and authorization
 - Preferences and settings
 - Activity tracking
-- Financial risk profile assessment (future)
 
 #### Budgeting Module
 
@@ -154,13 +214,6 @@ graph TD
 - Market data integration
 - Risk assessment
 
-#### Partner Integration Module (Future)
-
-- API adapters for financial partners
-- Account linking and management
-- Transaction synchronization
-- Offer management
-
 #### Debt Module (Future)
 
 - Debt tracking and management
@@ -184,6 +237,7 @@ graph TD
 
 ### Performance Optimization
 
+- Database indexing
 - Query optimization
 - Selective data fetching
 - Pagination for large datasets
@@ -194,7 +248,6 @@ graph TD
 - Unit tests for domain logic
 - Integration tests for API endpoints
 - End-to-end tests for critical flows
-- Performance testing for high-load scenarios
 
 ### Data Management
 
@@ -289,7 +342,7 @@ graph TD
 - Monitoring database performance for optimization
 - Database sharding for future growth (if needed)
 
-### Caching Strategy
+### Caching Strategy (Future)
 
 - Initial focus on architecture and functionality
 - Redis implementation for frequently accessed data
@@ -314,7 +367,7 @@ graph TD
 - Authentication events monitoring
 - Storage usage metrics
 
-### Additional Monitoring
+### Additional Monitoring (Future)
 
 - AWS CloudWatch for ECS container metrics
 - Application health checks
