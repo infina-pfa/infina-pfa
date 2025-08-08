@@ -39,7 +39,7 @@ export default function OnboardingV2Page() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen container mx-auto">
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col h-full">
         {/* Error Display */}
@@ -84,7 +84,7 @@ export default function OnboardingV2Page() {
         </div>
 
         {/* Input Area - fixed at bottom */}
-        <div className="flex-shrink-0 border-t border-gray-200 bg-white">
+        <div className="flex-shrink-0 rounded-t-button overflow-hidden bg-white">
           <ChatInput
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}

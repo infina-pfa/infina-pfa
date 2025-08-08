@@ -52,9 +52,6 @@ export function MessageBubble({
             <div className="w-full">
               <p className="text-base font-nunito whitespace-pre-wrap text-gray-900">
                 {message.content}
-                {message.isStreaming && (
-                  <span className="inline-block w-2 h-4 ml-1 bg-current animate-pulse" />
-                )}
               </p>
             </div>
           )}

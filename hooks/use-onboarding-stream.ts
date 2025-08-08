@@ -45,37 +45,9 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [showSuggestions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFetchingHistory, setIsFetchingHistory] = useState(true);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      const response = await fetch("/api/onboarding/messages");
-      const data = (await response.json()) as {
-        data: {
-          id: string;
-          userId: string;
-          sender: string;
-          content: string;
-          componentId: string | null;
-          metadata: Record<string, unknown> | null;
-          createdAt: string;
-          updatedAt: string;
-        }[];
-      };
-
-      setMessages(
-        data.data.map((message) => ({
-          id: message.id,
-          type: message.sender as "user" | "ai" | "system",
-          content: message.content,
-          component: message.metadata as unknown as OnboardingComponent,
-          timestamp: new Date(message.createdAt),
-        }))
-      );
-    };
-    fetchMessages();
-  }, []);
-
-  // Refs
+  // Refs - moved to top
   const currentStreamRef = useRef<OnboardingMessage | null>(null);
 
   // Clear error
@@ -83,36 +55,14 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
     setError(null);
   }, []);
 
-  // Stream message from API
-  const streamMessage = useCallback(async (userMessage: string) => {
+  // Define handleStream as a useCallback to ensure it's stable
+  const handleStream = useCallback(async (readable: ReadableStream) => {
     try {
       setIsStreaming(true);
       setIsThinking(true);
       setError(null);
 
-      // Add user message
-      const userMsg: OnboardingMessage = {
-        id: `user-${Date.now()}`,
-        type: "user",
-        content: userMessage,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, userMsg]);
-
-      // Call streaming API
-      const response = await fetch("/api/onboarding/stream", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: userMessage }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const reader = response.body?.getReader();
+      const reader = readable.getReader();
       if (!reader) {
         throw new Error("No response body reader");
       }
@@ -146,7 +96,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
             if (data === "[DONE]") {
               setIsStreaming(false);
               setIsThinking(false);
-              return;
+              break;
             }
 
             try {
@@ -156,19 +106,19 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 parsed.type === "status" &&
                 parsed.data.status_type === "started"
               ) {
-                // Initialize new AI message
-                currentAIMessage = {
-                  id: `ai-${Date.now()}`,
-                  type: "ai",
-                  content: "",
-                  timestamp: new Date(),
-                  isStreaming: true,
-                };
-                currentStreamRef.current = currentAIMessage;
-                setMessages((prev) => [...prev, currentAIMessage!]);
                 setIsThinking(false); // Stop thinking, start streaming
               } else if (parsed.type === "text") {
-                // Update streaming content
+                if (fullContent === "") {
+                  currentAIMessage = {
+                    id: `ai-${Date.now()}`,
+                    type: "ai",
+                    content: "",
+                    timestamp: new Date(),
+                    isStreaming: true,
+                  };
+                  currentStreamRef.current = currentAIMessage;
+                  setMessages((prev) => [...prev, currentAIMessage!]);
+                }
                 if (currentAIMessage) {
                   fullContent += parsed.content;
                   setMessages((prev) =>
@@ -196,9 +146,18 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                         : msg
                     )
                   );
-                  aiMessages.push(currentAIMessage);
+                  aiMessages.push({
+                    ...currentAIMessage,
+                    content: parsed.content || "",
+                  });
                   fullContent = "";
-                  currentAIMessage = null;
+                  currentAIMessage = {
+                    id: `ai-${Date.now()}`,
+                    type: "ai",
+                    content: "",
+                    timestamp: new Date(),
+                    isStreaming: true,
+                  };
                   currentStreamRef.current = null;
                 }
               } else if (parsed.type === "function_call") {
@@ -216,7 +175,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                   },
                 };
                 setMessages((prev) => [...prev, functionCallMessage]);
-                aiMessages.push(functionCallMessage);
+                aiMessages.push({ ...functionCallMessage });
               } else if (parsed.type === "error") {
                 const errorMessage =
                   "error" in parsed && typeof parsed.error === "string"
@@ -252,21 +211,132 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
     }
   }, []);
 
+  // Fetch initial messages on mount
+  useEffect(() => {
+    const fetchMessages = async () => {
+      setIsFetchingHistory(true);
+      try {
+        const response = await fetch("/api/onboarding/messages");
+        const data = (await response.json()) as {
+          data: {
+            id: string;
+            userId: string;
+            sender: string;
+            content: string;
+            componentId: string | null;
+            metadata: Record<string, unknown> | null;
+            createdAt: string;
+            updatedAt: string;
+          }[];
+        };
+
+        setMessages(
+          data.data.map((message) => ({
+            id: message.id,
+            type: message.sender as "user" | "ai" | "system",
+            content: message.content,
+            component: message.metadata as unknown as OnboardingComponent,
+            timestamp: new Date(message.createdAt),
+          }))
+        );
+      } finally {
+        setIsFetchingHistory(false);
+      }
+    };
+    fetchMessages();
+  }, []);
+
+  // Stream first messages if no history exists
+  useEffect(() => {
+    if (!isFetchingHistory && messages.length === 0) {
+      // Start streaming default messages
+      const streamFirstMessages = async () => {
+        try {
+          const response = await fetch("/api/onboarding/stream-first-messages");
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          if (!response.body) {
+            throw new Error("No response body");
+          }
+
+          await handleStream(response.body);
+        } catch (error) {
+          console.error("Error streaming first messages:", error);
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Failed to load initial messages"
+          );
+        }
+      };
+
+      streamFirstMessages();
+    }
+  }, [isFetchingHistory, messages.length, handleStream]);
+
+  // Stream message from API
+  const streamMessage = useCallback(
+    async (userMessage: string) => {
+      try {
+        setIsStreaming(true);
+        setIsThinking(true);
+        setError(null);
+
+        // Add user message
+        const userMsg: OnboardingMessage = {
+          id: `user-${Date.now()}`,
+          type: "user",
+          content: userMessage,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, userMsg]);
+
+        // Call streaming API
+        const response = await fetch("/api/onboarding/stream", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: userMessage }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        if (!response.body) {
+          throw new Error("No response body");
+        }
+
+        await handleStream(response.body);
+      } catch (err) {
+        console.error("Streaming error:", err);
+        setError(err instanceof Error ? err.message : "Streaming failed");
+      } finally {
+        setIsStreaming(false);
+        setIsThinking(false);
+        setIsSubmitting(false);
+      }
+    },
+    [handleStream]
+  );
+
   const saveAiResponses = useCallback(
     async (aiMessages: OnboardingMessage[]) => {
-      Promise.allSettled(
-        aiMessages.map(async (message) => {
-          await fetch("/api/onboarding/messages", {
-            method: "POST",
-            body: JSON.stringify({
-              message: message.content,
-              sender: "ai",
-              component_id: message.component?.id,
-              metadata: message.component,
-            }),
-          });
-        })
-      );
+      for (const message of aiMessages) {
+        await fetch("/api/onboarding/messages", {
+          method: "POST",
+          body: JSON.stringify({
+            message: message.content,
+            sender: "ai",
+            component_id: message.component?.id,
+            metadata: message.component,
+          }),
+        });
+      }
     },
     []
   );
