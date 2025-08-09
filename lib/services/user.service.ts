@@ -134,10 +134,12 @@ export const userService = {
     t?: TranslationFunction
   ): Promise<UserResponse> {
     try {
-      const response = await apiClient.patch<UserProfile>("/users/profile", {
-        budgeting_style: budgetingStyle,
-        updated_at: new Date().toISOString(),
-      });
+      const response = await apiClient.patch<UserProfile>(
+        "/onboarding/profile-v2",
+        {
+          budgetingStyle,
+        }
+      );
 
       if (response.success && response.data) {
         return {

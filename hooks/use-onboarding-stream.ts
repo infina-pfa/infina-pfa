@@ -3,7 +3,10 @@ import { StreamEvent } from "@/lib/types/streaming.types";
 import {
   OnboardingComponent,
   ComponentResponse,
+  UserProfile,
+  FinancialStage,
 } from "@/lib/types/onboarding.types";
+import { useTranslation } from "react-i18next";
 
 interface OnboardingMessage {
   id: string;
@@ -38,6 +41,7 @@ interface UseOnboardingStreamReturn {
 
 export const useOnboarding = (): UseOnboardingStreamReturn => {
   // State management
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<OnboardingMessage[]>([]);
   const [isLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +50,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
   const [showSuggestions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFetchingHistory, setIsFetchingHistory] = useState(true);
+  const streamFirstMessagesRef = useRef(false);
 
   // Refs - moved to top
   const currentStreamRef = useRef<OnboardingMessage | null>(null);
@@ -248,7 +253,12 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
 
   // Stream first messages if no history exists
   useEffect(() => {
-    if (!isFetchingHistory && messages.length === 0) {
+    if (
+      !isFetchingHistory &&
+      messages.length === 0 &&
+      !streamFirstMessagesRef.current
+    ) {
+      streamFirstMessagesRef.current = true;
       // Start streaming default messages
       const streamFirstMessages = async () => {
         try {
@@ -363,6 +373,124 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
     [isSubmitting, sendMessage]
   );
 
+  const getResponseText = useCallback(
+    (response: ComponentResponse): string => {
+      // First, check if response has a userMessage (our new detailed responses)
+      if (response.userMessage) {
+        return response.userMessage;
+      }
+
+      // Handle decision tree response
+      if (response.determinedStage && response.answers) {
+        const stageNames = {
+          debt: "Get Out of Debt",
+          start_saving: "Start Saving",
+          start_investing: "Start Investing",
+        };
+
+        const stageName =
+          stageNames[response.determinedStage as keyof typeof stageNames] ||
+          response.determinedStage;
+        return `Giai đoạn tài chính: ${t(stageName, { ns: "onboarding" })}`;
+      }
+
+      // Handle stage selector response (legacy)
+      if (response.selectedStage) {
+        const stageNames = {
+          debt: "Get Out of Debt",
+          start_saving: "Start Saving",
+          start_investing: "Start Investing",
+        };
+
+        const stageName =
+          stageNames[response.selectedStage as keyof typeof stageNames] ||
+          response.selectedStage;
+        return `Selected stage: ${stageName}`;
+      }
+
+      // Handle expense breakdown response with detailed breakdown
+      if (response.expenseBreakdown) {
+        const breakdown = response.expenseBreakdown;
+        const details: string[] = [];
+        let total = 0;
+
+        // Process all category expenses
+        Object.entries(breakdown).forEach(([key, value]) => {
+          if (typeof value === "number" && value > 0) {
+            total += value;
+            const formattedValue = value.toLocaleString("vi-VN");
+
+            // Map common category IDs to display names
+            const categoryNames: Record<string, string> = {
+              housing: "Nhà ở (thuê nhà/điện/nước)",
+              food: "Ăn uống",
+              transport: "Di chuyển",
+              other: "Chi tiêu khác (giải trí, mua sắm, v.v.)",
+            };
+
+            const displayName = categoryNames[key] || key;
+            details.push(`${displayName}: ${formattedValue} VND`);
+          }
+        });
+
+        const formattedTotal = total.toLocaleString("vi-VN");
+        const detailsText =
+          details.length > 0 ? `\n- ${details.join("\n- ")}` : "";
+
+        return `Chi phí hàng tháng:${detailsText}\n\nTổng cộng: ${formattedTotal} VND`;
+      }
+
+      // Handle savings capacity response
+      if (response.savingsCapacity) {
+        const formattedAmount =
+          response.savingsCapacity.toLocaleString("vi-VN");
+        return `Monthly savings capacity: ${formattedAmount} VND`;
+      }
+
+      // Handle goal confirmation
+      if (response.goalConfirmed !== undefined) {
+        // Use userMessage if available, otherwise fallback to simple message
+        if (response.userMessage) {
+          return response.userMessage;
+        }
+        return response.goalConfirmed
+          ? "Goal confirmed"
+          : "Goal needs adjustment";
+      }
+
+      // Handle education content completion
+      if (response.educationCompleted) {
+        return response.textValue || "Đã hoàn thành nội dung giáo dục";
+      }
+
+      if (response.textValue) {
+        return response.textValue;
+      } else if (response.selectedOption) {
+        return response.selectedOption;
+      } else if (
+        response.financialValue !== undefined &&
+        response.financialValue !== null
+      ) {
+        // ✨ IMPROVED: More descriptive financial value formatting
+        const formattedValue = response.financialValue.toLocaleString("vi-VN");
+        return `${formattedValue} VND`;
+      } else if (response.rating !== undefined && response.rating !== null) {
+        return `Rated ${response.rating}/5`;
+      } else if (
+        response.sliderValue !== undefined &&
+        response.sliderValue !== null
+      ) {
+        // Use unit from response if available, otherwise fallback to no unit
+        const unit = response.sliderUnit || "";
+        return unit
+          ? `${response.sliderValue} ${unit}`
+          : `${response.sliderValue}`;
+      }
+      return "Completed"; // More descriptive than "ok"
+    },
+    [t]
+  );
+
   // Handle component response
   const handleComponentResponse = useCallback(
     async (componentId: string, response: ComponentResponse) => {
@@ -382,6 +510,75 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
           return msg;
         })
       );
+
+      const profileUpdates: Partial<UserProfile> = {};
+
+      // Handle decision tree response
+      if (response.determinedStage && response.answers) {
+        profileUpdates.identifiedStage =
+          response.determinedStage as FinancialStage;
+        profileUpdates.stageConfirmed = true;
+
+        console.log(
+          `✅ Decision tree determined stage: ${response.determinedStage}`
+        );
+        console.log(`📋 User answers:`, response.answers);
+        console.log(`🧠 Reasoning:`, response.reasoning);
+        const aimessage: OnboardingMessage = {
+          id: `ai-${Date.now()}`,
+          type: "ai",
+          content: response.reasoning || "",
+          timestamp: new Date(),
+        };
+
+        setMessages((prev) => [...prev, aimessage]);
+
+        await saveAiResponses([aimessage]);
+      }
+
+      // Handle expense categories response
+      if (response.expenseBreakdown) {
+        profileUpdates.expenseBreakdown = response.expenseBreakdown;
+
+        // Calculate total monthly expenses from all categories
+        const breakdown = response.expenseBreakdown;
+        let total = 0;
+
+        // Sum all numeric values
+        Object.values(breakdown).forEach((value) => {
+          if (typeof value === "number") {
+            total += value;
+          }
+        });
+
+        profileUpdates.expenses = total;
+      }
+
+      // Handle savings capacity response
+      if (response.savingsCapacity) {
+        profileUpdates.monthlySavingsCapacity = response.savingsCapacity;
+      }
+
+      if (response.monetaryValues) {
+        profileUpdates.emergencyFundGoal =
+          response.monetaryValues.emergencyFund;
+        profileUpdates.expenses = response.monetaryValues.livingExpenses;
+      }
+
+      if (response.selectedPhilosophy) {
+        profileUpdates.budgetingStyle = response.selectedPhilosophy;
+      }
+
+      console.log("🚀 ~ profileUpdates:", profileUpdates);
+      console.log("🚀 ~ response:", response);
+
+      // Update profile
+      await fetch("/api/onboarding/profile-v2", {
+        method: "PUT",
+        body: JSON.stringify(profileUpdates),
+      });
+
+      await streamMessage(getResponseText(response));
     },
     []
   );

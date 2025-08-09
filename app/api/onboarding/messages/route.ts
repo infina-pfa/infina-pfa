@@ -1,5 +1,4 @@
 import { AuthenticatedContext, withAuth } from "@/lib/api/auth-wrapper";
-import { INFINA_FINANCIAL_SERVICE_URL } from "@/lib/config";
 import { NextRequest, NextResponse } from "next/server";
 
 export type OnboardingMessage = {
@@ -18,17 +17,10 @@ export const GET = withAuth(
     request: NextRequest,
     context: AuthenticatedContext
   ): Promise<NextResponse<OnboardingMessage[]>> => {
-    const { accessToken } = context;
-    const response = await fetch(
-      `${INFINA_FINANCIAL_SERVICE_URL}/onboarding/messages`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const { apiClient } = context;
+    const response = await apiClient.get("/onboarding/messages");
 
-    const messages = (await response.json()) as OnboardingMessage[];
+    const messages = response.data as OnboardingMessage[];
 
     return NextResponse.json(messages);
   }
@@ -39,27 +31,16 @@ export const POST = withAuth(
     request: NextRequest,
     context: AuthenticatedContext
   ): Promise<NextResponse<OnboardingMessage>> => {
-    const { accessToken } = context;
+    const { apiClient } = context;
 
     const { message, sender, component_id, metadata } = await request.json();
-    const response = await fetch(
-      `${INFINA_FINANCIAL_SERVICE_URL}/onboarding/messages`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: message,
-          sender,
-          component_id,
-          metadata,
-        }),
-      }
-    );
-
-    const createdMessage = (await response.json()) as OnboardingMessage;
+    const response = await apiClient.post("/onboarding/messages", {
+      content: message,
+      sender,
+      component_id,
+      metadata,
+    });
+    const createdMessage = response.data as OnboardingMessage;
 
     return NextResponse.json(createdMessage);
   }

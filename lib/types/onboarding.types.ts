@@ -48,6 +48,7 @@ export interface UserProfile {
   primaryFinancialGoal?: string;
   timeHorizon?: "short" | "medium" | "long";
   riskTolerance?: "conservative" | "moderate" | "aggressive";
+  budgetingStyle?: "goal_focused" | "detail_tracker";
 }
 
 export interface QualitativeAssessment {
