@@ -15,7 +15,7 @@ import {
 } from "../handlers/memory-handler";
 import { prepareUserContext } from "../utils/context";
 import { Message } from "openai/resources/beta/threads/messages.mjs";
-import { aiStreamingService } from "@/lib/services/ai-streaming.service";
+import { aiStreamingService } from "@/lib/services-v2/ai-streaming.service";
 import {
   financialOverviewService,
   FinancialOverviewData,

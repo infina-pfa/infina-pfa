@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { AppLayout } from "@/components/ui/app-layout";
-import { useRecentTransactionsSWR } from "@/hooks/swr/use-recent-transactions";
+import { useRecentTransactionsSWR } from "@/hooks/swr-v2/use-recent-transactions";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Transaction } from "@/lib/types/transaction.types";
 import { formatDateVN } from "@/lib/utils/date-formatter";

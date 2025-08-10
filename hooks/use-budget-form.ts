@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useBudgetCreateSWR } from "@/hooks/swr/use-budget-create";
-import { useBudgetUpdateSWR } from "@/hooks/swr/use-budget-update";
+import { useBudgetCreateSWR } from "@/hooks/swr-v2/use-budget-create";
+import { useBudgetUpdateSWR } from "@/hooks/swr-v2/use-budget-update";
 import {
   CreateBudgetRequest,
   UpdateBudgetRequest,

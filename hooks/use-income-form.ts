@@ -1,4 +1,4 @@
-import { useIncomeCreateSWR, useIncomeUpdateSWR } from "@/hooks/swr";
+import { useIncomeCreateSWR, useIncomeUpdateSWR } from "@/hooks/swr-v2";
 import { useToast } from "@/hooks/use-toast";
 import { useAppTranslation } from "@/hooks/use-translation";
 import {

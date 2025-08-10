@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGoalWithdraw } from "@/hooks/swr";
+import { useGoalWithdraw } from "@/hooks/swr-v2";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useToast } from "@/hooks/use-toast";
 import { Goal } from "@/lib/types/goal.types";

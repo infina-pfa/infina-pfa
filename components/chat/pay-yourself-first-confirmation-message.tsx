@@ -2,32 +2,32 @@
 
 import { useState } from "react";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { usePayYourselfFirstSWR } from "@/hooks/swr/use-pay-yourself-first";
+import { usePayYourselfFirstSWR } from "@/hooks/swr-v2/use-pay-yourself-first";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MoneyInput } from "@/components/ui/money-input";
 import { formatVND } from "@/lib/validation/input-validation";
 import { apiClient } from "@/lib/api-client";
 import { handleError } from "@/lib/error-handler";
-import { 
-  CheckCircle, 
-  Clock, 
-  AlertCircle, 
-  Target, 
+import {
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Target,
   Brain,
-  DollarSign 
+  DollarSign,
 } from "lucide-react";
 
 interface PayYourselfFirstConfirmationMessageProps {
   onSendMessage?: (message: string) => void;
 }
 
-export const PayYourselfFirstConfirmationMessage = ({ 
-  onSendMessage 
+export const PayYourselfFirstConfirmationMessage = ({
+  onSendMessage,
 }: PayYourselfFirstConfirmationMessageProps) => {
   const { t } = useAppTranslation(["goals", "common"]);
   const { data, loading, error, refetch } = usePayYourselfFirstSWR();
-  
+
   const [userAmount, setUserAmount] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -60,12 +60,12 @@ export const PayYourselfFirstConfirmationMessage = ({
 
   if (!data) return null;
 
-  const { 
-    recommendedAmount, 
-    minRecommendedAmount, 
+  const {
+    recommendedAmount,
+    minRecommendedAmount,
     maxRecommendedAmount,
-    emergencyFundGoal, 
-    aiRecommendation 
+    emergencyFundGoal,
+    aiRecommendation,
   } = data;
 
   const handleConfirmTransfer = async () => {
@@ -78,18 +78,25 @@ export const PayYourselfFirstConfirmationMessage = ({
       setIsSubmitting(true);
       setSubmitError(null);
 
-      const response = await apiClient.post("/goals/emergency-fund/pay-yourself-first", {
-        amount: parseFloat(userAmount),
-        status: "completed",
-      });
+      const response = await apiClient.post(
+        "/goals/emergency-fund/pay-yourself-first",
+        {
+          amount: parseFloat(userAmount),
+          status: "completed",
+        }
+      );
 
       if (response.success) {
         setSuccessMessage(t("contributionRecorded"));
         await refetch();
-        
+
         // Trigger AI follow-up message
         if (onSendMessage) {
-          onSendMessage(`I've successfully transferred ${formatVND(parseFloat(userAmount))} to my emergency fund`);
+          onSendMessage(
+            `I've successfully transferred ${formatVND(
+              parseFloat(userAmount)
+            )} to my emergency fund`
+          );
         }
       } else {
         throw new Error(response.error || "Failed to record contribution");
@@ -107,17 +114,22 @@ export const PayYourselfFirstConfirmationMessage = ({
       setIsSubmitting(true);
       setSubmitError(null);
 
-      const response = await apiClient.post("/goals/emergency-fund/pay-yourself-first", {
-        amount: 0,
-        status: "postponed",
-      });
+      const response = await apiClient.post(
+        "/goals/emergency-fund/pay-yourself-first",
+        {
+          amount: 0,
+          status: "postponed",
+        }
+      );
 
       if (response.success) {
         setSuccessMessage("No worries! We'll remind you again next month.");
         await refetch();
-        
+
         if (onSendMessage) {
-          onSendMessage("I haven't made my emergency fund contribution yet this month");
+          onSendMessage(
+            "I haven't made my emergency fund contribution yet this month"
+          );
         }
       } else {
         throw new Error(response.error || "Failed to record status");
@@ -132,7 +144,9 @@ export const PayYourselfFirstConfirmationMessage = ({
 
   const handleRemindLater = () => {
     if (onSendMessage) {
-      onSendMessage("Please remind me about my emergency fund contribution later");
+      onSendMessage(
+        "Please remind me about my emergency fund contribution later"
+      );
     }
   };
 
@@ -143,10 +157,14 @@ export const PayYourselfFirstConfirmationMessage = ({
   // Get confidence level colors
   const getConfidenceColor = (level: string) => {
     switch (level) {
-      case 'high': return 'text-green-600 bg-green-50 border-green-200';
-      case 'medium': return 'text-amber-600 bg-amber-50 border-amber-200';
-      case 'low': return 'text-red-600 bg-red-50 border-red-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case "high":
+        return "text-green-600 bg-green-50 border-green-200";
+      case "medium":
+        return "text-amber-600 bg-amber-50 border-amber-200";
+      case "low":
+        return "text-red-600 bg-red-50 border-red-200";
+      default:
+        return "text-gray-600 bg-gray-50 border-gray-200";
     }
   };
 
@@ -162,7 +180,9 @@ export const PayYourselfFirstConfirmationMessage = ({
           <p className="text-sm text-gray-600 mb-4">{successMessage}</p>
           <div className="bg-green-50 p-4 rounded-lg">
             <p className="text-sm text-green-700">{t("keepUpGoodWork")}</p>
-            <p className="text-xs text-green-600 mt-1">{t("everyContributionCounts")}</p>
+            <p className="text-xs text-green-600 mt-1">
+              {t("everyContributionCounts")}
+            </p>
           </div>
         </div>
       </div>
@@ -192,33 +212,41 @@ export const PayYourselfFirstConfirmationMessage = ({
             </h4>
             {aiRecommendation.monthsToComplete > 0 && (
               <span className="text-xs text-blue-600">
-                {t("monthsToDeadline", { count: aiRecommendation.monthsToComplete })}
+                {t("monthsToDeadline", {
+                  count: aiRecommendation.monthsToComplete,
+                })}
               </span>
             )}
           </div>
-          
+
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-blue-700">{emergencyFundGoal.title}</span>
               <span className="font-medium text-blue-900">
-                {formatVND(emergencyFundGoal.current_amount)} / {formatVND(emergencyFundGoal.target_amount || 0)}
+                {formatVND(emergencyFundGoal.current_amount)} /{" "}
+                {formatVND(emergencyFundGoal.target_amount || 0)}
               </span>
             </div>
-            
+
             {aiRecommendation.remainingAmount > 0 && (
               <div className="text-blue-600">
-                {t("remainingToTarget", { 
-                  amount: formatVND(aiRecommendation.remainingAmount) 
+                {t("remainingToTarget", {
+                  amount: formatVND(aiRecommendation.remainingAmount),
                 })}
               </div>
             )}
 
             {/* Progress bar */}
             <div className="w-full bg-blue-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full" 
-                style={{ 
-                  width: `${Math.min(100, (emergencyFundGoal.current_amount / (emergencyFundGoal.target_amount || 1)) * 100)}%` 
+              <div
+                className="bg-blue-600 h-2 rounded-full"
+                style={{
+                  width: `${Math.min(
+                    100,
+                    (emergencyFundGoal.current_amount /
+                      (emergencyFundGoal.target_amount || 1)) *
+                      100
+                  )}%`,
                 }}
               />
             </div>
@@ -235,19 +263,30 @@ export const PayYourselfFirstConfirmationMessage = ({
               <h4 className="font-medium text-purple-900">
                 {t("aiRecommendationTitle")}
               </h4>
-              <span className={`text-xs px-2 py-1 rounded border ${getConfidenceColor(aiRecommendation.confidenceLevel)}`}>
-                {t(`confidence${aiRecommendation.confidenceLevel.charAt(0).toUpperCase() + aiRecommendation.confidenceLevel.slice(1)}`)}
+              <span
+                className={`text-xs px-2 py-1 rounded border ${getConfidenceColor(
+                  aiRecommendation.confidenceLevel
+                )}`}
+              >
+                {t(
+                  `confidence${
+                    aiRecommendation.confidenceLevel.charAt(0).toUpperCase() +
+                    aiRecommendation.confidenceLevel.slice(1)
+                  }`
+                )}
               </span>
             </div>
-            
+
             {/* Main recommendation */}
             <div className="bg-white p-3 rounded border-l-4 border-purple-400 mb-3">
               <div className="text-lg font-semibold text-purple-900 mb-1">
                 {formatVND(recommendedAmount)}
               </div>
-              <p className="text-sm text-gray-700">{aiRecommendation.reasoning}</p>
+              <p className="text-sm text-gray-700">
+                {aiRecommendation.reasoning}
+              </p>
             </div>
-            
+
             {/* Alternative amounts */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-purple-800 mb-2">
@@ -258,13 +297,17 @@ export const PayYourselfFirstConfirmationMessage = ({
                   onClick={() => handleQuickAmount(minRecommendedAmount)}
                   className="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
                 >
-                  {t("minRecommendation", { amount: formatVND(minRecommendedAmount) })}
+                  {t("minRecommendation", {
+                    amount: formatVND(minRecommendedAmount),
+                  })}
                 </button>
                 <button
                   onClick={() => handleQuickAmount(maxRecommendedAmount)}
                   className="text-xs px-3 py-1 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
                 >
-                  {t("maxRecommendation", { amount: formatVND(maxRecommendedAmount) })}
+                  {t("maxRecommendation", {
+                    amount: formatVND(maxRecommendedAmount),
+                  })}
                 </button>
               </div>
             </div>
@@ -349,4 +392,4 @@ export const PayYourselfFirstConfirmationMessage = ({
       </div>
     </div>
   );
-}; 
+};

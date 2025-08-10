@@ -1,13 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useRouter } from "next/navigation";
 import { AuthFormFields } from "./auth-form-fields";
 import { EmailVerification } from "./email-verification";
+import {
+  signInSchema,
+  signUpSchema,
+  type SignInFormData,
+  type SignUpFormData,
+} from "@/lib/validation/schemas/auth.schema";
+import { ApiError } from "@/lib/api/type";
+import { toast } from "sonner";
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up";
@@ -15,56 +25,56 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formError, setFormError] = useState("");
   const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
   const { signIn, signUp, loading } = useAuth();
   const { t } = useAppTranslation(["auth", "common"]);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError("");
+  // Use different forms based on mode for better type safety
+  const signInForm = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
+    mode: "onBlur",
+  });
 
-    if (!email || !password) {
-      setFormError(t("pleaseEnterAllFields"));
-      return;
-    }
+  const signUpForm = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    mode: "onBlur",
+  });
 
-    if (mode === "sign-up" && password !== confirmPassword) {
-      setFormError(t("passwordsDontMatch"));
-      return;
-    }
+  // Select the appropriate form based on mode
+  const form = mode === "sign-in" ? signInForm : signUpForm;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = form;
 
-    if (password.length < 6) {
-      setFormError(t("passwordTooShort"));
-      return;
-    }
-
+  const onSubmit = async (data: SignInFormData | SignUpFormData) => {
     try {
-      const result =
-        mode === "sign-in"
-          ? await signIn(email, password)
-          : await signUp(email, password);
-
-      if (result.error) {
-        setFormError(result.error);
+      if (mode === "sign-in") {
+        await signIn(data.email, data.password);
       } else {
-        if (mode === "sign-up") {
-          // Show email verification for sign up
-          setShowEmailVerification(true);
-        } else {
-          // Redirect to chat for sign in
-          router.push("/chat");
-        }
+        await signUp(data.email, data.password);
       }
-    } catch {
-      setFormError(t("unexpectedError"));
+
+      if (mode === "sign-up") {
+        // Store email and show verification
+        setSubmittedEmail(data.email);
+        setShowEmailVerification(true);
+      } else {
+        // Redirect to chat for sign in
+        router.push("/chat");
+      }
+    } catch (error) {
+      if (error instanceof ApiError) {
+        toast.error(t(error.errorCode as string));
+      } else {
+        toast.error(t("unexpectedError"));
+      }
     }
   };
 
@@ -72,7 +82,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
   if (showEmailVerification) {
     return (
       <EmailVerification
-        email={email}
+        email={submittedEmail}
         onBackToSignIn={() => {
           setShowEmailVerification(false);
           onToggleMode();
@@ -92,21 +102,18 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <AuthFormFields
           mode={mode}
-          email={email}
-          password={password}
-          confirmPassword={confirmPassword}
+          register={register}
+          errors={errors}
           showPassword={showPassword}
           showConfirmPassword={showConfirmPassword}
-          onEmailChange={setEmail}
-          onPasswordChange={setPassword}
-          onConfirmPasswordChange={setConfirmPassword}
           onToggleShowPassword={() => setShowPassword(!showPassword)}
           onToggleShowConfirmPassword={() =>
             setShowConfirmPassword(!showConfirmPassword)
           }
+          t={t}
         />
 
         {/* Forgot Password Link (Sign In Only) */}
@@ -119,13 +126,6 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
             >
               {t("forgotPassword")}
             </button>
-          </div>
-        )}
-
-        {/* Error Message */}
-        {formError && (
-          <div className="text-infina-red text-sm bg-red-50 p-3 rounded-lg">
-            {formError}
           </div>
         )}
 

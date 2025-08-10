@@ -1,6 +1,6 @@
 "use client";
 
-import { useIncomeListSWR } from "@/hooks/swr";
+import { useIncomeListSWR } from "@/hooks/swr-v2";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Income } from "@/lib/types/income.types";
 import { formatCurrency } from "@/lib/utils";

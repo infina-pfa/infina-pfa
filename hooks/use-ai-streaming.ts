@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useAIAdvisorStreamProcessor } from "@/hooks/use-ai-advisor-stream";
-import { chatService } from "@/lib/services/chat.service";
+import { chatService } from "@/lib/services-v2/chat.service";
 import {
   ChatMessage,
   AdvisorStreamRequest,

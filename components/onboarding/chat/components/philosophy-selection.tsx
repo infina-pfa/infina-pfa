@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import {
-  OnboardingComponent,
-  ComponentResponse,
-} from "@/lib/types/onboarding.types";
-import { useAppTranslation } from "@/hooks/use-translation";
-import { useUserUpdateSWR } from "@/hooks/swr/use-user-update";
 import { Button } from "@/components/ui/button";
+import { useAppTranslation } from "@/hooks/use-translation";
+import {
+  ComponentResponse,
+  OnboardingComponent,
+} from "@/lib/types/onboarding.types";
 import { CheckCircle, Circle } from "lucide-react";
+import { useState } from "react";
 
 interface PhilosophySelectionProps {
   component: OnboardingComponent;
@@ -43,16 +42,6 @@ export default function PhilosophySelection({
   const [isCompleted, setIsCompleted] = useState(
     !!component.response?.selectedPhilosophy
   );
-
-  // SWR hook for updating user profile
-  const { updateBudgetingStyle } = useUserUpdateSWR({
-    onSuccess: (user) => {
-      console.log(
-        "✅ Budgeting style updated successfully:",
-        user.budgeting_style
-      );
-    },
-  });
 
   const philosophyOptions: PhilosophyOption[] = [
     {
@@ -111,19 +100,6 @@ export default function PhilosophySelection({
 
       const selectedOption = philosophyOptions.find(
         (option) => option.id === selectedPhilosophy
-      );
-
-      // Save budgeting style to database first
-      console.log("💾 Saving budgeting style to database:", selectedPhilosophy);
-      const updatedUser = await updateBudgetingStyle(selectedPhilosophy);
-
-      if (!updatedUser) {
-        throw new Error("Failed to update budgeting style in database");
-      }
-
-      console.log(
-        "✅ Budgeting style saved successfully:",
-        updatedUser.budgeting_style
       );
 
       // Then send response to chat component

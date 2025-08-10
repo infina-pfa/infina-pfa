@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useTranslation } from "react-i18next";
-import { chatService } from "@/lib/services/chat.service";
+import { chatService } from "@/lib/services-v2/chat.service";
 import { Conversation } from "@/lib/types/chat.types";
 
 interface UseSimpleChatSessionReturn {

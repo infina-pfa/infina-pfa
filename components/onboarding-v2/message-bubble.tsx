@@ -6,13 +6,13 @@ import {
   OnboardingComponent,
 } from "@/lib/types/onboarding.types";
 import { User } from "lucide-react";
+import { MarkdownMessage } from "../chat";
 
 interface OnboardingMessage {
   id: string;
   type: "user" | "ai" | "system";
   content: string;
-  timestamp: Date;
-  isStreaming?: boolean;
+  createdAt: string;
   component?: OnboardingComponent;
 }
 
@@ -35,7 +35,7 @@ export function MessageBubble({
   if (isSystem) {
     return (
       <div className="flex justify-center mb-6">
-        <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-nunito">
+        <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-base font-nunito">
           {message.content}
         </div>
       </div>
@@ -50,9 +50,7 @@ export function MessageBubble({
           {/* Text content if present */}
           {message.content && !hasComponent && (
             <div className="w-full">
-              <p className="text-base font-nunito whitespace-pre-wrap text-gray-900">
-                {message.content}
-              </p>
+              <MarkdownMessage content={message.content} />
             </div>
           )}
 
@@ -68,7 +66,7 @@ export function MessageBubble({
 
           {/* Timestamp */}
           <div className="text-sm text-gray-500 mt-2 font-nunito">
-            {message.timestamp.toLocaleTimeString([], {
+            {new Date(message.createdAt).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             })}
@@ -97,7 +95,7 @@ export function MessageBubble({
 
           {/* Timestamp */}
           <div className="text-sm text-gray-500 mt-2 font-nunito text-right">
-            {message.timestamp.toLocaleTimeString([], {
+            {new Date(message.createdAt).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             })}

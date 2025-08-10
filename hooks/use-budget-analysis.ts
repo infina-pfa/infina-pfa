@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 
 interface BudgetAnalysisData {
   totalBudget: number;
@@ -27,44 +27,47 @@ export const useBudgetAnalysis = (): UseBudgetAnalysisReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const analyzeBudget = useCallback(async (data: BudgetAnalysisData) => {
-    if (!user) {
-      setError("User not authenticated");
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/chat/budget-analysis", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...data,
-          userName: user.user_metadata?.name || "bạn",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  const analyzeBudget = useCallback(
+    async (data: BudgetAnalysisData) => {
+      if (!user) {
+        setError("User not authenticated");
+        return;
       }
 
-      const result = await response.json();
+      setLoading(true);
+      setError(null);
 
-      if (!result.success) {
-        throw new Error(result.error || "Failed to analyze budget");
+      try {
+        const response = await fetch("/api/chat/budget-analysis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...data,
+            userName: user.user_metadata?.name || "bạn",
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error || "Failed to analyze budget");
+        }
+
+        setAnalysis(result.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error occurred");
+      } finally {
+        setLoading(false);
       }
-
-      setAnalysis(result.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error occurred");
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
+    },
+    [user]
+  );
 
   const clearAnalysis = useCallback(() => {
     setAnalysis(null);
@@ -78,4 +81,4 @@ export const useBudgetAnalysis = (): UseBudgetAnalysisReturn => {
     analyzeBudget,
     clearAnalysis,
   };
-}; 
+};

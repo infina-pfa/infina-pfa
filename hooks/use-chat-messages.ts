@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { chatService } from "@/lib/services/chat.service";
+import { chatService } from "@/lib/services-v2/chat.service";
 import {
   ChatMessage,
   MessageSender,

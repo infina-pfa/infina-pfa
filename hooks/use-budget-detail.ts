@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { budgetService } from '@/lib/services/budget.service';
-import { UseBudgetDetailReturn, Budget } from '@/lib/types/budget.types';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useCallback } from "react";
+import { budgetService } from "@/lib/services-v2/budget.service";
+import { UseBudgetDetailReturn, Budget } from "@/lib/types/budget.types";
+import { useTranslation } from "react-i18next";
 
 export const useBudgetDetail = (id: string): UseBudgetDetailReturn => {
   const { t } = useTranslation();
@@ -18,9 +18,9 @@ export const useBudgetDetail = (id: string): UseBudgetDetailReturn => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await budgetService.getById(id, t);
-      
+
       if (response.error) {
         setError(response.error);
         setBudget(null);
@@ -28,7 +28,7 @@ export const useBudgetDetail = (id: string): UseBudgetDetailReturn => {
         setBudget(response.budget);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('errors.unknownError'));
+      setError(err instanceof Error ? err.message : t("errors.unknownError"));
       setBudget(null);
     } finally {
       setLoading(false);
@@ -49,4 +49,4 @@ export const useBudgetDetail = (id: string): UseBudgetDetailReturn => {
     error,
     refetch,
   };
-}; 
+};

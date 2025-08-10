@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { FormInput } from "@/components/ui/form-input";
 import { MoneyInput } from "@/components/ui/money-input";
-import { useExpenseCreateSWR } from "@/hooks/swr";
+import { useExpenseCreateSWR } from "@/hooks/swr-v2";
 import { useAppTranslation } from "@/hooks/use-translation";
 import {
   CreateExpenseRequest,

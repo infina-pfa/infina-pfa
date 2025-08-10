@@ -7,13 +7,13 @@ import {
   FinancialStage,
 } from "@/lib/types/onboarding.types";
 import { useTranslation } from "react-i18next";
+import { onboardingService } from "@/lib/services/onboarding.service";
 
 interface OnboardingMessage {
   id: string;
   type: "user" | "ai" | "system";
   content: string;
-  timestamp: Date;
-  isStreaming?: boolean;
+  createdAt: string;
   component?: OnboardingComponent;
 }
 
@@ -52,9 +52,6 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
   const [isFetchingHistory, setIsFetchingHistory] = useState(true);
   const streamFirstMessagesRef = useRef(false);
 
-  // Refs - moved to top
-  const currentStreamRef = useRef<OnboardingMessage | null>(null);
-
   // Clear error
   const clearError = useCallback(() => {
     setError(null);
@@ -73,7 +70,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
       }
 
       const decoder = new TextDecoder();
-      let currentAIMessage: OnboardingMessage | null = null;
+      let currentAIMessageId: string | null = null;
       let fullContent = "";
       let buffer = "";
       const aiMessages: OnboardingMessage[] = [];
@@ -111,24 +108,36 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 parsed.type === "status" &&
                 parsed.data.status_type === "started"
               ) {
-                setIsThinking(false); // Stop thinking, start streaming
-              } else if (parsed.type === "text") {
-                if (fullContent === "") {
-                  currentAIMessage = {
-                    id: `ai-${Date.now()}`,
-                    type: "ai",
-                    content: "",
-                    timestamp: new Date(),
-                    isStreaming: true,
-                  };
-                  currentStreamRef.current = currentAIMessage;
-                  setMessages((prev) => [...prev, currentAIMessage!]);
+                setIsThinking(false);
+                if (!currentAIMessageId) {
+                  currentAIMessageId = `ai-${Date.now()}`;
+                  setMessages((prev) => [
+                    ...prev,
+                    {
+                      id: currentAIMessageId!,
+                      type: "ai",
+                      content: fullContent,
+                      createdAt: new Date().toISOString(),
+                    },
+                  ]);
                 }
-                if (currentAIMessage) {
-                  fullContent += parsed.content;
+              } else if (parsed.type === "text") {
+                fullContent += parsed.content;
+                if (!currentAIMessageId) {
+                  currentAIMessageId = `ai-${Date.now()}`;
+                  setMessages((prev) => [
+                    ...prev,
+                    {
+                      id: currentAIMessageId!,
+                      type: "ai",
+                      content: fullContent,
+                      createdAt: new Date().toISOString(),
+                    },
+                  ]);
+                } else {
                   setMessages((prev) =>
                     prev.map((msg) =>
-                      msg.id === currentAIMessage!.id
+                      msg.id === currentAIMessageId
                         ? { ...msg, content: fullContent }
                         : msg
                     )
@@ -139,10 +148,10 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 parsed.data.status_type === "text_completed"
               ) {
                 // Finalize text content
-                if (currentAIMessage && parsed.content) {
+                if (currentAIMessageId && parsed.content) {
                   setMessages((prev) =>
                     prev.map((msg) =>
-                      msg.id === currentAIMessage!.id
+                      msg.id === currentAIMessageId
                         ? {
                             ...msg,
                             content: parsed.content || "",
@@ -152,25 +161,20 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                     )
                   );
                   aiMessages.push({
-                    ...currentAIMessage,
+                    id: currentAIMessageId,
+                    type: "ai",
                     content: parsed.content || "",
+                    createdAt: new Date().toISOString(),
                   });
                   fullContent = "";
-                  currentAIMessage = {
-                    id: `ai-${Date.now()}`,
-                    type: "ai",
-                    content: "",
-                    timestamp: new Date(),
-                    isStreaming: true,
-                  };
-                  currentStreamRef.current = null;
+                  currentAIMessageId = null;
                 }
               } else if (parsed.type === "function_call") {
                 const functionCallMessage: OnboardingMessage = {
                   id: `ai-${Date.now()}`,
                   type: "ai",
                   content: parsed.content || "",
-                  timestamp: new Date(),
+                  createdAt: new Date().toISOString(),
                   component: {
                     id: parsed.data.function_args.component_id,
                     title: parsed.data.function_args.title,
@@ -182,21 +186,6 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 setMessages((prev) => [...prev, functionCallMessage]);
                 aiMessages.push({ ...functionCallMessage });
               } else if (parsed.type === "error") {
-                const errorMessage =
-                  "error" in parsed && typeof parsed.error === "string"
-                    ? parsed.error
-                    : "An error occurred";
-                setError(errorMessage);
-                if (currentAIMessage) {
-                  setMessages((prev) =>
-                    prev.map((msg) =>
-                      msg.id === currentAIMessage!.id
-                        ? { ...msg, isStreaming: false }
-                        : msg
-                    )
-                  );
-                  currentStreamRef.current = null;
-                }
               }
             } catch (parseError) {
               console.error("Error parsing SSE data:", parseError);
@@ -221,27 +210,14 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
     const fetchMessages = async () => {
       setIsFetchingHistory(true);
       try {
-        const response = await fetch("/api/onboarding/messages");
-        const data = (await response.json()) as {
-          data: {
-            id: string;
-            userId: string;
-            sender: string;
-            content: string;
-            componentId: string | null;
-            metadata: Record<string, unknown> | null;
-            createdAt: string;
-            updatedAt: string;
-          }[];
-        };
-
+        const data = await onboardingService.getMessages();
         setMessages(
-          data.data.map((message) => ({
+          data.map((message) => ({
             id: message.id,
             type: message.sender as "user" | "ai" | "system",
             content: message.content,
             component: message.metadata as unknown as OnboardingComponent,
-            timestamp: new Date(message.createdAt),
+            createdAt: message.createdAt,
           }))
         );
       } finally {
@@ -300,28 +276,15 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
           id: `user-${Date.now()}`,
           type: "user",
           content: userMessage,
-          timestamp: new Date(),
+          createdAt: new Date().toISOString(),
         };
         setMessages((prev) => [...prev, userMsg]);
 
         // Call streaming API
-        const response = await fetch("/api/onboarding/stream", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ message: userMessage }),
+        const stream = await onboardingService.streamMessage({
+          message: userMessage,
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        if (!response.body) {
-          throw new Error("No response body");
-        }
-
-        await handleStream(response.body);
+        await handleStream(stream);
       } catch (err) {
         console.error("Streaming error:", err);
         setError(err instanceof Error ? err.message : "Streaming failed");
@@ -337,14 +300,11 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
   const saveAiResponses = useCallback(
     async (aiMessages: OnboardingMessage[]) => {
       for (const message of aiMessages) {
-        await fetch("/api/onboarding/messages", {
-          method: "POST",
-          body: JSON.stringify({
-            message: message.content,
-            sender: "ai",
-            component_id: message.component?.id,
-            metadata: message.component,
-          }),
+        await onboardingService.saveMessage({
+          message: message.content,
+          sender: "ai",
+          component_id: message.component?.id,
+          metadata: message.component as unknown as Record<string, unknown>,
         });
       }
     },
@@ -528,7 +488,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
           id: `ai-${Date.now()}`,
           type: "ai",
           content: response.reasoning || "",
-          timestamp: new Date(),
+          createdAt: new Date().toISOString(),
         };
 
         setMessages((prev) => [...prev, aimessage]);
@@ -567,6 +527,10 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
 
       if (response.selectedPhilosophy) {
         profileUpdates.budgetingStyle = response.selectedPhilosophy;
+      }
+
+      if (response.goalDetails) {
+        profileUpdates.goalDetails = response.goalDetails;
       }
 
       console.log("🚀 ~ profileUpdates:", profileUpdates);

@@ -1,4 +1,4 @@
-import { useGoalCreateSWR, useGoalUpdateSWR } from "@/hooks/swr";
+import { useGoalCreateSWR, useGoalUpdateSWR } from "@/hooks/swr-v2";
 import { useToast } from "@/hooks/use-toast";
 import { useAppTranslation } from "@/hooks/use-translation";
 import {

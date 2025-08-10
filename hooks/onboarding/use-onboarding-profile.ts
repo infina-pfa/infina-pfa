@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { budgetService } from "@/lib/services/budget.service";
-import { onboardingService } from "@/lib/services/onboarding.service";
+import { budgetService } from "@/lib/services-v2/budget.service";
+import { onboardingService } from "@/lib/services-v2/onboarding.service";
 import {
   ComponentResponse,
   UserProfile,

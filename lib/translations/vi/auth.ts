@@ -33,6 +33,12 @@ export const authVi = {
   pleaseEnterEmail: "Vui lòng nhập địa chỉ email",
   invalidEmailAddress: "Vui lòng nhập địa chỉ email hợp lệ",
   unexpectedError: "Đã xảy ra lỗi không mong muốn",
+  
+  // Validation Messages
+  emailRequired: "Email là bắt buộc",
+  invalidEmail: "Vui lòng nhập địa chỉ email hợp lệ",
+  passwordRequired: "Mật khẩu là bắt buộc",
+  confirmPasswordRequired: "Vui lòng xác nhận mật khẩu",
 
   // Auth Layout
   financialJourneyStarts: "Hành trình tài chính của bạn bắt đầu từ đây",

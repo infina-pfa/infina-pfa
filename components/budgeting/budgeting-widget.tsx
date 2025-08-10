@@ -9,8 +9,11 @@ import {
   Transaction,
 } from "@/components/budgeting/recent-expenses-list";
 import { SpendingOverview } from "@/components/budgeting/spending-overview";
-import { useBudgetManagementSWR, useRecentTransactionsSWR } from "@/hooks/swr";
-import { useBudgetDeleteSWR } from "@/hooks/swr/use-budget-delete";
+import {
+  useBudgetManagementSWR,
+  useRecentTransactionsSWR,
+} from "@/hooks/swr-v2";
+import { useBudgetDeleteSWR } from "@/hooks/swr-v2/use-budget-delete";
 import { useBudgetStats } from "@/hooks/use-budget-stats";
 import { useToast } from "@/hooks/use-toast";
 import { useAppTranslation } from "@/hooks/use-translation";

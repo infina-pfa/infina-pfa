@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useRouter } from "next/navigation";
 import { useAppTranslation } from "@/hooks/use-translation";
 

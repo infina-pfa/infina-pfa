@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useBudgetListSWR } from "@/hooks/swr/use-budget-list";
+import { useBudgetListSWR } from "@/hooks/swr-v2/use-budget-list";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProgressBar } from "@/components/budgeting/progress-bar";

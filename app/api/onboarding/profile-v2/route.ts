@@ -8,6 +8,14 @@ interface UserProfile {
   budgetingStyle: string;
 }
 
+export const GET = withAuth(
+  async (req: NextRequest, context: AuthenticatedContext) => {
+    const { apiClient } = context;
+    const response = await apiClient.get("/onboarding/profile");
+    return NextResponse.json(response.data);
+  }
+);
+
 export const PUT = withAuth(
   async (req: NextRequest, context: AuthenticatedContext) => {
     const { apiClient } = context;

@@ -1,9 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { onboardingService } from "@/lib/services/onboarding.service";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { onboardingService } from "@/lib/services";
 
 export function FinishOnboarding() {
   const { t } = useAppTranslation();

@@ -145,9 +145,8 @@ export function OnboardingComponentRenderer({
       return (
         <Suggestions
           suggestions={
-            component.context.suggestions?.map(
-              (suggestion) => suggestion.text
-            ) || []
+            component.context.options?.map((suggestion) => suggestion.label) ||
+            []
           }
           onSelect={(suggestionLabel) => {
             handleResponse({

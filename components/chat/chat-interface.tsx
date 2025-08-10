@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useChatFlow } from "@/hooks/use-chat-flow";
 import { useOnboardingCheck } from "@/hooks/use-onboarding-check";
 import { useAppTranslation } from "@/hooks/use-translation";

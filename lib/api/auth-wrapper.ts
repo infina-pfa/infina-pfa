@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import { NextRequest, NextResponse } from "next/server";
 import { User } from "@supabase/supabase-js";
-import { AxiosInstance } from "axios";
-import { getClient } from "./client";
+import axios, { AxiosInstance } from "axios";
+import { NextRequest, NextResponse } from "next/server";
+import { INFINA_FINANCIAL_SERVICE_URL } from "../config";
 
 export interface AuthenticatedContext {
   user: User;
@@ -53,7 +53,13 @@ export function withAuth(handler: AuthenticatedHandler) {
       const context: AuthenticatedContext = {
         user,
         stream,
-        apiClient: getClient(session?.access_token),
+        apiClient: axios.create({
+          baseURL: INFINA_FINANCIAL_SERVICE_URL,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+        }),
       };
 
       return await handler(request, context);

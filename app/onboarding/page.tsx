@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuthContext } from "@/components/providers/auth-provider";
-import { userService } from "@/lib/services/user.service";
+import { userService } from "@/lib/services-v2/user.service";
 import { OnboardingChatInterface } from "@/components/onboarding/chat/onboarding-chat-interface";
 import { useAppTranslation } from "@/hooks/use-translation";
 

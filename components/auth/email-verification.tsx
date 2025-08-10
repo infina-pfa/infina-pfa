@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, ArrowLeft } from "lucide-react";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useToast } from "@/hooks/use-toast";
 
 interface EmailVerificationProps {

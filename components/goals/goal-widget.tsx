@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useGoalManagementSWR } from "@/hooks/swr";
+import { useGoalManagementSWR } from "@/hooks/swr-v2";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { formatCurrency } from "@/lib/utils";
 import { Goal } from "@/lib/types/goal.types";

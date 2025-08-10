@@ -1,10 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
-import { budgetService } from '@/lib/services/budget.service';
-import { UseBudgetListReturn, BudgetFilters, Budget, BudgetWithSpending } from '@/lib/types/budget.types';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useCallback } from "react";
+import { budgetService } from "@/lib/services-v2/budget.service";
+import {
+  UseBudgetListReturn,
+  BudgetFilters,
+  Budget,
+  BudgetWithSpending,
+} from "@/lib/types/budget.types";
+import { useTranslation } from "react-i18next";
 
 export const useBudgetList = (filters?: BudgetFilters): UseBudgetListReturn => {
-  const { t } = useTranslation(['budgeting', 'common']);
+  const { t } = useTranslation(["budgeting", "common"]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,9 +18,9 @@ export const useBudgetList = (filters?: BudgetFilters): UseBudgetListReturn => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await budgetService.getAll(filters, t);
-      
+
       if (response.error) {
         setError(response.error);
         setBudgets([]);
@@ -23,7 +28,9 @@ export const useBudgetList = (filters?: BudgetFilters): UseBudgetListReturn => {
         setBudgets(response.budgets);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('unknownError', { ns: 'common' }));
+      setError(
+        err instanceof Error ? err.message : t("unknownError", { ns: "common" })
+      );
       setBudgets([]);
     } finally {
       setLoading(false);
@@ -55,8 +62,10 @@ export interface UseBudgetListWithSpendingReturn {
   refetch: () => Promise<void>;
 }
 
-export const useBudgetListWithSpending = (filters?: BudgetFilters): UseBudgetListWithSpendingReturn => {
-  const { t } = useTranslation(['budgeting', 'common']);
+export const useBudgetListWithSpending = (
+  filters?: BudgetFilters
+): UseBudgetListWithSpendingReturn => {
+  const { t } = useTranslation(["budgeting", "common"]);
   const [budgets, setBudgets] = useState<BudgetWithSpending[]>([]);
   const [totalBudget, setTotalBudget] = useState(0);
   const [totalSpent, setTotalSpent] = useState(0);
@@ -67,9 +76,9 @@ export const useBudgetListWithSpending = (filters?: BudgetFilters): UseBudgetLis
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await budgetService.getAllWithSpending(filters, t);
-      
+
       if (response.error) {
         setError(response.error);
         setBudgets([]);
@@ -81,7 +90,9 @@ export const useBudgetListWithSpending = (filters?: BudgetFilters): UseBudgetLis
         setTotalSpent(response.totalSpent);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('unknownError', { ns: 'common' }));
+      setError(
+        err instanceof Error ? err.message : t("unknownError", { ns: "common" })
+      );
       setBudgets([]);
       setTotalBudget(0);
       setTotalSpent(0);
@@ -124,18 +135,22 @@ export interface UseRecentTransactionsReturn {
   refetch: () => Promise<void>;
 }
 
-export const useRecentTransactions = (limit: number = 10): UseRecentTransactionsReturn => {
-  const { t } = useTranslation(['budgeting', 'common']);
-  const [transactions, setTransactions] = useState<Array<{
-    id: string;
-    name: string;
-    amount: number;
-    date: string;
-    category: string;
-    type: string;
-    description: string | null;
-    budgetName?: string;
-  }>>([]);
+export const useRecentTransactions = (
+  limit: number = 10
+): UseRecentTransactionsReturn => {
+  const { t } = useTranslation(["budgeting", "common"]);
+  const [transactions, setTransactions] = useState<
+    Array<{
+      id: string;
+      name: string;
+      amount: number;
+      date: string;
+      category: string;
+      type: string;
+      description: string | null;
+      budgetName?: string;
+    }>
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -143,9 +158,9 @@ export const useRecentTransactions = (limit: number = 10): UseRecentTransactions
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await budgetService.getRecentTransactions(limit, t);
-      
+
       if (response.error) {
         setError(response.error);
         setTransactions([]);
@@ -153,7 +168,9 @@ export const useRecentTransactions = (limit: number = 10): UseRecentTransactions
         setTransactions(response.transactions);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('unknownError', { ns: 'common' }));
+      setError(
+        err instanceof Error ? err.message : t("unknownError", { ns: "common" })
+      );
       setTransactions([]);
     } finally {
       setLoading(false);
@@ -174,4 +191,4 @@ export const useRecentTransactions = (limit: number = 10): UseRecentTransactions
     error,
     refetch,
   };
-}; 
+};

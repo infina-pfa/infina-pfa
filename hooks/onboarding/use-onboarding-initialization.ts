@@ -1,7 +1,10 @@
 import { useEffect, useCallback } from "react";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { onboardingService } from "@/lib/services/onboarding.service";
-import { OnboardingMessage, OnboardingState } from "@/lib/types/onboarding.types";
+import { onboardingService } from "@/lib/services-v2/onboarding.service";
+import {
+  OnboardingMessage,
+  OnboardingState,
+} from "@/lib/types/onboarding.types";
 
 interface UseOnboardingInitializationProps {
   userId: string;
@@ -150,34 +153,35 @@ export const useOnboardingInitialization = ({
   const loadChatHistory = useCallback(
     async (conversationId: string) => {
       try {
-        const { messages: chatHistory } = await onboardingService.loadChatHistory(
-          conversationId
-        );
+        const { messages: chatHistory } =
+          await onboardingService.loadChatHistory(conversationId);
 
         // Convert chat history to OnboardingMessage format - simplified version
-        const onboardingMessages: OnboardingMessage[] = chatHistory.map((msg) => {
-          const chatMsg = msg as {
-            id: string;
-            sender: "user" | "ai" | "system";
-            content: string;
-            created_at: string;
-            component_id?: string;
-            metadata?: Record<string, unknown>;
-          };
+        const onboardingMessages: OnboardingMessage[] = chatHistory.map(
+          (msg) => {
+            const chatMsg = msg as {
+              id: string;
+              sender: "user" | "ai" | "system";
+              content: string;
+              created_at: string;
+              component_id?: string;
+              metadata?: Record<string, unknown>;
+            };
 
-          // Note: Component reconstruction will be handled by the conversation flow
-          // For now, just preserve the basic message structure
-          const component = undefined;
+            // Note: Component reconstruction will be handled by the conversation flow
+            // For now, just preserve the basic message structure
+            const component = undefined;
 
-          return {
-            id: chatMsg.id,
-            type: chatMsg.sender === "user" ? "user" : "ai",
-            content: chatMsg.content,
-            timestamp: new Date(chatMsg.created_at),
-            component,
-            metadata: chatMsg.metadata,
-          };
-        });
+            return {
+              id: chatMsg.id,
+              type: chatMsg.sender === "user" ? "user" : "ai",
+              content: chatMsg.content,
+              timestamp: new Date(chatMsg.created_at),
+              component,
+              metadata: chatMsg.metadata,
+            };
+          }
+        );
 
         setMessages(onboardingMessages);
 
@@ -200,7 +204,9 @@ export const useOnboardingInitialization = ({
         // If the last message is from AI and user hasn't responded, they can continue
         const lastMessage = onboardingMessages[onboardingMessages.length - 1];
         if (lastMessage?.type === "ai") {
-          console.log("💬 User can continue conversation from where they left off");
+          console.log(
+            "💬 User can continue conversation from where they left off"
+          );
         }
       } catch (err) {
         console.error("❌ Failed to load chat history:", err);

@@ -1,5 +1,5 @@
 import { useAIStreaming } from "@/hooks/use-ai-streaming";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useChatMessages } from "@/hooks/use-chat-messages";
 import { useSimpleChatSession } from "@/hooks/use-chat-session";
 import { ChatToolId } from "@/lib/types/ai-streaming.types";

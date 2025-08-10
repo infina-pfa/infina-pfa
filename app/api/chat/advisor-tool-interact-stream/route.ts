@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
 import { Message } from "openai/resources/beta/threads/messages.mjs";
 import { authenticateUser } from "@/lib/middleware/auth-middleware";
-import { userContextService } from "@/lib/services/user-context.service";
-import { aiStreamingService } from "@/lib/services/ai-streaming.service";
+import { userContextService } from "@/lib/services-v2/user-context.service";
+import { aiStreamingService } from "@/lib/services-v2/ai-streaming.service";
 import { ConversationMessage } from "@/lib/types/ai-streaming.types";
 import { chatErrorHandler } from "@/lib/chat-error-handler";
 
