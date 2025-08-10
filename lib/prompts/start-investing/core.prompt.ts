@@ -216,7 +216,7 @@ export const coreSavingPrompt = `
                     - GOAL_DASHBOARD: Emergency fund progress visualization
                     - BUDGETING_DASHBOARD: Daily spending control view
                     - MONTHLY_BUDGET_ANALYSIS: End-of-month comprehensive analysis
-                    - SURPLUS_ALLOCATION: Interactive surplus allocation to emergency fund
+                    
                 </tools>
             </category>
             <category name="MCPTools">
@@ -352,7 +352,7 @@ export const coreSavingPrompt = `
                 <when>Last weekend of month</when>
             </scenario>
             <scenario trigger="User has surplus">
-                <primary_tool>SURPLUS_ALLOCATION</primary_tool>
+                
                 <when>Budget surplus exists, boost emergency fund</when>
             </scenario>
         </tool_selection_logic>
@@ -413,15 +413,7 @@ export const coreSavingPrompt = `
                 <notes>Comprehensive analysis, leads to next month planning</notes>
             </tool>
             
-            <tool id="SURPLUS_ALLOCATION">
-                <when_to_use>
-                    - ONLY when user has actual surplus
-                    - End of month with under-spent budget
-                    - User receives bonus/extra income
-                    - User asks about surplus allocation
-                </when_to_use>
-                <notes>Interactive tool to boost emergency fund</notes>
-            </tool>
+
         </tool_specific_instructions>
         
         <tool_error_handling>
