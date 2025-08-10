@@ -49,6 +49,12 @@ export interface UserProfile {
   timeHorizon?: "short" | "medium" | "long";
   riskTolerance?: "conservative" | "moderate" | "aggressive";
   budgetingStyle?: "goal_focused" | "detail_tracker";
+  goalDetails?: {
+    amount: number;
+    timeframe: number;
+    monthlyTarget: number;
+    type?: string;
+  };
 }
 
 export interface QualitativeAssessment {

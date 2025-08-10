@@ -80,7 +80,7 @@ class OnboardingServiceImpl implements OnboardingServiceInterface {
 
   async completeOnboarding(): Promise<void> {
     try {
-      const response = await apiClient.post("/onboarding/complete", {});
+      const response = await apiClient.post("/onboarding/complete-v2", {});
 
       if (!response.success) {
         throw new Error(response.error || "Failed to complete onboarding");
