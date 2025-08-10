@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { chatService } from "@/lib/services-v2/chat.service";
 import {
   ChatMessage,
   MessageSender,
   MessageType,
 } from "@/lib/types/chat.types";
+import { chatService } from "@/lib/services/chat.service";
 
 interface UseChatMessagesReturn {
   // State
@@ -56,6 +56,7 @@ export const useChatMessages = (): UseChatMessagesReturn => {
       conversationId: string,
       options?: { sender?: MessageSender }
     ): Promise<ChatMessage | null> => {
+      console.log("🚀 ~ useChatMessages ~ content:", content);
       setIsSending(true);
       setError(null);
 

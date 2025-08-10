@@ -1,13 +1,12 @@
 import {
-  AdvisorStreamEvent,
   ChatMessage,
   MessageType,
-  ResponseDataEvent,
   UIAction,
   UIActionType,
   UseAIAdvisorStreamProcessorOptions,
   UseAIAdvisorStreamProcessorReturn,
 } from "@/lib/types/chat.types";
+import { StreamEvent } from "@/lib/types/streaming.types";
 import { useCallback, useRef, useState } from "react";
 
 const getMessageType = (action: UIAction): MessageType => {
@@ -110,183 +109,163 @@ export const useAIAdvisorStreamProcessor = ({
     []
   );
 
-  const processStreamEvent = useCallback(
-    (event: AdvisorStreamEvent) => {
-      const { type, content, action, response_id } = event;
+  // Add ref to track full content accumulation
+  const fullContentRef = useRef<string>("");
 
-      // Store response ID when received
-      if (response_id) {
-        responseIdRef.current = response_id;
+  const processStreamEvent = useCallback(
+    (event: StreamEvent) => {
+      // Handle status events
+      if (event.type === "status" && event.data?.status_type === "started") {
+        setIsProcessing(false);
+        setIsStreaming(true);
+        // Initialize message if needed
+        if (!currentTextMessageRef.current) {
+          const newMessage = createStreamingMessage("", true);
+          currentTextMessageRef.current = newMessage;
+          onMessageStreaming(newMessage);
+        }
+        return;
       }
 
-      switch (type) {
-        case ResponseDataEvent.RESPONSE_CREATED: {
-          break;
+      // Handle text streaming
+      if (event.type === "text" && event.content) {
+        setIsStreaming(true);
+        fullContentRef.current += event.content;
+
+        if (!currentTextMessageRef.current) {
+          const newMessage = createStreamingMessage(
+            fullContentRef.current,
+            true
+          );
+          currentTextMessageRef.current = newMessage;
+          onMessageStreaming(newMessage);
+        } else {
+          const updatedMessage = updateStreamingMessage(
+            currentTextMessageRef.current,
+            {
+              content: fullContentRef.current,
+              isStreaming: true,
+            }
+          );
+          currentTextMessageRef.current = updatedMessage;
+          onMessageUpdate(updatedMessage.id, updatedMessage);
         }
+        return;
+      }
 
-        case ResponseDataEvent.OUTPUT_TEXT_STREAMING: {
-          setIsStreaming(true);
-          if (!content) return;
+      // Handle text completion
+      if (
+        event.type === "status" &&
+        event.data?.status_type === "text_completed"
+      ) {
+        if (currentTextMessageRef.current && event.content) {
+          const completedMessage = updateStreamingMessage(
+            currentTextMessageRef.current,
+            {
+              content: event.content || fullContentRef.current,
+              isStreaming: false,
+              isComplete: true,
+            }
+          );
+          onMessageUpdate(completedMessage.id, completedMessage);
+          onMessageComplete(completedMessage);
 
-          // Create new message if we don't have a current text message
-          if (!currentTextMessageRef.current) {
-            const newMessage = createStreamingMessage(content, true);
-            currentTextMessageRef.current = newMessage;
-            onMessageStreaming(newMessage);
-          } else {
-            // Update existing message with streamed content
-            const updatedContent =
-              (currentTextMessageRef.current.streamingContent || "") + content;
-            const updatedMessage = updateStreamingMessage(
-              currentTextMessageRef.current,
-              {
-                content: updatedContent,
-                isStreaming: true,
-              }
-            );
-            currentTextMessageRef.current = updatedMessage;
-            onMessageUpdate(updatedMessage.id, updatedMessage);
-          }
-          break;
-        }
-
-        case ResponseDataEvent.OUTPUT_TEXT_DONE: {
-          if (currentTextMessageRef.current) {
-            // Mark the text message as complete
-            const completedMessage = updateStreamingMessage(
-              currentTextMessageRef.current,
-              {
-                isStreaming: false,
-                isComplete: true,
-              }
-            );
-
-            onMessageUpdate(completedMessage.id, completedMessage);
-            onMessageComplete(completedMessage);
-
-            // Reset ref
-            currentTextMessageRef.current = null;
-            setIsStreaming(false);
-            setIsProcessing(false);
-          }
-          break;
-        }
-
-        case ResponseDataEvent.FUNCTION_CALL_ARGUMENTS_STREAMING: {
-          setIsStreaming(true);
-          setIsProcessing(true);
-          // Create new tool preparation message if we don't have one
-          if (!currentToolMessageRef.current) {
-            const newMessage = createStreamingMessage(
-              "Đang chuẩn bị công cụ...",
-              true,
-              action
-            );
-            currentToolMessageRef.current = newMessage;
-            onMessageStreaming(newMessage);
-          }
-          break;
-        }
-
-        case ResponseDataEvent.FUNCTION_CALL_ARGUMENTS_DONE: {
-          if (currentToolMessageRef.current && action) {
-            // Update tool message with final content
-            const toolTitle = action.payload?.title || "";
-            const finalContent = `Hiển thị công cụ: ${toolTitle}`;
-
-            const completedMessage = updateStreamingMessage(
-              currentToolMessageRef.current,
-              {
-                type: getMessageType(action),
-                content: finalContent,
-                action,
-                isStreaming: false,
-                isComplete: true,
-              }
-            );
-
-            onMessageUpdate(completedMessage.id, completedMessage);
-            onMessageComplete(completedMessage);
-            onFunctionToolComplete(action);
-
-            // Reset ref
-            currentToolMessageRef.current = null;
-            setIsStreaming(false);
-            setIsProcessing(false);
-          }
-          break;
-        }
-
-        case ResponseDataEvent.MCP_TOOL_CALLING: {
-          setIsMCPLoading(true);
-          break;
-        }
-
-        case ResponseDataEvent.MCP_TOOL_CALL_DONE:
-        case ResponseDataEvent.MCP_TOOL_CALL_FAILED: {
-          setIsMCPLoading(false);
-          break;
-        }
-
-
-        case ResponseDataEvent.RESPONSE_COMPLETED: {
-          // Clean up any remaining streaming messages
-          if (currentTextMessageRef.current) {
-            const completedMessage = updateStreamingMessage(
-              currentTextMessageRef.current,
-              {
-                isStreaming: false,
-                isComplete: true,
-              }
-            );
-            onMessageUpdate(completedMessage.id, completedMessage);
-            onMessageComplete(completedMessage);
-            currentTextMessageRef.current = null;
-          }
-
-          if (currentToolMessageRef.current) {
-            const completedMessage = updateStreamingMessage(
-              currentToolMessageRef.current,
-              {
-                isStreaming: false,
-                isComplete: true,
-              }
-            );
-            onMessageUpdate(completedMessage.id, completedMessage);
-            onMessageComplete(completedMessage);
-            currentToolMessageRef.current = null;
-          }
-
+          // Reset for next message
+          currentTextMessageRef.current = null;
+          fullContentRef.current = "";
           setIsStreaming(false);
           setIsProcessing(false);
-          break;
+        }
+        return;
+      }
+
+      // Handle function calls (components)
+      if (event.type === "function_call" && event.data) {
+        const functionArgs = event.data.function_args;
+        if (functionArgs.component_id) {
+          // Create UI action from function args
+          const action: UIAction = {
+            type:
+              event.data.function_name === "open_tool"
+                ? UIActionType.OPEN_TOOL
+                : UIActionType.SHOW_COMPONENT,
+            payload: {
+              componentId: functionArgs.component_id,
+              title: functionArgs.title,
+              context: functionArgs.context,
+            },
+          };
+
+          const componentMessage = createStreamingMessage(
+            event.content || "",
+            false,
+            action
+          );
+
+          onMessageStreaming(componentMessage);
+          onMessageComplete(componentMessage);
+          onFunctionToolComplete(action);
+        }
+        return;
+      }
+
+      // Handle MCP tool events
+      if (event.type === "mcp_call") {
+        setIsMCPLoading(true);
+        return;
+      }
+
+      if (event.type === "mcp_result") {
+        setIsMCPLoading(false);
+        return;
+      }
+
+      // Handle completion
+      if (event.type === "complete") {
+        // Clean up any remaining streaming messages
+        if (currentTextMessageRef.current) {
+          const completedMessage = updateStreamingMessage(
+            currentTextMessageRef.current,
+            {
+              content:
+                fullContentRef.current || currentTextMessageRef.current.content,
+              isStreaming: false,
+              isComplete: true,
+            }
+          );
+          onMessageUpdate(completedMessage.id, completedMessage);
+          onMessageComplete(completedMessage);
+          currentTextMessageRef.current = null;
+          fullContentRef.current = "";
         }
 
-        case "error": {
-          setIsStreaming(false);
-          setIsProcessing(false);
+        setIsStreaming(false);
+        setIsProcessing(false);
+        return;
+      }
 
-          // Update any current streaming message with error state
-          if (currentTextMessageRef.current) {
-            const errorMessage = updateStreamingMessage(
-              currentTextMessageRef.current,
-              {
-                content:
-                  currentTextMessageRef.current.content ||
-                  "Sorry, I encountered an error while responding.",
-                isStreaming: false,
-                isComplete: true,
-              }
-            );
-            onMessageUpdate(errorMessage.id, errorMessage);
-            onMessageComplete(errorMessage);
-            currentTextMessageRef.current = null;
-          }
-          break;
+      // Handle errors
+      if (event.type === "error") {
+        setIsStreaming(false);
+        setIsProcessing(false);
+
+        if (currentTextMessageRef.current) {
+          const errorMessage = updateStreamingMessage(
+            currentTextMessageRef.current,
+            {
+              content:
+                currentTextMessageRef.current.content ||
+                "Sorry, I encountered an error while responding.",
+              isStreaming: false,
+              isComplete: true,
+            }
+          );
+          onMessageUpdate(errorMessage.id, errorMessage);
+          onMessageComplete(errorMessage);
+          currentTextMessageRef.current = null;
+          fullContentRef.current = "";
         }
-
-        default:
-          break;
+        return;
       }
     },
     [
@@ -306,65 +285,55 @@ export const useAIAdvisorStreamProcessor = ({
     ) => {
       conversationIdRef.current = conversationId;
       setIsProcessing(true);
+      setIsStreaming(true);
 
       try {
         const reader = readableStream.getReader();
-        let buffer = ""; // Buffer to accumulate partial data
+        const decoder = new TextDecoder();
+        let buffer = "";
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = new TextDecoder().decode(value);
+          const chunk = decoder.decode(value, { stream: true });
           buffer += chunk;
 
-          // Process complete events from buffer
-          const events = buffer.split("\n\n");
+          // Process line by line instead of splitting by \n\n
+          const lines = buffer.split("\n");
+          // Keep incomplete line in buffer
+          buffer = lines.pop() || "";
 
-          // Keep the last potentially incomplete event in buffer
-          buffer = events.pop() || "";
+          for (const line of lines) {
+            // Skip empty lines (they separate SSE events but we don't need to process them)
+            if (line === "") continue;
 
-          for (const event of events) {
-            if (event.trim() === "") continue;
+            // Check for SSE data field
+            if (line.startsWith("data: ")) {
+              const data = line.slice(6).trim();
 
-            if (event.startsWith("data: ")) {
+              if (data === "[DONE]") {
+                setIsStreaming(false);
+                setIsProcessing(false);
+                break;
+              }
+
               try {
-                const eventData = event.substring(6).trim();
-
-                // Skip [DONE] marker
-                if (eventData === "[DONE]") {
-                  continue;
-                }
-
-                // Validate JSON before parsing
-                if (eventData.startsWith("{") && eventData.endsWith("}")) {
-                  const parsedEvent: AdvisorStreamEvent = JSON.parse(eventData);
-                  processStreamEvent(parsedEvent);
-                }
-              } catch {
-                // Skip malformed events
+                const parsed = JSON.parse(data) as StreamEvent;
+                processStreamEvent(parsed);
+              } catch (parseError) {
+                console.error(
+                  "Error parsing SSE data:",
+                  parseError,
+                  "Data:",
+                  data
+                );
               }
             }
           }
         }
-
-        // Process any remaining data in buffer
-        if (buffer.trim() && buffer.startsWith("data: ")) {
-          try {
-            const eventData = buffer.substring(6).trim();
-            if (
-              eventData !== "[DONE]" &&
-              eventData.startsWith("{") &&
-              eventData.endsWith("}")
-            ) {
-              const parsedEvent: AdvisorStreamEvent = JSON.parse(eventData);
-              processStreamEvent(parsedEvent);
-            }
-          } catch {
-            // Skip malformed final event
-          }
-        }
-      } catch {
+      } catch (error) {
+        console.error("Streaming error:", error);
         setIsStreaming(false);
         setIsProcessing(false);
       }
@@ -379,6 +348,7 @@ export const useAIAdvisorStreamProcessor = ({
     currentTextMessageRef.current = null;
     currentToolMessageRef.current = null;
     responseIdRef.current = "";
+    fullContentRef.current = "";
   }, []);
 
   return {

@@ -1,12 +1,12 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useAIAdvisorStreamProcessor } from "@/hooks/use-ai-advisor-stream";
-import { chatService } from "@/lib/services-v2/chat.service";
 import {
   ChatMessage,
   AdvisorStreamRequest,
   UIAction,
 } from "@/lib/types/chat.types";
+import { chatService } from "@/lib/services/chat.service";
 
 interface UseAIStreamingReturn {
   // State
@@ -87,7 +87,10 @@ export const useAIStreaming = (
 
       try {
         // Get stream from service
-        const stream = await chatService.startAIAdvisorStream(request);
+        const stream = await chatService.startAIAdvisorStream(
+          request.conversationId,
+          request.message
+        );
 
         // Process the stream
         await aiAdvisorProcessor.processStreamData(

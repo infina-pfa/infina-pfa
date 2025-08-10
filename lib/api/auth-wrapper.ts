@@ -4,23 +4,36 @@ import axios, { AxiosInstance } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 import { INFINA_FINANCIAL_SERVICE_URL } from "../config";
 
-export interface AuthenticatedContext {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface AuthenticatedContext<T extends Record<string, unknown> = {}> {
   user: User;
   apiClient: AxiosInstance;
   stream: (url: string, options: RequestInit) => Promise<Response>;
+  params?: T;
 }
 
-export type AuthenticatedHandler = (
+interface RouteParams<T> {
+  params: Promise<T>;
+}
+
+export type AuthenticatedHandler<T extends Record<string, unknown>> = (
   request: NextRequest,
-  context: AuthenticatedContext
+  context: AuthenticatedContext<T>
 ) => Promise<NextResponse> | NextResponse;
 
 /**
  * Wrapper for authenticated API routes
  * Automatically handles authentication and provides user context
  */
-export function withAuth(handler: AuthenticatedHandler) {
-  return async (request: NextRequest) => {
+export function withAuth<T extends Record<string, unknown>>(
+  handler: AuthenticatedHandler<T>
+) {
+  return async (request: NextRequest, routeParams?: RouteParams<T>) => {
+    let params: T | undefined;
+    if (routeParams) {
+      params = await routeParams.params;
+    }
+
     try {
       const supabase = await createClient();
       const {
@@ -50,7 +63,7 @@ export function withAuth(handler: AuthenticatedHandler) {
         });
       };
 
-      const context: AuthenticatedContext = {
+      const context: AuthenticatedContext<T> = {
         user,
         stream,
         apiClient: axios.create({
@@ -60,6 +73,7 @@ export function withAuth(handler: AuthenticatedHandler) {
             Authorization: `Bearer ${session?.access_token}`,
           },
         }),
+        params,
       };
 
       return await handler(request, context);

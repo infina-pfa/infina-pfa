@@ -10,7 +10,6 @@ import { BudgetingDashboardMessage } from "./budgeting-dashboard-message";
 import { MonthlyBudgetAnalysisMessage } from "./monthly-budget-analysis-message";
 import { BudgetDetailMessage } from "./budget-detail-message";
 
-
 const today = new Date();
 const currentMonth = today.getMonth() + 1;
 const currentYear = today.getFullYear();

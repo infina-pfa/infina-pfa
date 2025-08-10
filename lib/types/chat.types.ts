@@ -5,6 +5,7 @@ import {
   TablesUpdate,
 } from "@/lib/supabase/database";
 import { ChatToolId } from "./ai-streaming.types";
+import { StreamEvent } from "./streaming.types";
 
 // Database types
 export type Conversation = Tables<"conversations">;
@@ -45,7 +46,7 @@ export interface CreateConversationRequest {
 }
 
 export interface CreateConversationResponse {
-  success: boolean;
+  status: number;
   data?: Conversation;
   error?: string;
   message?: string;
@@ -281,7 +282,7 @@ export interface UseAIAdvisorStreamProcessorReturn {
     conversationId: string,
     readableStream: ReadableStream<Uint8Array>
   ) => Promise<void>;
-  processStreamEvent: (event: AdvisorStreamEvent) => void;
+  processStreamEvent: (event: StreamEvent) => void;
   reset: () => void;
   responseId: string;
 }

@@ -159,6 +159,7 @@ export const useChatFlow = (): UseChatFlowReturn => {
       // Step 1: Create session if it doesn't exist
       if (!conversationId) {
         conversationId = (await createConversation()) || undefined;
+        console.log("🚀 ~ sendMessage ~ conversationId:", conversationId);
 
         if (!conversationId) {
           return;
