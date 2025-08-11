@@ -38,13 +38,9 @@ export function ForgotPasswordForm({
     }
 
     try {
-      const result = await forgotPassword(email);
+      await forgotPassword(email);
 
-      if (result.error) {
-        setFormError(result.error);
-      } else {
-        setIsSubmitted(true);
-      }
+      setIsSubmitted(true);
     } catch {
       setFormError(t("unexpectedError"));
     }

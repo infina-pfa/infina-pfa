@@ -12,9 +12,6 @@ export interface AuthenticatedContext<T extends Record<string, unknown> = {}> {
   params?: T;
 }
 
-interface RouteParams<T> {
-  params: Promise<T>;
-}
 
 export type AuthenticatedHandler<T extends Record<string, unknown>> = (
   request: NextRequest,
@@ -24,14 +21,24 @@ export type AuthenticatedHandler<T extends Record<string, unknown>> = (
 /**
  * Wrapper for authenticated API routes
  * Automatically handles authentication and provides user context
+ * 
+ * For dynamic routes: withAuth<{ id: string }>((req, ctx) => {...})
+ * For static routes: withAuth((req, ctx) => {...})
  */
-export function withAuth<T extends Record<string, unknown>>(
+export function withAuth<T extends Record<string, unknown> = Record<string, never>>(
   handler: AuthenticatedHandler<T>
 ) {
-  return async (request: NextRequest, routeParams?: RouteParams<T>) => {
+  // Return a function that matches Next.js expectations
+  return async function (
+    request: NextRequest,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    context?: any // Next.js 15 has varying signatures for route handlers
+  ): Promise<NextResponse> {
     let params: T | undefined;
-    if (routeParams) {
-      params = await routeParams.params;
+    
+    // For dynamic routes, context is required and has params
+    if (context?.params) {
+      params = await context.params;
     }
 
     try {

@@ -1,8 +1,8 @@
-import { AuthenticatedContext, withAuth } from "@/lib/api/auth-wrapper";
-import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "@/lib/api/auth-wrapper";
+import { NextResponse } from "next/server";
 
 export const POST = withAuth(
-  async (req: NextRequest, context: AuthenticatedContext) => {
+  async (req, context) => {
     const { apiClient } = context;
     const { title } = await req.json();
 
@@ -26,7 +26,7 @@ export const POST = withAuth(
 );
 
 export const GET = withAuth(
-  async (req: NextRequest, context: AuthenticatedContext) => {
+  async (req, context) => {
     const { apiClient } = context;
 
     // Get all conversations for the authenticated user

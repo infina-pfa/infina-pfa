@@ -43,14 +43,10 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
       return;
     }
 
-    const result = await resetPassword(password, confirmPassword);
+    await resetPassword(password, confirmPassword);
 
-    if (result.error) {
-      setFormError(result.error);
-    } else {
-      // Redirect to sign in page after successful reset
-      router.push("/auth/sign-in");
-    }
+    // Redirect to sign in page after successful reset
+    router.push("/auth/sign-in");
   };
 
   return (

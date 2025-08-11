@@ -33,10 +33,7 @@ export const authService = {
   /**
    * Sign in with email and password
    */
-  async signIn(
-    credentials: SignInRequest,
-    t?: TranslationFunction
-  ): Promise<AuthResponse> {
+  async signIn(credentials: SignInRequest): Promise<AuthResponse> {
     try {
       const { data, error } = await supabase.auth.signInWithPassword(
         credentials
@@ -46,13 +43,10 @@ export const authService = {
 
       return {
         user: data.user as AuthUser,
-        error: null,
       };
-    } catch (error) {
-      const appError = handleError(error, t);
+    } catch {
       return {
         user: null,
-        error: appError.message,
       };
     }
   },
@@ -60,10 +54,7 @@ export const authService = {
   /**
    * Sign up with email and password
    */
-  async signUp(
-    credentials: SignUpRequest,
-    t?: TranslationFunction
-  ): Promise<AuthResponse> {
+  async signUp(credentials: SignUpRequest): Promise<AuthResponse> {
     try {
       const { data, error } = await supabase.auth.signUp({
         ...credentials,
@@ -76,13 +67,10 @@ export const authService = {
 
       return {
         user: data.user as AuthUser,
-        error: null,
       };
-    } catch (error) {
-      const appError = handleError(error, t);
+    } catch {
       return {
         user: null,
-        error: appError.message,
       };
     }
   },

@@ -27,13 +27,9 @@ export function EmailVerification({
 
     setIsResending(true);
     try {
-      const result = await resendEmailVerification(email);
+      await resendEmailVerification(email);
 
-      if (result.error) {
-        error(t("signUpFailed"), result.error);
-      } else {
-        success(t("verificationEmailResent"), t("checkYourEmail"));
-      }
+      success(t("verificationEmailResent"), t("checkYourEmail"));
     } catch {
       error(t("signUpFailed"), t("unexpectedError"));
     } finally {
