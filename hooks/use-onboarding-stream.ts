@@ -148,13 +148,13 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 parsed.data.status_type === "text_completed"
               ) {
                 // Finalize text content
-                if (currentAIMessageId && parsed.content) {
+                if (currentAIMessageId && parsed.data.message) {
                   setMessages((prev) =>
                     prev.map((msg) =>
                       msg.id === currentAIMessageId
                         ? {
                             ...msg,
-                            content: parsed.content || "",
+                            content: parsed.data.message || "",
                             isStreaming: false,
                           }
                         : msg
@@ -163,7 +163,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                   aiMessages.push({
                     id: currentAIMessageId,
                     type: "ai",
-                    content: parsed.content || "",
+                    content: parsed.data.message || "",
                     createdAt: new Date().toISOString(),
                   });
                   fullContent = "";
