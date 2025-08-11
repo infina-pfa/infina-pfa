@@ -17,9 +17,6 @@ export { useIncomeStatsSWR } from "./use-income-stats";
 export { useExpenseCreateSWR } from "./use-expense-create";
 export { useExpenseUpdateSWR } from "./use-expense-update";
 
-// Financial overview hooks
-export { useFinancialOverviewSWR } from "./use-financial-overview";
-
 // Transaction hooks
 export { useRecentTransactionsSWR } from "./use-recent-transactions";
 
@@ -29,7 +26,6 @@ export { useGoalCreateSWR } from "./use-goal-create";
 export { useGoalUpdateSWR } from "./use-goal-update";
 export { useGoalDeleteSWR } from "./use-goal-delete";
 export { useGoalManagementSWR } from "./use-goal-management";
-export { useGoalDashboardSWR } from "./use-goal-dashboard";
 export { usePayYourselfFirstSWR } from "./use-pay-yourself-first";
 export { useGoalTransactionIncomeCreateSWR } from "./use-goal-transaction-income-create";
 export { useGoalTransactionWithdrawalCreateSWR } from "./use-goal-transaction-withdrawal-create";

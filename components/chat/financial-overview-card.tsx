@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { useFinancialOverviewSWR } from "@/hooks/swr-v2/use-financial-overview";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProgressBar } from "@/components/budgeting/progress-bar";
@@ -28,7 +27,7 @@ export const FinancialOverviewCard = ({
     [month, year]
   );
 
-  const { overview, loading, error } = useFinancialOverviewSWR(filter);
+  return null;
 
   if (error) {
     return (

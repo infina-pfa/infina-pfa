@@ -5,7 +5,6 @@ import { ChatMessage, ChatSuggestion } from "@/lib/types/chat.types";
 import { FinancialOverviewCard } from "./financial-overview-card";
 import { VideoMessage } from "./video-message";
 import { SuggestionList } from "./suggestion-list";
-import { GoalDashboardMessage } from "./goal-dashboard-message";
 import { BudgetingDashboardMessage } from "./budgeting-dashboard-message";
 import { MonthlyBudgetAnalysisMessage } from "./monthly-budget-analysis-message";
 import { BudgetDetailMessage } from "./budget-detail-message";
@@ -64,9 +63,9 @@ export function ComponentMessage({
     );
   }
 
-  if (componentId === ChatComponentId.GOAL_DASHBOARD) {
-    return <GoalDashboardMessage onSendMessage={onSendMessage} />;
-  }
+  // if (componentId === ChatComponentId.GOAL_DASHBOARD) {
+  //   return <GoalDashboardMessage onSendMessage={onSendMessage} />;
+  // }
 
   if (componentId === ChatComponentId.BUDGETING_DASHBOARD) {
     return <BudgetingDashboardMessage onSendMessage={onSendMessage} />;

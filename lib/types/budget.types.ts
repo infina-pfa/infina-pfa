@@ -1,89 +1,85 @@
-import { Database } from "@/lib/supabase/database";
+export enum BudgetCategory {
+  FIXED = "fixed",
+  FLEXIBLE = "flexible",
+}
 
-// Database types
-export type Budget = Database["public"]["Tables"]["budgets"]["Row"];
-export type BudgetInsert = Database["public"]["Tables"]["budgets"]["Insert"];
-export type BudgetUpdate = Database["public"]["Tables"]["budgets"]["Update"];
+export enum TransactionType {
+  INCOME = "income",
+  BUDGET_SPENDING = "budget_spending",
+  GOAL_CONTRIBUTION = "goal_contribution",
+  GOAL_WITHDRAWAL = "goal_withdrawal",
+}
 
-// Extended types for budget with spending data
-export type BudgetWithSpending = Budget & {
-  spent: number;
-  remaining: number;
-};
+export enum BudgetErrorCode {
+  BUDGET_NOT_FOUND = "BUDGET_NOT_FOUND",
+  BUDGET_INVALID_AMOUNT = "BUDGET_INVALID_AMOUNT",
+  SPENDING_NOT_FOUND = "SPENDING_NOT_FOUND",
+  INCOME_NOT_FOUND = "INCOME_NOT_FOUND",
+}
 
-// API Request/Response types
 export interface CreateBudgetRequest {
+  name: string;
+  amount: number;
+  category: BudgetCategory;
+  color: string;
+  icon: string;
   month: number;
   year: number;
-  name: string;
-  color?: string;
-  icon?: string;
-  category?: string;
-  amount?: number;
 }
 
 export interface UpdateBudgetRequest {
   name?: string;
+  amount?: number;
+  category?: BudgetCategory;
   color?: string;
   icon?: string;
-  category?: string;
-  month?: number;
-  year?: number;
-  amount?: number;
+}
+
+export interface SpendRequest {
+  amount: number;
+  name?: string;
+  description?: string;
+  recurring?: number;
 }
 
 export interface BudgetResponse {
-  budget: Budget | null;
-  error: string | null;
+  id: string;
+  name: string;
+  amount: number;
+  userId: string;
+  category: BudgetCategory;
+  color: string;
+  icon: string;
+  month: number;
+  year: number;
+  spent: number;
+  createdAt: string;
+  updatedAt: string;
+  transactions?: TransactionResponse[];
 }
 
-export interface BudgetListResponse {
-  budgets: Budget[];
-  error: string | null;
+export interface TransactionResponse {
+  id: string;
+  name: string;
+  description: string;
+  amount: number;
+  type: TransactionType;
+  recurring: number;
+  createdAt: string;
+  updatedAt: string;
+  budget: Omit<BudgetResponse, "spent" | "transactions">;
 }
 
-export interface BudgetFilters {
-  month?: number;
-  year?: number;
-  category?: string;
+export interface BudgetDetailResponse extends BudgetResponse {
+  transactions: TransactionResponse[];
 }
 
-export interface BudgetStats {
-  totalBudgets: number;
-  categoriesCount: number;
-  monthlyBudgets: number;
-  yearlyBudgets: number;
+export interface GetBudgetsQuery {
+  month: number;
+  year: number;
 }
 
-// Hook return types
-export interface UseBudgetListReturn {
-  budgets: Budget[];
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
+export interface MonthlySpendingQuery {
+  month: number;
+  year: number;
 }
-
-export interface UseBudgetCreateReturn {
-  createBudget: (data: CreateBudgetRequest) => Promise<Budget | null>;
-  isCreating: boolean;
-  error: string | null;
-}
-
-export interface UseBudgetUpdateReturn {
-  updateBudget: (id: string, data: UpdateBudgetRequest) => Promise<Budget | null>;
-  isUpdating: boolean;
-  error: string | null;
-}
-
-export interface UseBudgetDeleteReturn {
-  deleteBudget: (id: string) => Promise<boolean>;
-  isDeleting: boolean;
-  error: string | null;
-}
-
-export interface UseBudgetDetailReturn {
-  budget: Budget | null;
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
-} 
