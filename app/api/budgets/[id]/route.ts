@@ -19,7 +19,7 @@ export const GET = withAuth<{ id: string }>(async (_req, context) => {
   const response = await apiClient.get<BudgetDetailResponse>(
     `/budgets/${params.id}`
   );
-
+  
   return NextResponse.json(response.data);
 });
 
@@ -39,7 +39,7 @@ export const PATCH = withAuth<{ id: string }>(async (req, context) => {
     `/budgets/${params.id}`,
     body
   );
-
+  
   return NextResponse.json(response.data);
 });
 
@@ -54,6 +54,6 @@ export const DELETE = withAuth<{ id: string }>(async (_req, context) => {
   }
 
   await apiClient.delete(`/budgets/${params.id}`);
-
+  
   return NextResponse.json({ message: "Budget deleted successfully" });
 });

@@ -59,38 +59,21 @@ export function useCreateBudget(month: number, year: number) {
 
   const { trigger, isMutating, error } = useSWRMutation(
     ["budgets", "create"],
-    async (_, { arg }: { arg: CreateBudgetRequest }) => {
-      // Optimistic update - add temporary budget to list
-      const tempBudget: BudgetResponse = {
-        id: `temp-${Date.now()}`,
-        ...arg,
-        userId: "temp",
-        spent: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
+    async (_, { arg }: { arg: CreateBudgetRequest }): Promise<BudgetResponse> => {
+      // Create the budget on server first
+      const newBudget = await budgetService.createBudget(arg);
+      
+      // Then update the cache with the real data
       await globalMutate(
         async (currentBudgets: BudgetResponse[] | undefined) => {
-          try {
-            // Create the budget on server
-            const newBudget = await budgetService.createBudget(arg);
-            // Replace temp budget with real one
-            return (currentBudgets || []).concat(newBudget);
-          } catch (error) {
-            // On error, revert to original
-            throw error;
-          }
+          return (currentBudgets || []).concat(newBudget);
         },
         {
-          optimisticData: (current: BudgetResponse[] | undefined) => [...(current || []), tempBudget],
-          rollbackOnError: true,
-          populateCache: true,
           revalidate: false,
         }
       );
 
-      return true;
+      return newBudget;
     }
   );
 
@@ -110,24 +93,18 @@ export function useUpdateBudget(budgetId: string, month: number, year: number) {
 
   const { trigger, isMutating, error } = useSWRMutation(
     ["budget", "update", budgetId],
-    async (_, { arg }: { arg: UpdateBudgetRequest }) => {
-      // Optimistic update for list
+    async (_, { arg }: { arg: UpdateBudgetRequest }): Promise<BudgetResponse> => {
+      // Update the budget on server first
+      const updatedBudget = await budgetService.updateBudget(budgetId, arg);
+      
+      // Then update the cache with the real data
       await listMutate(
         async (currentBudgets: BudgetResponse[] | undefined) => {
-          try {
-            const updatedBudget = await budgetService.updateBudget(budgetId, arg);
-            return (currentBudgets || []).map((b: BudgetResponse) =>
-              b.id === budgetId ? updatedBudget : b
-            );
-          } catch (error) {
-            throw error;
-          }
+          return (currentBudgets || []).map((b: BudgetResponse) =>
+            b.id === budgetId ? updatedBudget : b
+          );
         },
         {
-          optimisticData: (current: BudgetResponse[] | undefined) =>
-            (current || []).map((b: BudgetResponse) => (b.id === budgetId ? { ...b, ...arg } : b)),
-          rollbackOnError: true,
-          populateCache: true,
           revalidate: false,
         }
       );
@@ -137,7 +114,7 @@ export function useUpdateBudget(budgetId: string, month: number, year: number) {
         await detailMutate();
       }
 
-      return true;
+      return updatedBudget;
     }
   );
 

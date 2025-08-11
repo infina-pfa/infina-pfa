@@ -21,22 +21,11 @@ class ApiClient {
     const result = await response.json();
 
     if (!response.ok) {
-      // Create specific error messages based on status code
-      const errorMessage = result.error || "Request failed";
-
-      if (response.status === 401) {
-        throw new Error("UNAUTHORIZED");
-      } else if (response.status === 400) {
-        throw new Error(`VALIDATION_ERROR: ${errorMessage}`);
-      } else if (response.status === 404) {
-        throw new Error("NOT_FOUND");
-      } else if (response.status === 409) {
-        throw new Error("DUPLICATE_RESOURCE");
-      } else if (response.status >= 500) {
-        throw new Error(`SERVER_ERROR: ${errorMessage}`);
-      } else {
-        throw new Error(errorMessage);
-      }
+      // Pass through backend error with code and status
+      const error = new Error(result.error || "Request failed") as Error & { code?: string; statusCode?: number };
+      error.code = result.code;
+      error.statusCode = response.status;
+      throw error;
     }
 
     return result;

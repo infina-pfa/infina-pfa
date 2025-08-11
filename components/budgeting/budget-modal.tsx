@@ -45,7 +45,6 @@ export const BudgetModal = ({
     validationErrors,
     touched,
     isLoading,
-    error,
     handleSubmit,
     handleInputChange,
     handleFieldBlur,
@@ -142,15 +141,6 @@ export const BudgetModal = ({
               validationErrors={validationErrors}
               touched={touched}
             />
-
-            {/* Error Display */}
-            {error && (
-              <div className="bg-[#FEF2F2] rounded-lg p-3 md:p-4">
-                <p className="text-[#F44336] text-[12px] md:text-[14px] font-nunito">
-                  {error}
-                </p>
-              </div>
-            )}
 
             {/* Form Actions */}
             <div className="flex flex-col sm:flex-row-reverse gap-3 pt-3 md:pt-4">

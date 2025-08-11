@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { User } from "@supabase/supabase-js";
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosError } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 import { INFINA_FINANCIAL_SERVICE_URL } from "../config";
 
@@ -12,7 +12,6 @@ export interface AuthenticatedContext<T extends Record<string, unknown> = {}> {
   params?: T;
 }
 
-
 export type AuthenticatedHandler<T extends Record<string, unknown>> = (
   request: NextRequest,
   context: AuthenticatedContext<T>
@@ -21,13 +20,13 @@ export type AuthenticatedHandler<T extends Record<string, unknown>> = (
 /**
  * Wrapper for authenticated API routes
  * Automatically handles authentication and provides user context
- * 
+ *
  * For dynamic routes: withAuth<{ id: string }>((req, ctx) => {...})
  * For static routes: withAuth((req, ctx) => {...})
  */
-export function withAuth<T extends Record<string, unknown> = Record<string, never>>(
-  handler: AuthenticatedHandler<T>
-) {
+export function withAuth<
+  T extends Record<string, unknown> = Record<string, never>
+>(handler: AuthenticatedHandler<T>) {
   // Return a function that matches Next.js expectations
   return async function (
     request: NextRequest,
@@ -35,7 +34,7 @@ export function withAuth<T extends Record<string, unknown> = Record<string, neve
     context?: any // Next.js 15 has varying signatures for route handlers
   ): Promise<NextResponse> {
     let params: T | undefined;
-    
+
     // For dynamic routes, context is required and has params
     if (context?.params) {
       params = await context.params;
@@ -83,8 +82,65 @@ export function withAuth<T extends Record<string, unknown> = Record<string, neve
         params,
       };
 
-      return await handler(request, context);
+      // Execute the handler and catch any errors
+      try {
+        return await handler(request, context);
+      } catch (handlerError) {
+        // If the handler throws a NextResponse, return it as-is
+        if (handlerError instanceof NextResponse) {
+          return handlerError;
+        }
+
+        // Handle AxiosError from backend API calls
+        if (handlerError instanceof AxiosError) {
+          const axiosError = handlerError as AxiosError<{
+            statusCode?: number;
+            message?: string;
+            error?: string;
+            code?: string;
+            timestamp?: string;
+            path?: string;
+          }>;
+
+          // If we have a response from the backend, pass through its error details
+          if (axiosError.response?.data) {
+            const errorData = axiosError.response.data;
+            const status = axiosError.response.status;
+
+            return NextResponse.json(
+              {
+                error: errorData.message || "Request failed",
+                code: errorData.code,
+                statusCode: errorData.statusCode || status,
+              },
+              { status }
+            );
+          }
+
+          // If no response (network error, timeout, etc.)
+          if (axiosError.request) {
+            return NextResponse.json(
+              { error: "Unable to connect to server" },
+              { status: 503 }
+            );
+          }
+
+          // Other axios errors
+          return NextResponse.json(
+            { error: axiosError.message || "Request failed" },
+            { status: 500 }
+          );
+        }
+
+        // For any other unexpected errors
+        console.error("Unexpected error in API route:", handlerError);
+        return NextResponse.json(
+          { error: "Internal server error" },
+          { status: 500 }
+        );
+      }
     } catch (error) {
+      // This catches auth errors from the wrapper itself
       if (error instanceof NextResponse) {
         return error;
       }

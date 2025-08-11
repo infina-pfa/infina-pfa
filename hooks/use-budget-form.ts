@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useBudgetCreateSWR } from "@/hooks/swr-v2/use-budget-create";
-import { useBudgetUpdateSWR } from "@/hooks/swr-v2/use-budget-update";
+import { useCreateBudget, useUpdateBudget } from "@/hooks/swr/budget";
 import {
   CreateBudgetRequest,
   UpdateBudgetRequest,
   Budget,
+  BudgetCategory,
 } from "@/lib/types/budget.types";
 import {
   inputValidationRules,
@@ -13,6 +13,7 @@ import {
 } from "@/lib/validation/input-validation";
 import { validateField } from "@/lib/validation/form-validation";
 import { BUDGET_COLORS } from "@/lib/utils/budget-constants";
+import { useToast } from "@/hooks/use-toast";
 
 type BudgetModalMode = "create" | "edit";
 
@@ -46,22 +47,24 @@ export const useBudgetForm = ({
   onBudgetUpdated,
 }: UseBudgetFormProps) => {
   const { t } = useTranslation();
+  const toast = useToast();
 
-  // ✨ Use SWR hooks with callbacks
+  // Get current month and year for the hooks
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+
+  // ✨ Use new SWR hooks
   const {
     createBudget,
     isCreating,
     error: createError,
-  } = useBudgetCreateSWR({
-    onSuccess: onBudgetCreated,
-  });
+  } = useCreateBudget(currentMonth, currentYear);
+
   const {
     updateBudget,
     isUpdating,
     error: updateError,
-  } = useBudgetUpdateSWR({
-    onSuccess: onBudgetUpdated,
-  });
+  } = useUpdateBudget(budget?.id || "", currentMonth, currentYear);
 
   // Determine which hooks to use based on mode
   const isLoading = mode === "create" ? isCreating : isUpdating;
@@ -159,26 +162,71 @@ export const useBudgetForm = ({
       return;
     }
 
-    let result = null;
-
-    if (mode === "create") {
-      const createData: CreateBudgetRequest = formData;
-      result = await createBudget(createData);
-    } else if (mode === "edit" && budget) {
-      const updateData: UpdateBudgetRequest = formData;
-      const oldAmount = budget.amount; // Store old amount for callback
-      result = await updateBudget(budget.id, updateData, oldAmount);
-    }
-
-    if (result) {
-      onSuccess();
-      onClose();
-
-      // Reset form only for create mode
+    try {
       if (mode === "create") {
-        setFormData(getDefaultFormData());
-        setValidationErrors({});
-        setTouched({});
+        const createData: CreateBudgetRequest = {
+          name: formData.name,
+          amount: formData.amount,
+          category:
+            formData.category === "fixed"
+              ? BudgetCategory.FIXED
+              : BudgetCategory.FLEXIBLE,
+          color: formData.color,
+          icon: formData.icon,
+          month: formData.month,
+          year: formData.year,
+        };
+
+        const result = await createBudget(createData);
+        if (result) {
+          // Call the callback if provided
+          if (onBudgetCreated) {
+            await onBudgetCreated(result);
+          }
+          toast.success(t("budgetCreated", { ns: "budgeting" }));
+          onSuccess();
+          onClose();
+
+          // Reset form for create mode
+          setFormData(getDefaultFormData());
+          setValidationErrors({});
+          setTouched({});
+        }
+      } else if (mode === "edit" && budget) {
+        const updateData: UpdateBudgetRequest = {
+          name: formData.name,
+          amount: formData.amount,
+          category:
+            formData.category === "fixed"
+              ? BudgetCategory.FIXED
+              : BudgetCategory.FLEXIBLE,
+          color: formData.color,
+          icon: formData.icon,
+        };
+
+        const oldAmount = budget.amount;
+        const result = await updateBudget(updateData);
+
+        if (result) {
+          // Call the callback if provided
+          if (onBudgetUpdated) {
+            await onBudgetUpdated(result, oldAmount);
+          }
+          toast.success(t("budgetUpdated", { ns: "budgeting" }));
+          onSuccess();
+          onClose();
+        }
+      }
+    } catch (err) {
+      // Show error toast using error code as translation key
+      const error = err as { code?: string; message?: string };
+      if (error?.code) {
+        toast.error(t(error.code, { 
+          ns: "errors", 
+          defaultValue: error.message || t("UNKNOWN_ERROR", { ns: "errors" })
+        }));
+      } else {
+        toast.error(t("UNKNOWN_ERROR", { ns: "errors" }));
       }
     }
   };

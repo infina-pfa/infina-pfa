@@ -17,7 +17,7 @@ export const GET = withAuth(async (req, context) => {
   const response = await apiClient.get<BudgetResponse[]>("/budgets", {
     params,
   });
-
+  
   return NextResponse.json(response.data);
 });
 
@@ -27,6 +27,6 @@ export const POST = withAuth(async (req, context) => {
   const body: CreateBudgetRequest = await req.json();
 
   const response = await apiClient.post<BudgetResponse>("/budgets", body);
-
+  
   return NextResponse.json(response.data, { status: 201 });
 });

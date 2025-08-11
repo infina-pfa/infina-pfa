@@ -83,3 +83,7 @@ export interface MonthlySpendingQuery {
   month: number;
   year: number;
 }
+
+// Alias types for backward compatibility with existing components
+export type Budget = BudgetResponse;
+export type BudgetWithSpending = BudgetResponse;
