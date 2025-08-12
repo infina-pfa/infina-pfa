@@ -32,6 +32,10 @@ export function MessageBubble({
   const isSystem = message.type === "system";
   const hasComponent = !!message.component;
 
+  if (!isUser && !isSystem && !hasComponent && !message.content) {
+    return null;
+  }
+
   if (isSystem) {
     return (
       <div className="flex justify-center mb-6">

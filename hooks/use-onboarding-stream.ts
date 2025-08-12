@@ -110,7 +110,6 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 parsed.type === "status" &&
                 parsed.data.status_type === "started"
               ) {
-                setIsThinking(false);
                 if (!currentAIMessageId) {
                   currentAIMessageId = `ai-${Date.now()}`;
                   setMessages((prev) => [
@@ -124,6 +123,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                   ]);
                 }
               } else if (parsed.type === "text") {
+                setIsThinking(false);
                 fullContent += parsed.content;
                 if (!currentAIMessageId) {
                   currentAIMessageId = `ai-${Date.now()}`;
@@ -181,7 +181,6 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 parsed.type === "function_result" &&
                 parsed.data.result.component_id
               ) {
-                console.log("🚀 ~ useOnboarding ~ parsed:", parsed);
                 setIsPreparingTool(false);
                 const functionCallMessage: OnboardingMessage = {
                   id: `ai-${Date.now()}-${parsed.data.result.component_id}`,
