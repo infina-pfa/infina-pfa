@@ -137,7 +137,7 @@ export type OnboardingComponentType =
   | "goal_confirmation"
   | "education_content"
   | "suggestions"
-  | "infina_app_qr"
+  | "infina_qr"
   | "finish_onboarding"
   // Budget allocation enhancement components
   | "budget_category_education"

@@ -157,7 +157,7 @@ export function OnboardingComponentRenderer({
         />
       );
 
-    case "infina_app_qr":
+    case "infina_qr":
       return <InfinAppQR />;
 
     case "finish_onboarding":
