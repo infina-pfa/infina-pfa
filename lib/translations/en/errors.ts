@@ -47,6 +47,14 @@ export const errorsEn = {
   INVALID_MONTH: "Invalid month",
   INVALID_YEAR: "Invalid year",
   
+  // Goal Error Codes
+  INVALID_GOAL: "Invalid goal data",
+  GOAL_NOT_FOUND: "Goal not found",
+  GOAL_INVALID_TARGET_AMOUNT: "Invalid target amount",
+  GOAL_INVALID_DUE_DATE: "Invalid due date",
+  GOAL_TITLE_ALREADY_EXISTS: "A goal with this title already exists",
+  GOAL_INSUFFICIENT_BALANCE: "Insufficient balance to withdraw",
+  
   // Default fallback
   UNKNOWN_ERROR: "An unexpected error occurred",
 };

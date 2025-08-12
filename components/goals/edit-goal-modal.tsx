@@ -1,14 +1,14 @@
 "use client";
 
 import { GoalModal } from "./goal-modal";
-import { Goal } from "@/lib/types/goal.types";
+import { GoalResponseDto } from "@/lib/types/goal.types";
 
 interface EditGoalModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  goal: Goal | null;
-  onGoalUpdated?: (goal: Goal) => Promise<void>;
+  goal: GoalResponseDto | null;
+  onGoalUpdated?: (goal: GoalResponseDto) => Promise<void>;
 }
 
 export function EditGoalModal({

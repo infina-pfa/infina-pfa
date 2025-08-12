@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useGoalDeposit } from "@/hooks/swr-v2";
+import { useContributeToGoal } from "@/hooks/swr/goal";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useToast } from "@/hooks/use-toast";
-import { Goal } from "@/lib/types/goal.types";
+import { GoalResponseDto } from "@/lib/types/goal.types";
 import { formatCurrency } from "@/lib/utils";
 import {
   Dialog,
@@ -20,7 +20,7 @@ interface DepositGoalModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  goal: Goal | null;
+  goal: GoalResponseDto | null;
 }
 
 export function DepositGoalModal({
@@ -31,7 +31,7 @@ export function DepositGoalModal({
 }: DepositGoalModalProps) {
   const { t } = useAppTranslation(["goals", "common"]);
   const { success, error: showError } = useToast();
-  const { deposit, isLoading } = useGoalDeposit();
+  const { contributeToGoal, isContributing } = useContributeToGoal(goal?.id || "");
 
   // Form state
   const [amount, setAmount] = useState("");
@@ -74,10 +74,8 @@ export function DepositGoalModal({
     if (!validateForm()) return;
 
     try {
-      const result = await deposit(goal.id, {
-        name: `${goal.title}`,
+      const result = await contributeToGoal({
         amount: parseFloat(amount),
-        description: "",
       });
 
       if (result) {
@@ -128,12 +126,12 @@ export function DepositGoalModal({
               type="button"
               variant="outline"
               onClick={handleClose}
-              disabled={isLoading}
+              disabled={isContributing}
             >
               {t("cancel", { ns: "common" })}
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? t("depositing", { ns: "common" }) : t("deposit")}
+            <Button type="submit" disabled={isContributing}>
+              {isContributing ? t("depositing", { ns: "common" }) : t("deposit")}
             </Button>
           </DialogFooter>
         </form>

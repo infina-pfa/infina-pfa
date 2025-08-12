@@ -47,6 +47,14 @@ export const errorsVi = {
   INVALID_MONTH: "Tháng không hợp lệ",
   INVALID_YEAR: "Năm không hợp lệ",
   
+  // Goal Error Codes
+  INVALID_GOAL: "Dữ liệu mục tiêu không hợp lệ",
+  GOAL_NOT_FOUND: "Không tìm thấy mục tiêu",
+  GOAL_INVALID_TARGET_AMOUNT: "Số tiền mục tiêu không hợp lệ",
+  GOAL_INVALID_DUE_DATE: "Ngày đến hạn không hợp lệ",
+  GOAL_TITLE_ALREADY_EXISTS: "Mục tiêu với tên này đã tồn tại",
+  GOAL_INSUFFICIENT_BALANCE: "Số dư không đủ để rút tiền",
+  
   // Default fallback
   UNKNOWN_ERROR: "Đã xảy ra lỗi không mong muốn",
 };

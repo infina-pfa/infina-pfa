@@ -4,14 +4,15 @@ import { GoalCard } from "./goal-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { Goal } from "@/lib/types/goal.types";
+import { GoalResponseDto } from "@/lib/types/goal.types";
 
 interface GoalListProps {
-  goals: Goal[];
+  goals: GoalResponseDto[];
   onCreateGoal: () => void;
   onEditGoal: (goalId: string) => void;
   onDepositGoal: (goalId: string) => void;
   onWithdrawGoal: (goalId: string) => void;
+  onDeleteGoal?: (goalId: string) => void;
   loading?: boolean;
 }
 
@@ -21,6 +22,7 @@ export function GoalList({
   onEditGoal,
   onDepositGoal,
   onWithdrawGoal,
+  onDeleteGoal,
   loading = false,
 }: GoalListProps) {
   const { t } = useAppTranslation(["goals"]);
@@ -62,6 +64,7 @@ export function GoalList({
               onEdit={() => onEditGoal(goal.id)}
               onDeposit={onDepositGoal}
               onWithdraw={onWithdrawGoal}
+              onDelete={onDeleteGoal ? () => onDeleteGoal(goal.id) : undefined}
             />
           ))}
         </div>

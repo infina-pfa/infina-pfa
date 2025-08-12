@@ -1,9 +1,9 @@
-import { useGoalCreateSWR, useGoalUpdateSWR } from "@/hooks/swr-v2";
+import { useCreateGoal, useUpdateGoal } from "@/hooks/swr/goal";
 import { useToast } from "@/hooks/use-toast";
 import { useAppTranslation } from "@/hooks/use-translation";
 import {
   CreateGoalRequest,
-  Goal,
+  GoalResponseDto,
   UpdateGoalRequest,
 } from "@/lib/types/goal.types";
 import { textValidator } from "@/lib/validation/financial-validators";
@@ -12,35 +12,35 @@ import { useCallback, useEffect, useState } from "react";
 interface GoalFormData {
   title: string;
   description: string | null;
-  current_amount: number;
-  target_amount: number | null;
-  due_date: string | null;
+  currentAmount: number;
+  targetAmount: number | null;
+  dueDate: string | null;
 }
 
 interface GoalFormValidationErrors {
   title?: string;
   description?: string;
-  current_amount?: string;
-  target_amount?: string;
-  due_date?: string;
+  currentAmount?: string;
+  targetAmount?: string;
+  dueDate?: string;
 }
 
 interface GoalFormTouched {
   title: boolean;
   description: boolean;
-  current_amount: boolean;
-  target_amount: boolean;
-  due_date: boolean;
+  currentAmount: boolean;
+  targetAmount: boolean;
+  dueDate: boolean;
 }
 
 interface UseGoalFormProps {
   mode: "create" | "edit";
   isOpen: boolean;
-  goal?: Goal | null;
+  goal?: GoalResponseDto | null;
   onSuccess: () => void;
   onClose: () => void;
-  onGoalCreated?: (goal: Goal) => Promise<void>;
-  onGoalUpdated?: (goal: Goal) => Promise<void>;
+  onGoalCreated?: (goal: GoalResponseDto) => Promise<void>;
+  onGoalUpdated?: (goal: GoalResponseDto) => Promise<void>;
 }
 
 interface UseGoalFormReturn {
@@ -72,8 +72,8 @@ export const useGoalForm = ({
   const toast = useToast();
 
   // SWR hooks
-  const { createGoal, isCreating, error: createError } = useGoalCreateSWR({});
-  const { updateGoal, isUpdating, error: updateError } = useGoalUpdateSWR({});
+  const { createGoal, isCreating, error: createError } = useCreateGoal();
+  const { updateGoal, isUpdating, error: updateError } = useUpdateGoal(goal?.id || "");
 
   const isLoading = isCreating || isUpdating;
   const error = createError || updateError;
@@ -83,19 +83,19 @@ export const useGoalForm = ({
     if (mode === "edit" && goal) {
       return {
         title: goal.title,
-        description: goal.description,
-        current_amount: goal.current_amount || 0,
-        target_amount: goal.target_amount || 0,
-        due_date: goal.due_date,
+        description: goal.description || null,
+        currentAmount: goal.currentAmount || 0,
+        targetAmount: goal.targetAmount || 0,
+        dueDate: goal.dueDate || null,
       };
     }
 
     return {
       title: "",
       description: null,
-      current_amount: 0,
-      target_amount: null,
-      due_date: null,
+      currentAmount: 0,
+      targetAmount: null,
+      dueDate: null,
     };
   };
 
@@ -106,9 +106,9 @@ export const useGoalForm = ({
   const [touched, setTouched] = useState<GoalFormTouched>({
     title: false,
     description: false,
-    current_amount: false,
-    target_amount: false,
-    due_date: false,
+    currentAmount: false,
+    targetAmount: false,
+    dueDate: false,
   });
 
   // Reset form when modal opens/closes or goal changes
@@ -119,9 +119,9 @@ export const useGoalForm = ({
       setTouched({
         title: false,
         description: false,
-        current_amount: false,
-        target_amount: false,
-        due_date: false,
+        currentAmount: false,
+        targetAmount: false,
+        dueDate: false,
       });
     }
   }, [isOpen, goal, mode]);
@@ -146,8 +146,8 @@ export const useGoalForm = ({
     }
 
     // Validate target amount if provided
-    if (formData.target_amount !== null && formData.target_amount <= 0) {
-      errors.target_amount = t("targetAmountPositive");
+    if (formData.targetAmount !== null && formData.targetAmount <= 0) {
+      errors.targetAmount = t("targetAmountPositive");
     }
 
     // Validate description length if provided
@@ -159,13 +159,13 @@ export const useGoalForm = ({
     }
 
     // Validate due date is in the future if provided
-    if (formData.due_date) {
-      const dueDate = new Date(formData.due_date);
+    if (formData.dueDate) {
+      const dueDate = new Date(formData.dueDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       if (dueDate < today) {
-        errors.due_date = t("dueDateInFuture");
+        errors.dueDate = t("dueDateInFuture");
       }
     }
 
@@ -199,9 +199,9 @@ export const useGoalForm = ({
     setTouched({
       title: true,
       description: true,
-      current_amount: true,
-      target_amount: true,
-      due_date: true,
+      currentAmount: true,
+      targetAmount: true,
+      dueDate: true,
     });
 
     // Validate form
@@ -214,9 +214,8 @@ export const useGoalForm = ({
         const createData: CreateGoalRequest = {
           title: formData.title,
           description: formData.description || undefined,
-          current_amount: formData.current_amount,
-          target_amount: formData.target_amount || undefined,
-          due_date: formData.due_date || undefined,
+          targetAmount: formData.targetAmount || undefined,
+          dueDate: formData.dueDate || undefined,
         };
 
         const newGoal = await createGoal(createData);
@@ -229,12 +228,11 @@ export const useGoalForm = ({
         const updateData: UpdateGoalRequest = {
           title: formData.title,
           description: formData.description || undefined,
-          current_amount: formData.current_amount,
-          target_amount: formData.target_amount || undefined,
-          due_date: formData.due_date || undefined,
+          targetAmount: formData.targetAmount || undefined,
+          dueDate: formData.dueDate || undefined,
         };
 
-        const updatedGoal = await updateGoal(goal.id, updateData);
+        const updatedGoal = await updateGoal(updateData);
         if (updatedGoal) {
           toast.success(t("goalUpdateSuccess"));
           await onGoalUpdated?.(updatedGoal);
