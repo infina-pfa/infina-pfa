@@ -5,6 +5,7 @@ import {
   ComponentResponse,
   UserProfile,
   FinancialStage,
+  OnboardingComponentType,
 } from "@/lib/types/onboarding.types";
 import { useTranslation } from "react-i18next";
 import { onboardingService } from "@/lib/services/onboarding.service";
@@ -147,14 +148,15 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 parsed.type === "status" &&
                 parsed.data.status_type === "text_completed"
               ) {
-                // Finalize text content
-                if (currentAIMessageId && parsed.data.message) {
+                const finalContent =
+                  parsed.content || parsed.data.message || "";
+                if (currentAIMessageId && finalContent) {
                   setMessages((prev) =>
                     prev.map((msg) =>
                       msg.id === currentAIMessageId
                         ? {
                             ...msg,
-                            content: parsed.data.message || "",
+                            content: finalContent,
                             isStreaming: false,
                           }
                         : msg
@@ -163,23 +165,24 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                   aiMessages.push({
                     id: currentAIMessageId,
                     type: "ai",
-                    content: parsed.data.message || "",
+                    content: finalContent,
                     createdAt: new Date().toISOString(),
                   });
                   fullContent = "";
                   currentAIMessageId = null;
                 }
-              } else if (parsed.type === "function_call") {
+              } else if (parsed.type === "function_result") {
                 const functionCallMessage: OnboardingMessage = {
                   id: `ai-${Date.now()}`,
                   type: "ai",
                   content: parsed.content || "",
                   createdAt: new Date().toISOString(),
                   component: {
-                    id: parsed.data.function_args.component_id,
-                    title: parsed.data.function_args.title,
-                    type: parsed.data.function_args.component_type,
-                    context: parsed.data.function_args.context,
+                    id: parsed.data.result.component_id,
+                    title: parsed.data.result.title,
+                    type: parsed.data.result
+                      .component_type as OnboardingComponentType,
+                    context: parsed.data.result.context,
                     isCompleted: false,
                   },
                 };

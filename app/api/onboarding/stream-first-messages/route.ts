@@ -1,4 +1,5 @@
 import { OnboardingMessage } from "@/lib/types/onboarding.types";
+import { FunctionResultEvent } from "@/lib/types/streaming.types";
 import { NextResponse } from "next/server";
 
 interface MessageWithMetadata extends OnboardingMessage {
@@ -106,11 +107,14 @@ export const GET = async () => {
 
           // Send component if exists
           if (message.metadata?.component) {
-            const functionCallEvent = {
-              type: "function_call",
+            const functionCallEvent: FunctionResultEvent = {
+              type: "function_result",
               content: message.content || "",
               data: {
-                function_args: {
+                function_name: "function call",
+                success: true,
+                result: {
+                  action: "show_component",
                   component_id: `component-${Date.now()}`,
                   title: message.metadata.component.title,
                   component_type: message.metadata.component.type,

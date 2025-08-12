@@ -71,6 +71,13 @@ export interface FunctionCallData {
 export interface FunctionResultData {
   function_name: string;
   success: boolean;
+  result: {
+    action: string;
+    component_id: string;
+    component_type: string;
+    context: Record<string, any>;
+    title: string;
+  };
 }
 
 export interface MCPCallData {
