@@ -171,7 +171,10 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                   fullContent = "";
                   currentAIMessageId = null;
                 }
-              } else if (parsed.type === "function_result") {
+              } else if (
+                parsed.type === "function_result" &&
+                parsed.data.result.component_id
+              ) {
                 const functionCallMessage: OnboardingMessage = {
                   id: `ai-${Date.now()}`,
                   type: "ai",
