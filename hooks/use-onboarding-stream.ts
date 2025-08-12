@@ -181,9 +181,10 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 parsed.type === "function_result" &&
                 parsed.data.result.component_id
               ) {
+                console.log("🚀 ~ useOnboarding ~ parsed:", parsed);
                 setIsPreparingTool(false);
                 const functionCallMessage: OnboardingMessage = {
-                  id: `ai-${Date.now()}`,
+                  id: `ai-${Date.now()}-${parsed.data.result.component_id}`,
                   type: "ai",
                   content: parsed.content || "",
                   createdAt: new Date().toISOString(),

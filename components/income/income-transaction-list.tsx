@@ -92,10 +92,10 @@ export function IncomeTransactionList({
               {/* Left side - Income details */}
               <div className="flex-1 mb-2 sm:mb-0">
                 <h3 className="text-[16px] font-medium text-[#111827] font-nunito mb-1 break-words">
-                  {t(income.description?.toLowerCase() || "", { ns: "income" })}
+                  {t(income.name?.toLowerCase() || "", { ns: "income" })}
                 </h3>
                 <p className="text-[12px] md:text-[14px] text-[#6B7280] font-nunito">
-                  {formatDate(income.created_at)}
+                  {formatDate(income.createdAt)}
                 </p>
               </div>
 

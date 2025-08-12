@@ -12,7 +12,7 @@ import {
 import { MoneyInput } from "@/components/ui/money-input";
 import { useIncomeForm } from "@/hooks/use-income-form";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { INCOME_CATEGORIES, Income } from "@/lib/types/income.types";
+import { Income } from "@/lib/types/income.types";
 
 interface IncomeModalProps {
   mode: "create" | "edit";
@@ -70,13 +70,6 @@ export function IncomeModal({
 
         <div className="overflow-y-auto max-h-[calc(90vh-140px)] sm:max-h-[60vh]">
           <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-6">
-            {/* Error Message */}
-            {error && (
-              <div className="bg-[#FEF2F2] border border-[#FECACA] rounded-lg p-3">
-                <p className="text-[#DC2626] text-[14px]">{error}</p>
-              </div>
-            )}
-
             {/* Amount */}
             <div>
               <MoneyInput
@@ -114,17 +107,11 @@ export function IncomeModal({
                   backgroundSize: "20px",
                 }}
               >
-                <option value={INCOME_CATEGORIES.SALARY}>{t("salary")}</option>
-                <option value={INCOME_CATEGORIES.FREELANCE}>
-                  {t("freelance")}
-                </option>
-                <option value={INCOME_CATEGORIES.BUSINESS}>
-                  {t("business")}
-                </option>
-                <option value={INCOME_CATEGORIES.INVESTMENT}>
-                  {t("investment")}
-                </option>
-                <option value={INCOME_CATEGORIES.OTHER}>{t("other")}</option>
+                <option value="Salary">{t("salary")}</option>
+                <option value="Freelance">{t("freelance")}</option>
+                <option value="Business">{t("business")}</option>
+                <option value="Investment">{t("investment")}</option>
+                <option value="Other">{t("other")}</option>
               </select>
             </div>
 
