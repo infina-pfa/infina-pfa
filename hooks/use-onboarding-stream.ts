@@ -26,7 +26,7 @@ interface UseOnboardingStreamReturn {
   isThinking: boolean;
   isStreaming: boolean;
   showSuggestions: boolean;
-
+  isPreparingTool: boolean;
   // Actions
   sendMessage: (content: string) => Promise<void>;
   clearError: () => void;
@@ -48,6 +48,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
   const [error, setError] = useState<string | null>(null);
   const [isThinking, setIsThinking] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isPreparingTool, setIsPreparingTool] = useState(false);
   const [showSuggestions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFetchingHistory, setIsFetchingHistory] = useState(true);
@@ -146,6 +147,11 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 }
               } else if (
                 parsed.type === "status" &&
+                parsed.data.status_type === "preparing_tool"
+              ) {
+                setIsPreparingTool(true);
+              } else if (
+                parsed.type === "status" &&
                 parsed.data.status_type === "text_completed"
               ) {
                 const finalContent =
@@ -175,6 +181,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 parsed.type === "function_result" &&
                 parsed.data.result.component_id
               ) {
+                setIsPreparingTool(false);
                 const functionCallMessage: OnboardingMessage = {
                   id: `ai-${Date.now()}`,
                   type: "ai",
@@ -561,7 +568,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
     isThinking,
     isStreaming,
     showSuggestions,
-
+    isPreparingTool,
     // Actions
     sendMessage,
     clearError,

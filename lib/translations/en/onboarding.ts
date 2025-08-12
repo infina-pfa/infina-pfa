@@ -106,6 +106,7 @@ export const onboardingEn = {
   saving: "Saving...",
   submitting: "Submitting...",
   processing: "Processing...",
+  preparingTool: "Preparing tool...",
 
   // Component responses
   responseRecorded: "Your response has been recorded",

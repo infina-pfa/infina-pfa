@@ -5,6 +5,7 @@ import { useAppTranslation } from "@/hooks/use-translation";
 import { ChatInput } from "@/components/onboarding-v2/chat-input";
 import { MessageList } from "@/components/onboarding-v2/message-list";
 import { TypingIndicator } from "@/components/onboarding-v2/typing-indicator";
+import { ToolPreparingIndicator } from "@/components/onboarding/chat/components/tool-preparing-indicator";
 
 export default function OnboardingV2Page() {
   const { t } = useAppTranslation(["onboarding", "common"]);
@@ -16,6 +17,7 @@ export default function OnboardingV2Page() {
     error,
     isThinking,
     isStreaming,
+    isPreparingTool,
     clearError,
     handleComponentResponse,
     handleSubmit,
@@ -81,6 +83,7 @@ export default function OnboardingV2Page() {
             onComponentResponse={handleComponentResponse}
           />
           {isThinking && <TypingIndicator />}
+          {isPreparingTool && <ToolPreparingIndicator />}
         </div>
 
         {/* Input Area - fixed at bottom */}
