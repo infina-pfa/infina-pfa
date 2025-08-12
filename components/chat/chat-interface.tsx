@@ -12,6 +12,7 @@ import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
+import { aiService } from "@/lib/services/ai.service";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
@@ -64,7 +65,7 @@ export function ChatInterface() {
     if (user && !sentFirstMessage.current) {
       const startConversation = async () => {
         setIsGettingFirstMessage(true);
-        sendMessage("Hello", {
+        sendMessage(await aiService.getStartMessage(), {
           sender: "system",
         });
         setIsGettingFirstMessage(false);

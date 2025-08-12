@@ -52,10 +52,10 @@ export function ComponentMessage({
           (
             component.action.payload as unknown as {
               context: {
-                suggestions: ChatSuggestion[];
+                options: ChatSuggestion[];
               };
             }
-          ).context.suggestions
+          ).context.options
         }
         onSuggestionClick={onSendMessage}
         isSubmitting={false}

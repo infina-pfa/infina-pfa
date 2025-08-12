@@ -89,7 +89,8 @@ export const useAIStreaming = (
         // Get stream from service
         const stream = await chatService.startAIAdvisorStream(
           request.conversationId,
-          request.message
+          request.message,
+          request.sender
         );
 
         // Process the stream

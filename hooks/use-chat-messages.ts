@@ -56,7 +56,6 @@ export const useChatMessages = (): UseChatMessagesReturn => {
       conversationId: string,
       options?: { sender?: MessageSender }
     ): Promise<ChatMessage | null> => {
-      console.log("🚀 ~ useChatMessages ~ content:", content);
       setIsSending(true);
       setError(null);
 

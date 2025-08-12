@@ -75,7 +75,7 @@ export interface SendMessageResponse {
 // Chat suggestions
 export interface ChatSuggestion {
   id: string;
-  text: string;
+  label: string;
   description?: string;
   icon?: string;
 }
@@ -84,25 +84,25 @@ export interface ChatSuggestion {
 export const DEFAULT_CHAT_SUGGESTIONS: ChatSuggestion[] = [
   {
     id: "create_budget",
-    text: "Giúp tôi tạo ngân sách",
+    label: "Giúp tôi tạo ngân sách",
     description: "Thiết lập kế hoạch ngân sách hàng tháng",
     icon: "calculator",
   },
   {
     id: "analyze_spending",
-    text: "Phân tích thói quen chi tiêu của tôi",
+    label: "Phân tích thói quen chi tiêu của tôi",
     description: "Xem xét các giao dịch gần đây",
     icon: "trending-down",
   },
   {
     id: "plan_goals",
-    text: "Lập kế hoạch mục tiêu tài chính",
+    label: "Lập kế hoạch mục tiêu tài chính",
     description: "Đặt và theo dõi các mục tiêu tài chính",
     icon: "target",
   },
   {
     id: "review_investments",
-    text: "Xem xét các khoản đầu tư",
+    label: "Xem xét các khoản đầu tư",
     description: "Phân tích danh mục và đưa ra khuyến nghị",
     icon: "trending-up",
   },
@@ -211,34 +211,7 @@ export interface UIAction {
 export interface AdvisorStreamRequest {
   conversationId: string;
   message: string;
-  conversationHistory: Array<{
-    id: string;
-    content: string;
-    sender: "user" | "ai";
-    timestamp: string;
-  }>;
-  userContext?: {
-    financial?: {
-      totalIncome?: number;
-      totalExpenses?: number;
-      totalCurrentMonthIncome?: number;
-      totalCurrentMonthExpenses?: number;
-      currentBudgets?: number;
-      budgetCategories?: string[];
-      budgets?: Array<{
-        name: string;
-        budgeted: number;
-        spent: number;
-      }>;
-      hasCompletedOnboarding?: boolean;
-    };
-    learning?: {
-      currentLevel?: number;
-      xp?: number;
-      currentGoal?: string;
-      progress?: string;
-    };
-  };
+  sender: MessageSender;
 }
 
 // Response Data Event Types (matching the backend)

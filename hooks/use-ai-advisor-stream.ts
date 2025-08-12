@@ -180,17 +180,17 @@ export const useAIAdvisorStreamProcessor = ({
       }
 
       // Handle function calls (components)
-      if (event.type === "function_call" && event.data) {
-        const functionArgs = event.data.function_args;
+      if (event.type === "function_result" && event.data) {
+        const functionArgs = event.data.result;
         if (functionArgs.component_id) {
           // Create UI action from function args
           const action: UIAction = {
             type:
-              event.data.function_name === "open_tool"
+              functionArgs.action === "open_tool"
                 ? UIActionType.OPEN_TOOL
                 : UIActionType.SHOW_COMPONENT,
             payload: {
-              componentId: functionArgs.component_id,
+              componentId: functionArgs.component_type,
               title: functionArgs.title,
               context: functionArgs.context,
             },

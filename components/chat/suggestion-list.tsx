@@ -25,7 +25,7 @@ export function SuggestionList({
         {suggestions.map((suggestion) => (
           <Button
             key={suggestion.id}
-            onClick={() => onSuggestionClick?.(suggestion.text)}
+            onClick={() => onSuggestionClick?.(suggestion.label)}
             disabled={isSubmitting}
             variant="secondary"
             size="default"
@@ -39,7 +39,7 @@ export function SuggestionList({
           >
             <div className="flex flex-col items-start">
               <span className="font-semibold text-gray-900">
-                {suggestion.text}
+                {suggestion.label}
               </span>
               {suggestion.description && (
                 <span className="text-xs text-gray-600 mt-1">

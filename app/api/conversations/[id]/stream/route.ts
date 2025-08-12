@@ -9,7 +9,7 @@ export const POST = withAuth(
   ): Promise<NextResponse> => {
     const { stream } = context;
     const { id } = context.params!;
-    const { content } = await request.json();
+    const { content, sender } = await request.json();
 
     const response = await stream(
       `${INFINA_FINANCIAL_SERVICE_URL}/ai-advisor/conversations/${id}/stream`,
@@ -20,6 +20,7 @@ export const POST = withAuth(
         },
         body: JSON.stringify({
           content,
+          sender,
         }),
       }
     );
