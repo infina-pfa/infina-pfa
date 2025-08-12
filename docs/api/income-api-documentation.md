@@ -23,11 +23,17 @@ headers: {
 }
 ```
 
+### Controller Information
+
+- **Controller Path**: `/incomes`
+- **API Tags**: `Incomes`
+- **Authentication**: Required for all endpoints (SupabaseAuthGuard)
+
 ## Income-Specific Error Codes
 
 ```typescript
 enum IncomeErrorCode {
-  INCOME_NOT_FOUND = 'INCOME_NOT_FOUND', // Income transaction doesn't exist
+  INCOME_NOT_FOUND = "INCOME_NOT_FOUND", // Income transaction doesn't exist
 }
 ```
 
@@ -41,7 +47,7 @@ interface TransactionResponseDto {
   name: string; // Income name (e.g., "Salary")
   description: string; // Transaction description
   amount: number; // Income amount
-  type: 'income'; // Transaction type (always 'income')
+  type: "income"; // Transaction type (always 'income')
   recurring: number; // 0 = one-time, >0 = frequency in days
   createdAt: string; // ISO 8601 timestamp
   updatedAt: string; // ISO 8601 timestamp
@@ -54,7 +60,7 @@ interface TransactionResponseDto {
 
 Retrieves all income transactions for a specific month and year.
 
-**Endpoint:** `GET /budgets/income?month={month}&year={year}`
+**Endpoint:** `GET /incomes?month={month}&year={year}`
 
 **Query Parameters:**
 
@@ -86,7 +92,7 @@ export async function getMonthlyIncome(month: number, year: number) {
     year: year.toString(),
   });
 
-  const response = await fetch(`${API_URL}/budgets/income?${params}`, {
+  const response = await fetch(`${API_URL}/incomes?${params}`, {
     headers: {
       Authorization: `Bearer ${session.access_token}`,
     },
@@ -100,7 +106,7 @@ export async function getMonthlyIncome(month: number, year: number) {
 
 Creates a new income transaction.
 
-**Endpoint:** `POST /budgets/income`
+**Endpoint:** `POST /incomes`
 
 **Request Body:**
 
@@ -128,11 +134,11 @@ Returns a `TransactionResponseDto` object.
 export async function addIncome(data: CreateIncomeRequest) {
   const session = await getSession();
 
-  const response = await fetch(`${API_URL}/budgets/income`, {
-    method: 'POST',
+  const response = await fetch(`${API_URL}/incomes`, {
+    method: "POST",
     headers: {
       Authorization: `Bearer ${session.access_token}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
@@ -145,7 +151,7 @@ export async function addIncome(data: CreateIncomeRequest) {
 
 Updates an existing income transaction.
 
-**Endpoint:** `PATCH /budgets/income/{id}`
+**Endpoint:** `PATCH /incomes/{id}`
 
 **Path Parameters:**
 
@@ -177,15 +183,15 @@ Returns updated `TransactionResponseDto`.
 // app/lib/api/income.ts
 export async function updateIncome(
   incomeId: string,
-  data: UpdateIncomeRequest,
+  data: UpdateIncomeRequest
 ) {
   const session = await getSession();
 
-  const response = await fetch(`${API_URL}/budgets/income/${incomeId}`, {
-    method: 'PATCH',
+  const response = await fetch(`${API_URL}/incomes/${incomeId}`, {
+    method: "PATCH",
     headers: {
       Authorization: `Bearer ${session.access_token}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
@@ -198,7 +204,7 @@ export async function updateIncome(
 
 Deletes an income transaction.
 
-**Endpoint:** `DELETE /budgets/income/{id}`
+**Endpoint:** `DELETE /incomes/{id}`
 
 **Path Parameters:**
 
@@ -221,8 +227,8 @@ No response body.
 export async function deleteIncome(incomeId: string) {
   const session = await getSession();
 
-  const response = await fetch(`${API_URL}/budgets/income/${incomeId}`, {
-    method: 'DELETE',
+  const response = await fetch(`${API_URL}/incomes/${incomeId}`, {
+    method: "DELETE",
     headers: {
       Authorization: `Bearer ${session.access_token}`,
     },
@@ -249,7 +255,7 @@ const RECURRING_PATTERNS = {
 
 // Example: Set monthly salary
 const monthlySalary = {
-  name: 'Monthly Salary',
+  name: "Monthly Salary",
   amount: 5000,
   recurring: RECURRING_PATTERNS.MONTHLY,
 };
@@ -260,15 +266,15 @@ const monthlySalary = {
 ```typescript
 // These are not enforced by the API but useful for UI
 const INCOME_CATEGORIES = [
-  'Salary',
-  'Freelance',
-  'Investment',
-  'Rental',
-  'Business',
-  'Side Hustle',
-  'Dividends',
-  'Royalties',
-  'Other',
+  "Salary",
+  "Freelance",
+  "Investment",
+  "Rental",
+  "Business",
+  "Side Hustle",
+  "Dividends",
+  "Royalties",
+  "Other",
 ];
 ```
 
