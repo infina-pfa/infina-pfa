@@ -79,7 +79,7 @@ export const useGoalForm = ({
   const error = createError || updateError;
 
   // Initial form data
-  const getInitialFormData = (): GoalFormData => {
+  const getInitialFormData = useCallback((): GoalFormData => {
     if (mode === "edit" && goal) {
       return {
         title: goal.title,
@@ -97,7 +97,7 @@ export const useGoalForm = ({
       targetAmount: null,
       dueDate: null,
     };
-  };
+  }, [mode, goal]);
 
   // Form state
   const [formData, setFormData] = useState<GoalFormData>(getInitialFormData);
@@ -124,7 +124,7 @@ export const useGoalForm = ({
         dueDate: false,
       });
     }
-  }, [isOpen, goal, mode]);
+  }, [isOpen, goal, mode, getInitialFormData]);
 
   // Helper function to parse formatted number
   const parseFormattedNumber = (value: string): number => {

@@ -75,8 +75,13 @@ export function GoalConfirmationComponent({
     }
 
     // Look for existing emergency fund goal (by title)
+    interface GoalType {
+      title: string;
+      [key: string]: unknown;
+    }
+    
     const existingEmergencyFundGoal = existingGoalsResponse.goals.find(
-      (goal) =>
+      (goal: GoalType) =>
         goal.title.toLowerCase().includes("quỹ dự phòng") ||
         goal.title.toLowerCase().includes("emergency fund")
     );

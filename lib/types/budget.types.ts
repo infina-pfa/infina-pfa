@@ -87,3 +87,52 @@ export interface MonthlySpendingQuery {
 // Alias types for backward compatibility with existing components
 export type Budget = BudgetResponse;
 export type BudgetWithSpending = BudgetResponse;
+
+// Filter types
+export interface BudgetFilters {
+  category?: BudgetCategory;
+  month?: number;
+  year?: number;
+}
+
+// List response types
+export interface BudgetListResponse {
+  budgets: BudgetResponse[];
+  error: string | null;
+}
+
+// Hook return types
+export interface UseBudgetListReturn {
+  budgets: Budget[];
+  loading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}
+
+export interface UseBudgetUpdateReturn {
+  updateBudget: (
+    budgetId: string,
+    data: UpdateBudgetRequest
+  ) => Promise<BudgetResponse | null>;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface UseBudgetCreateReturn {
+  createBudget: (data: CreateBudgetRequest) => Promise<BudgetResponse | null>;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface UseBudgetDeleteReturn {
+  deleteBudget: (budgetId: string) => Promise<boolean>;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface UseBudgetDetailReturn {
+  budget: BudgetResponse | null;
+  loading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}

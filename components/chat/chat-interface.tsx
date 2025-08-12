@@ -72,7 +72,7 @@ export function ChatInterface() {
       sentFirstMessage.current = true;
       startConversation();
     }
-  }, [user]);
+  }, [user, sendMessage]);
 
   // Loading state
   if (chatLoading || isGettingFirstMessage) {

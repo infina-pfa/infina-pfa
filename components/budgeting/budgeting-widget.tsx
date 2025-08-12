@@ -14,7 +14,6 @@ import {
   useDeleteBudget,
   useMonthlySpending,
 } from "@/hooks/swr/budget";
-import { useBudgetStats } from "@/hooks/use-budget-stats";
 import { useToast } from "@/hooks/use-toast";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { BudgetResponse } from "@/lib/types/budget.types";
@@ -112,9 +111,6 @@ export function BudgetingWidget({
     currentYear
   );
 
-  // Keep budget statistics for future use
-  const { loading: statsLoading, error: statsError } = useBudgetStats();
-
   // Handle edit budget
   const handleEditBudget = (budgetId: string) => {
     const budget = budgets?.find((b) => b.id === budgetId);
@@ -155,8 +151,8 @@ export function BudgetingWidget({
   };
 
   const isLoading =
-    budgetsLoading || statsLoading || spendingLoading || isDeleting;
-  const hasError = budgetsError || statsError || spendingError;
+    budgetsLoading || spendingLoading || isDeleting;
+  const hasError = budgetsError || spendingError;
 
   if (isLoading) {
     return (
@@ -172,7 +168,7 @@ export function BudgetingWidget({
   }
 
   if (hasError) {
-    const error = (budgetsError || statsError || spendingError) as {
+    const error = (budgetsError || spendingError) as {
       code?: string;
       message?: string;
     };

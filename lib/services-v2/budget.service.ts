@@ -6,7 +6,6 @@ import {
   BudgetResponse,
   BudgetListResponse,
   BudgetFilters,
-  BudgetStats,
   BudgetWithSpending,
 } from "@/lib/types/budget.types";
 
@@ -215,32 +214,6 @@ export const budgetService = {
       const appError = handleError(error, t);
       return {
         success: false,
-        error: appError.message,
-      };
-    }
-  },
-
-  /**
-   * Get budget statistics
-   */
-  async getStats(
-    t?: TranslationFunction
-  ): Promise<{ stats: BudgetStats | null; error: string | null }> {
-    try {
-      const response = await apiClient.get<BudgetStats>("/budgets/stats");
-
-      if (response.success && response.data) {
-        return {
-          stats: response.data,
-          error: null,
-        };
-      }
-
-      throw new Error(response.error || "Failed to fetch budget stats");
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        stats: null,
         error: appError.message,
       };
     }
