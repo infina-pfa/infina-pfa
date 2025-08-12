@@ -7,7 +7,7 @@ import {
 } from "@/lib/types/onboarding.types";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useAuthContext } from "@/components/providers/auth-provider";
-import { goalService } from "@/lib/services-v2/goal.service";
+import { goalService } from "@/lib/services/goal.service";
 import { Button } from "@/components/ui/button";
 import {
   CheckCircle,
@@ -62,57 +62,41 @@ export function GoalConfirmationComponent({
       } tháng với mức tiết kiệm ${formatCurrency(
         goalDetails.monthlyTarget
       )} VND mỗi tháng.`,
-      target_amount: goalDetails.amount,
-      current_amount: 0,
-      due_date: dueDate.toISOString(),
+      targetAmount: goalDetails.amount,
+      dueDate: dueDate.toISOString(),
     };
 
-    // First, check if an emergency fund goal already exists
-    const existingGoalsResponse = await goalService.getAll(undefined, t);
+    try {
+      // First, check if an emergency fund goal already exists
+      const existingGoals = await goalService.getGoals();
 
-    if (existingGoalsResponse.error) {
-      throw new Error(existingGoalsResponse.error);
-    }
-
-    // Look for existing emergency fund goal (by title)
-    interface GoalType {
-      title: string;
-      [key: string]: unknown;
-    }
-    
-    const existingEmergencyFundGoal = existingGoalsResponse.goals.find(
-      (goal: GoalType) =>
-        goal.title.toLowerCase().includes("quỹ dự phòng") ||
-        goal.title.toLowerCase().includes("emergency fund")
-    );
-
-    if (existingEmergencyFundGoal) {
-      // Update existing goal
-      console.log(
-        "Updating existing emergency fund goal:",
-        existingEmergencyFundGoal.id
-      );
-      const updateResponse = await goalService.update(
-        existingEmergencyFundGoal.id,
-        emergencyFundData,
-        t
+      // Look for existing emergency fund goal (by title)
+      const existingEmergencyFundGoal = existingGoals.find(
+        (goal) =>
+          goal.title.toLowerCase().includes("quỹ dự phòng") ||
+          goal.title.toLowerCase().includes("emergency fund")
       );
 
-      if (updateResponse.error) {
-        throw new Error(updateResponse.error);
+      if (existingEmergencyFundGoal) {
+        // Update existing goal
+        console.log(
+          "Updating existing emergency fund goal:",
+          existingEmergencyFundGoal.id
+        );
+        const updatedGoal = await goalService.updateGoal(
+          existingEmergencyFundGoal.id,
+          emergencyFundData
+        );
+        return updatedGoal;
+      } else {
+        // Create new goal
+        console.log("Creating new emergency fund goal");
+        const newGoal = await goalService.createGoal(emergencyFundData);
+        return newGoal;
       }
-
-      return updateResponse.goal;
-    } else {
-      // Create new goal
-      console.log("Creating new emergency fund goal");
-      const createResponse = await goalService.create(emergencyFundData, t);
-
-      if (createResponse.error) {
-        throw new Error(createResponse.error);
-      }
-
-      return createResponse.goal;
+    } catch (error) {
+      console.error("Error creating/updating emergency fund goal:", error);
+      throw error;
     }
   };
 
