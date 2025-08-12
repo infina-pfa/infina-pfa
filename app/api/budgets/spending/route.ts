@@ -1,23 +1,25 @@
+import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/api/auth-wrapper";
-import { TransactionResponse } from "@/lib/types/budget.types";
-import { NextResponse } from "next/server";
 
-export const GET = withAuth(async (req, context) => {
+export const GET = withAuth(async (req: NextRequest, context) => {
   const { apiClient } = context;
-
-  const searchParams = req.nextUrl.searchParams;
+  const { searchParams } = new URL(req.url);
   const month = searchParams.get("month");
   const year = searchParams.get("year");
 
-  const params = {
-    month: month ? parseInt(month, 10) : undefined,
-    year: year ? parseInt(year, 10) : undefined,
-  };
+  if (!month || !year) {
+    return NextResponse.json(
+      { error: "Month and year are required" },
+      { status: 400 }
+    );
+  }
 
-  const response = await apiClient.get<TransactionResponse[]>(
-    "/budgets/spending",
-    { params }
-  );
+  const response = await apiClient.get(`/budgets/spending`, {
+    params: {
+      month: parseInt(month),
+      year: parseInt(year),
+    },
+  });
 
-  return NextResponse.json(response.data);
+  return NextResponse.json(response.data || []);
 });

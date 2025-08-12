@@ -1,23 +1,12 @@
+import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/api/auth-wrapper";
-import { SpendRequest, BudgetDetailResponse } from "@/lib/types/budget.types";
-import { NextResponse } from "next/server";
+import { SpendRequest } from "@/lib/types/budget.types";
 
-export const POST = withAuth<{ id: string }>(async (req, context) => {
-  const { apiClient, params } = context;
-
-  if (!params) {
-    return NextResponse.json(
-      { error: "Missing route parameters" },
-      { status: 400 }
-    );
-  }
-
+export const POST = withAuth(async (req: NextRequest, context) => {
+  const { apiClient } = context;
+  const { id } = context.params as unknown as { id: string };
   const body: SpendRequest = await req.json();
 
-  const response = await apiClient.post<BudgetDetailResponse>(
-    `/budgets/${params.id}/spend`,
-    body
-  );
-
+  const response = await apiClient.post(`/budgets/${id}/spend`, body);
   return NextResponse.json(response.data, { status: 201 });
 });

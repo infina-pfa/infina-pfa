@@ -23,7 +23,10 @@ import { useMemo, useState } from "react";
 
 interface BudgetingWidgetProps {
   onBudgetCreated?: (budget: BudgetResponse) => Promise<void>;
-  onBudgetUpdated?: (budget: BudgetResponse, oldAmount?: number) => Promise<void>;
+  onBudgetUpdated?: (
+    budget: BudgetResponse,
+    oldAmount?: number
+  ) => Promise<void>;
   onExpenseCreated?: (
     name: string,
     amount: number,
@@ -50,7 +53,9 @@ export function BudgetingWidget({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateExpenseModalOpen, setIsCreateExpenseModalOpen] =
     useState(false);
-  const [selectedBudget, setSelectedBudget] = useState<BudgetResponse | null>(null);
+  const [selectedBudget, setSelectedBudget] = useState<BudgetResponse | null>(
+    null
+  );
 
   // Get current month and year for filtering
   const currentDate = new Date();
@@ -64,11 +69,11 @@ export function BudgetingWidget({
     isError: budgetsError,
   } = useBudgets(currentMonth, currentYear);
 
-  // Use monthly spending hook for recent transactions
+  // Use monthly spending hook to get all transactions
   const {
-    transactions: monthlyTransactions,
-    isLoading: transactionsLoading,
-    isError: transactionsError,
+    spending: monthlySpending,
+    isLoading: spendingLoading,
+    isError: spendingError,
   } = useMonthlySpending(currentMonth, currentYear);
 
   // Calculate total budget and spent from budgets
@@ -82,9 +87,13 @@ export function BudgetingWidget({
 
   // Map API transactions to component's Transaction type
   const mappedTransactions: Transaction[] = useMemo(() => {
-    if (!monthlyTransactions) return [];
-    // Take only the 10 most recent transactions
-    return monthlyTransactions.slice(0, 10).map((transaction) => ({
+    if (!monthlySpending) return [];
+    // Sort by date and take only the 10 most recent transactions
+    const sortedTransactions = [...monthlySpending].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    return sortedTransactions.slice(0, 10).map((transaction) => ({
       id: transaction.id,
       name: transaction.name,
       amount: transaction.amount,
@@ -95,10 +104,13 @@ export function BudgetingWidget({
       budgetName: transaction.budget?.name,
       budgetColor: transaction.budget?.color,
     }));
-  }, [monthlyTransactions]);
+  }, [monthlySpending]);
 
   // Use the budget delete hook
-  const { deleteBudget, isDeleting } = useDeleteBudget(currentMonth, currentYear);
+  const { deleteBudget, isDeleting } = useDeleteBudget(
+    currentMonth,
+    currentYear
+  );
 
   // Keep budget statistics for future use
   const { loading: statsLoading, error: statsError } = useBudgetStats();
@@ -129,18 +141,22 @@ export function BudgetingWidget({
     } catch (err) {
       const error = err as { code?: string; message?: string };
       if (error?.code) {
-        toast.error(t(error.code, { 
-          ns: "errors", 
-          defaultValue: error.message || t("BUDGET_DELETE_FAILED", { ns: "errors" })
-        }));
+        toast.error(
+          t(error.code, {
+            ns: "errors",
+            defaultValue:
+              error.message || t("BUDGET_DELETE_FAILED", { ns: "errors" }),
+          })
+        );
       } else {
         toast.error(t("BUDGET_DELETE_FAILED", { ns: "errors" }));
       }
     }
   };
 
-  const isLoading = budgetsLoading || statsLoading || transactionsLoading || isDeleting;
-  const hasError = budgetsError || statsError || transactionsError;
+  const isLoading =
+    budgetsLoading || statsLoading || spendingLoading || isDeleting;
+  const hasError = budgetsError || statsError || spendingError;
 
   if (isLoading) {
     return (
@@ -156,17 +172,21 @@ export function BudgetingWidget({
   }
 
   if (hasError) {
-    const error = (budgetsError || statsError || transactionsError) as { code?: string; message?: string };
-    const errorMessage = error?.code 
-      ? t(error.code, { ns: "errors", defaultValue: error.message || t("UNKNOWN_ERROR", { ns: "errors" }) })
+    const error = (budgetsError || statsError || spendingError) as {
+      code?: string;
+      message?: string;
+    };
+    const errorMessage = error?.code
+      ? t(error.code, {
+          ns: "errors",
+          defaultValue: error.message || t("UNKNOWN_ERROR", { ns: "errors" }),
+        })
       : t("UNKNOWN_ERROR", { ns: "errors" });
-      
+
     return (
       <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-[#F44336] font-nunito mb-4">
-            {errorMessage}
-          </p>
+          <p className="text-[#F44336] font-nunito mb-4">{errorMessage}</p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-[#0055FF] text-white rounded-lg font-nunito hover:bg-[#0041CC]"
@@ -244,6 +264,8 @@ export function BudgetingWidget({
               }
             : null
         }
+        month={currentMonth}
+        year={currentYear}
         onExpenseCreated={onExpenseCreated}
       />
     </div>

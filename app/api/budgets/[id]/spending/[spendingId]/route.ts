@@ -1,21 +1,13 @@
+import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/api/auth-wrapper";
-import { NextResponse } from "next/server";
 
-export const DELETE = withAuth<{ id: string; spendingId: string }>(
-  async (_req, context) => {
-    const { apiClient, params } = context;
+export const DELETE = withAuth(async (req: NextRequest, context) => {
+  const { apiClient } = context;
+  const { id, spendingId } = context.params as unknown as {
+    id: string;
+    spendingId: string;
+  };
 
-    if (!params) {
-      return NextResponse.json(
-        { error: "Missing route parameters" },
-        { status: 400 }
-      );
-    }
-
-    const { id, spendingId } = params;
-
-    await apiClient.delete(`/budgets/${id}/spending/${spendingId}`);
-
-    return NextResponse.json({ message: "Spending deleted successfully" });
-  }
-);
+  await apiClient.delete(`/budgets/${id}/spending/${spendingId}`);
+  return NextResponse.json({ success: true }, { status: 200 });
+});

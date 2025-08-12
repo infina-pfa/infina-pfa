@@ -43,11 +43,6 @@ export const RecentExpensesList = ({
     budgetName?: string;
   } | null>(null);
 
-  // Filter only outcome transactions (expenses)
-  const expenses = transactions.filter(
-    (transaction) => transaction.type === "outcome"
-  );
-
   const handleEditExpense = (expense: {
     id: string;
     name: string;
@@ -96,7 +91,7 @@ export const RecentExpensesList = ({
         </div>
 
         <div className="bg-[#FFFFFF] rounded-b-xl overflow-hidden">
-          {expenses.map((expense, index) => (
+          {transactions.map((expense, index) => (
             <div key={expense.id}>
               <ExpenseItem
                 id={expense.id}
@@ -109,14 +104,14 @@ export const RecentExpensesList = ({
                 description={expense.description}
                 onEdit={handleEditExpense}
               />
-              {index < expenses.length - 1 && (
+              {index < transactions.length - 1 && (
                 <div className="h-px bg-[#E5E7EB] mx-4 md:mx-6" />
               )}
             </div>
           ))}
         </div>
 
-        {expenses.length === 0 && (
+        {transactions.length === 0 && (
           <div className="px-4 md:px-6 py-6 md:py-8 text-center bg-[#FFFFFF] rounded-xl">
             <p className="text-[#6B7280] font-nunito text-[14px] md:text-[16px] leading-[20px] md:leading-[24px]">
               {t("noRecentExpenses")}
