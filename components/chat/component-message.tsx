@@ -5,11 +5,9 @@ import { ChatMessage, ChatSuggestion } from "@/lib/types/chat.types";
 import { FinancialOverviewCard } from "./financial-overview-card";
 import { VideoMessage } from "./video-message";
 import { SuggestionList } from "./suggestion-list";
-import { GoalDashboardMessage } from "./goal-dashboard-message";
 import { BudgetingDashboardMessage } from "./budgeting-dashboard-message";
 import { MonthlyBudgetAnalysisMessage } from "./monthly-budget-analysis-message";
 import { BudgetDetailMessage } from "./budget-detail-message";
-
 
 const today = new Date();
 const currentMonth = today.getMonth() + 1;
@@ -54,10 +52,10 @@ export function ComponentMessage({
           (
             component.action.payload as unknown as {
               context: {
-                suggestions: ChatSuggestion[];
+                options: ChatSuggestion[];
               };
             }
-          ).context.suggestions
+          ).context.options
         }
         onSuggestionClick={onSendMessage}
         isSubmitting={false}
@@ -65,9 +63,9 @@ export function ComponentMessage({
     );
   }
 
-  if (componentId === ChatComponentId.GOAL_DASHBOARD) {
-    return <GoalDashboardMessage onSendMessage={onSendMessage} />;
-  }
+  // if (componentId === ChatComponentId.GOAL_DASHBOARD) {
+  //   return <GoalDashboardMessage onSendMessage={onSendMessage} />;
+  // }
 
   if (componentId === ChatComponentId.BUDGETING_DASHBOARD) {
     return <BudgetingDashboardMessage onSendMessage={onSendMessage} />;

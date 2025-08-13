@@ -9,26 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import { FormInput } from "@/components/ui/form-input";
 import { MoneyInput } from "@/components/ui/money-input";
-import { useExpenseCreateSWR } from "@/hooks/swr";
+import { useRecordSpending } from "@/hooks/swr/budget";
 import { useAppTranslation } from "@/hooks/use-translation";
-import {
-  CreateExpenseRequest,
-  Transaction,
-} from "@/lib/types/transaction.types";
+import { useToast } from "@/hooks/use-toast";
+import { SpendRequest } from "@/lib/types/budget.types";
 import { useState } from "react";
-
-// Extended transaction type with budget info for callbacks
-interface ExpenseCallback {
-  id: string;
-  name: string;
-  amount: number;
-  date: string;
-  category: string;
-  type: string;
-  description: string | null;
-  budgetName?: string;
-  budgetColor?: string;
-}
 
 interface CreateExpenseModalProps {
   isOpen: boolean;
@@ -39,6 +24,8 @@ interface CreateExpenseModalProps {
     name: string;
     color: string;
   } | null;
+  month: number;
+  year: number;
   onExpenseCreated?: (
     name: string,
     amount: number,
@@ -51,45 +38,24 @@ export const CreateExpenseModal = ({
   onClose,
   onSuccess,
   budget,
+  month,
+  year,
   onExpenseCreated,
 }: CreateExpenseModalProps) => {
   const { t } = useAppTranslation(["budgeting", "common"]);
+  const toast = useToast();
 
-  // Create callback wrapper to include budget info
-  const handleExpenseCreated = async (
-    expense: Transaction & { budgetName?: string; budgetColor?: string }
-  ) => {
-    if (onExpenseCreated && budget) {
-      const expenseWithBudgetInfo: ExpenseCallback = {
-        id: expense.id,
-        name: expense.name,
-        amount: expense.amount,
-        date: new Date(expense.created_at).toLocaleDateString(),
-        category: budget.name,
-        type: expense.type,
-        description: expense.description,
-        budgetName: budget.name,
-        budgetColor: budget.color,
-      };
-      onExpenseCreated(
-        expenseWithBudgetInfo.name,
-        expenseWithBudgetInfo.amount,
-        budget.name
-      );
-    }
-  };
+  const { recordSpending, isRecording } = useRecordSpending(
+    budget?.id || "",
+    month,
+    year
+  );
 
-  const { createExpense, isCreating, error } = useExpenseCreateSWR({
-    onSuccess: handleExpenseCreated,
-  });
-
-  const [formData, setFormData] = useState<
-    Omit<CreateExpenseRequest, "budgetId">
-  >({
-    name: "",
+  const [formData, setFormData] = useState<SpendRequest>({
     amount: 0,
+    name: "",
     description: "",
-    date: new Date().toISOString().split("T")[0], // Today's date in YYYY-MM-DD format
+    recurring: 0, // One-time expense by default
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,33 +63,56 @@ export const CreateExpenseModal = ({
 
     if (!budget) return;
 
-    const result = await createExpense({
-      ...formData,
-      budgetId: budget.id,
-    });
+    try {
+      const result = await recordSpending(formData);
 
-    if (result) {
-      // Reset form
-      setFormData({
-        name: "",
-        amount: 0,
-        description: "",
-        date: new Date().toISOString().split("T")[0],
-      });
+      if (result) {
+        // Call the onExpenseCreated callback if provided
+        if (onExpenseCreated) {
+          await onExpenseCreated(
+            formData.name || "Expense",
+            formData.amount,
+            budget.name
+          );
+        }
 
-      // Call success callback and close modal
-      onSuccess?.();
-      onClose();
+        // Show success message
+        toast.success(t("expenseAdded", { ns: "budgeting" }));
+
+        // Reset form
+        setFormData({
+          amount: 0,
+          name: "",
+          description: "",
+          recurring: 0,
+        });
+
+        // Call success callback and close modal
+        onSuccess?.();
+        onClose();
+      }
+    } catch (err) {
+      const error = err as { code?: string; message?: string };
+      if (error?.code) {
+        toast.error(
+          t(error.code, {
+            ns: "errors",
+            defaultValue: error.message || t("UNKNOWN_ERROR", { ns: "errors" }),
+          })
+        );
+      } else {
+        toast.error(t("UNKNOWN_ERROR", { ns: "errors" }));
+      }
     }
   };
 
   const handleClose = () => {
     // Reset form when closing
     setFormData({
-      name: "",
       amount: 0,
+      name: "",
       description: "",
-      date: new Date().toISOString().split("T")[0],
+      recurring: 0,
     });
     onClose();
   };
@@ -173,16 +162,6 @@ export const CreateExpenseModal = ({
             className="w-full"
           />
 
-          {/* Date */}
-          <FormInput
-            label={t("date")}
-            type="date"
-            value={formData.date}
-            onChange={(value) => setFormData({ ...formData, date: value })}
-            required
-            className="w-full"
-          />
-
           {/* Description */}
           <FormInput
             label={`${t("description")} (${t("optional")})`}
@@ -195,30 +174,21 @@ export const CreateExpenseModal = ({
             className="w-full"
           />
 
-          {/* Error Message */}
-          {error && (
-            <div className="text-[#F44336] text-[12px] md:text-[14px] font-nunito leading-[16px] md:leading-[20px]">
-              {error}
-            </div>
-          )}
-
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Button
               type="submit"
               className="flex-1 h-10 md:h-12 text-[14px] md:text-[16px] font-nunito bg-[#0055FF] hover:bg-[#0041CC]"
-              disabled={
-                isCreating || !formData.name.trim() || formData.amount <= 0
-              }
+              disabled={isRecording || !formData.name || formData.amount <= 0}
             >
-              {isCreating ? t("creating", { ns: "common" }) : t("addExpense")}
+              {isRecording ? t("creating", { ns: "common" }) : t("addExpense")}
             </Button>
             <Button
               type="button"
               variant="outline"
               onClick={handleClose}
               className="flex-1 h-10 md:h-12 text-[14px] md:text-[16px] font-nunito"
-              disabled={isCreating}
+              disabled={isRecording}
             >
               {t("cancel", { ns: "common" })}
             </Button>

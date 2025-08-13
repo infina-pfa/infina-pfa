@@ -44,22 +44,6 @@ export function OnboardingComponentRenderer({
   };
 
   switch (component.type) {
-    case "multiple_choice":
-      return (
-        <MultipleChoiceComponent
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
-    case "rating_scale":
-      return (
-        <RatingScaleComponent
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
     case "slider":
       return (
         <SliderComponent component={component} onResponse={handleResponse} />
@@ -145,9 +129,8 @@ export function OnboardingComponentRenderer({
       return (
         <Suggestions
           suggestions={
-            component.context.suggestions?.map(
-              (suggestion) => suggestion.text
-            ) || []
+            component.context.options?.map((suggestion) => suggestion.label) ||
+            []
           }
           onSelect={(suggestionLabel) => {
             handleResponse({
@@ -158,7 +141,7 @@ export function OnboardingComponentRenderer({
         />
       );
 
-    case "infina_app_qr":
+    case "infina_qr":
       return <InfinAppQR />;
 
     case "finish_onboarding":

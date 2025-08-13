@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
-import { userService } from "@/lib/services/user.service";
+import { userService } from "@/lib/services-v2/user.service";
 import { CreateUserRequest } from "@/lib/types/user.types";
 
 export type OnboardingStep = "welcome" | "name" | "loading";
@@ -28,7 +28,7 @@ export const useOnboarding = () => {
 
   const nextStep = () => {
     if (state.step === "welcome") {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         step: "name",
         error: null,
@@ -37,7 +37,7 @@ export const useOnboarding = () => {
   };
 
   const updateName = (name: string) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       name,
       error: null,
@@ -58,14 +58,14 @@ export const useOnboarding = () => {
     // Validate name first
     const nameError = validateName(state.name);
     if (nameError) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         error: nameError,
       }));
       return;
     }
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       step: "loading",
       loading: true,
@@ -80,7 +80,7 @@ export const useOnboarding = () => {
       const result = await userService.createUser(request, t);
 
       if (result.error) {
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           step: "name",
           loading: false,
@@ -92,13 +92,13 @@ export const useOnboarding = () => {
 
       // Success - show success message and navigate
       success(t("successTitle"), t("successSubtitle"));
-      
+
       // Navigate to chat immediately
       router.push("/chat");
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : t("unexpectedError");
-      setState(prev => ({
+      const errorMessage =
+        error instanceof Error ? error.message : t("unexpectedError");
+      setState((prev) => ({
         ...prev,
         step: "name",
         loading: false,
@@ -109,7 +109,7 @@ export const useOnboarding = () => {
   };
 
   const retryCreation = () => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       step: "name",
       error: null,
@@ -127,4 +127,4 @@ export const useOnboarding = () => {
     retryCreation,
     validateName,
   };
-}; 
+};

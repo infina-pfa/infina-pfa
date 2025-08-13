@@ -12,16 +12,16 @@ import { Input } from "@/components/ui/input";
 import { MoneyInput } from "@/components/ui/money-input";
 import { useGoalForm } from "@/hooks/use-goal-form";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { Goal } from "@/lib/types/goal.types";
+import { GoalResponseDto } from "@/lib/types/goal.types";
 
 interface GoalModalProps {
   mode: "create" | "edit";
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  goal?: Goal | null;
-  onGoalCreated?: (goal: Goal) => Promise<void>;
-  onGoalUpdated?: (goal: Goal) => Promise<void>;
+  goal?: GoalResponseDto | null;
+  onGoalCreated?: (goal: GoalResponseDto) => Promise<void>;
+  onGoalUpdated?: (goal: GoalResponseDto) => Promise<void>;
 }
 
 export function GoalModal({
@@ -103,17 +103,17 @@ export function GoalModal({
               <div>
                 <MoneyInput
                   label={t("targetAmount")}
-                  value={formData.target_amount || 0}
+                  value={formData.targetAmount || 0}
                   onChange={(value) =>
                     handleInputChange(
-                      "target_amount",
+                      "targetAmount",
                       parseFormattedNumber(value.toString())
                     )
                   }
-                  onBlur={() => handleFieldBlur("target_amount")}
+                  onBlur={() => handleFieldBlur("targetAmount")}
                   error={
-                    touched.target_amount
-                      ? validationErrors.target_amount
+                    touched.targetAmount
+                      ? validationErrors.targetAmount
                       : undefined
                   }
                   placeholder={t("targetAmountPlaceholder")}
@@ -149,14 +149,14 @@ export function GoalModal({
                 </label>
                 <Input
                   type="date"
-                  value={formData.due_date || ""}
-                  onChange={(e) => handleInputChange("due_date", e.target.value)}
-                  onBlur={() => handleFieldBlur("due_date")}
+                  value={formData.dueDate || ""}
+                  onChange={(e) => handleInputChange("dueDate", e.target.value)}
+                  onBlur={() => handleFieldBlur("dueDate")}
                   className="h-12"
                 />
-                {touched.due_date && validationErrors.due_date && (
+                {touched.dueDate && validationErrors.dueDate && (
                   <p className="text-[#DC2626] text-[12px] mt-1">
-                    {validationErrors.due_date}
+                    {validationErrors.dueDate}
                   </p>
                 )}
               </div>

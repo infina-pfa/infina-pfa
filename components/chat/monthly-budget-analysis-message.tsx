@@ -1,27 +1,27 @@
 "use client";
 
-import { useMonthlyBudgetAnalysisSWR } from "@/hooks/swr/use-monthly-budget-analysis";
+import { useMonthlyBudgetAnalysisSWR } from "@/hooks/swr-v2/use-monthly-budget-analysis";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { formatVND } from "@/lib/validation/input-validation";
 
-import { 
-  AlertTriangle, 
-  TrendingUp, 
+import {
+  AlertTriangle,
+  TrendingUp,
   TrendingDown,
   Target,
   Calendar,
   ShoppingBag,
-  PiggyBank
+  PiggyBank,
 } from "lucide-react";
 
 interface MonthlyBudgetAnalysisMessageProps {
   onSendMessage?: (message: string) => void;
 }
 
-export function MonthlyBudgetAnalysisMessage({ 
-  onSendMessage 
+export function MonthlyBudgetAnalysisMessage({
+  onSendMessage,
 }: MonthlyBudgetAnalysisMessageProps) {
   const { t } = useAppTranslation(["budgeting", "common"]);
   const { data, loading, error } = useMonthlyBudgetAnalysisSWR();
@@ -67,8 +67,12 @@ export function MonthlyBudgetAnalysisMessage({
     });
   };
 
-  const ComparisonIcon = data.previousMonthComparison.isImprovement ? TrendingDown : TrendingUp;
-  const comparisonColor = data.previousMonthComparison.isImprovement ? "#2ECC71" : "#F44336";
+  const ComparisonIcon = data.previousMonthComparison.isImprovement
+    ? TrendingDown
+    : TrendingUp;
+  const comparisonColor = data.previousMonthComparison.isImprovement
+    ? "#2ECC71"
+    : "#F44336";
 
   return (
     <div className="bg-white rounded-lg p-6 space-y-6 max-w-lg">
@@ -84,11 +88,13 @@ export function MonthlyBudgetAnalysisMessage({
       </div>
 
       {/* Overall Summary */}
-      <div className={`p-4 rounded-lg ${
-        data.isOverspent 
-          ? "bg-red-50 border border-red-200" 
-          : "bg-green-50 border border-green-200"
-      }`}>
+      <div
+        className={`p-4 rounded-lg ${
+          data.isOverspent
+            ? "bg-red-50 border border-red-200"
+            : "bg-green-50 border border-green-200"
+        }`}
+      >
         <div className="flex items-center space-x-3">
           {data.isOverspent ? (
             <AlertTriangle className="h-6 w-6 text-red-500" />
@@ -96,20 +102,27 @@ export function MonthlyBudgetAnalysisMessage({
             <Target className="h-6 w-6 text-green-500" />
           )}
           <div className="flex-1">
-            <h4 className={`font-semibold ${
-              data.isOverspent ? "text-red-700" : "text-green-700"
-            }`}>
+            <h4
+              className={`font-semibold ${
+                data.isOverspent ? "text-red-700" : "text-green-700"
+              }`}
+            >
               {data.isOverspent ? t("analysisOverspent") : t("analysisOnTrack")}
             </h4>
-            <p className={`text-sm ${
-              data.isOverspent ? "text-red-600" : "text-green-600"
-            }`}>
-              {data.isOverspent 
-                ? t("analysisOverspentAmount", { amount: formatVND(data.overspentAmount) })
-                : t("analysisBudgetUsed", { 
-                    percentage: Math.round((data.totalSpent / data.totalBudget) * 100) 
+            <p
+              className={`text-sm ${
+                data.isOverspent ? "text-red-600" : "text-green-600"
+              }`}
+            >
+              {data.isOverspent
+                ? t("analysisOverspentAmount", {
+                    amount: formatVND(data.overspentAmount),
                   })
-              }
+                : t("analysisBudgetUsed", {
+                    percentage: Math.round(
+                      (data.totalSpent / data.totalBudget) * 100
+                    ),
+                  })}
             </p>
           </div>
         </div>
@@ -118,17 +131,24 @@ export function MonthlyBudgetAnalysisMessage({
       {/* Previous Month Comparison */}
       <div className="p-4 bg-[#F0F2F5] rounded-lg">
         <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-          <ComparisonIcon className="h-4 w-4 mr-2" style={{ color: comparisonColor }} />
+          <ComparisonIcon
+            className="h-4 w-4 mr-2"
+            style={{ color: comparisonColor }}
+          />
           {t("analysisPreviousMonth")}
         </h4>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">{t("analysisSpendingChange")}</span>
-          <span 
+          <span className="text-sm text-gray-600">
+            {t("analysisSpendingChange")}
+          </span>
+          <span
             className="text-sm font-medium"
             style={{ color: comparisonColor }}
           >
             {data.previousMonthComparison.spendingDifference > 0 ? "+" : ""}
-            {formatVND(Math.abs(data.previousMonthComparison.spendingDifference))}
+            {formatVND(
+              Math.abs(data.previousMonthComparison.spendingDifference)
+            )}
           </span>
         </div>
       </div>
@@ -142,7 +162,10 @@ export function MonthlyBudgetAnalysisMessage({
           </h4>
           <div className="space-y-2">
             {data.overspentCategories.slice(0, 3).map((category, index) => (
-              <div key={index} className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <div
+                key={index}
+                className="p-3 bg-amber-50 rounded-lg border border-amber-200"
+              >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm font-medium text-gray-900">
                     {category.categoryName}
@@ -152,7 +175,9 @@ export function MonthlyBudgetAnalysisMessage({
                   </span>
                 </div>
                 <div className="text-xs text-amber-600">
-                  {t("analysisOverspentBy", { percentage: Math.round(category.percentage) })}
+                  {t("analysisOverspentBy", {
+                    percentage: Math.round(category.percentage),
+                  })}
                 </div>
               </div>
             ))}
@@ -168,8 +193,11 @@ export function MonthlyBudgetAnalysisMessage({
             {t("analysisLargestExpenses")}
           </h4>
           <div className="space-y-2">
-                         {data.largestExpenses.slice(0, 3).map((expense) => (
-              <div key={expense.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+            {data.largestExpenses.slice(0, 3).map((expense) => (
+              <div
+                key={expense.id}
+                className="flex items-center justify-between p-2 hover:bg-gray-50 rounded"
+              >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
                     {expense.description}
@@ -195,39 +223,48 @@ export function MonthlyBudgetAnalysisMessage({
             {t("analysisImprovementTips")}
           </h4>
           <ul className="space-y-1">
-            {data.previousMonthComparison.improvementAreas.map((area, index) => (
-              <li key={index} className="text-sm text-blue-700">
-                • {t("analysisReduceSpending", { category: area })}
-              </li>
-            ))}
+            {data.previousMonthComparison.improvementAreas.map(
+              (area, index) => (
+                <li key={index} className="text-sm text-blue-700">
+                  • {t("analysisReduceSpending", { category: area })}
+                </li>
+              )
+            )}
           </ul>
         </div>
       )}
 
       {/* Action Buttons */}
       <div className="space-y-2 pt-4 border-t border-gray-100">
-        <Button 
+        <Button
           className="w-full bg-[#0055FF] hover:bg-[#0044CC] text-white"
-          onClick={() => onSendMessage && onSendMessage("Help me create a budget plan for next month")}
+          onClick={() =>
+            onSendMessage &&
+            onSendMessage("Help me create a budget plan for next month")
+          }
         >
           <Target className="h-4 w-4 mr-2" />
           {t("analysisPlanNextMonth")}
         </Button>
-        
+
         <div className="grid grid-cols-2 gap-2">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
-            onClick={() => onSendMessage && onSendMessage("Show me my spending trends")}
+            onClick={() =>
+              onSendMessage && onSendMessage("Show me my spending trends")
+            }
           >
             <TrendingUp className="h-4 w-4 mr-1" />
             {t("analysisViewTrends")}
           </Button>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             size="sm"
-            onClick={() => onSendMessage && onSendMessage("How can I save money next month?")}
+            onClick={() =>
+              onSendMessage && onSendMessage("How can I save money next month?")
+            }
           >
             <PiggyBank className="h-4 w-4 mr-1" />
             {t("analysisSavingTips")}
@@ -236,4 +273,4 @@ export function MonthlyBudgetAnalysisMessage({
       </div>
     </div>
   );
-} 
+}

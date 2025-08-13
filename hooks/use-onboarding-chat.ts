@@ -11,7 +11,7 @@ import { useOnboardingAI } from "./onboarding/use-onboarding-ai";
 import { useOnboardingProfile } from "./onboarding/use-onboarding-profile";
 import { useOnboardingInitialization } from "./onboarding/use-onboarding-initialization";
 // Import onboarding service (to avoid circular dependencies)
-import { onboardingService } from "@/lib/services/onboarding.service";
+import { onboardingService } from "@/lib/services-v2/onboarding.service";
 
 /**
  * Onboarding chat hook that follows SOLID principles
@@ -129,7 +129,10 @@ export const useOnboardingChat = (
   // Start onboarding conversation
   const startOnboardingConversation = useCallback(
     async (initialMessage: string) => {
-      console.log("Starting onboarding conversation with user input:", initialMessage);
+      console.log(
+        "Starting onboarding conversation with user input:",
+        initialMessage
+      );
 
       const conversationHistory = buildConversationHistory(messages);
 
@@ -155,7 +158,13 @@ export const useOnboardingChat = (
 
       setHasStartedAI(true);
     },
-    [messages, state.userProfile, buildConversationHistory, streamOnboardingAI, setHasStartedAI]
+    [
+      messages,
+      state.userProfile,
+      buildConversationHistory,
+      streamOnboardingAI,
+      setHasStartedAI,
+    ]
   );
 
   // Process user message
@@ -229,7 +238,8 @@ export const useOnboardingChat = (
           await processUserMessage(message);
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : t("messageFailed");
+        const errorMessage =
+          err instanceof Error ? err.message : t("messageFailed");
         setError(errorMessage);
       }
     },
@@ -300,7 +310,9 @@ export const useOnboardingChat = (
         console.log(
           `🔧 Manually built conversation history: ${conversationHistory.length} messages`
         );
-        console.log("📋 Manual conversation history (with completed components):");
+        console.log(
+          "📋 Manual conversation history (with completed components):"
+        );
         conversationHistory.forEach((msg, index) => {
           console.log(
             `${index + 1}. [${msg.sender}] (${msg.id}): "${msg.content}" (${
@@ -331,7 +343,8 @@ export const useOnboardingChat = (
           });
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : t("responseFailed");
+        const errorMessage =
+          err instanceof Error ? err.message : t("responseFailed");
         setError(errorMessage);
       }
     },

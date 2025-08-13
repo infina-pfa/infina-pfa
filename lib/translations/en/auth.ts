@@ -33,6 +33,12 @@ export const authEn = {
   pleaseEnterEmail: "Please enter your email address",
   invalidEmailAddress: "Please enter a valid email address",
   unexpectedError: "An unexpected error occurred",
+  
+  // Validation Messages
+  emailRequired: "Email is required",
+  invalidEmail: "Please enter a valid email address",
+  passwordRequired: "Password is required",
+  confirmPasswordRequired: "Please confirm your password",
 
   // Auth Layout
   financialJourneyStarts: "Your financial journey starts here",

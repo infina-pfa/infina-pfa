@@ -1,10 +1,9 @@
 "use client";
 
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useChatFlow } from "@/hooks/use-chat-flow";
 import { useOnboardingCheck } from "@/hooks/use-onboarding-check";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { startConversationService } from "@/lib/ai-advisor/services/start-conversation.service";
 import { ChatToolId } from "@/lib/types/ai-streaming.types";
 import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -13,6 +12,7 @@ import { MessageList } from "./message-list";
 import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
+import { aiService } from "@/lib/services/ai.service";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
@@ -65,9 +65,7 @@ export function ChatInterface() {
     if (user && !sentFirstMessage.current) {
       const startConversation = async () => {
         setIsGettingFirstMessage(true);
-        const firstMessage = await startConversationService.getFirstMessage();
-        console.log("🚀 ~ startConversation ~ firstMessage:", firstMessage);
-        sendMessage(firstMessage, {
+        sendMessage(await aiService.getStartMessage(), {
           sender: "system",
         });
         setIsGettingFirstMessage(false);
@@ -75,7 +73,7 @@ export function ChatInterface() {
       sentFirstMessage.current = true;
       startConversation();
     }
-  }, [user]);
+  }, [user, sendMessage]);
 
   // Loading state
   if (chatLoading || isGettingFirstMessage) {

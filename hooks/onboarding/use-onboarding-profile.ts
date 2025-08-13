@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { budgetService } from "@/lib/services/budget.service";
 import { onboardingService } from "@/lib/services/onboarding.service";
@@ -74,11 +74,7 @@ export const useOnboardingProfile = ({
 
         // Get existing budgets first to check for duplicates
         console.log("🔍 Checking for existing budgets...");
-        const existingBudgetsResponse = await budgetService.getAll({
-          month,
-          year,
-        });
-        const existingBudgets = existingBudgetsResponse.budgets || [];
+        const existingBudgets = await budgetService.getBudgets(month, year);
 
         // Create/update budgets for each category
         const budgetPromises = Object.entries(expenseBreakdown).map(
@@ -98,25 +94,24 @@ export const useOnboardingProfile = ({
                   existingBudget.id
                 );
 
-                const updateResult = await budgetService.update(
-                  existingBudget.id,
-                  {
-                    amount,
-                    category: mapping.category,
-                    icon: mapping.icon,
-                    color: mapping.color,
-                  }
-                );
-
-                if (updateResult.budget) {
+                try {
+                  const updateResult = await budgetService.updateBudget(
+                    existingBudget.id,
+                    {
+                      amount,
+                      category: mapping.category,
+                      icon: mapping.icon,
+                      color: mapping.color,
+                    }
+                  );
                   console.log(
                     `✅ Budget updated for ${categoryId}:`,
-                    updateResult.budget
+                    updateResult
                   );
-                } else {
+                } catch (error) {
                   console.error(
                     `❌ Failed to update budget for ${categoryId}:`,
-                    updateResult.error
+                    error
                   );
                 }
               } else {
@@ -136,17 +131,16 @@ export const useOnboardingProfile = ({
                   budgetData
                 );
 
-                const result = await budgetService.create(budgetData);
-
-                if (result.budget) {
+                try {
+                  const result = await budgetService.createBudget(budgetData);
                   console.log(
                     `✅ Budget created for ${categoryId}:`,
-                    result.budget
+                    result
                   );
-                } else {
+                } catch (error) {
                   console.error(
                     `❌ Failed to create budget for ${categoryId}:`,
-                    result.error
+                    error
                   );
                 }
               }

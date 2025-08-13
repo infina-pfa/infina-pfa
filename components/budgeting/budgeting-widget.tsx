@@ -9,18 +9,23 @@ import {
   Transaction,
 } from "@/components/budgeting/recent-expenses-list";
 import { SpendingOverview } from "@/components/budgeting/spending-overview";
-import { useBudgetManagementSWR, useRecentTransactionsSWR } from "@/hooks/swr";
-import { useBudgetDeleteSWR } from "@/hooks/swr/use-budget-delete";
-import { useBudgetStats } from "@/hooks/use-budget-stats";
+import {
+  useBudgets,
+  useDeleteBudget,
+  useMonthlySpending,
+} from "@/hooks/swr/budget";
 import { useToast } from "@/hooks/use-toast";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { Budget } from "@/lib/types/budget.types";
+import { BudgetResponse } from "@/lib/types/budget.types";
 import { formatDateVN } from "@/lib/utils/date-formatter";
 import { useMemo, useState } from "react";
 
 interface BudgetingWidgetProps {
-  onBudgetCreated?: (budget: Budget) => Promise<void>;
-  onBudgetUpdated?: (budget: Budget, oldAmount?: number) => Promise<void>;
+  onBudgetCreated?: (budget: BudgetResponse) => Promise<void>;
+  onBudgetUpdated?: (
+    budget: BudgetResponse,
+    oldAmount?: number
+  ) => Promise<void>;
   onExpenseCreated?: (
     name: string,
     amount: number,
@@ -47,62 +52,68 @@ export function BudgetingWidget({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateExpenseModalOpen, setIsCreateExpenseModalOpen] =
     useState(false);
-  const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
+  const [selectedBudget, setSelectedBudget] = useState<BudgetResponse | null>(
+    null
+  );
 
   // Get current month and year for filtering
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
   const currentYear = currentDate.getFullYear();
 
-  // Memoize filter object
-  const filter = useMemo(
-    () => ({
-      month: currentMonth,
-      year: currentYear,
-    }),
-    [currentMonth, currentYear]
-  );
-
-  // ✨ Use the combined SWR hook for budget management
+  // Use new budget hooks
   const {
     budgets,
-    totalBudget,
-    totalSpent,
-    loading: budgetsLoading,
-    error: budgetsError,
-  } = useBudgetManagementSWR(filter);
+    isLoading: budgetsLoading,
+    isError: budgetsError,
+  } = useBudgets(currentMonth, currentYear);
 
+  // Use monthly spending hook to get all transactions
   const {
-    data: recentTransactions,
-    isLoading: transactionsLoading,
-    error: transactionsError,
-  } = useRecentTransactionsSWR(10);
+    spending: monthlySpending,
+    isLoading: spendingLoading,
+    isError: spendingError,
+  } = useMonthlySpending(currentMonth, currentYear);
+
+  // Calculate total budget and spent from budgets
+  const totalBudget = useMemo(() => {
+    return budgets?.reduce((sum, budget) => sum + budget.amount, 0) || 0;
+  }, [budgets]);
+
+  const totalSpent = useMemo(() => {
+    return budgets?.reduce((sum, budget) => sum + budget.spent, 0) || 0;
+  }, [budgets]);
 
   // Map API transactions to component's Transaction type
   const mappedTransactions: Transaction[] = useMemo(() => {
-    if (!recentTransactions) return [];
-    return recentTransactions.map((transaction) => ({
+    if (!monthlySpending) return [];
+    // Sort by date and take only the 10 most recent transactions
+    const sortedTransactions = [...monthlySpending].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    return sortedTransactions.slice(0, 10).map((transaction) => ({
       id: transaction.id,
       name: transaction.name,
       amount: transaction.amount,
-      date: formatDateVN(new Date(transaction.created_at)),
-      category: transaction.budgetName || "Uncategorized",
+      date: formatDateVN(new Date(transaction.createdAt)),
+      category: transaction.budget?.name || "Uncategorized",
       type: transaction.type,
       description: transaction.description,
-      budgetName: transaction.budgetName,
-      budgetColor: transaction.budgetColor,
+      budgetName: transaction.budget?.name,
+      budgetColor: transaction.budget?.color,
     }));
-  }, [recentTransactions]);
+  }, [monthlySpending]);
 
   // Use the budget delete hook
-  const { deleteBudget, error: deleteError } = useBudgetDeleteSWR();
-
-  // Keep budget statistics for future use
-  const { loading: statsLoading, error: statsError } = useBudgetStats();
+  const { deleteBudget, isDeleting } = useDeleteBudget(
+    currentMonth,
+    currentYear
+  );
 
   // Handle edit budget
   const handleEditBudget = (budgetId: string) => {
-    const budget = budgets.find((b) => b.id === budgetId);
+    const budget = budgets?.find((b) => b.id === budgetId);
     if (budget) {
       setSelectedBudget(budget);
       setIsEditModalOpen(true);
@@ -111,7 +122,7 @@ export function BudgetingWidget({
 
   // Handle add expense
   const handleAddExpense = (budgetId: string) => {
-    const budget = budgets.find((b) => b.id === budgetId);
+    const budget = budgets?.find((b) => b.id === budgetId);
     if (budget) {
       setSelectedBudget(budget);
       setIsCreateExpenseModalOpen(true);
@@ -120,20 +131,28 @@ export function BudgetingWidget({
 
   // Handle delete budget
   const handleDeleteBudget = async (budgetId: string) => {
-    const success = await deleteBudget(budgetId);
-
-    if (success) {
+    try {
+      await deleteBudget(budgetId);
       toast.success(t("budgetDeleted", { ns: "budgeting" }));
-    } else if (deleteError) {
-      toast.error(t("failedToDeleteBudget", { ns: "budgeting" }), deleteError);
+    } catch (err) {
+      const error = err as { code?: string; message?: string };
+      if (error?.code) {
+        toast.error(
+          t(error.code, {
+            ns: "errors",
+            defaultValue:
+              error.message || t("BUDGET_DELETE_FAILED", { ns: "errors" }),
+          })
+        );
+      } else {
+        toast.error(t("BUDGET_DELETE_FAILED", { ns: "errors" }));
+      }
     }
   };
 
-  const isLoading = budgetsLoading || statsLoading || transactionsLoading;
-  const hasError = budgetsError || statsError || transactionsError?.message;
-
-  // Display the first error that occurs
-  const errorMessage = budgetsError || statsError || transactionsError?.message;
+  const isLoading =
+    budgetsLoading || spendingLoading || isDeleting;
+  const hasError = budgetsError || spendingError;
 
   if (isLoading) {
     return (
@@ -149,12 +168,21 @@ export function BudgetingWidget({
   }
 
   if (hasError) {
+    const error = (budgetsError || spendingError) as {
+      code?: string;
+      message?: string;
+    };
+    const errorMessage = error?.code
+      ? t(error.code, {
+          ns: "errors",
+          defaultValue: error.message || t("UNKNOWN_ERROR", { ns: "errors" }),
+        })
+      : t("UNKNOWN_ERROR", { ns: "errors" });
+
     return (
       <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-[#F44336] font-nunito mb-4">
-            {errorMessage || t("error", { ns: "common" })}
-          </p>
+          <p className="text-[#F44336] font-nunito mb-4">{errorMessage}</p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-[#0055FF] text-white rounded-lg font-nunito hover:bg-[#0041CC]"
@@ -173,7 +201,7 @@ export function BudgetingWidget({
 
         <div className="mt-6 md:mt-8">
           <BudgetCategoriesList
-            budgets={budgets}
+            budgets={budgets || []}
             onCreateBudget={() => setIsCreateModalOpen(true)}
             onEditBudget={handleEditBudget}
             onAddExpense={handleAddExpense}
@@ -232,6 +260,8 @@ export function BudgetingWidget({
               }
             : null
         }
+        month={currentMonth}
+        year={currentYear}
         onExpenseCreated={onExpenseCreated}
       />
     </div>

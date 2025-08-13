@@ -23,7 +23,7 @@ export function EducationContentComponent({
   const { t } = useAppTranslation(["onboarding", "common"]);
 
   const educationContent = component.context
-    .educationContent as EducationContent;
+    ?.educationContent as EducationContent;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
@@ -71,7 +71,9 @@ export function EducationContentComponent({
         <div className="inline-block">
           <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#0055FF]/10 rounded-full">
             <span className="text-xs sm:text-sm font-medium text-[#0055FF] uppercase tracking-wide">
-              {educationContent.type === "video" ? "Video Learning" : "Educational Content"}
+              {educationContent.type === "video"
+                ? "Video Learning"
+                : "Educational Content"}
             </span>
           </div>
         </div>
@@ -129,28 +131,36 @@ export function EducationContentComponent({
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 pr-2">
-                      <span className={`
+                      <span
+                        className={`
                         font-medium text-sm sm:text-base transition-colors duration-300 leading-tight
                         ${
                           selectedAction === action
                             ? "text-white"
                             : "text-[#111827] group-hover:text-[#0055FF]"
                         }
-                      `}>
+                      `}
+                      >
                         {action}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center">
                       {selectedAction === action && isSubmitting ? (
                         <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       ) : selectedAction === action ? (
                         <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                       ) : (
-                        <ArrowRight className={`
+                        <ArrowRight
+                          className={`
                           w-4 h-4 sm:w-5 sm:h-5 transition-all duration-300 group-hover:translate-x-1
-                          ${selectedAction === action ? "text-white" : "text-[#6B7280] group-hover:text-[#0055FF]"}
-                        `} />
+                          ${
+                            selectedAction === action
+                              ? "text-white"
+                              : "text-[#6B7280] group-hover:text-[#0055FF]"
+                          }
+                        `}
+                        />
                       )}
                     </div>
                   </div>
@@ -168,7 +178,9 @@ export function EducationContentComponent({
           className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-[#0055FF] text-white hover:bg-[#0055FF]/90 text-sm sm:text-base font-medium rounded-lg sm:rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-[#0055FF]/20"
         >
           <span className="flex items-center justify-center space-x-2">
-            <span>{isSubmitting ? t("submitting") : t("continueToNextStep")}</span>
+            <span>
+              {isSubmitting ? t("submitting") : t("continueToNextStep")}
+            </span>
             {!isSubmitting && (
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
             )}
@@ -185,7 +197,9 @@ export function EducationContentComponent({
             </div>
           </div>
           <div className="min-w-0 flex-1">
-            <h5 className="font-semibold text-[#111827] mb-1 text-sm sm:text-base">Mẹo học tập</h5>
+            <h5 className="font-semibold text-[#111827] mb-1 text-sm sm:text-base">
+              Mẹo học tập
+            </h5>
             <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
               {t("educationTip")}
             </p>

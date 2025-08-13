@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useGoalDashboardSWR } from "@/hooks/swr/use-goal-dashboard";
-import { useGoalDeposit } from "@/hooks/swr/use-goal-deposit";
+import { useGoalDashboardSWR } from "@/hooks/swr-v2/use-goal-dashboard";
+import { useGoalDeposit } from "@/hooks/swr-v2/use-goal-deposit";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,7 +18,9 @@ interface GoalDashboardMessageProps {
   onSendMessage?: (message: string) => void;
 }
 
-export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProps) {
+export function GoalDashboardMessage({
+  onSendMessage,
+}: GoalDashboardMessageProps) {
   const { t } = useAppTranslation(["goals", "common"]);
   const { data, loading, error, refetch } = useGoalDashboardSWR();
   const { deposit, isLoading: isDepositing } = useGoalDeposit();
@@ -79,7 +81,7 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
             goal: data.emergencyFundGoal.title,
           })
         );
-        
+
         // Send confirmation message to chat
         if (onSendMessage) {
           const confirmationMessage = t("depositSuccess", {
@@ -88,7 +90,7 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
           });
           onSendMessage(confirmationMessage);
         }
-        
+
         resetInput();
         // Refresh dashboard data
         await refetch();
@@ -104,7 +106,10 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
 
   if (loading) {
     return (
-      <div className="bg-white p-6 space-y-6" style={{ fontFamily: 'Nunito, sans-serif' }}>
+      <div
+        className="bg-white p-6 space-y-6"
+        style={{ fontFamily: "Nunito, sans-serif" }}
+      >
         <div className="text-center space-y-3">
           <Skeleton className="h-7 w-64 mx-auto" />
           <Skeleton className="h-5 w-48 mx-auto" />
@@ -123,14 +128,20 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
 
   if (error) {
     return (
-      <div className="bg-white p-6 text-center" style={{ fontFamily: 'Nunito, sans-serif' }}>
+      <div
+        className="bg-white p-6 text-center"
+        style={{ fontFamily: "Nunito, sans-serif" }}
+      >
         <div className="space-y-4">
-          <Target className="mx-auto h-12 w-12" style={{ color: '#FF9800' }} />
+          <Target className="mx-auto h-12 w-12" style={{ color: "#FF9800" }} />
           <p className="text-gray-600">{t("common:errorLoadingData")}</p>
-          <Button 
+          <Button
             onClick={() => window.location.reload()}
             className="text-white"
-            style={{ backgroundColor: '#0055FF', fontFamily: 'Nunito, sans-serif' }}
+            style={{
+              backgroundColor: "#0055FF",
+              fontFamily: "Nunito, sans-serif",
+            }}
           >
             {t("common:tryAgain")}
           </Button>
@@ -141,13 +152,16 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
 
   if (!data) {
     return (
-      <div className="bg-white p-6 text-center space-y-6" style={{ fontFamily: 'Nunito, sans-serif' }}>
+      <div
+        className="bg-white p-6 text-center space-y-6"
+        style={{ fontFamily: "Nunito, sans-serif" }}
+      >
         <div className="space-y-4">
-          <div 
+          <div
             className="mx-auto w-16 h-16 flex items-center justify-center rounded-full"
-            style={{ backgroundColor: '#F0F2F5' }}
+            style={{ backgroundColor: "#F0F2F5" }}
           >
-            <Target className="h-8 w-8" style={{ color: '#0055FF' }} />
+            <Target className="h-8 w-8" style={{ color: "#0055FF" }} />
           </div>
           <div className="space-y-2">
             <h3 className="text-xl font-bold text-gray-900">
@@ -157,10 +171,16 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
               {t("goalDashboardCreateFirst")}
             </p>
           </div>
-          <Button 
+          <Button
             className="text-white px-6 py-3 text-base font-semibold"
-            style={{ backgroundColor: '#0055FF', fontFamily: 'Nunito, sans-serif' }}
-            onClick={() => onSendMessage && onSendMessage("I want to create my first emergency fund goal")}
+            style={{
+              backgroundColor: "#0055FF",
+              fontFamily: "Nunito, sans-serif",
+            }}
+            onClick={() =>
+              onSendMessage &&
+              onSendMessage("I want to create my first emergency fund goal")
+            }
           >
             <Plus className="h-5 w-5 mr-2" />
             {t("createGoal")}
@@ -189,14 +209,17 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
   };
 
   const getProgressColor = (percentage: number) => {
-    if (percentage >= 100) return '#2ECC71'; // Green for completed
-    if (percentage >= 75) return '#0055FF'; // Blue for almost there
-    if (percentage >= 50) return '#0055FF'; // Blue for halfway
-    return '#0055FF'; // Default blue
+    if (percentage >= 100) return "#2ECC71"; // Green for completed
+    if (percentage >= 75) return "#0055FF"; // Blue for almost there
+    if (percentage >= 50) return "#0055FF"; // Blue for halfway
+    return "#0055FF"; // Default blue
   };
 
   return (
-    <div className="bg-white p-6 space-y-6" style={{ fontFamily: 'Nunito, sans-serif' }}>
+    <div
+      className="bg-white p-6 space-y-6"
+      style={{ fontFamily: "Nunito, sans-serif" }}
+    >
       {/* Header Section */}
       <div className="text-center space-y-3">
         <h3 className="text-2xl font-bold text-gray-900">
@@ -209,7 +232,7 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
 
       {/* Circular Progress Section */}
       <div className="flex justify-center py-4">
-        <CircularProgress 
+        <CircularProgress
           value={data.progressPercentage}
           size={140}
           strokeWidth={10}
@@ -217,9 +240,12 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
           backgroundColor="#F0F2F5"
         >
           <div className="text-center">
-            <div 
+            <div
               className="text-3xl font-bold mb-1"
-              style={{ color: getProgressColor(data.progressPercentage), fontFamily: 'Nunito, sans-serif' }}
+              style={{
+                color: getProgressColor(data.progressPercentage),
+                fontFamily: "Nunito, sans-serif",
+              }}
             >
               {Math.round(data.progressPercentage)}%
             </div>
@@ -234,7 +260,7 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
       <div className="grid grid-cols-2 gap-4">
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center text-gray-600">
-            <Wallet className="h-4 w-4 mr-1" style={{ color: '#0055FF' }} />
+            <Wallet className="h-4 w-4 mr-1" style={{ color: "#0055FF" }} />
             <span className="text-sm font-medium">{t("currentAmount")}</span>
           </div>
           <div className="text-lg font-bold text-gray-900">
@@ -243,7 +269,7 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
         </div>
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center text-gray-600">
-            <Target className="h-4 w-4 mr-1" style={{ color: '#2ECC71' }} />
+            <Target className="h-4 w-4 mr-1" style={{ color: "#2ECC71" }} />
             <span className="text-sm font-medium">{t("targetAmount")}</span>
           </div>
           <div className="text-lg font-bold text-gray-900">
@@ -254,14 +280,13 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
 
       {/* Additional Info Section */}
       <div className="space-y-4">
-        <div 
-          className="p-4 space-y-3"
-          style={{ backgroundColor: '#F6F7F9' }}
-        >
+        <div className="p-4 space-y-3" style={{ backgroundColor: "#F6F7F9" }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center text-gray-700">
-              <Calendar className="h-4 w-4 mr-2" style={{ color: '#FF9800' }} />
-              <span className="text-sm font-medium">{t("goalDashboardProjectedCompletion")}</span>
+              <Calendar className="h-4 w-4 mr-2" style={{ color: "#FF9800" }} />
+              <span className="text-sm font-medium">
+                {t("goalDashboardProjectedCompletion")}
+              </span>
             </div>
             <span className="font-medium text-gray-900 text-sm">
               {formatCompletionDate(data.projectedCompletionDate)}
@@ -270,8 +295,10 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
 
           <div className="flex items-center justify-between">
             <div className="flex items-center text-gray-700">
-              <Clock className="h-4 w-4 mr-2" style={{ color: '#0055FF' }} />
-              <span className="text-sm font-medium">{t("goalDashboardRemainingAmount")}</span>
+              <Clock className="h-4 w-4 mr-2" style={{ color: "#0055FF" }} />
+              <span className="text-sm font-medium">
+                {t("goalDashboardRemainingAmount")}
+              </span>
             </div>
             <span className="font-bold text-gray-900">
               {formatVND(data.remainingAmount)}
@@ -283,9 +310,12 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
       {/* Action Section */}
       {!isInputMode ? (
         <div className="pt-2">
-          <Button 
+          <Button
             className="w-full text-white py-3 text-base font-semibold"
-            style={{ backgroundColor: '#0055FF', fontFamily: 'Nunito, sans-serif' }}
+            style={{
+              backgroundColor: "#0055FF",
+              fontFamily: "Nunito, sans-serif",
+            }}
             onClick={handleAddMoney}
             disabled={isDepositing}
           >
@@ -297,16 +327,16 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
         <div className="pt-2 space-y-4">
           {/* Money Input */}
           <div>
-                         <MoneyInput
-               label={t("amount", { ns: "common" })}
-               value={inputAmount}
-               onChange={(value) => setInputAmount(value)}
-               error={inputError || undefined}
-               placeholder="0.00"
-               disabled={isDepositing}
-             />
+            <MoneyInput
+              label={t("amount", { ns: "common" })}
+              value={inputAmount}
+              onChange={(value) => setInputAmount(value)}
+              error={inputError || undefined}
+              placeholder="0.00"
+              disabled={isDepositing}
+            />
           </div>
-          
+
           {/* Action Buttons */}
           <div className="flex gap-3">
             <Button
@@ -314,14 +344,17 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
               className="flex-1 py-3 text-base font-semibold"
               onClick={handleCancelInput}
               disabled={isDepositing}
-              style={{ fontFamily: 'Nunito, sans-serif' }}
+              style={{ fontFamily: "Nunito, sans-serif" }}
             >
               <X className="h-4 w-4 mr-2" />
               {t("cancel", { ns: "common" })}
             </Button>
             <Button
               className="flex-1 text-white py-3 text-base font-semibold"
-              style={{ backgroundColor: '#0055FF', fontFamily: 'Nunito, sans-serif' }}
+              style={{
+                backgroundColor: "#0055FF",
+                fontFamily: "Nunito, sans-serif",
+              }}
               onClick={handleConfirmDeposit}
               disabled={isDepositing || !inputAmount}
             >
@@ -333,4 +366,4 @@ export function GoalDashboardMessage({ onSendMessage }: GoalDashboardMessageProp
       )}
     </div>
   );
-} 
+}

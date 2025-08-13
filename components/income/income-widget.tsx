@@ -1,6 +1,6 @@
 "use client";
 
-import { useIncomeListSWR } from "@/hooks/swr";
+import { useMonthlyIncome } from "@/hooks/swr/income";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Income } from "@/lib/types/income.types";
 import { formatCurrency } from "@/lib/utils";
@@ -33,10 +33,12 @@ export function IncomeWidget({
   const year = selectedMonth.getFullYear();
 
   // Fetch incomes using SWR
-  const { incomes, loading, error, refetch } = useIncomeListSWR({
+  const { income: incomes = [], isLoading: loading, isError, mutate: refetch } = useMonthlyIncome(
     month,
-    year,
-  });
+    year
+  );
+  
+  const error = isError ? "Failed to load income" : null;
 
   // Calculate total for selected month
   const totalMonthIncome = incomes.reduce(

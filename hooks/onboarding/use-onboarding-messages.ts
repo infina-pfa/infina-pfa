@@ -1,8 +1,7 @@
-import { useCallback } from "react";
-import { OnboardingMessage, ComponentResponse } from "@/lib/types/onboarding.types";
-import { onboardingService } from "@/lib/services/onboarding.service";
-import { chatMessageManager } from "@/lib/services/chat-message-manager.service";
 import { useAppTranslation } from "@/hooks/use-translation";
+import { chatMessageManager } from "@/lib/services-v2/chat-message-manager.service";
+import { ComponentResponse } from "@/lib/types/onboarding.types";
+import { useCallback } from "react";
 
 interface UseOnboardingMessagesProps {
   conversationId: string | null;
@@ -69,11 +68,15 @@ export const useOnboardingMessages = ({
       }
 
       if (hasInitialHistorySaved) {
-        console.log("📋 Initial conversation history already saved, skipping...");
+        console.log(
+          "📋 Initial conversation history already saved, skipping..."
+        );
         return;
       }
 
-      console.log("💾 Saving initial conversation history with proper timestamps...");
+      console.log(
+        "💾 Saving initial conversation history with proper timestamps..."
+      );
 
       // Use Vietnamese as default for now (same as showInitialWelcomeFlow)
       const isVietnamese = i18n.language === "vi" || true;
@@ -154,12 +157,19 @@ export const useOnboardingMessages = ({
         true // critical: initial setup message
       );
 
-      console.log("✅ Successfully saved new stage-first conversation history in correct order");
+      console.log(
+        "✅ Successfully saved new stage-first conversation history in correct order"
+      );
       setHasInitialHistorySaved(true);
     } catch (error) {
       console.error("❌ Failed to save initial conversation history:", error);
     }
-  }, [conversationId, hasInitialHistorySaved, setHasInitialHistorySaved, i18n.language]);
+  }, [
+    conversationId,
+    hasInitialHistorySaved,
+    setHasInitialHistorySaved,
+    i18n.language,
+  ]);
 
   const getResponseText = useCallback(
     (response: ComponentResponse): string => {
@@ -222,14 +232,16 @@ export const useOnboardingMessages = ({
         });
 
         const formattedTotal = total.toLocaleString("vi-VN");
-        const detailsText = details.length > 0 ? `\n- ${details.join("\n- ")}` : "";
+        const detailsText =
+          details.length > 0 ? `\n- ${details.join("\n- ")}` : "";
 
         return `Chi phí hàng tháng:${detailsText}\n\nTổng cộng: ${formattedTotal} VND`;
       }
 
       // Handle savings capacity response
       if (response.savingsCapacity) {
-        const formattedAmount = response.savingsCapacity.toLocaleString("vi-VN");
+        const formattedAmount =
+          response.savingsCapacity.toLocaleString("vi-VN");
         return `Monthly savings capacity: ${formattedAmount} VND`;
       }
 
@@ -239,7 +251,9 @@ export const useOnboardingMessages = ({
         if (response.userMessage) {
           return response.userMessage;
         }
-        return response.goalConfirmed ? "Goal confirmed" : "Goal needs adjustment";
+        return response.goalConfirmed
+          ? "Goal confirmed"
+          : "Goal needs adjustment";
       }
 
       // Handle education content completion
@@ -266,7 +280,9 @@ export const useOnboardingMessages = ({
       ) {
         // Use unit from response if available, otherwise fallback to no unit
         const unit = response.sliderUnit || "";
-        return unit ? `${response.sliderValue} ${unit}` : `${response.sliderValue}`;
+        return unit
+          ? `${response.sliderValue} ${unit}`
+          : `${response.sliderValue}`;
       }
       return "Completed"; // More descriptive than "ok"
     },

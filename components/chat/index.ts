@@ -11,7 +11,7 @@ export * from "./component-message";
 export * from "./financial-overview-card";
 export * from "./financial-overview-message";
 export * from "./floating-ai-button";
-export * from "./goal-dashboard-message";
+// export * from "./goal-dashboard-message";
 export * from "./markdown-message";
 export * from "./message-bubble";
 export * from "./message-list";

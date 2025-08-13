@@ -23,7 +23,7 @@ interface BudgetSummaryComponentProps {
 
 interface BudgetCategory {
   id: string;
-  title: string;
+  name: string;
   description: string;
   priority: number;
   amount: number;
@@ -173,7 +173,7 @@ export default function BudgetSummaryComponent({
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Title */}
+      {/* Name */}
       <div className="text-center space-y-2">
         <h3 className="text-base sm:text-lg font-semibold text-[#111827] font-nunito">
           {component.title}
@@ -259,7 +259,7 @@ export default function BudgetSummaryComponent({
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h5 className="font-semibold text-[#111827] font-nunito text-sm">
-                        {category.title}
+                        {category.name}
                       </h5>
                       <p className="text-xs text-[#6B7280] mt-1">
                         {category.description}

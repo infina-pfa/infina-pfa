@@ -306,6 +306,7 @@ export const onboardingVi = {
   creatingProfile: "Đang tạo hồ sơ của bạn...",
   settingUpAccount: "Đang thiết lập tài khoản",
   almostReady: "Sắp sẵn sàng!",
+  preparingTool: "Đang chuẩn bị công cụ...",
 
   // Success Step
   successTitle: "Chào mừng lên tàu!",

@@ -33,6 +33,8 @@ import { goalsVi } from "./translations/vi/goals";
 import { goalsEn } from "./translations/en/goals";
 import { spendingVi } from "./translations/vi/spending";
 import { spendingEn } from "./translations/en/spending";
+import { errorsVi } from "./translations/vi/errors";
+import { errorsEn } from "./translations/en/errors";
 
 // Translation resources
 const resources = {
@@ -52,6 +54,7 @@ const resources = {
     income: incomeVi,
     goals: goalsVi,
     spending: spendingVi,
+    errors: errorsVi,
   },
   en: {
     common: commonEn,
@@ -69,6 +72,7 @@ const resources = {
     income: incomeEn,
     goals: goalsEn,
     spending: spendingEn,
+    errors: errorsEn,
   },
 };
 
@@ -94,6 +98,7 @@ i18n
       "chat",
       "onboarding",
       "spending",
+      "errors",
     ],
 
     detection: {

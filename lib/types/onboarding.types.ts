@@ -48,6 +48,13 @@ export interface UserProfile {
   primaryFinancialGoal?: string;
   timeHorizon?: "short" | "medium" | "long";
   riskTolerance?: "conservative" | "moderate" | "aggressive";
+  budgetingStyle?: "goal_focused" | "detail_tracker";
+  goalDetails?: {
+    amount: number;
+    timeframe: number;
+    monthlyTarget: number;
+    type?: string;
+  };
 }
 
 export interface QualitativeAssessment {
@@ -130,7 +137,7 @@ export type OnboardingComponentType =
   | "goal_confirmation"
   | "education_content"
   | "suggestions"
-  | "infina_app_qr"
+  | "infina_qr"
   | "finish_onboarding"
   // Budget allocation enhancement components
   | "budget_category_education"
@@ -160,6 +167,7 @@ export interface ComponentData {
     max: number;
     step: number;
     unit?: string;
+    default?: number;
   };
 
   // Text input

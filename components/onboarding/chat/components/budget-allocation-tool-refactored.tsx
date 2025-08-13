@@ -8,7 +8,7 @@ import {
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useBudgetAllocation } from "@/hooks/budgeting/use-budget-allocation";
 import { BudgetAllocationForm } from "./budget-allocation-form";
-import { budgetAllocationService } from "@/lib/services/budget-allocation.service";
+import { budgetAllocationService } from "@/lib/services-v2/budget-allocation.service";
 
 interface BudgetAllocationToolProps {
   component: OnboardingComponent;
@@ -38,21 +38,29 @@ export default function BudgetAllocationToolRefactored({
   // Memoize context data to prevent recalculation on every render
   const contextData = useMemo(() => {
     const monthlyIncome = component.context?.monthlyIncome || 10000000; // Default 10M VND for demo
-    const emergencyFundTarget = component.context?.emergencyFundTarget || monthlyIncome * 6; // Default 6 months of income
-    const monthlyTargetSavings = component.context?.monthlyTargetSavings || emergencyFundTarget / 24; // 24 months to reach target
+    const emergencyFundTarget =
+      component.context?.emergencyFundTarget || monthlyIncome * 6; // Default 6 months of income
+    const monthlyTargetSavings =
+      component.context?.monthlyTargetSavings || emergencyFundTarget / 24; // 24 months to reach target
     const budgetingStyle = component.context?.budgetingStyle || "goal_focused";
     const expenseBreakdown = component.context?.expenseBreakdown || {};
-    
+
     return {
       monthlyIncome,
       emergencyFundTarget,
       monthlyTargetSavings,
       budgetingStyle,
-      expenseBreakdown
+      expenseBreakdown,
     };
   }, [component.context]);
 
-  const { monthlyIncome, emergencyFundTarget, monthlyTargetSavings, budgetingStyle, expenseBreakdown } = contextData;
+  const {
+    monthlyIncome,
+    emergencyFundTarget,
+    monthlyTargetSavings,
+    budgetingStyle,
+    expenseBreakdown,
+  } = contextData;
 
   // Debug logging for context data
   console.log("🔍 BudgetAllocationTool - Context data received:", {
@@ -99,37 +107,40 @@ export default function BudgetAllocationToolRefactored({
   }, []);
 
   // Memoize form props to prevent unnecessary re-renders
-  const formProps = useMemo(() => ({
-    monthlyIncome,
-    allocation,
-    validationErrors,
-    totalPercentage,
-    isValid,
-    isSubmitting,
-    isCompleted,
-    budgetingStyle,
-    expenseBreakdown,
-    onPercentageChange: handlePercentageChange,
-    onAutoAdjust: autoAdjustAllocation,
-    formatCurrency,
-    formatPercentage,
-    calculateMonetaryValue,
-  }), [
-    monthlyIncome,
-    allocation,
-    validationErrors,
-    totalPercentage,
-    isValid,
-    isSubmitting,
-    isCompleted,
-    budgetingStyle,
-    expenseBreakdown,
-    handlePercentageChange,
-    autoAdjustAllocation,
-    formatCurrency,
-    formatPercentage,
-    calculateMonetaryValue,
-  ]);
+  const formProps = useMemo(
+    () => ({
+      monthlyIncome,
+      allocation,
+      validationErrors,
+      totalPercentage,
+      isValid,
+      isSubmitting,
+      isCompleted,
+      budgetingStyle,
+      expenseBreakdown,
+      onPercentageChange: handlePercentageChange,
+      onAutoAdjust: autoAdjustAllocation,
+      formatCurrency,
+      formatPercentage,
+      calculateMonetaryValue,
+    }),
+    [
+      monthlyIncome,
+      allocation,
+      validationErrors,
+      totalPercentage,
+      isValid,
+      isSubmitting,
+      isCompleted,
+      budgetingStyle,
+      expenseBreakdown,
+      handlePercentageChange,
+      autoAdjustAllocation,
+      formatCurrency,
+      formatPercentage,
+      calculateMonetaryValue,
+    ]
+  );
 
   // Handle submit
   const handleSubmit = useCallback(async () => {
@@ -274,10 +285,5 @@ export default function BudgetAllocationToolRefactored({
     component.context,
   ]);
 
-  return (
-    <BudgetAllocationForm
-      {...formProps}
-      onSubmit={handleSubmit}
-    />
-  );
+  return <BudgetAllocationForm {...formProps} onSubmit={handleSubmit} />;
 }

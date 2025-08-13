@@ -61,7 +61,7 @@ export const BudgetCategoriesList = ({
                 }
                 spent={budget.spent}
                 budget={budget.amount}
-                remaining={budget.remaining}
+                remaining={budget.amount - budget.spent}
                 color={budget.color}
                 onEdit={onEditBudget}
                 onAddExpense={onAddExpense}

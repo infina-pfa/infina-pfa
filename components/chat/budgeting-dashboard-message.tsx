@@ -1,6 +1,6 @@
 "use client";
 
-import { useBudgetingDashboardSWR } from "@/hooks/swr/use-budgeting-dashboard";
+import { useBudgetingDashboardSWR } from "@/hooks/swr-v2/use-budgeting-dashboard";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -8,21 +8,21 @@ import { Progress } from "@/components/ui/progress";
 import { formatVND } from "@/lib/validation/input-validation";
 import { BUDGET_ICONS } from "@/lib/utils/budget-constants";
 
-import { 
-  TrendingUp, 
-  AlertTriangle, 
-  Plus, 
+import {
+  TrendingUp,
+  AlertTriangle,
+  Plus,
   BarChart3,
   Calendar,
-  Wallet
+  Wallet,
 } from "lucide-react";
 
 interface BudgetingDashboardMessageProps {
   onSendMessage?: (message: string) => void;
 }
 
-export function BudgetingDashboardMessage({ 
-  onSendMessage 
+export function BudgetingDashboardMessage({
+  onSendMessage,
 }: BudgetingDashboardMessageProps) {
   const { t } = useAppTranslation(["budgeting", "common"]);
   const { data, loading, error } = useBudgetingDashboardSWR();
@@ -59,9 +59,11 @@ export function BudgetingDashboardMessage({
             {t("dashboardNoBudgets")}
           </h3>
           <p className="text-gray-500">{t("dashboardCreateFirst")}</p>
-          <Button 
+          <Button
             className="bg-[#0055FF] hover:bg-[#0044CC] text-white"
-            onClick={() => onSendMessage && onSendMessage("I want to create my first budget")}
+            onClick={() =>
+              onSendMessage && onSendMessage("I want to create my first budget")
+            }
           >
             <Plus className="h-4 w-4 mr-2" />
             {t("createBudget")}
@@ -73,9 +75,9 @@ export function BudgetingDashboardMessage({
 
   const formatMonthYear = () => {
     const now = new Date();
-    return now.toLocaleDateString("vi-VN", { 
-      month: "long", 
-      year: "numeric" 
+    return now.toLocaleDateString("vi-VN", {
+      month: "long",
+      year: "numeric",
     });
   };
 
@@ -85,7 +87,9 @@ export function BudgetingDashboardMessage({
         color: "#F44336",
         bgColor: "#FFF5F5",
         icon: AlertTriangle,
-        message: t("overBudgetWarning", { amount: formatVND(data.overBudgetAmount) })
+        message: t("overBudgetWarning", {
+          amount: formatVND(data.overBudgetAmount),
+        }),
       };
     }
     const budgetUsage = (data.totalSpent / data.totalBudget) * 100;
@@ -94,14 +98,14 @@ export function BudgetingDashboardMessage({
         color: "#FFC107",
         bgColor: "#FFFBF0",
         icon: AlertTriangle,
-        message: t("budgetWarning", { percentage: Math.round(budgetUsage) })
+        message: t("budgetWarning", { percentage: Math.round(budgetUsage) }),
       };
     }
     return {
       color: "#2ECC71",
       bgColor: "#F0FDF4",
       icon: TrendingUp,
-      message: t("budgetOnTrack")
+      message: t("budgetOnTrack"),
     };
   };
 
@@ -122,7 +126,7 @@ export function BudgetingDashboardMessage({
       </div>
 
       {/* Overall Status */}
-      <div 
+      <div
         className="p-4 rounded-lg flex items-center space-x-3"
         style={{ backgroundColor: status.bgColor }}
       >
@@ -146,14 +150,16 @@ export function BudgetingDashboardMessage({
             / {formatVND(data.totalBudget)}
           </span>
         </div>
-        
-        <Progress 
+
+        <Progress
           value={Math.min((data.totalSpent / data.totalBudget) * 100, 100)}
           className="h-2 mb-2"
         />
-        
+
         <div className="flex items-center justify-between text-xs text-gray-500">
-          <span>{t("dailyAverage")}: {formatVND(data.dailyAverage)}</span>
+          <span>
+            {t("dailyAverage")}: {formatVND(data.dailyAverage)}
+          </span>
           <span>{Math.round((data.totalSpent / data.totalBudget) * 100)}%</span>
         </div>
       </div>
@@ -164,45 +170,59 @@ export function BudgetingDashboardMessage({
           <BarChart3 className="h-4 w-4 mr-2" />
           {t("budgetCategories")}
         </h4>
-        
+
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {data.monthlyBudgets.map((budget) => {
-            const iconInfo = BUDGET_ICONS.find(icon => icon.name === budget.icon) || BUDGET_ICONS[0];
+            const iconInfo =
+              BUDGET_ICONS.find((icon) => icon.name === budget.icon) ||
+              BUDGET_ICONS[0];
             const IconComponent = iconInfo.icon;
-            const percentage = budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0;
+            const percentage =
+              budget.limit > 0 ? (budget.spent / budget.limit) * 100 : 0;
             const isWarning = budget.spent > budget.warningThreshold;
             const isOverLimit = budget.spent > budget.limit;
-            
+
             return (
-              <div key={budget.categoryId} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
-                <div 
+              <div
+                key={budget.categoryId}
+                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50"
+              >
+                <div
                   className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: `${budget.color}20` }}
                 >
-                  <IconComponent 
-                    className="w-4 h-4" 
-                    style={{ color: budget.color }} 
+                  <IconComponent
+                    className="w-4 h-4"
+                    style={{ color: budget.color }}
                   />
                 </div>
-                
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-gray-900 truncate">
                       {budget.categoryName}
                     </span>
-                    <span className={`text-xs font-medium ${
-                      isOverLimit ? 'text-red-600' : 
-                      isWarning ? 'text-amber-600' : 'text-gray-600'
-                    }`}>
+                    <span
+                      className={`text-xs font-medium ${
+                        isOverLimit
+                          ? "text-red-600"
+                          : isWarning
+                          ? "text-amber-600"
+                          : "text-gray-600"
+                      }`}
+                    >
                       {formatVND(budget.spent)} / {formatVND(budget.limit)}
                     </span>
                   </div>
-                  
+
                   <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div 
+                    <div
                       className={`h-1.5 rounded-full transition-all ${
-                        isOverLimit ? 'bg-red-500' : 
-                        isWarning ? 'bg-amber-500' : 'bg-green-500'
+                        isOverLimit
+                          ? "bg-red-500"
+                          : isWarning
+                          ? "bg-amber-500"
+                          : "bg-green-500"
                       }`}
                       style={{ width: `${Math.min(percentage, 100)}%` }}
                     />
@@ -216,28 +236,35 @@ export function BudgetingDashboardMessage({
 
       {/* Quick Actions */}
       <div className="space-y-2 pt-4 border-t border-gray-100">
-        <Button 
+        <Button
           className="w-full bg-[#0055FF] hover:bg-[#0044CC] text-white"
-          onClick={() => onSendMessage && onSendMessage("I want to add a new expense")}
+          onClick={() =>
+            onSendMessage && onSendMessage("I want to add a new expense")
+          }
         >
           <Plus className="h-4 w-4 mr-2" />
           {t("addExpense")}
         </Button>
-        
+
         <div className="grid grid-cols-2 gap-2">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
-            onClick={() => onSendMessage && onSendMessage("Show me my budget analysis")}
+            onClick={() =>
+              onSendMessage && onSendMessage("Show me my budget analysis")
+            }
           >
             <BarChart3 className="h-4 w-4 mr-1" />
             {t("viewAnalysis")}
           </Button>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             size="sm"
-            onClick={() => onSendMessage && onSendMessage("I want to create a new budget category")}
+            onClick={() =>
+              onSendMessage &&
+              onSendMessage("I want to create a new budget category")
+            }
           >
             <Plus className="h-4 w-4 mr-1" />
             {t("addCategory")}
@@ -246,4 +273,4 @@ export function BudgetingDashboardMessage({
       </div>
     </div>
   );
-} 
+}

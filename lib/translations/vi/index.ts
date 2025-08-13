@@ -13,6 +13,7 @@ import { budgetingVi } from "./budgeting";
 import { incomeVi } from "./income";
 import { goalsVi } from "./goals";
 import { spendingVi } from "./spending";
+import { errorsVi } from "./errors";
 
 export const viTranslations = {
   ...commonVi,
@@ -30,4 +31,5 @@ export const viTranslations = {
   ...incomeVi,
   goals: goalsVi,
   spending: spendingVi,
+  errors: errorsVi,
 };

@@ -1,4 +1,4 @@
-import { useIncomeCreateSWR, useIncomeUpdateSWR } from "@/hooks/swr";
+import { useCreateIncome, useUpdateIncome } from "@/hooks/swr/income";
 import { useToast } from "@/hooks/use-toast";
 import { useAppTranslation } from "@/hooks/use-translation";
 import {
@@ -66,9 +66,13 @@ export const useIncomeForm = ({
   const { t } = useAppTranslation(["income", "common"]);
   const toast = useToast();
 
+  // Get current month and year for the hooks
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+
   // SWR hooks
-  const { createIncome, isCreating, error: createError } = useIncomeCreateSWR();
-  const { updateIncome, isUpdating, error: updateError } = useIncomeUpdateSWR();
+  const { createIncome, isCreating, error: createError } = useCreateIncome(currentMonth, currentYear);
+  const { updateIncome, isUpdating, error: updateError } = useUpdateIncome(income?.id || "", currentMonth, currentYear);
 
   const isLoading = isCreating || isUpdating;
   const error = createError || updateError;
@@ -80,15 +84,15 @@ export const useIncomeForm = ({
       const getCategoryFromDescription = (
         description: string | null
       ): string => {
-        if (!description) return INCOME_CATEGORIES.OTHER;
+        if (!description) return "Other";
 
         const desc = description.toLowerCase();
-        for (const [, value] of Object.entries(INCOME_CATEGORIES)) {
-          if (desc.includes(value.toLowerCase())) {
-            return value;
+        for (const category of INCOME_CATEGORIES) {
+          if (desc.includes(category.toLowerCase())) {
+            return category;
           }
         }
-        return INCOME_CATEGORIES.OTHER;
+        return "Other";
       };
 
       return {
@@ -100,7 +104,7 @@ export const useIncomeForm = ({
 
     return {
       amount: 0,
-      category: INCOME_CATEGORIES.SALARY,
+      category: "Salary",
       recurring: 30,
     };
   };
@@ -187,8 +191,8 @@ export const useIncomeForm = ({
         // Build description with category included
 
         const createData: CreateIncomeRequest = {
+          name: formData.category,
           amount: formData.amount,
-          description: formData.category,
           recurring: formData.recurring,
         };
 
@@ -202,12 +206,12 @@ export const useIncomeForm = ({
         // Build description with category included
 
         const updateData: UpdateIncomeRequest = {
+          name: formData.category,
           amount: formData.amount,
-          description: formData.category,
           recurring: formData.recurring,
         };
 
-        const updatedIncome = await updateIncome(income.id, updateData);
+        const updatedIncome = await updateIncome(updateData);
         if (updatedIncome) {
           toast.success(t("incomeUpdateSuccess", { ns: "income" }));
           await onIncomeUpdated?.(updatedIncome);

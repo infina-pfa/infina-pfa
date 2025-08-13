@@ -1,120 +1,78 @@
-import { Transaction } from "./transaction.types";
+/**
+ * Income Transaction Types
+ * Defines all TypeScript interfaces for income management
+ */
 
-// Database types - Income is a transaction with type "income"
-export type Income = Transaction & {
-  type: "income";
-};
-
-// API Request/Response types
-export interface CreateIncomeRequest {
-  amount: number;
-  description: string; // Will contain category info
-  recurring?: number; // 0 = one-time, 1 = daily, 7 = weekly, 30 = monthly, etc.
-}
-
-export interface UpdateIncomeRequest {
-  amount?: number;
-  description: string;
-  recurring?: number;
-}
-
+/**
+ * Income transaction response from API
+ */
 export interface IncomeResponse {
-  income: Income | null;
-  error: string | null;
+  id: string;
+  name: string;
+  description: string;
+  amount: number;
+  type: 'income';
+  recurring: number; // 0 = one-time, >0 = frequency in days
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface IncomeListResponse {
-  incomes: Income[];
-  error: string | null;
+/**
+ * Request to create a new income
+ */
+export interface CreateIncomeRequest {
+  name: string;
+  amount: number;
+  recurring: number;
 }
 
+/**
+ * Request to update an existing income
+ */
+export interface UpdateIncomeRequest {
+  name: string;
+  amount: number;
+  recurring: number;
+}
+
+/**
+ * Filters for income queries
+ */
 export interface IncomeFilters {
   month?: number;
   year?: number;
-  category?: string;
-  recurring?: boolean; // Filter for recurring vs one-time incomes
 }
 
-export interface IncomeStats {
-  totalIncomes: number;
-  monthlyTotal: number;
-  yearlyTotal: number;
-  recurringTotal: number;
-  oneTimeTotal: number;
-  averageMonthly: number;
-  categoriesCount: number;
-}
-
-export interface IncomeAnalytics {
-  monthlyIncomes: Array<{
-    month: string;
-    total: number;
-    count: number;
-  }>;
-  categoryBreakdown: Array<{
-    category: string;
-    total: number;
-    percentage: number;
-  }>;
-  recurringVsOneTime: {
-    recurring: number;
-    oneTime: number;
-  };
-}
-
-// Income categories that will be stored in description
-export const INCOME_CATEGORIES = {
-  SALARY: "Salary",
-  FREELANCE: "Freelance",
-  INVESTMENT: "Investment",
-  BUSINESS: "Business",
-  BONUS: "Bonus",
-  GIFT: "Gift",
-  OTHER: "Other",
+/**
+ * Common recurring patterns for income
+ */
+export const RECURRING_PATTERNS = {
+  ONE_TIME: 0,
+  WEEKLY: 7,
+  BI_WEEKLY: 14,
+  MONTHLY: 30,
+  QUARTERLY: 90,
+  SEMI_ANNUAL: 180,
+  ANNUAL: 365,
 } as const;
 
-export type IncomeCategory =
-  (typeof INCOME_CATEGORIES)[keyof typeof INCOME_CATEGORIES];
+/**
+ * Income categories for UI organization
+ */
+export const INCOME_CATEGORIES = [
+  'Salary',
+  'Freelance',
+  'Investment',
+  'Rental',
+  'Business',
+  'Side Hustle',
+  'Dividends',
+  'Royalties',
+  'Other',
+] as const;
 
-// Hook return types
-export interface UseIncomeListReturn {
-  incomes: Income[];
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
-}
+export type RecurringPattern = typeof RECURRING_PATTERNS[keyof typeof RECURRING_PATTERNS];
+export type IncomeCategory = typeof INCOME_CATEGORIES[number];
 
-export interface UseIncomeCreateReturn {
-  createIncome: (data: CreateIncomeRequest) => Promise<Income | null>;
-  isCreating: boolean;
-  error: string | null;
-}
-
-export interface UseIncomeUpdateReturn {
-  updateIncome: (
-    id: string,
-    data: UpdateIncomeRequest
-  ) => Promise<Income | null>;
-  isUpdating: boolean;
-  error: string | null;
-}
-
-export interface UseIncomeDeleteReturn {
-  deleteIncome: (id: string) => Promise<boolean>;
-  isDeleting: boolean;
-  error: string | null;
-}
-
-export interface UseIncomeStatsReturn {
-  stats: IncomeStats | null;
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
-}
-
-export interface UseIncomeAnalyticsReturn {
-  analytics: IncomeAnalytics | null;
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
-}
+// Alias for backward compatibility
+export type Income = IncomeResponse;

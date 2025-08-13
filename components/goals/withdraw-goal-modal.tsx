@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useGoalWithdraw } from "@/hooks/swr";
+import { useWithdrawFromGoal } from "@/hooks/swr/goal";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useToast } from "@/hooks/use-toast";
-import { Goal } from "@/lib/types/goal.types";
+import { GoalResponseDto } from "@/lib/types/goal.types";
 import { formatCurrency } from "@/lib/utils";
 import {
   Dialog,
@@ -22,7 +22,7 @@ interface WithdrawGoalModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  goal: Goal | null;
+  goal: GoalResponseDto | null;
 }
 
 export function WithdrawGoalModal({
@@ -33,7 +33,7 @@ export function WithdrawGoalModal({
 }: WithdrawGoalModalProps) {
   const { t } = useAppTranslation(["goals", "common"]);
   const { success, error: showError } = useToast();
-  const { withdraw, isLoading } = useGoalWithdraw();
+  const { withdrawFromGoal, isWithdrawing } = useWithdrawFromGoal(goal?.id || "");
 
   // Form state
   const [amount, setAmount] = useState("");
@@ -73,10 +73,10 @@ export function WithdrawGoalModal({
     }
 
     // Check if withdrawal amount is greater than current amount
-    if (goal && amountValue > goal.current_amount) {
+    if (goal && amountValue > goal.currentAmount) {
       errors.amount = t("insufficientFunds", {
         ns: "common",
-        available: formatCurrency(goal.current_amount),
+        available: formatCurrency(goal.currentAmount),
       });
       isValid = false;
     }
@@ -93,10 +93,8 @@ export function WithdrawGoalModal({
     if (!validateForm()) return;
 
     try {
-      const result = await withdraw(goal.id, {
-        name: `${goal.title}`,
+      const result = await withdrawFromGoal({
         amount: parseFloat(amount),
-        description: reason,
       });
 
       if (result) {
@@ -142,7 +140,7 @@ export function WithdrawGoalModal({
             />
             <p className="text-xs text-[#6B7280]">
               {t("availableBalance", { ns: "common" })}:{" "}
-              {formatCurrency(goal.current_amount)}
+              {formatCurrency(goal.currentAmount)}
             </p>
           </div>
 
@@ -165,16 +163,16 @@ export function WithdrawGoalModal({
               type="button"
               variant="outline"
               onClick={handleClose}
-              disabled={isLoading}
+              disabled={isWithdrawing}
             >
               {t("cancel", { ns: "common" })}
             </Button>
             <Button
               type="submit"
               variant="destructive"
-              disabled={isLoading || goal.current_amount <= 0}
+              disabled={isWithdrawing || goal.currentAmount <= 0}
             >
-              {isLoading ? t("withdrawing", { ns: "common" }) : t("withdraw")}
+              {isWithdrawing ? t("withdrawing", { ns: "common" }) : t("withdraw")}
             </Button>
           </DialogFooter>
         </form>

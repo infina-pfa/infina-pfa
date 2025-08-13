@@ -1,5 +1,5 @@
 import { useAIStreaming } from "@/hooks/use-ai-streaming";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useChatMessages } from "@/hooks/use-chat-messages";
 import { useSimpleChatSession } from "@/hooks/use-chat-session";
 import { ChatToolId } from "@/lib/types/ai-streaming.types";
@@ -165,51 +165,24 @@ export const useChatFlow = (): UseChatFlowReturn => {
         }
       }
 
-      // Step 2: Send user message and update state
-      const userMessage = await messages.sendUserMessage(
+      // // Add the current user message to history
+      messages.addMessage({
+        id: `user-${Date.now()}`,
         content,
-        conversationId,
-        { sender: options?.sender }
-      );
-
-      if (!userMessage) {
-        return;
-      }
-
-      // Step 3: Prepare conversation history for AI
-      const conversationHistory = messages.messages
-        .slice(-10) // Last 10 messages for context
-        .map((msg) => ({
-          id: msg.id,
-          content: msg.content,
-          sender: msg.sender === "user" ? ("user" as const) : ("ai" as const),
-          timestamp: msg.created_at,
-        }));
-
-      // Add the current user message to history
-      conversationHistory.push({
-        id: userMessage.id,
-        content: userMessage.content,
-        sender: "user" as const,
-        timestamp: userMessage.created_at,
+        conversation_id: conversationId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        sender: options?.sender || "user",
+        type: "text",
+        metadata: {},
+        user_id: user?.id || "",
       });
-
-      // TODO: Get actual user context from API
-      const userContext = {
-        financial: {
-          totalIncome: 0,
-          totalExpenses: 0,
-          currentBudgets: 0,
-          hasCompletedOnboarding: false,
-        },
-      };
 
       // Step 4: Prepare AI advisor request and start streaming
       const advisorRequest: AdvisorStreamRequest = {
         conversationId: conversationId,
         message: content,
-        conversationHistory,
-        userContext,
+        sender: options?.sender || "user",
       };
 
       if (options?.isToolMessage) {

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Mail, ArrowLeft } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useAppTranslation } from "@/hooks/use-translation";
 
 interface ForgotPasswordFormProps {
@@ -38,13 +38,9 @@ export function ForgotPasswordForm({
     }
 
     try {
-      const result = await forgotPassword(email);
+      await forgotPassword(email);
 
-      if (result.error) {
-        setFormError(result.error);
-      } else {
-        setIsSubmitted(true);
-      }
+      setIsSubmitted(true);
     } catch {
       setFormError(t("unexpectedError"));
     }

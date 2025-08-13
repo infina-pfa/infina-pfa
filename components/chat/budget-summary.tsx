@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useBudgetListSWR } from "@/hooks/swr/use-budget-list";
+import { useBudgetListSWR } from "@/hooks/swr-v2/use-budget-list";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProgressBar } from "@/components/budgeting/progress-bar";
@@ -19,12 +19,15 @@ export const BudgetSummary = ({ onDataReady }: BudgetSummaryProps) => {
   const { t } = useAppTranslation(["budgeting", "common"]);
 
   const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+  
   const filter = useMemo(
     () => ({
-      month: currentDate.getMonth() + 1,
-      year: currentDate.getFullYear(),
+      month: currentMonth,
+      year: currentYear,
     }),
-    []
+    [currentMonth, currentYear]
   );
 
   const { totalBudget, totalSpent, loading, error } = useBudgetListSWR(filter);

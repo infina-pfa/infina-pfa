@@ -1,4 +1,3 @@
-import { handleError } from "@/lib/error-handler";
 import {
   AdvisorStreamRequest,
   ChatMessage,
@@ -8,38 +7,25 @@ import {
   MessageType,
 } from "@/lib/types/chat.types";
 import { Json } from "../supabase/database";
+import { apiClient } from "../api/api-client";
 
 export const chatService = {
   /**
    * Create a new conversation
    */
   async createConversation(title?: string): Promise<Conversation> {
-    try {
-      const response = await fetch("/api/conversations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: title || `Chat Session - ${new Date().toLocaleString()}`,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    const response = await apiClient.post<CreateConversationResponse>(
+      "/conversations",
+      {
+        title: title || `Chat Session - ${new Date().toLocaleString()}`,
       }
+    );
 
-      const data: CreateConversationResponse = await response.json();
-
-      if (!data.success || !data.data) {
-        throw new Error(data.error || "Failed to create conversation");
-      }
-
-      return data.data;
-    } catch (error) {
-      const appError = handleError(error);
-      throw new Error(appError.message);
+    if (response.data.status !== 201 || !response.data.data) {
+      throw new Error(response.data.error || "Failed to create conversation");
     }
+
+    return response.data.data;
   },
 
   /**
@@ -50,52 +36,37 @@ export const chatService = {
     conversationId: string,
     options?: { sender?: MessageSender }
   ): Promise<ChatMessage> {
-    try {
-      if (!content.trim()) {
-        throw new Error("Message content cannot be empty");
-      }
-
-      if (content.length > 10000) {
-        throw new Error("Message content cannot exceed 10,000 characters");
-      }
-
-      const requestData = {
-        content: content.trim(),
-        conversation_id: conversationId,
-        sender: options?.sender || ("user" as MessageSender),
-        type: "text" as MessageType,
-      };
-
-      const response = await fetch("/api/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data.success || !data.data) {
-        throw new Error(data.error || "Failed to send message");
-      }
-
-      // Transform the message to include client-side properties
-      const userMessage: ChatMessage = {
-        ...data.data,
-        isStreaming: false,
-        component: null,
-      };
-
-      return userMessage;
-    } catch (error) {
-      const appError = handleError(error);
-      throw new Error(appError.message);
+    if (!content.trim()) {
+      throw new Error("Message content cannot be empty");
     }
+
+    if (content.length > 10000) {
+      throw new Error("Message content cannot exceed 10,000 characters");
+    }
+
+    const requestData = {
+      content: content.trim(),
+      sender: options?.sender || ("user" as MessageSender),
+      type: "text" as MessageType,
+    };
+
+    const response = await apiClient.post(
+      `/conversations/${conversationId}/messages`,
+      requestData
+    );
+
+    if (response.data.status !== 201 || !response.data.data) {
+      throw new Error(response.data.error || "Failed to send message");
+    }
+
+    // Transform the message to include client-side properties
+    const userMessage: ChatMessage = {
+      ...response.data.data,
+      isStreaming: false,
+      component: null,
+    };
+
+    return userMessage;
   },
 
   /**
@@ -108,101 +79,81 @@ export const chatService = {
     sender: MessageSender;
     metadata?: Json | null;
   }): Promise<ChatMessage> {
-    try {
-      const requestData: {
-        content: string;
-        conversation_id: string;
-        type: MessageType;
-        sender: MessageSender;
-        metadata?: Json;
-      } = message;
+    const requestData: {
+      content: string;
+      type: MessageType;
+      sender: MessageSender;
+      metadata?: Json;
+    } = message;
 
-      const response = await fetch("/api/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
+    const response = await apiClient.post(
+      `/conversations/${message.conversation_id}/messages`,
+      requestData
+    );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data.success || !data.data) {
-        throw new Error(data.error || "Failed to save AI message");
-      }
-
-      return {
-        ...data.data,
-        isStreaming: false,
-        component: null,
-      };
-    } catch (error) {
-      const appError = handleError(error);
-      throw new Error(appError.message);
+    if (response.data.status !== 201 || !response.data.data) {
+      throw new Error(response.data.error || "Failed to save AI message");
     }
+
+    return {
+      ...response.data.data,
+      isStreaming: false,
+      component: null,
+    };
   },
 
   /**
    * Start AI advisor streaming response
    */
   async startAIAdvisorStream(
-    request: AdvisorStreamRequest
+    conversationId: string,
+    userMessage: string,
+    sender: MessageSender
   ): Promise<ReadableStream<Uint8Array>> {
-    try {
-      const response = await fetch("/api/chat/advisor-stream", {
+    const response = await fetch(
+      `/api/conversations/${conversationId}/stream`,
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(request),
-      });
-
-      if (!response.ok) {
-        throw new Error(`AI advisor request failed: ${response.status}`);
+        body: JSON.stringify({ content: userMessage, sender }),
       }
+    );
 
-      if (!response.body) {
-        throw new Error("No response body from AI advisor");
-      }
-
-      return response.body;
-    } catch (error) {
-      const appError = handleError(error);
-      throw new Error(appError.message);
+    if (!response.ok) {
+      throw new Error(`AI advisor request failed: ${response.status}`);
     }
+
+    if (!response.body) {
+      throw new Error("No response body from AI advisor");
+    }
+
+    return response.body;
   },
 
   /**
-   * Start AI advisor streaming response
+   * Start AI advisor tool streaming response
    */
   async startAIAdvisorToolStream(
     request: AdvisorStreamRequest
   ): Promise<ReadableStream<Uint8Array>> {
-    try {
-      const response = await fetch("/api/chat/advisor-tool-interact-stream", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(request),
-      });
+    const response = await fetch("/api/chat/advisor-tool-interact-stream", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    });
 
-      if (!response.ok) {
-        throw new Error(`AI advisor request failed: ${response.status}`);
-      }
-
-      if (!response.body) {
-        throw new Error("No response body from AI advisor");
-      }
-
-      return response.body;
-    } catch (error) {
-      const appError = handleError(error);
-      throw new Error(appError.message);
+    if (!response.ok) {
+      throw new Error(`AI advisor request failed: ${response.status}`);
     }
+
+    if (!response.body) {
+      throw new Error("No response body from AI advisor");
+    }
+
+    return response.body;
   },
 };

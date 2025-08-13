@@ -1,438 +1,113 @@
 import { apiClient } from "@/lib/api-client";
-import { handleError } from "@/lib/error-handler";
 import {
+  BudgetResponse,
   CreateBudgetRequest,
   UpdateBudgetRequest,
-  BudgetResponse,
-  BudgetListResponse,
-  BudgetFilters,
-  BudgetStats,
-  BudgetWithSpending,
+  SpendRequest,
+  BudgetDetailResponse,
+  TransactionResponse,
 } from "@/lib/types/budget.types";
 
-// Type for translation function
-type TranslationFunction = (
-  key: string,
-  options?: { ns?: string | string[] }
-) => string;
-
+/**
+ * Budget Service Layer
+ * Acts as the "API Menu" - a clean abstraction over the API routes
+ * Each method knows HOW to talk to the corresponding endpoint
+ */
 export const budgetService = {
   /**
-   * Get all budgets for the current user with optional filters
+   * Fetches all budgets for a specific month and year
    */
-  async getAll(
-    filters?: BudgetFilters,
-    t?: TranslationFunction
-  ): Promise<BudgetListResponse> {
-    try {
-      const params: Record<string, string | number> = {};
-
-      if (filters?.month) params.month = filters.month;
-      if (filters?.year) params.year = filters.year;
-      if (filters?.category) params.category = filters.category;
-
-      const response = await apiClient.get<BudgetWithSpending[]>(
-        "/budgets",
-        params
-      );
-
-      if (response.success && response.data) {
-        return {
-          budgets: response.data,
-          error: null,
-        };
-      }
-
-      throw new Error(response.error || "Failed to fetch budgets");
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        budgets: [],
-        error: appError.message,
-      };
-    }
+  async getBudgets(month: number, year: number): Promise<BudgetResponse[]> {
+    const response = await apiClient.get<BudgetResponse[]>("/budgets", {
+      month,
+      year,
+    });
+    return response.data || [];
   },
 
   /**
-   * Get budgets with spending data for the current user
+   * Creates a new budget
    */
-  async getAllWithSpending(
-    filters?: BudgetFilters,
-    t?: TranslationFunction
-  ): Promise<{
-    budgets: BudgetWithSpending[];
-    totalBudget: number;
-    totalSpent: number;
-    error: string | null;
-  }> {
-    try {
-      const params: Record<string, string | number> = {};
-
-      if (filters?.month) params.month = filters.month;
-      if (filters?.year) params.year = filters.year;
-      if (filters?.category) params.category = filters.category;
-
-      // Add parameter to request spending data
-      params.withSpending = "true";
-
-      const response = await apiClient.get<{
-        budgets: BudgetWithSpending[];
-        totalBudget: number;
-        totalSpent: number;
-      }>("/budgets", params);
-
-      if (response.success && response.data) {
-        return {
-          budgets: response.data.budgets,
-          totalBudget: response.data.totalBudget,
-          totalSpent: response.data.totalSpent,
-          error: null,
-        };
-      }
-
-      throw new Error(
-        response.error || "Failed to fetch budgets with spending"
-      );
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        budgets: [],
-        totalBudget: 0,
-        totalSpent: 0,
-        error: appError.message,
-      };
+  async createBudget(data: CreateBudgetRequest): Promise<BudgetResponse> {
+    const response = await apiClient.post<BudgetResponse>("/budgets", data);
+    if (!response.data) {
+      throw new Error("Failed to create budget");
     }
+    return response.data;
   },
 
   /**
-   * Get a single budget by ID
+   * Fetches detailed information about a specific budget
    */
-  async getById(id: string, t?: TranslationFunction): Promise<BudgetResponse> {
-    try {
-      const response = await apiClient.get<BudgetWithSpending>(
-        `/budgets/${id}`
-      );
-
-      if (response.success && response.data) {
-        return {
-          budget: response.data,
-          error: null,
-        };
-      }
-
-      throw new Error(response.error || "Failed to fetch budget");
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        budget: null,
-        error: appError.message,
-      };
+  async getBudgetDetail(budgetId: string): Promise<BudgetDetailResponse> {
+    const response = await apiClient.get<BudgetDetailResponse>(
+      `/budgets/${budgetId}`
+    );
+    if (!response.data) {
+      throw new Error("Budget not found");
     }
+    return response.data;
   },
 
   /**
-   * Create a new budget
+   * Updates an existing budget
    */
-  async create(
-    data: CreateBudgetRequest,
-    t?: TranslationFunction
+  async updateBudget(
+    budgetId: string,
+    data: UpdateBudgetRequest
   ): Promise<BudgetResponse> {
-    try {
-      const response = await apiClient.post<BudgetWithSpending>(
-        "/budgets",
-        data
-      );
-
-      if (response.success && response.data) {
-        return {
-          budget: response.data,
-          error: null,
-        };
-      }
-
-      throw new Error(response.error || "Failed to create budget");
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        budget: null,
-        error: appError.message,
-      };
+    const response = await apiClient.patch<BudgetResponse>(
+      `/budgets/${budgetId}`,
+      data
+    );
+    if (!response.data) {
+      throw new Error("Failed to update budget");
     }
+    return response.data;
   },
 
   /**
-   * Update an existing budget
+   * Deletes a budget
    */
-  async update(
-    id: string,
-    data: UpdateBudgetRequest,
-    t?: TranslationFunction
-  ): Promise<BudgetResponse> {
-    try {
-      const response = await apiClient.put<BudgetWithSpending>(
-        `/budgets/${id}`,
-        data
-      );
-
-      if (response.success && response.data) {
-        return {
-          budget: response.data,
-          error: null,
-        };
-      }
-
-      throw new Error(response.error || "Failed to update budget");
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        budget: null,
-        error: appError.message,
-      };
-    }
+  async deleteBudget(budgetId: string): Promise<void> {
+    await apiClient.delete(`/budgets/${budgetId}`);
   },
 
   /**
-   * Delete a budget
+   * Records spending against a budget
    */
-  async delete(
-    id: string,
-    t?: TranslationFunction
-  ): Promise<{ success: boolean; error: string | null }> {
-    try {
-      const response = await apiClient.delete<{ success: boolean }>(
-        `/budgets/${id}`
-      );
-
-      if (response.success) {
-        return {
-          success: true,
-          error: null,
-        };
-      }
-
-      throw new Error(response.error || "Failed to delete budget");
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        success: false,
-        error: appError.message,
-      };
+  async recordSpending(
+    budgetId: string,
+    data: SpendRequest
+  ): Promise<BudgetDetailResponse> {
+    const response = await apiClient.post<BudgetDetailResponse>(
+      `/budgets/${budgetId}/spend`,
+      data
+    );
+    if (!response.data) {
+      throw new Error("Failed to record spending");
     }
+    return response.data;
   },
 
   /**
-   * Get budget statistics
+   * Deletes a specific spending transaction
    */
-  async getStats(
-    t?: TranslationFunction
-  ): Promise<{ stats: BudgetStats | null; error: string | null }> {
-    try {
-      const response = await apiClient.get<BudgetStats>("/budgets/stats");
-
-      if (response.success && response.data) {
-        return {
-          stats: response.data,
-          error: null,
-        };
-      }
-
-      throw new Error(response.error || "Failed to fetch budget stats");
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        stats: null,
-        error: appError.message,
-      };
-    }
+  async deleteSpending(budgetId: string, spendingId: string): Promise<void> {
+    await apiClient.delete(`/budgets/${budgetId}/spending/${spendingId}`);
   },
 
   /**
-   * Get recent transactions for all budgets
+   * Fetches all spending transactions for a specific month and year
    */
-  async getRecentTransactions(
-    limit: number = 10,
-    t?: TranslationFunction
-  ): Promise<{
-    transactions: Array<{
-      id: string;
-      name: string;
-      amount: number;
-      date: string;
-      category: string;
-      type: string;
-      description: string | null;
-      budgetName?: string;
-      budgetColor?: string;
-    }>;
-    error: string | null;
-  }> {
-    try {
-      const response = await apiClient.get<
-        Array<{
-          id: string;
-          name: string;
-          amount: number;
-          date: string;
-          category: string;
-          type: string;
-          description: string | null;
-          budgetName?: string;
-          budgetColor?: string;
-        }>
-      >("/transactions", { limit });
-
-      if (response.success && response.data) {
-        return {
-          transactions: response.data,
-          error: null,
-        };
-      }
-
-      throw new Error(response.error || "Failed to fetch recent transactions");
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        transactions: [],
-        error: appError.message,
-      };
-    }
-  },
-
-  /**
-   * Create priority-based budgets from allocation data
-   */
-  async createPriorityBasedBudgets(
-    allocation: {
-      emergencyFund: number;
-      livingExpenses: number;
-      freeToSpend: number;
-    },
-    monthlyIncome: number,
-    t?: TranslationFunction
-  ): Promise<{ budgets: BudgetWithSpending[]; error: string | null }> {
-    try {
-      // Calculate monetary values from percentages
-      const monetaryValues = {
-        emergencyFund: (monthlyIncome * allocation.emergencyFund) / 100,
-        livingExpenses: (monthlyIncome * allocation.livingExpenses) / 100,
-        freeToSpend: (monthlyIncome * allocation.freeToSpend) / 100,
-      };
-
-      // Define the priority-based budget categories
-      const budgetCategories = [
-        {
-          name: t ? t("emergencyFund", { ns: "budgeting" }) : "Emergency Fund",
-          category: "savings",
-          amount: monetaryValues.emergencyFund,
-          color: "#0055FF",
-          description: t
-            ? t("emergencyFundDescription", { ns: "budgeting" })
-            : "Priority 1: Emergency fund savings",
-          priority: 1,
-        },
-        {
-          name: t
-            ? t("livingExpenses", { ns: "budgeting" })
-            : "Living Expenses",
-          category: "essential",
-          amount: monetaryValues.livingExpenses,
-          color: "#2ECC71",
-          description: t
-            ? t("livingExpensesDescription", { ns: "budgeting" })
-            : "Priority 2: Essential living costs and future plans",
-          priority: 2,
-        },
-        {
-          name: t ? t("freeToSpend", { ns: "budgeting" }) : "Free to Spend",
-          category: "discretionary",
-          amount: monetaryValues.freeToSpend,
-          color: "#FF9800",
-          description: t
-            ? t("freeToSpendDescription", { ns: "budgeting" })
-            : "Priority 3: Discretionary spending",
-          priority: 3,
-        },
-      ];
-
-      // Create all budgets in sequence
-      const createdBudgets: BudgetWithSpending[] = [];
-      const errors: string[] = [];
-
-      for (const budgetData of budgetCategories) {
-        const createRequest: CreateBudgetRequest = {
-          name: budgetData.name,
-          category: budgetData.category,
-          amount: budgetData.amount,
-          color: budgetData.color,
-          month: new Date().getMonth() + 1,
-          year: new Date().getFullYear(),
-        };
-
-        const result = await this.create(createRequest, t);
-
-        if (result.error) {
-          errors.push(`Failed to create ${budgetData.name}: ${result.error}`);
-        } else if (result.budget) {
-          createdBudgets.push({
-            ...result.budget,
-            spent: 0,
-            remaining: result.budget.amount,
-          });
-        }
-      }
-
-      // If there were errors creating some budgets, return partial success
-      if (errors.length > 0) {
-        return {
-          budgets: createdBudgets,
-          error: `Some budgets failed to create: ${errors.join(", ")}`,
-        };
-      }
-
-      return {
-        budgets: createdBudgets,
-        error: null,
-      };
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        budgets: [],
-        error: appError.message,
-      };
-    }
-  },
-
-  /**
-   * Update user's budgeting philosophy
-   */
-  async updateBudgetingPhilosophy(
-    philosophy: "goal_focused" | "detail_tracker",
-    t?: TranslationFunction
-  ): Promise<{ success: boolean; error: string | null }> {
-    try {
-      const response = await apiClient.put<{ success: boolean }>(
-        "/user/budgeting-philosophy",
-        {
-          budgetingStyle: philosophy,
-        }
-      );
-
-      if (response.success) {
-        return {
-          success: true,
-          error: null,
-        };
-      }
-
-      throw new Error(
-        response.error || "Failed to update budgeting philosophy"
-      );
-    } catch (error) {
-      const appError = handleError(error, t);
-      return {
-        success: false,
-        error: appError.message,
-      };
-    }
+  async getMonthlySpending(
+    month: number,
+    year: number
+  ): Promise<TransactionResponse[]> {
+    const response = await apiClient.get<TransactionResponse[]>(
+      "/budgets/spending",
+      { month, year }
+    );
+    return response.data || [];
   },
 };

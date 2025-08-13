@@ -1,12 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { OnboardingComponent, ComponentResponse } from "@/lib/types/onboarding.types";
+import {
+  OnboardingComponent,
+  ComponentResponse,
+} from "@/lib/types/onboarding.types";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useAuthContext } from "@/components/providers/auth-provider";
 import { goalService } from "@/lib/services/goal.service";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Target, Calendar, DollarSign, Edit3, Sparkles, TrendingUp } from "lucide-react";
+import {
+  CheckCircle,
+  Target,
+  Calendar,
+  DollarSign,
+  Edit3,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 
 interface GoalConfirmationComponentProps {
   component: OnboardingComponent;
@@ -25,7 +36,7 @@ export function GoalConfirmationComponent({
 }: GoalConfirmationComponentProps) {
   const { t } = useAppTranslation(["onboarding", "common"]);
   const { user } = useAuthContext();
-  
+
   const goalDetails = component.context.goalDetails as GoalDetails;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,49 +55,48 @@ export function GoalConfirmationComponent({
     // Emergency fund goal data
     const emergencyFundData = {
       title: "Quỹ Dự phòng Khẩn cấp",
-      description: `Mục tiêu xây dựng quỹ dự phòng khẩn cấp ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng với mức tiết kiệm ${formatCurrency(goalDetails.monthlyTarget)} VND mỗi tháng.`,
-      target_amount: goalDetails.amount,
-      current_amount: 0,
-      due_date: dueDate.toISOString(),
+      description: `Mục tiêu xây dựng quỹ dự phòng khẩn cấp ${formatCurrency(
+        goalDetails.amount
+      )} VND trong ${
+        goalDetails.timeframe
+      } tháng với mức tiết kiệm ${formatCurrency(
+        goalDetails.monthlyTarget
+      )} VND mỗi tháng.`,
+      targetAmount: goalDetails.amount,
+      dueDate: dueDate.toISOString(),
     };
 
-    // First, check if an emergency fund goal already exists
-    const existingGoalsResponse = await goalService.getAll(undefined, t);
-    
-    if (existingGoalsResponse.error) {
-      throw new Error(existingGoalsResponse.error);
-    }
+    try {
+      // First, check if an emergency fund goal already exists
+      const existingGoals = await goalService.getGoals();
 
-    // Look for existing emergency fund goal (by title)
-    const existingEmergencyFundGoal = existingGoalsResponse.goals.find(
-      goal => goal.title.toLowerCase().includes("quỹ dự phòng") || 
-              goal.title.toLowerCase().includes("emergency fund")
-    );
-
-    if (existingEmergencyFundGoal) {
-      // Update existing goal
-      console.log("Updating existing emergency fund goal:", existingEmergencyFundGoal.id);
-      const updateResponse = await goalService.update(
-        existingEmergencyFundGoal.id,
-        emergencyFundData,
-        t
+      // Look for existing emergency fund goal (by title)
+      const existingEmergencyFundGoal = existingGoals.find(
+        (goal) =>
+          goal.title.toLowerCase().includes("quỹ dự phòng") ||
+          goal.title.toLowerCase().includes("emergency fund")
       );
-      
-      if (updateResponse.error) {
-        throw new Error(updateResponse.error);
+
+      if (existingEmergencyFundGoal) {
+        // Update existing goal
+        console.log(
+          "Updating existing emergency fund goal:",
+          existingEmergencyFundGoal.id
+        );
+        const updatedGoal = await goalService.updateGoal(
+          existingEmergencyFundGoal.id,
+          emergencyFundData
+        );
+        return updatedGoal;
+      } else {
+        // Create new goal
+        console.log("Creating new emergency fund goal");
+        const newGoal = await goalService.createGoal(emergencyFundData);
+        return newGoal;
       }
-      
-      return updateResponse.goal;
-    } else {
-      // Create new goal
-      console.log("Creating new emergency fund goal");
-      const createResponse = await goalService.create(emergencyFundData, t);
-      
-      if (createResponse.error) {
-        throw new Error(createResponse.error);
-      }
-      
-      return createResponse.goal;
+    } catch (error) {
+      console.error("Error creating/updating emergency fund goal:", error);
+      throw error;
     }
   };
 
@@ -105,15 +115,21 @@ export function GoalConfirmationComponent({
           amount: goalDetails.amount,
           timeframe: goalDetails.timeframe,
           monthlyTarget: goalDetails.monthlyTarget,
-          type: "emergency_fund"
+          type: "emergency_fund",
         },
         userAction: "confirmed",
-        userMessage: t("goalConfirmationUserMessage", { 
+        userMessage: t("goalConfirmationUserMessage", {
           ns: "onboarding",
           amount: formatCurrency(goalDetails.amount),
           timeframe: goalDetails.timeframe,
           monthlyTarget: formatCurrency(goalDetails.monthlyTarget),
-          defaultValue: `Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng với mức tiết kiệm ${formatCurrency(goalDetails.monthlyTarget)} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.`
+          defaultValue: `Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp ${formatCurrency(
+            goalDetails.amount
+          )} VND trong ${
+            goalDetails.timeframe
+          } tháng với mức tiết kiệm ${formatCurrency(
+            goalDetails.monthlyTarget
+          )} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.`,
         }),
         nextSteps: "guide_implementation",
         actionContext: {
@@ -136,15 +152,21 @@ export function GoalConfirmationComponent({
           amount: goalDetails.amount,
           timeframe: goalDetails.timeframe,
           monthlyTarget: goalDetails.monthlyTarget,
-          type: "emergency_fund"
+          type: "emergency_fund",
         },
         userAction: "confirmed",
-        userMessage: t("goalConfirmationUserMessage", { 
+        userMessage: t("goalConfirmationUserMessage", {
           ns: "onboarding",
           amount: formatCurrency(goalDetails.amount),
           timeframe: goalDetails.timeframe,
           monthlyTarget: formatCurrency(goalDetails.monthlyTarget),
-          defaultValue: `Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng với mức tiết kiệm ${formatCurrency(goalDetails.monthlyTarget)} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.`
+          defaultValue: `Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp ${formatCurrency(
+            goalDetails.amount
+          )} VND trong ${
+            goalDetails.timeframe
+          } tháng với mức tiết kiệm ${formatCurrency(
+            goalDetails.monthlyTarget
+          )} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.`,
         }),
         nextSteps: "guide_implementation",
         actionContext: {
@@ -153,7 +175,8 @@ export function GoalConfirmationComponent({
           monthlyTarget: goalDetails.monthlyTarget,
           timeframe: goalDetails.timeframe,
           readyToStart: true,
-          goalCreationError: error instanceof Error ? error.message : "Unknown error",
+          goalCreationError:
+            error instanceof Error ? error.message : "Unknown error",
         },
         completedAt: new Date(),
       });
@@ -170,12 +193,16 @@ export function GoalConfirmationComponent({
       await onResponse({
         goalConfirmed: false,
         userAction: "requested_adjustment",
-        userMessage: t("goalAdjustmentUserMessage", { 
+        userMessage: t("goalAdjustmentUserMessage", {
           ns: "onboarding",
           amount: formatCurrency(goalDetails.amount),
           timeframe: goalDetails.timeframe,
           monthlyTarget: formatCurrency(goalDetails.monthlyTarget),
-          defaultValue: `Tôi muốn điều chỉnh lại mục tiêu quỹ dự phòng khẩn cấp. Mục tiêu hiện tại ${formatCurrency(goalDetails.amount)} VND trong ${goalDetails.timeframe} tháng (${formatCurrency(goalDetails.monthlyTarget)} VND/tháng) chưa phù hợp với tình hình của tôi. Hãy giúp tôi tính toán lại với các thông số khác.`
+          defaultValue: `Tôi muốn điều chỉnh lại mục tiêu quỹ dự phòng khẩn cấp. Mục tiêu hiện tại ${formatCurrency(
+            goalDetails.amount
+          )} VND trong ${goalDetails.timeframe} tháng (${formatCurrency(
+            goalDetails.monthlyTarget
+          )} VND/tháng) chưa phù hợp với tình hình của tôi. Hãy giúp tôi tính toán lại với các thông số khác.`,
         }),
         adjustmentReason: "user_wants_different_parameters",
         nextSteps: "recalculate_goal",
@@ -185,7 +212,7 @@ export function GoalConfirmationComponent({
           currentMonthlyTarget: goalDetails.monthlyTarget,
           currentTimeframe: goalDetails.timeframe,
           needsAdjustment: true,
-          adjustmentRequested: true
+          adjustmentRequested: true,
         },
         completedAt: new Date(),
       });
@@ -197,10 +224,14 @@ export function GoalConfirmationComponent({
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN').format(amount);
+    return new Intl.NumberFormat("vi-VN").format(amount);
   };
 
-  const progressPercentage = Math.min((goalDetails.monthlyTarget * goalDetails.timeframe / goalDetails.amount) * 100, 100);
+  const progressPercentage = Math.min(
+    ((goalDetails.monthlyTarget * goalDetails.timeframe) / goalDetails.amount) *
+      100,
+    100
+  );
 
   return (
     <div className="space-y-5 font-nunito max-w-2xl mx-auto">
@@ -209,7 +240,7 @@ export function GoalConfirmationComponent({
         <div className="w-16 h-16 bg-[#0055FF] rounded-full flex items-center justify-center mx-auto">
           <Target className="text-white" size={24} />
         </div>
-        
+
         <div>
           <h3 className="text-xl font-semibold text-[#111827] mb-2">
             {t("emergencyFundGoal")}
@@ -232,7 +263,9 @@ export function GoalConfirmationComponent({
               <DollarSign className="text-white" size={20} />
             </div>
             <div>
-              <p className="text-sm text-[#6B7280] font-medium">{t("monthlyTarget")}</p>
+              <p className="text-sm text-[#6B7280] font-medium">
+                {t("monthlyTarget")}
+              </p>
               <p className="text-lg font-semibold text-[#111827]">
                 {formatCurrency(goalDetails.monthlyTarget)} VND
               </p>
@@ -246,7 +279,9 @@ export function GoalConfirmationComponent({
               <Calendar className="text-white" size={20} />
             </div>
             <div>
-              <p className="text-sm text-[#6B7280] font-medium">{t("timeToGoal")}</p>
+              <p className="text-sm text-[#6B7280] font-medium">
+                {t("timeToGoal")}
+              </p>
               <p className="text-lg font-semibold text-[#111827]">
                 {goalDetails.timeframe} {t("months")}
               </p>
@@ -263,7 +298,7 @@ export function GoalConfirmationComponent({
             {t("yourProgressTimeline")}
           </h4>
         </div>
-        
+
         {/* Overall Progress */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
@@ -272,10 +307,10 @@ export function GoalConfirmationComponent({
               {goalDetails.timeframe} tháng
             </span>
           </div>
-          
+
           <div className="relative">
             <div className="w-full bg-[#E5E7EB] rounded-full h-4">
-              <div 
+              <div
                 className="bg-gradient-to-r from-[#0055FF] to-[#2ECC71] h-4 rounded-full transition-all duration-700 flex items-center justify-end pr-2"
                 style={{ width: `${Math.min(progressPercentage, 100)}%` }}
               >
@@ -348,19 +383,25 @@ export function GoalConfirmationComponent({
             <div className="w-5 h-5 bg-[#2ECC71] rounded-full flex items-center justify-center mt-0.5">
               <CheckCircle className="text-white" size={12} />
             </div>
-            <span className="text-sm text-[#374151] leading-relaxed">{t("benefit1")}</span>
+            <span className="text-sm text-[#374151] leading-relaxed">
+              {t("benefit1")}
+            </span>
           </div>
           <div className="flex items-start space-x-3">
             <div className="w-5 h-5 bg-[#2ECC71] rounded-full flex items-center justify-center mt-0.5">
               <CheckCircle className="text-white" size={12} />
             </div>
-            <span className="text-sm text-[#374151] leading-relaxed">{t("benefit2")}</span>
+            <span className="text-sm text-[#374151] leading-relaxed">
+              {t("benefit2")}
+            </span>
           </div>
           <div className="flex items-start space-x-3">
             <div className="w-5 h-5 bg-[#2ECC71] rounded-full flex items-center justify-center mt-0.5">
               <CheckCircle className="text-white" size={12} />
             </div>
-            <span className="text-sm text-[#374151] leading-relaxed">{t("benefit3")}</span>
+            <span className="text-sm text-[#374151] leading-relaxed">
+              {t("benefit3")}
+            </span>
           </div>
         </div>
       </div>
@@ -384,7 +425,7 @@ export function GoalConfirmationComponent({
             </div>
           )}
         </Button>
-        
+
         <Button
           onClick={handleReject}
           disabled={isSubmitting}
@@ -398,4 +439,4 @@ export function GoalConfirmationComponent({
       </div>
     </div>
   );
-} 
+}

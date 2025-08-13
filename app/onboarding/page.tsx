@@ -1,113 +1,100 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { useAuthContext } from "@/components/providers/auth-provider";
-import { userService } from "@/lib/services/user.service";
-import { OnboardingChatInterface } from "@/components/onboarding/chat/onboarding-chat-interface";
+import { useOnboarding } from "@/hooks/use-onboarding-stream";
 import { useAppTranslation } from "@/hooks/use-translation";
+import { ChatInput } from "@/components/onboarding-v2/chat-input";
+import { MessageList } from "@/components/onboarding-v2/message-list";
+import { TypingIndicator } from "@/components/onboarding-v2/typing-indicator";
+import { ToolPreparingIndicator } from "@/components/onboarding/chat/components/tool-preparing-indicator";
 
-export default function OnboardingPage() {
-  const { user, loading: authLoading } = useAuthContext();
-  const router = useRouter();
+export default function OnboardingV2Page() {
   const { t } = useAppTranslation(["onboarding", "common"]);
 
-  // Check if user has completed onboarding
-  useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      if (!user?.id) return;
+  const onboardingStream = useOnboarding();
+  const {
+    messages,
+    isLoading,
+    error,
+    isThinking,
+    isStreaming,
+    isPreparingTool,
+    clearError,
+    handleComponentResponse,
+    handleSubmit,
+    isSubmitting,
+  } = onboardingStream;
 
-      try {
-        const result = await userService.checkUserExists();
-
-        if (
-          result.exists &&
-          result.user &&
-          result.user.onboarding_completed_at
-        ) {
-          // User has completed onboarding, redirect to chat
-          router.push("/chat");
-        }
-        // If user exists but hasn't completed onboarding, continue with onboarding
-      } catch (error) {
-        console.error("Error checking onboarding status:", error);
-        // Continue with onboarding if there's an error
-      }
-    };
-
-    if (user && !authLoading) {
-      checkOnboardingStatus();
-    }
-  }, [user, authLoading, router]);
-
-  // Redirect to sign-in if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/auth/sign-in");
-    }
-  }, [user, authLoading, router]);
-
-  // Show loading while checking auth or user profile
-  if (authLoading || !user) {
+  // Loading state
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F6F7F9] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#0055FF] border-t-transparent rounded-full animate-spin"></div>
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <div className="w-8 h-8 mx-auto mb-6">
+            <div className="w-full h-full bg-blue-600 rounded-full animate-pulse"></div>
+          </div>
+          <p className="text-gray-600 font-nunito font-medium">
+            {t("loading")}
+          </p>
+        </div>
       </div>
     );
   }
 
-  const handleOnboardingComplete = () => {
-    // Navigate to chat after successful onboarding
-    router.push("/chat");
-  };
-
   return (
-    <div className="min-h-screen bg-[#F6F7F9] font-nunito flex flex-col">
-      {/* Header - following landing page design */}
-      <header className="bg-white shadow-sm flex-shrink-0">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center">
-            {/* Logo - same as landing page */}
-            <Link href="/" className="flex items-center space-x-2">
-              <Image
-                src="/infina-logo.png"
-                alt="Infina"
-                width={100}
-                height={30}
-                className="h-auto w-auto max-h-[24px] sm:max-h-[30px]"
-                priority
-              />
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content - Full height chat interface */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 flex flex-col max-w-5xl w-full mx-auto">
-          <div className="flex-1 bg-white sm:rounded-t-2xl sm:mt-4 shadow-sm flex flex-col overflow-hidden">
-            {/* Header - Reduced padding on mobile */}
-            <div className="text-center px-4 pt-6 pb-4 sm:px-8 sm:pt-8 sm:pb-6 flex-shrink-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#111827] mb-2 sm:mb-4">
-                {t("onboardingTitle")}
-              </h1>
-              <p className="text-base sm:text-lg text-[#6B7280] max-w-2xl mx-auto">
-                {t("onboardingSubtitle")}
-              </p>
-            </div>
-
-            {/* Chat Interface - Takes remaining space */}
-            <div className="flex-1 px-4 pb-4 sm:px-8 sm:pb-6 overflow-hidden">
-              <OnboardingChatInterface
-                userId={user.id}
-                onComplete={handleOnboardingComplete}
-              />
+    <div className="flex h-screen container mx-auto">
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col h-full">
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 p-6 mb-6">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg
+                  className="w-5 h-5 text-red-400 mt-0.5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700 font-nunito font-medium">
+                  {error}
+                </p>
+                <button
+                  onClick={clearError}
+                  className="text-red-600 hover:text-red-800 text-sm font-nunito font-medium mt-2 cursor-pointer"
+                >
+                  {t("dismissError")}
+                </button>
+              </div>
             </div>
           </div>
+        )}
+
+        {/* Messages Area - flex-1 to take remaining space */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide min-h-0">
+          <MessageList
+            messages={messages}
+            onComponentResponse={handleComponentResponse}
+          />
+          {isThinking && <TypingIndicator />}
+          {isPreparingTool && <ToolPreparingIndicator />}
         </div>
-      </main>
+
+        {/* Input Area - fixed at bottom */}
+        <div className="flex-shrink-0 rounded-t-button overflow-hidden bg-white">
+          <ChatInput
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            disabled={isThinking || isStreaming}
+          />
+        </div>
+      </div>
     </div>
   );
 }

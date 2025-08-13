@@ -2,37 +2,32 @@
 
 import { Input } from "@/components/ui/input";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useAppTranslation } from "@/hooks/use-translation";
+import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { TFunction } from "i18next";
 
 interface AuthFormFieldsProps {
   mode: "sign-in" | "sign-up";
-  email: string;
-  password: string;
-  confirmPassword: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  register: UseFormRegister<any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors: FieldErrors<any>;
   showPassword: boolean;
   showConfirmPassword: boolean;
-  onEmailChange: (value: string) => void;
-  onPasswordChange: (value: string) => void;
-  onConfirmPasswordChange: (value: string) => void;
   onToggleShowPassword: () => void;
   onToggleShowConfirmPassword: () => void;
+  t: TFunction;
 }
 
 export function AuthFormFields({
   mode,
-  email,
-  password,
-  confirmPassword,
+  register,
+  errors,
   showPassword,
   showConfirmPassword,
-  onEmailChange,
-  onPasswordChange,
-  onConfirmPasswordChange,
   onToggleShowPassword,
   onToggleShowConfirmPassword,
+  t,
 }: AuthFormFieldsProps) {
-  const { t } = useAppTranslation(["auth", "common"]);
-
   return (
     <>
       {/* Email Field */}
@@ -48,13 +43,18 @@ export function AuthFormFields({
           <Input
             id="email"
             type="email"
-            value={email}
-            onChange={(e) => onEmailChange(e.target.value)}
+            autoComplete="email"
+            {...register("email")}
+            error={!!errors.email}
             className="pl-12"
             placeholder={t("enterEmail")}
-            required
           />
         </div>
+        {errors.email && (
+          <p className="text-sm text-red-600 mt-1">
+            {t(errors.email.message as string)}
+          </p>
+        )}
       </div>
 
       {/* Password Field */}
@@ -68,13 +68,13 @@ export function AuthFormFields({
         <div className="relative">
           <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
+            autoComplete="current-password"
             id="password"
             type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(e) => onPasswordChange(e.target.value)}
-            className="pl-12 pr-12"
+            {...register("password")}
+            error={!!errors.password}
+            className="pl-12"
             placeholder={t("enterPassword")}
-            required
           />
           <button
             type="button"
@@ -88,6 +88,11 @@ export function AuthFormFields({
             )}
           </button>
         </div>
+        {errors.password && (
+          <p className="text-sm text-red-600 mt-1">
+            {t(errors.password.message as string)}
+          </p>
+        )}
       </div>
 
       {/* Confirm Password Field (Sign Up Only) */}
@@ -104,11 +109,10 @@ export function AuthFormFields({
             <Input
               id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => onConfirmPasswordChange(e.target.value)}
-              className="pl-12 pr-12"
+              {...register("confirmPassword")}
+              error={!!errors.confirmPassword}
+              className="pl-12"
               placeholder={t("confirmPasswordPlaceholder")}
-              required
             />
             <button
               type="button"
@@ -122,6 +126,11 @@ export function AuthFormFields({
               )}
             </button>
           </div>
+          {errors.confirmPassword && (
+            <p className="text-sm text-red-600 mt-1">
+              {t(errors.confirmPassword.message as string)}
+            </p>
+          )}
         </div>
       )}
     </>
