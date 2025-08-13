@@ -4,11 +4,6 @@ import {
   ComponentResponse,
   OnboardingComponent,
 } from "@/lib/types/onboarding.types";
-import { FinancialInputComponent } from "./financial-input-component";
-import { GoalSelectorComponent } from "./goal-selector-component";
-import { IntroductionTemplateComponent } from "./introduction-template-component";
-import { SliderComponent } from "./slider-component";
-import { TextInputComponent } from "./text-input-component";
 // New stage-first components
 import { DecisionTreeComponent } from "./decision-tree-component";
 import { EducationContentComponent } from "./education-content-component";
@@ -16,11 +11,8 @@ import { ExpenseCategoriesComponent } from "./expense-categories-component";
 import { FinishOnboarding } from "./finish-onboarding";
 import { GoalConfirmationComponent } from "./goal-confirmation-component";
 import { InfinAppQR } from "./infina-app-qr";
-import { SavingsCapacityComponent } from "./savings-capacity-component";
-import { StageSelectorComponent } from "./stage-selector-component";
 import { Suggestions } from "./suggestions";
 // Budget allocation enhancement components
-import BudgetAllocationTool from "./budget-allocation-tool";
 import BudgetCategoryEducation from "./budget-category-education";
 import BudgetSummaryComponent from "./budget-summary-component";
 import PhilosophySelection from "./philosophy-selection";
@@ -42,48 +34,6 @@ export function OnboardingComponentRenderer({
   };
 
   switch (component.type) {
-    case "slider":
-      return (
-        <SliderComponent component={component} onResponse={handleResponse} />
-      );
-
-    case "text_input":
-      return (
-        <TextInputComponent component={component} onResponse={handleResponse} />
-      );
-
-    case "financial_input":
-      return (
-        <FinancialInputComponent
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
-    case "goal_selector":
-      return (
-        <GoalSelectorComponent
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
-    case "introduction_template":
-      return (
-        <IntroductionTemplateComponent
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
-    case "stage_selector":
-      return (
-        <StageSelectorComponent
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
     case "decision_tree":
       return (
         <DecisionTreeComponent
@@ -95,14 +45,6 @@ export function OnboardingComponentRenderer({
     case "expense_categories":
       return (
         <ExpenseCategoriesComponent
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
-    case "savings_capacity":
-      return (
-        <SavingsCapacityComponent
           component={component}
           onResponse={handleResponse}
         />
@@ -148,14 +90,6 @@ export function OnboardingComponentRenderer({
     case "budget_category_education":
       return (
         <BudgetCategoryEducation
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
-    case "budget_allocation_tool":
-      return (
-        <BudgetAllocationTool
           component={component}
           onResponse={handleResponse}
         />
