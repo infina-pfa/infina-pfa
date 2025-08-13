@@ -40,7 +40,6 @@ export function IncomeModal({
     validationErrors,
     touched,
     isLoading,
-    error,
     handleSubmit,
     handleInputChange,
     handleFieldBlur,
