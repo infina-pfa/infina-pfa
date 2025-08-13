@@ -44,22 +44,6 @@ export function OnboardingComponentRenderer({
   };
 
   switch (component.type) {
-    case "multiple_choice":
-      return (
-        <MultipleChoiceComponent
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
-    case "rating_scale":
-      return (
-        <RatingScaleComponent
-          component={component}
-          onResponse={handleResponse}
-        />
-      );
-
     case "slider":
       return (
         <SliderComponent component={component} onResponse={handleResponse} />

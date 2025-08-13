@@ -116,8 +116,6 @@ export const useAIAdvisorStreamProcessor = ({
     (event: StreamEvent) => {
       // Handle status events
       if (event.type === "status" && event.data?.status_type === "started") {
-        setIsProcessing(false);
-        setIsStreaming(true);
         // Initialize message if needed
         if (!currentTextMessageRef.current) {
           const newMessage = createStreamingMessage("", true);
@@ -129,6 +127,7 @@ export const useAIAdvisorStreamProcessor = ({
 
       // Handle text streaming
       if (event.type === "text" && event.content) {
+        setIsProcessing(false);
         setIsStreaming(true);
         fullContentRef.current += event.content;
 

@@ -167,6 +167,7 @@ export interface ComponentData {
     max: number;
     step: number;
     unit?: string;
+    default?: number;
   };
 
   // Text input
