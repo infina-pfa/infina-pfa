@@ -1,31 +1,29 @@
 "use client";
 
 import {
-  OnboardingComponent,
   ComponentResponse,
+  OnboardingComponent,
 } from "@/lib/types/onboarding.types";
-import { MultipleChoiceComponent } from "./multiple-choice-component";
-import { RatingScaleComponent } from "./rating-scale-component";
-import { SliderComponent } from "./slider-component";
-import { TextInputComponent } from "./text-input-component";
 import { FinancialInputComponent } from "./financial-input-component";
 import { GoalSelectorComponent } from "./goal-selector-component";
 import { IntroductionTemplateComponent } from "./introduction-template-component";
+import { SliderComponent } from "./slider-component";
+import { TextInputComponent } from "./text-input-component";
 // New stage-first components
-import { StageSelectorComponent } from "./stage-selector-component";
 import { DecisionTreeComponent } from "./decision-tree-component";
-import { ExpenseCategoriesComponent } from "./expense-categories-component";
-import { SavingsCapacityComponent } from "./savings-capacity-component";
-import { GoalConfirmationComponent } from "./goal-confirmation-component";
 import { EducationContentComponent } from "./education-content-component";
-import { Suggestions } from "./suggestions";
-import { InfinAppQR } from "./infina-app-qr";
+import { ExpenseCategoriesComponent } from "./expense-categories-component";
 import { FinishOnboarding } from "./finish-onboarding";
+import { GoalConfirmationComponent } from "./goal-confirmation-component";
+import { InfinAppQR } from "./infina-app-qr";
+import { SavingsCapacityComponent } from "./savings-capacity-component";
+import { StageSelectorComponent } from "./stage-selector-component";
+import { Suggestions } from "./suggestions";
 // Budget allocation enhancement components
-import BudgetCategoryEducation from "./budget-category-education";
 import BudgetAllocationTool from "./budget-allocation-tool";
-import PhilosophySelection from "./philosophy-selection";
+import BudgetCategoryEducation from "./budget-category-education";
 import BudgetSummaryComponent from "./budget-summary-component";
+import PhilosophySelection from "./philosophy-selection";
 
 interface OnboardingComponentRendererProps {
   component: OnboardingComponent;
