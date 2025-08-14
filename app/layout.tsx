@@ -5,6 +5,7 @@ import { I18nProvider } from "@/components/providers/i18n-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { SWRProvider } from "@/lib/swr-config";
 import { Toaster } from "sonner";
+import { ElevenLabsWidget } from "@/components/elevenlabs/elevenlabs-widget";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -41,6 +42,7 @@ export default function RootLayout({
             },
           }}
         />
+        <ElevenLabsWidget />
         {/* <StagewiseToolbar
           config={{
             plugins: [ReactPlugin],
