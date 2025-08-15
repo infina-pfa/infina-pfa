@@ -1,8 +1,23 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/providers/auth-provider";
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      "elevenlabs-convai": React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          "agent-id"?: string;
+          "dynamic-variables"?: string;
+        },
+        HTMLElement
+      >;
+    }
+  }
+}
 
 interface ElevenLabsCallEvent extends Event {
   detail: {
@@ -12,21 +27,6 @@ interface ElevenLabsCallEvent extends Event {
       };
     };
   };
-}
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    interface IntrinsicElements {
-      "elevenlabs-convai": React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement> & {
-          "agent-id": string;
-          "dynamic-variables"?: string;
-        },
-        HTMLElement
-      >;
-    }
-  }
 }
 
 export function ElevenLabsWidget() {
@@ -131,10 +131,11 @@ export function ElevenLabsWidget() {
 
   return (
     <div style={{ position: "relative" }}>
-      <elevenlabs-convai
-        agent-id="agent_2301k2jes0nbe4zte8ycedhzh60a"
-        dynamic-variables={dynamicVariables}
-      />
+      {React.createElement("elevenlabs-convai", {
+        "agent-id": "agent_2301k2jes0nbe4zte8ycedhzh60a",
+        "dynamic-variables": dynamicVariables,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any)}
     </div>
   );
 }
