@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { IncomeItem } from "./income-item";
 import { Search, Filter, Plus } from "lucide-react";
-import { Income, INCOME_CATEGORIES } from "@/lib/types/income.types";
+import { Income, IncomeCategory } from "@/lib/types/income.types";
 
 interface IncomeListProps {
   incomes?: Income[];
@@ -21,36 +21,33 @@ interface IncomeListProps {
 const mockIncomes: Income[] = [
   {
     id: "1",
-    user_id: "user-1",
     name: "Software Engineer Salary",
     amount: 8000,
     type: "income",
-    description: INCOME_CATEGORIES.SALARY,
+    description: IncomeCategory.SALARY,
     recurring: 30, // Monthly
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
   },
   {
     id: "2",
-    user_id: "user-1",
     name: "Freelance Projects",
     amount: 2500,
     type: "income",
-    description: INCOME_CATEGORIES.FREELANCE,
+    description: IncomeCategory.FREELANCE,
     recurring: 30, // Monthly
-    created_at: "2024-01-15T00:00:00Z",
-    updated_at: "2024-01-15T00:00:00Z",
+    createdAt: "2024-01-15T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z",
   },
   {
     id: "3",
-    user_id: "user-1",
     name: "Rental Income",
     amount: 1200,
     type: "income",
-    description: INCOME_CATEGORIES.INVESTMENT,
+    description: IncomeCategory.INVESTMENT,
     recurring: 30, // Monthly
-    created_at: "2023-12-01T00:00:00Z",
-    updated_at: "2023-12-01T00:00:00Z",
+    createdAt: "2023-12-01T00:00:00Z",
+    updatedAt: "2023-12-01T00:00:00Z",
   },
 ];
 
@@ -118,13 +115,13 @@ export function IncomeList({
         {/* Category Filter */}
         <Select value={filterCategory} onValueChange={setFilterCategory}>
           <option value="all">{t("allCategories")}</option>
-          <option value={INCOME_CATEGORIES.SALARY}>{t("salary")}</option>
-          <option value={INCOME_CATEGORIES.FREELANCE}>{t("freelance")}</option>
-          <option value={INCOME_CATEGORIES.BUSINESS}>{t("business")}</option>
-          <option value={INCOME_CATEGORIES.INVESTMENT}>
+          <option value={IncomeCategory.SALARY}>{t("salary")}</option>
+          <option value={IncomeCategory.FREELANCE}>{t("freelance")}</option>
+          <option value={IncomeCategory.BUSINESS}>{t("business")}</option>
+          <option value={IncomeCategory.INVESTMENT}>
             {t("investment")}
           </option>
-          <option value={INCOME_CATEGORIES.OTHER}>{t("other")}</option>
+          <option value={IncomeCategory.OTHER}>{t("other")}</option>
         </Select>
 
         {/* Frequency Filter */}

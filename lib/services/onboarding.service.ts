@@ -29,10 +29,12 @@ export const onboardingService = {
     return response.data.data;
   },
 
-  updateUserProfile: async (updates: Partial<OnboardingProfile>): Promise<void> => {
+  updateUserProfile: async (
+    updates: Partial<OnboardingProfile>
+  ): Promise<void> => {
     const response = await apiClient.patch("/onboarding/profile", updates);
-    if (!response.success) {
-      throw new Error(response.error || "Failed to update profile");
+    if (!response.data) {
+      throw new Error("Failed to update profile");
     }
   },
 

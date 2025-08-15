@@ -1,5 +1,5 @@
-import { apiClient } from "@/lib/api-client";
 import { UpdateExpenseRequest } from "@/lib/types/transaction.types";
+import { apiClient } from "../api/api-client";
 
 /**
  * Minimal transaction service for operations not covered by budget service
@@ -33,8 +33,8 @@ export const transactionService = {
       date: data.date,
     });
 
-    if (!response.success || !response.data) {
-      throw new Error(response.error || "Failed to update expense");
+    if (!response.data) {
+      throw new Error("Failed to update expense");
     }
 
     return response.data;

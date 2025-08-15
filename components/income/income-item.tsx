@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { formatCurrency } from "@/lib/utils";
-import { Income, INCOME_CATEGORIES } from "@/lib/types/income.types";
+import { Income, IncomeCategory } from "@/lib/types/income.types";
 import {
   DollarSignIcon,
   RepeatIcon,
@@ -35,31 +35,31 @@ export const IncomeItem = ({
 
   // Extract category from description or default to "other"
   const getIncomeCategory = (description: string | null): string => {
-    if (!description) return INCOME_CATEGORIES.OTHER;
+    if (!description) return IncomeCategory.OTHER;
 
     const desc = description.toLowerCase();
-    for (const [, value] of Object.entries(INCOME_CATEGORIES)) {
+    for (const value of Object.values(IncomeCategory)) {
       if (desc.includes(value.toLowerCase())) {
         return value;
       }
     }
-    return INCOME_CATEGORIES.OTHER;
+    return IncomeCategory.OTHER;
   };
 
   const category = getIncomeCategory(income.description);
   const isRecurring = income.recurring > 0;
-  const formattedDate = new Date(income.created_at).toLocaleDateString();
+  const formattedDate = new Date(income.createdAt).toLocaleDateString();
 
   // Get category color
   const getCategoryColor = (category: string): string => {
     const colorMap: Record<string, string> = {
-      [INCOME_CATEGORIES.SALARY]: "#0055FF",
-      [INCOME_CATEGORIES.FREELANCE]: "#2ECC71",
-      [INCOME_CATEGORIES.INVESTMENT]: "#FF9800",
-      [INCOME_CATEGORIES.BUSINESS]: "#9C27B0",
-      [INCOME_CATEGORIES.BONUS]: "#FFC107",
-      [INCOME_CATEGORIES.GIFT]: "#E91E63",
-      [INCOME_CATEGORIES.OTHER]: "#6B7280",
+      [IncomeCategory.SALARY]: "#0055FF",
+      [IncomeCategory.FREELANCE]: "#2ECC71",
+      [IncomeCategory.INVESTMENT]: "#FF9800",
+      [IncomeCategory.BUSINESS]: "#9C27B0",
+      [IncomeCategory.BONUS]: "#FFC107",
+      [IncomeCategory.GIFT]: "#E91E63",
+      [IncomeCategory.OTHER]: "#6B7280",
     };
     return colorMap[category] || "#6B7280";
   };
@@ -69,9 +69,9 @@ export const IncomeItem = ({
   // Get category icon
   const getCategoryIcon = () => {
     switch (category) {
-      case INCOME_CATEGORIES.SALARY:
-      case INCOME_CATEGORIES.FREELANCE:
-      case INCOME_CATEGORIES.BUSINESS:
+      case IncomeCategory.SALARY:
+      case IncomeCategory.FREELANCE:
+      case IncomeCategory.BUSINESS:
         return DollarSignIcon;
       default:
         return DollarSignIcon;
