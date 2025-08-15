@@ -59,20 +59,26 @@ export const RECURRING_PATTERNS = {
 /**
  * Income categories for UI organization
  */
-export const INCOME_CATEGORIES = [
-  'Salary',
-  'Freelance',
-  'Investment',
-  'Rental',
-  'Business',
-  'Side Hustle',
-  'Dividends',
-  'Royalties',
-  'Other',
-] as const;
+export enum IncomeCategory {
+  SALARY = 'Salary',
+  FREELANCE = 'Freelance',
+  INVESTMENT = 'Investment',
+  RENTAL = 'Rental',
+  BUSINESS = 'Business',
+  SIDE_HUSTLE = 'Side Hustle',
+  DIVIDENDS = 'Dividends',
+  ROYALTIES = 'Royalties',
+  BONUS = 'Bonus',
+  GIFT = 'Gift',
+  OTHER = 'Other',
+}
+
+/**
+ * Array of all income categories for iteration
+ */
+export const INCOME_CATEGORIES = Object.values(IncomeCategory);
 
 export type RecurringPattern = typeof RECURRING_PATTERNS[keyof typeof RECURRING_PATTERNS];
-export type IncomeCategory = typeof INCOME_CATEGORIES[number];
 
 // Alias for backward compatibility
 export type Income = IncomeResponse;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppTranslation } from "@/hooks/use-translation";
-import { INCOME_CATEGORIES } from "@/lib/types/income.types";
+import { IncomeCategory } from "@/lib/types/income.types";
 import {
   DollarSignIcon,
   TrendingUpIcon,
@@ -27,43 +27,43 @@ export const IncomeCategorySelector = ({
   // Define category options with icons and colors
   const categoryOptions = [
     {
-      value: INCOME_CATEGORIES.SALARY,
+      value: IncomeCategory.SALARY,
       label: t("salary"),
       icon: DollarSignIcon,
       color: "#0055FF",
     },
     {
-      value: INCOME_CATEGORIES.FREELANCE,
+      value: IncomeCategory.FREELANCE,
       label: t("freelance"),
       icon: BriefcaseIcon,
       color: "#2ECC71",
     },
     {
-      value: INCOME_CATEGORIES.INVESTMENT,
+      value: IncomeCategory.INVESTMENT,
       label: t("investment"),
       icon: TrendingUpIcon,
       color: "#FF9800",
     },
     {
-      value: INCOME_CATEGORIES.BUSINESS,
+      value: IncomeCategory.BUSINESS,
       label: t("business"),
       icon: BriefcaseIcon,
       color: "#9C27B0",
     },
     {
-      value: INCOME_CATEGORIES.BONUS,
+      value: IncomeCategory.BONUS,
       label: t("bonus"),
       icon: AwardIcon,
       color: "#FFC107",
     },
     {
-      value: INCOME_CATEGORIES.GIFT,
+      value: IncomeCategory.GIFT,
       label: t("gift"),
       icon: GiftIcon,
       color: "#E91E63",
     },
     {
-      value: INCOME_CATEGORIES.OTHER,
+      value: IncomeCategory.OTHER,
       label: t("other"),
       icon: MoreHorizontalIcon,
       color: "#6B7280",

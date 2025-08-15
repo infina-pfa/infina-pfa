@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { FormInput } from "@/components/ui/form-input";
 import { MoneyInput } from "@/components/ui/money-input";
-import { useExpenseUpdateSWR } from "@/hooks/swr-v2";
+import { useUpdateExpense } from "@/hooks/swr/budget/use-expense-update";
 import { useToast } from "@/hooks/use-toast";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { UpdateExpenseRequest } from "@/lib/types/transaction.types";
@@ -36,7 +36,7 @@ export const EditExpenseModal = ({
   expense,
 }: EditExpenseModalProps) => {
   const { t } = useAppTranslation(["budgeting", "common"]);
-  const { updateExpense, isUpdating, error } = useExpenseUpdateSWR();
+  const { updateExpense, isUpdating, error } = useUpdateExpense();
   const { success: showSuccessToast } = useToast();
 
   const [formData, setFormData] = useState<UpdateExpenseRequest>({

@@ -2,10 +2,10 @@
 
 import { useOnboarding } from "@/hooks/use-onboarding-stream";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { ChatInput } from "@/components/onboarding-v2/chat-input";
-import { MessageList } from "@/components/onboarding-v2/message-list";
-import { TypingIndicator } from "@/components/onboarding-v2/typing-indicator";
-import { ToolPreparingIndicator } from "@/components/onboarding/chat/components/tool-preparing-indicator";
+import { ChatInput } from "@/components/onboarding/chat-input";
+import { MessageList } from "@/components/onboarding/message-list";
+import { TypingIndicator } from "@/components/onboarding/typing-indicator";
+import { ToolPreparingIndicator } from "@/components/onboarding/tool-preparing-indicator";
 
 export default function OnboardingV2Page() {
   const { t } = useAppTranslation(["onboarding", "common"]);

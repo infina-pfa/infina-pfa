@@ -1,6 +1,6 @@
 "use client";
 
-import { OnboardingComponentRenderer } from "@/components/onboarding/chat/components/onboarding-component-renderer";
+import { OnboardingComponentRenderer } from "@/components/onboarding/onboarding-component-renderer";
 import {
   ComponentResponse,
   OnboardingComponent,
