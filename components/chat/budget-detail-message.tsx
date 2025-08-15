@@ -1,6 +1,6 @@
 "use client";
 
-import { useBudgetManagementSWR } from "@/hooks/swr-v2";
+import { useBudgets } from "@/hooks/swr/budget/use-budget-operations";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { BUDGET_ICONS } from "@/lib/utils/budget-constants";
 import { formatCurrency } from "@/lib/utils";
@@ -28,17 +28,25 @@ export function BudgetDetailMessage({
   const currentMonth = currentDate.getMonth() + 1;
   const currentYear = currentDate.getFullYear();
 
-  // Memoize filter object
-  const filter = useMemo(
-    () => ({
-      month: currentMonth,
-      year: currentYear,
-    }),
-    [currentMonth, currentYear]
-  );
-
-  const { budgets, totalBudget, totalSpent, loading, error } =
-    useBudgetManagementSWR(filter);
+  // Use the budget hook for current month
+  const { budgets, isLoading, isError } = useBudgets(currentMonth, currentYear);
+  
+  // Calculate total budget and total spent from budgets
+  const { totalBudget, totalSpent } = useMemo(() => {
+    if (!budgets || budgets.length === 0) {
+      return { totalBudget: 0, totalSpent: 0 };
+    }
+    
+    const totals = budgets.reduce(
+      (acc, budget) => ({
+        totalBudget: acc.totalBudget + budget.amount,
+        totalSpent: acc.totalSpent + budget.spent,
+      }),
+      { totalBudget: 0, totalSpent: 0 }
+    );
+    
+    return totals;
+  }, [budgets]);
 
   const formatMonthYear = () => {
     return `Tháng ${currentMonth}/${currentYear}`;
@@ -46,7 +54,7 @@ export function BudgetDetailMessage({
 
   const formatVND = (amount: number) => formatCurrency(amount);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="bg-white rounded-lg p-6 space-y-4 max-w-lg">
         <div className="animate-pulse">
@@ -61,7 +69,7 @@ export function BudgetDetailMessage({
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="bg-white rounded-lg p-6 max-w-lg">
         <div className="text-center text-red-500">
@@ -179,7 +187,7 @@ export function BudgetDetailMessage({
       </div>
 
       {/* Budget Categories */}
-      {budgets.length > 0 && (
+      {budgets && budgets.length > 0 && (
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-gray-900">
             Danh mục chi tiêu ({budgets.length})

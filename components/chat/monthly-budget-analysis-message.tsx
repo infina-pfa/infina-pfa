@@ -1,10 +1,12 @@
 "use client";
 
-import { useMonthlyBudgetAnalysisSWR } from "@/hooks/swr-v2/use-monthly-budget-analysis";
+import { useBudgets } from "@/hooks/swr/budget/use-budget-operations";
+import { useMonthlySpending } from "@/hooks/swr/budget/use-budget-spending";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { formatVND } from "@/lib/validation/input-validation";
+import { useMemo } from "react";
 
 import {
   AlertTriangle,
@@ -24,7 +26,109 @@ export function MonthlyBudgetAnalysisMessage({
   onSendMessage,
 }: MonthlyBudgetAnalysisMessageProps) {
   const { t } = useAppTranslation(["budgeting", "common"]);
-  const { data, loading, error } = useMonthlyBudgetAnalysisSWR();
+  
+  // Get current and previous month dates
+  const currentDate = useMemo(() => new Date(), []);
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+  
+  const previousDate = new Date(currentYear, currentMonth - 2);
+  const previousMonth = previousDate.getMonth() + 1;
+  const previousYear = previousDate.getFullYear();
+  
+  // Fetch current month budgets
+  const { budgets: currentBudgets, isLoading: currentLoading, isError: currentError } = 
+    useBudgets(currentMonth, currentYear);
+  
+  // Fetch previous month budgets for comparison
+  const { budgets: previousBudgets, isLoading: previousLoading } = 
+    useBudgets(previousMonth, previousYear);
+  
+  // Fetch spending transactions for current month
+  const { spending: currentSpending, isLoading: spendingLoading } = 
+    useMonthlySpending(currentMonth, currentYear);
+  
+  const loading = currentLoading || previousLoading || spendingLoading;
+  const error = currentError;
+  
+  // Transform data into analysis format
+  const data = useMemo(() => {
+    if (!currentBudgets || currentBudgets.length === 0) {
+      return null;
+    }
+    
+    // Calculate totals
+    const totalBudget = currentBudgets.reduce((sum, b) => sum + b.amount, 0);
+    const totalSpent = currentBudgets.reduce((sum, b) => sum + b.spent, 0);
+    
+    // Previous month totals
+    const previousTotalSpent = previousBudgets
+      ? previousBudgets.reduce((sum, b) => sum + b.spent, 0)
+      : 0;
+    
+    // Check if overspent
+    const isOverspent = totalSpent > totalBudget;
+    const overspentAmount = isOverspent ? totalSpent - totalBudget : 0;
+    
+    // Find overspent categories
+    const overspentCategories = currentBudgets
+      .filter(budget => budget.spent > budget.amount)
+      .map(budget => ({
+        categoryName: budget.name,
+        overspentAmount: budget.spent - budget.amount,
+        percentage: budget.amount > 0
+          ? ((budget.spent - budget.amount) / budget.amount) * 100
+          : 0,
+        budgetAmount: budget.amount,
+        spentAmount: budget.spent,
+      }))
+      .sort((a, b) => b.overspentAmount - a.overspentAmount);
+    
+    // Get largest expenses from spending transactions
+    const largestExpenses = currentSpending
+      ? currentSpending
+          .filter(transaction => transaction.type === "budget_spending")
+          .sort((a, b) => b.amount - a.amount)
+          .slice(0, 5)
+          .map(transaction => ({
+            description: transaction.name,
+            amount: transaction.amount,
+            date: transaction.createdAt,
+            category: transaction.budget?.name || "Uncategorized",
+            id: transaction.id,
+          }))
+      : [];
+    
+    // Previous month comparison
+    const spendingDifference = totalSpent - previousTotalSpent;
+    const isImprovement = spendingDifference < 0;
+    
+    // Suggest improvement areas
+    const improvementAreas = overspentCategories
+      .slice(0, 3)
+      .map(category => category.categoryName);
+    
+    // Format month/year
+    const monthYear = currentDate.toLocaleDateString("vi-VN", {
+      month: "long",
+      year: "numeric",
+    });
+    
+    return {
+      overspentAmount,
+      isOverspent,
+      overspentCategories,
+      largestExpenses,
+      previousMonthComparison: {
+        spendingDifference,
+        improvementAreas,
+        isImprovement,
+      },
+      totalBudget,
+      totalSpent,
+      monthYear,
+    };
+  }, [currentBudgets, previousBudgets, currentSpending, currentDate]);
 
   if (loading) {
     return (

@@ -10,9 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { AppLayout } from "@/components/ui/app-layout";
-import { useRecentTransactionsSWR } from "@/hooks/swr-v2/use-recent-transactions";
+import { useMonthlySpending } from "@/hooks/swr/budget/use-budget-spending";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { Transaction } from "@/lib/types/transaction.types";
+import { TransactionResponse } from "@/lib/types/budget.types";
 import { formatDateVN } from "@/lib/utils/date-formatter";
 import { format, parseISO } from "date-fns";
 import { useMemo, useState } from "react";
@@ -30,28 +30,78 @@ export default function TransactionsPage() {
     budgetName?: string;
   } | null>(null);
 
-  // Get transactions from the last 6 months
-  const { data: transactions, isLoading, mutate } = useRecentTransactionsSWR(6);
+  // Get transactions from the last 6 months using multiple hooks
+  const today = new Date();
+  
+  // Calculate month/year for each of the last 6 months
+  const getMonthYear = (monthsAgo: number) => {
+    const date = new Date(today.getFullYear(), today.getMonth() - monthsAgo, 1);
+    return { month: date.getMonth() + 1, year: date.getFullYear() };
+  };
+  
+  const m0 = getMonthYear(0);
+  const m1 = getMonthYear(1);
+  const m2 = getMonthYear(2);
+  const m3 = getMonthYear(3);
+  const m4 = getMonthYear(4);
+  const m5 = getMonthYear(5);
+  
+  // Use hooks for each month
+  const { spending: spending0, isLoading: loading0, refetch: refetch0 } = useMonthlySpending(m0.month, m0.year);
+  const { spending: spending1, isLoading: loading1, refetch: refetch1 } = useMonthlySpending(m1.month, m1.year);
+  const { spending: spending2, isLoading: loading2, refetch: refetch2 } = useMonthlySpending(m2.month, m2.year);
+  const { spending: spending3, isLoading: loading3, refetch: refetch3 } = useMonthlySpending(m3.month, m3.year);
+  const { spending: spending4, isLoading: loading4, refetch: refetch4 } = useMonthlySpending(m4.month, m4.year);
+  const { spending: spending5, isLoading: loading5, refetch: refetch5 } = useMonthlySpending(m5.month, m5.year);
+  
+  // Combine all transactions
+  const transactions = useMemo(() => {
+    const allSpending = [
+      ...spending0,
+      ...spending1,
+      ...spending2,
+      ...spending3,
+      ...spending4,
+      ...spending5
+    ];
+    
+    // Sort by date (newest first)
+    return allSpending.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [spending0, spending1, spending2, spending3, spending4, spending5]);
+  
+  const isLoading = loading0 || loading1 || loading2 || loading3 || loading4 || loading5;
+  
+  // Refresh all data
+  const mutate = () => {
+    refetch0();
+    refetch1();
+    refetch2();
+    refetch3();
+    refetch4();
+    refetch5();
+  };
 
   // Get unique budget names for filter
   const budgetNames = useMemo(() => {
-    if (!transactions) return [];
+    if (!transactions.length) return [];
 
     const names = transactions
-      .filter((t) => t.type === "outcome" && t.budgetName)
-      .map((t) => t.budgetName as string);
+      .filter((t) => t.type === "budget_spending" && t.budget?.name)
+      .map((t) => t.budget.name);
 
     return Array.from(new Set(names)).sort();
   }, [transactions]);
 
   // Filter expenses by selected budget
   const filteredExpenses = useMemo(() => {
-    if (!transactions) return [];
+    if (!transactions.length) return [];
 
-    let expenses = transactions.filter((t) => t.type === "outcome");
+    let expenses = transactions.filter((t) => t.type === "budget_spending");
 
     if (selectedBudget && selectedBudget !== "allBudgets") {
-      expenses = expenses.filter((e) => e.budgetName === selectedBudget);
+      expenses = expenses.filter((e) => e.budget?.name === selectedBudget);
     }
 
     return expenses;
@@ -61,13 +111,10 @@ export default function TransactionsPage() {
   const groupedExpenses = useMemo(() => {
     if (!filteredExpenses.length) return [];
 
-    const groups: Record<
-      string,
-      Array<Transaction & { budgetName?: string; budgetColor?: string }>
-    > = {};
+    const groups: Record<string, TransactionResponse[]> = {};
 
     filteredExpenses.forEach((expense) => {
-      const date = parseISO(expense.created_at);
+      const date = parseISO(expense.createdAt);
       const monthYear = format(date, "MM/yyyy");
 
       if (!groups[monthYear]) {
@@ -162,9 +209,9 @@ export default function TransactionsPage() {
                         id={expense.id}
                         name={expense.name}
                         amount={expense.amount}
-                        date={formatDateVN(new Date(expense.created_at))}
-                        budgetName={expense.budgetName}
-                        budgetColor={expense.budgetColor}
+                        date={formatDateVN(new Date(expense.createdAt))}
+                        budgetName={expense.budget?.name}
+                        budgetColor={expense.budget?.color}
                         description={expense.description}
                         onEdit={handleEditExpense}
                       />

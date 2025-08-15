@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useBudgetListSWR } from "@/hooks/swr-v2/use-budget-list";
+import { useBudgets } from "@/hooks/swr/budget/use-budget-operations";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProgressBar } from "@/components/budgeting/progress-bar";
@@ -22,22 +22,32 @@ export const BudgetSummary = ({ onDataReady }: BudgetSummaryProps) => {
   const currentMonth = currentDate.getMonth() + 1;
   const currentYear = currentDate.getFullYear();
   
-  const filter = useMemo(
-    () => ({
-      month: currentMonth,
-      year: currentYear,
-    }),
-    [currentMonth, currentYear]
-  );
-
-  const { totalBudget, totalSpent, loading, error } = useBudgetListSWR(filter);
+  // Use the budget hook for current month
+  const { budgets, isLoading, isError } = useBudgets(currentMonth, currentYear);
+  
+  // Calculate total budget and total spent from budgets
+  const { totalBudget, totalSpent } = useMemo(() => {
+    if (!budgets || budgets.length === 0) {
+      return { totalBudget: 0, totalSpent: 0 };
+    }
+    
+    const totals = budgets.reduce(
+      (acc, budget) => ({
+        totalBudget: acc.totalBudget + budget.amount,
+        totalSpent: acc.totalSpent + budget.spent,
+      }),
+      { totalBudget: 0, totalSpent: 0 }
+    );
+    
+    return totals;
+  }, [budgets]);
   const remaining = totalBudget - totalSpent;
   const spendingPercentage =
     totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
   // Call onDataReady when data is available
   useMemo(() => {
-    if (!loading && !error && totalBudget > 0 && onDataReady) {
+    if (!isLoading && !isError && totalBudget > 0 && onDataReady) {
       onDataReady({
         totalBudget,
         totalSpent,
@@ -46,8 +56,8 @@ export const BudgetSummary = ({ onDataReady }: BudgetSummaryProps) => {
       });
     }
   }, [
-    loading,
-    error,
+    isLoading,
+    isError,
     totalBudget,
     totalSpent,
     remaining,
@@ -61,7 +71,7 @@ export const BudgetSummary = ({ onDataReady }: BudgetSummaryProps) => {
       currency: "VND",
     }).format(amount);
 
-  if (error) {
+  if (isError) {
     return (
       <div className="text-center text-red-500 p-3">
         {t("failedToLoadBudgets", { ns: "budgeting" })}
@@ -71,7 +81,7 @@ export const BudgetSummary = ({ onDataReady }: BudgetSummaryProps) => {
 
   const hasBudgetData = totalBudget > 0 || totalSpent > 0;
 
-  if (!loading && !hasBudgetData) {
+  if (!isLoading && !hasBudgetData) {
     return null;
   }
 
@@ -83,7 +93,7 @@ export const BudgetSummary = ({ onDataReady }: BudgetSummaryProps) => {
 
   return (
     <div className="mt-4 mb-2 w-[50%]">
-      {loading ? (
+      {isLoading ? (
         <Skeleton className="w-full h-20" />
       ) : (
         <div className="p-4 bg-white rounded-lg">

@@ -1,12 +1,13 @@
 "use client";
 
-import { useBudgetingDashboardSWR } from "@/hooks/swr-v2/use-budgeting-dashboard";
+import { useBudgets } from "@/hooks/swr/budget/use-budget-operations";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { formatVND } from "@/lib/validation/input-validation";
 import { BUDGET_ICONS } from "@/lib/utils/budget-constants";
+import { useMemo } from "react";
 
 import {
   TrendingUp,
@@ -25,7 +26,61 @@ export function BudgetingDashboardMessage({
   onSendMessage,
 }: BudgetingDashboardMessageProps) {
   const { t } = useAppTranslation(["budgeting", "common"]);
-  const { data, loading, error } = useBudgetingDashboardSWR();
+  
+  // Get current month and year
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+  
+  // Use the budget hook for current month
+  const { budgets, isLoading: loading, isError: error } = useBudgets(currentMonth, currentYear);
+  
+  // Transform budget data to dashboard format
+  const data = useMemo(() => {
+    if (!budgets || budgets.length === 0) {
+      return null;
+    }
+    
+    // Calculate totals
+    const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
+    const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0);
+    
+    // Calculate daily average
+    const currentDay = currentDate.getDate();
+    const dailyAverage = currentDay > 0 ? totalSpent / currentDay : 0;
+    
+    // Generate weekly trend (mock data)
+    const weeklyTrend = Array.from({ length: 7 }, (_, i) => {
+      const baseAmount = dailyAverage * (i + 1);
+      const variation = Math.random() * 0.2 - 0.1;
+      return Math.max(0, baseAmount * (1 + variation));
+    });
+    
+    // Transform budgets to dashboard format
+    const monthlyBudgets = budgets.map((budget) => ({
+      categoryId: budget.id,
+      categoryName: budget.name,
+      limit: budget.amount,
+      spent: budget.spent,
+      remaining: budget.amount - budget.spent,
+      warningThreshold: budget.amount * 0.8,
+      color: budget.color || "#0055FF",
+      icon: budget.icon || "wallet",
+    }));
+    
+    const isOverBudget = totalSpent > totalBudget;
+    const overBudgetAmount = isOverBudget ? totalSpent - totalBudget : 0;
+    
+    return {
+      monthlyBudgets,
+      totalSpent,
+      totalBudget,
+      dailyAverage,
+      weeklyTrend,
+      isOverBudget,
+      overBudgetAmount,
+    };
+  }, [budgets, currentDate]);
 
   if (loading) {
     return (
