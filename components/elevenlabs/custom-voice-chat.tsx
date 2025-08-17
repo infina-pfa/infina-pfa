@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { 
   Mic, 
-  MessageCircle, 
   X, 
   PhoneOff,
   Minimize2,
@@ -89,6 +88,9 @@ export function CustomVoiceChat() {
       setIsAgentSpeaking(false);
       addMessage("agent", t("voiceChatDisconnected", { ns: "chat" }) || "Voice chat disconnected");
       cleanupAudioVisualization();
+    },
+    onDebug: (debugInfo: any) => {
+      console.debug("Voice conversation debug:", debugInfo);
     },
     onUserTranscript: (transcript: {
       text: string;
@@ -252,7 +254,7 @@ export function CustomVoiceChat() {
 
   const addMessage = (type: 'user' | 'agent', content: string) => {
     const newMessage: ConversationMessage = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       type,
       content,
       timestamp: new Date()
@@ -274,10 +276,22 @@ export function CustomVoiceChat() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
       
+      //Inject dynamic variables for personalization
+      const userName = 'Duy';
+      const userId = 'f0981b82-6f76-4985-bd8c-fd969cc737d7';
+      const now = new Date();
+      const utc7Time = new Date(now.getTime() + (7 * 60 * 60 * 1000));
+      const currentDateTime = utc7Time.toISOString().replace('Z', '+07:00');
+      
       const conversationId = await conversation.startSession({
         agentId: "agent_2301k2jes0nbe4zte8ycedhzh60a",
         connectionType: "webrtc",
-        userId: user?.id || undefined,
+        // Inject dynamic variables for personalization
+        dynamicVariables: {
+          user_id: userId,
+          user_name: userName,
+          current_date_time: currentDateTime,
+        }
       });
       
       console.log("Conversation started with ID:", conversationId);
@@ -485,7 +499,7 @@ export function CustomVoiceChat() {
                 <Mic size={20} className="text-[#0055FF]" />
               </div>
             ) : (
-              <MessageCircle size={20} className="text-[#0055FF]" />
+              <Sparkles size={20} className="text-[#0055FF]" />
             )}
           </div>
           
@@ -608,7 +622,7 @@ export function CustomVoiceChat() {
           {messages.length === 0 && !isConnected && (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="w-16 h-16 rounded-full bg-[#0055FF]/10 flex items-center justify-center mb-4 animate-pulse">
-                <MessageCircle size={24} className="text-[#0055FF]" />
+                <Sparkles size={24} className="text-[#0055FF]" />
               </div>
               <p className="text-gray-600 text-sm mb-2 font-nunito">{t("startVoiceConversation", { ns: "chat" })}</p>
             </div>
