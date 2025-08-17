@@ -28,7 +28,7 @@ interface ConversationMessage {
 type ViewMode = 'orb' | 'minimized' | 'expanded' | 'fullscreen';
 
 export function CustomVoiceChat() {
-  const { user } = useAuthContext();
+  const { } = useAuthContext();
   const router = useRouter();
   const { t } = useAppTranslation(["chat", "common"]);
   
@@ -67,7 +67,7 @@ export function CustomVoiceChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const orbRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number | undefined>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -89,7 +89,7 @@ export function CustomVoiceChat() {
       addMessage("agent", t("voiceChatDisconnected", { ns: "chat" }) || "Voice chat disconnected");
       cleanupAudioVisualization();
     },
-    onDebug: (debugInfo: any) => {
+    onDebug: (debugInfo: unknown) => {
       console.debug("Voice conversation debug:", debugInfo);
     },
     onUserTranscript: (transcript: {
@@ -192,11 +192,13 @@ export function CustomVoiceChat() {
   // Initialize audio visualization
   const initAudioVisualization = () => {
     if (!audioContextRef.current) {
-      const AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
+      const AudioContext = (window as Window & { AudioContext?: typeof window.AudioContext; webkitAudioContext?: typeof window.AudioContext }).AudioContext || (window as Window & { AudioContext?: typeof window.AudioContext; webkitAudioContext?: typeof window.AudioContext }).webkitAudioContext;
       if (AudioContext) {
         audioContextRef.current = new AudioContext();
-        analyserRef.current = audioContextRef.current.createAnalyser();
-        analyserRef.current.fftSize = 256;
+        if (audioContextRef.current) {
+          analyserRef.current = audioContextRef.current.createAnalyser();
+          analyserRef.current.fftSize = 256;
+        }
       }
     }
     drawWaveform();
@@ -335,7 +337,7 @@ export function CustomVoiceChat() {
   };
 
   // Handle drag functionality
-  const handleDragStart = (clientX: number, clientY: number) => {
+  const handleDragStart = useCallback((clientX: number, clientY: number) => {
     if (viewMode !== 'orb') return;
     
     setIsDragging(true);
@@ -344,9 +346,9 @@ export function CustomVoiceChat() {
     const startY = clientY - position.y;
     setDragOffset({ x: startX, y: startY });
     setDragStartPos({ x: clientX, y: clientY });
-  };
+  }, [viewMode, position.x, position.y]);
 
-  const handleDragMove = (clientX: number, clientY: number) => {
+  const handleDragMove = useCallback((clientX: number, clientY: number) => {
     if (!isDragging) return;
     
     // Check if we've moved enough to consider it a drag (5px threshold)
@@ -363,9 +365,9 @@ export function CustomVoiceChat() {
     const newY = Math.max(0, Math.min(window.innerHeight - 56, clientY - dragOffset.y));
     
     setPosition({ x: newX, y: newY });
-  };
+  }, [isDragging, dragStartPos.x, dragStartPos.y, dragOffset.x, dragOffset.y]);
 
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     setIsDragging(false);
     
     // Magnetic dock to edges
@@ -388,7 +390,7 @@ export function CustomVoiceChat() {
     
     // Reset drag flag after a short delay to prevent click interference
     setTimeout(() => setHasDragged(false), 100);
-  };
+  }, [position]);
 
   // Mouse event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -398,11 +400,11 @@ export function CustomVoiceChat() {
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     handleDragMove(e.clientX, e.clientY);
-  }, [isDragging, dragOffset, dragStartPos]);
+  }, [handleDragMove]);
 
   const handleMouseUp = useCallback(() => {
     handleDragEnd();
-  }, [position]);
+  }, [handleDragEnd]);
 
   // Touch event handlers for mobile
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -415,11 +417,11 @@ export function CustomVoiceChat() {
     e.preventDefault();
     const touch = e.touches[0];
     handleDragMove(touch.clientX, touch.clientY);
-  }, [isDragging, dragOffset, dragStartPos]);
+  }, [handleDragMove]);
 
   const handleTouchEnd = useCallback(() => {
     handleDragEnd();
-  }, [position]);
+  }, [handleDragEnd]);
 
   useEffect(() => {
     if (isDragging) {
