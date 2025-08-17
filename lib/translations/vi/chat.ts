@@ -166,4 +166,22 @@ export const chatVi = {
   videoPlayError: "Không thể phát video. Vui lòng thử lại.",
   videoNotSupported: "Trình duyệt của bạn không hỗ trợ thẻ video.",
   clickToPlay: "Nhấn để phát video",
+
+  // Voice Chat
+  voiceAssistant: "Trợ lý giọng nói",
+  voiceChatConnected: "Đã kết nối chat giọng nói",
+  voiceChatDisconnected: "Đã ngắt kết nối chat giọng nói",
+  voiceChatError: "Xin lỗi, đã có lỗi với kết nối giọng nói.",
+  openVoiceChat: "Mở chat giọng nói",
+  startVoiceConversation: "Nhấn vào micro để bắt đầu cuộc trò chuyện giọng nói",
+  startVoiceChat: "Bắt đầu Chat giọng nói",
+  endCall: "Kết thúc cuộc gọi",
+  speaking: "Đang nói...",
+  listening: "Đang nghe...",
+  connected: "Đã kết nối",
+  disconnected: "Chưa kết nối",
+  connecting: "Đang kết nối...",
+  mute: "Tắt tiếng",
+  unmute: "Bật tiếng",
+  microphonePermissionDenied: "Cần quyền truy cập microphone để sử dụng chat giọng nói.",
 };

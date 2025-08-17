@@ -160,4 +160,22 @@ export const chatEn = {
   videoPlayError: "Unable to play video. Please try again.",
   videoNotSupported: "Your browser does not support the video tag.",
   clickToPlay: "Click to play video",
+
+  // Voice Chat
+  voiceAssistant: "Voice Assistant",
+  voiceChatConnected: "Voice chat connected",
+  voiceChatDisconnected: "Voice chat disconnected",
+  voiceChatError: "Sorry, there was an error with the voice connection.",
+  openVoiceChat: "Open voice chat",
+  startVoiceConversation: "Click the microphone to start a voice conversation",
+  startVoiceChat: "Start Voice Chat",
+  endCall: "End Call",
+  speaking: "Speaking...",
+  listening: "Listening...",
+  connected: "Connected",
+  disconnected: "Disconnected",
+  connecting: "Connecting...",
+  mute: "Mute",
+  unmute: "Unmute",
+  microphonePermissionDenied: "Microphone permission is required for voice chat.",
 };

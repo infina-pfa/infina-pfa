@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
+import "./voice-chat.css";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { SWRProvider } from "@/lib/swr-config";
 import { Toaster } from "sonner";
-import { ElevenLabsWidget } from "@/components/elevenlabs/elevenlabs-widget";
+import { CustomVoiceChat } from "@/components/elevenlabs/custom-voice-chat";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -42,7 +43,7 @@ export default function RootLayout({
             },
           }}
         />
-        <ElevenLabsWidget />
+        <CustomVoiceChat />
         {/* <StagewiseToolbar
           config={{
             plugins: [ReactPlugin],
