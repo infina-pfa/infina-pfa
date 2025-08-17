@@ -161,29 +161,32 @@ export function CustomVoiceChat() {
           return "No URL provided";
         }
 
+        // Check if it's a full external URL (starts with http:// or https://)
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+          console.log("External navigation to:", url);
+          window.open(url, "_blank", "noopener,noreferrer");
+          return `Opened external URL in new tab: ${url}`;
+        }
+        
+        // Check if it's an internal path (starts with /)
+        if (url.startsWith("/")) {
+          console.log("Internal navigation to:", url);
+          router.push(url);
+          return `Navigated to internal page: ${url}`;
+        }
+        
+        // For other cases, try to parse as URL and determine if external
         try {
-          const parsedUrl = new URL(url, window.location.origin);
-          const currentOrigin = window.location.origin;
-          
-          if (parsedUrl.origin === currentOrigin) {
-            const internalPath = parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;
-            console.log("Internal navigation to:", internalPath);
-            router.push(internalPath);
-            return `Navigated to internal page: ${internalPath}`;
-          } else {
-            console.log("External navigation to:", url);
-            window.open(url, "_blank", "noopener,noreferrer");
-            return `Opened external URL: ${url}`;
-          }
-        } catch (error) {
-          if (url.startsWith("/")) {
-            console.log("Direct internal navigation to:", url);
-            router.push(url);
-            return `Navigated to: ${url}`;
-          } else {
-            console.error("Invalid URL provided:", url, error);
-            return "Invalid URL provided";
-          }
+          new URL(url);
+          // If we successfully parsed it as a full URL, it's external
+          console.log("External navigation to:", url);
+          window.open(url, "_blank", "noopener,noreferrer");
+          return `Opened external URL in new tab: ${url}`;
+        } catch {
+          // If parsing failed, assume it's a relative path
+          console.log("Relative path navigation to:", url);
+          router.push(`/${url}`);
+          return `Navigated to: /${url}`;
         }
       }
     }
