@@ -175,19 +175,19 @@ export function CustomVoiceChat() {
           return `Navigated to internal page: ${url}`;
         }
         
-        // For other cases, try to parse as URL and determine if external
-        try {
-          new URL(url);
-          // If we successfully parsed it as a full URL, it's external
-          console.log("External navigation to:", url);
-          window.open(url, "_blank", "noopener,noreferrer");
-          return `Opened external URL in new tab: ${url}`;
-        } catch {
-          // If parsing failed, assume it's a relative path
-          console.log("Relative path navigation to:", url);
-          router.push(`/${url}`);
-          return `Navigated to: /${url}`;
-        }
+        // // For other cases, try to parse as URL and determine if external
+        // try {
+        //   new URL(url);
+        //   // If we successfully parsed it as a full URL, it's external
+        //   console.log("External navigation to:", url);
+        //   window.open(url, "_blank", "noopener,noreferrer");
+        //   return `Opened external URL in new tab: ${url}`;
+        // } catch {
+        //   // If parsing failed, assume it's a relative path
+        //   console.log("Relative path navigation to:", url);
+        //   router.push(`/${url}`);
+        //   return `Navigated to: /${url}`;
+        // }
       }
     }
   });
