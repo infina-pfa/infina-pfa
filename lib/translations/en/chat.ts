@@ -28,6 +28,10 @@ export const chatEn = {
   aiTyping: "AI is thinking...",
   attachFile: "Attach file",
   voiceInput: "Voice input",
+  uploadImage: "Upload image",
+  uploadFailed: "Failed",
+  uploading: "Uploading...",
+  uploadSuccess: "Uploaded",
 
   // Suggestions
   suggestionsTitle: "Try asking about:",

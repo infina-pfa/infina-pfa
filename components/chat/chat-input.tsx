@@ -2,7 +2,16 @@
 
 import { useRef, useEffect, useState } from "react";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { Plus, Mic, Send } from "lucide-react";
+import { Plus, Mic, Send, Image as ImageIcon, FileText } from "lucide-react";
+import { ImagePreview } from "./image-preview";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { UploadedImage } from "@/lib/types/image-upload.types";
 
 interface ChatInputProps {
   value: string;
@@ -12,6 +21,9 @@ interface ChatInputProps {
   disabled?: boolean;
   onAttachFile?: () => void;
   onVoiceInput?: () => void;
+  uploadedImages?: UploadedImage[];
+  onImagesChange?: (images: UploadedImage[]) => void;
+  onImageSelect?: (files: File[]) => void;
 }
 
 export function ChatInput({
@@ -22,10 +34,15 @@ export function ChatInput({
   disabled = false,
   onAttachFile,
   onVoiceInput,
+  uploadedImages = [],
+  onImagesChange,
+  onImageSelect,
 }: ChatInputProps) {
   const { t } = useAppTranslation(["chat", "common"]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [charCount, setCharCount] = useState<number>(0);
+  const [showAttachMenu, setShowAttachMenu] = useState(false);
   const maxLength = 500;
 
   // Auto-resize textarea and update character count
@@ -57,9 +74,35 @@ export function ChatInput({
   };
 
   const handleSubmit = () => {
-    if (value.trim() && !isSubmitting && !disabled) {
+    const hasUploadedImages = uploadedImages.some(img => img.status === "success");
+    if ((value.trim() || hasUploadedImages) && !isSubmitting && !disabled) {
       onSubmit();
     }
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && onImageSelect) {
+      const imageFiles = Array.from(files).filter(file => 
+        file.type.startsWith('image/')
+      );
+      onImageSelect(imageFiles);
+    }
+    setShowAttachMenu(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveImage = (imageId: string) => {
+    if (onImagesChange) {
+      const newImages = uploadedImages.filter(img => img.id !== imageId);
+      onImagesChange(newImages);
+    }
+  };
+
+  const handleImageButtonClick = () => {
+    fileInputRef.current?.click();
   };
 
   const isOverLimit = charCount > maxLength;
@@ -67,6 +110,24 @@ export function ChatInput({
 
   return (
     <div className="bg-white rounded-xl mx-4">
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleImageSelect}
+        className="hidden"
+      />
+
+      {/* Image preview */}
+      {uploadedImages.length > 0 && (
+        <ImagePreview
+          images={uploadedImages}
+          onRemove={handleRemoveImage}
+        />
+      )}
+
       {/* Text Input Row */}
       <div className="px-4 pt-4 pb-1">
         <textarea
@@ -101,59 +162,50 @@ export function ChatInput({
 
       {/* Tools Row */}
       <div className="flex items-center justify-between px-4 pb-4">
-        {/* Add/Attach Button */}
-        <button
-          onClick={onAttachFile}
-          disabled={disabled || isSubmitting}
-          className={`
-            flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
-            transition-colors font-nunito
-            ${
-              disabled || isSubmitting
-                ? "bg-gray-200 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }
-          `}
-          aria-label={t("attachFile")}
-        >
-          <Plus
-            className={`w-5 h-5 ${
-              disabled || isSubmitting ? "text-gray-400" : "text-white"
-            }`}
-          />
-        </button>
+        {/* Add/Attach Button with Dropdown */}
+        <DropdownMenu open={showAttachMenu} onOpenChange={setShowAttachMenu}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon"
+              variant="default"
+              disabled={disabled || isSubmitting}
+              aria-label={t("attachFile")}
+            >
+              <Plus
+                className={`w-5 h-5 ${showAttachMenu ? "rotate-45" : ""} transition-transform`}
+              />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" side="top" className="mb-2">
+            <DropdownMenuItem onClick={handleImageButtonClick}>
+              <ImageIcon className="w-4 h-4" />
+              <span>{t("uploadImage")}</span>
+            </DropdownMenuItem>
+            {onAttachFile && (
+              <DropdownMenuItem onClick={onAttachFile}>
+                <FileText className="w-4 h-4" />
+                <span>{t("attachFile")}</span>
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Voice/Send Button */}
-        <button
-          onClick={value.trim() ? handleSubmit : onVoiceInput}
-          disabled={disabled || isSubmitting || isOverLimit}
-          className={`
-            flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
-            transition-colors font-nunito
-            ${
-              disabled || isSubmitting || isOverLimit
-                ? "bg-gray-200 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }
-          `}
-          aria-label={value.trim() ? t("sendMessage") : t("voiceInput")}
+        <Button
+          size="icon"
+          variant="default"
+          onClick={(value.trim() || uploadedImages.some(img => img.status === "success")) ? handleSubmit : onVoiceInput}
+          disabled={disabled || isSubmitting || isOverLimit || uploadedImages.some(img => img.status === "uploading")}
+          aria-label={(value.trim() || uploadedImages.some(img => img.status === "success")) ? t("sendMessage") : t("voiceInput")}
         >
           {isSubmitting ? (
             <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
-          ) : value.trim() ? (
-            <Send
-              className={`w-5 h-5 ${
-                disabled || isOverLimit ? "text-gray-400" : "text-white"
-              }`}
-            />
+          ) : (value.trim() || uploadedImages.some(img => img.status === "success")) ? (
+            <Send className="w-5 h-5" />
           ) : (
-            <Mic
-              className={`w-5 h-5 ${
-                disabled || isOverLimit ? "text-gray-400" : "text-white"
-              }`}
-            />
+            <Mic className="w-5 h-5" />
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

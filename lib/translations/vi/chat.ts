@@ -28,6 +28,10 @@ export const chatVi = {
   aiTyping: "AI đang suy nghĩ...",
   attachFile: "Đính kèm tệp",
   voiceInput: "Nhập giọng nói",
+  uploadImage: "Tải ảnh lên",
+  uploadFailed: "Thất bại",
+  uploading: "Đang tải...",
+  uploadSuccess: "Đã tải",
 
   // Suggestions
   suggestionsTitle: "Thử hỏi về:",

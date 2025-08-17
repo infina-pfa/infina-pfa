@@ -20,6 +20,15 @@ export type MessageUpdate = TablesUpdate<"messages">;
 export type MessageSender = Enums<"message_sender">;
 export type MessageType = Enums<"message_type">;
 
+// Image upload response
+export interface UploadImageResponse {
+  fileName: string;
+  filePath: string;
+  publicUrl: string;
+  size: number;
+  mimeType: string;
+}
+
 // Extended message types for the chat interface
 export interface ChatMessage extends Message {
   isStreaming?: boolean;

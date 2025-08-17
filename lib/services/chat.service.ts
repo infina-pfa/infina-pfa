@@ -5,6 +5,7 @@ import {
   CreateConversationResponse,
   MessageSender,
   MessageType,
+  UploadImageResponse,
 } from "@/lib/types/chat.types";
 import { Json } from "../supabase/database";
 import { apiClient } from "../api/api-client";
@@ -155,5 +156,31 @@ export const chatService = {
     }
 
     return response.body;
+  },
+
+  /**
+   * Upload an image to a conversation
+   */
+  async uploadImage(
+    conversationId: string,
+    file: File
+  ): Promise<UploadImageResponse> {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await fetch(
+      `/api/conversations/${conversationId}/upload-image`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to upload image");
+    }
+
+    return response.json();
   },
 };

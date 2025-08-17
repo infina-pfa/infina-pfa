@@ -13,10 +13,13 @@ import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
 import { aiService } from "@/lib/services/ai.service";
+import { chatService } from "@/lib/services/chat.service";
+import { UploadedImage } from "@/lib/types/image-upload.types";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
   const [isMobile, setIsMobile] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const { user } = useAuth();
   const sentFirstMessage = useRef(false);
   const { needsOnboarding, isLoading: isOnboardingLoading } =
@@ -38,13 +41,88 @@ export function ChatInterface() {
     setToolId,
     inputValue,
     setInputValue,
-    handleSubmit,
+    handleSubmit: originalHandleSubmit,
     isSubmitting,
     suggestions,
     onSuggestionClick,
     conversationId,
     sendMessage,
   } = chatFlow;
+
+  // Handle image selection and immediate upload
+  const handleImageSelect = async (files: File[]) => {
+    if (!conversationId) {
+      console.error("No conversation ID available for image upload");
+      return;
+    }
+
+    // Create temporary upload entries
+    const newImages: UploadedImage[] = files.map(file => ({
+      id: `${Date.now()}-${Math.random()}`,
+      file,
+      name: file.name,
+      size: file.size,
+      mimeType: file.type,
+      status: "uploading" as const,
+    }));
+
+    // Add to state immediately to show loading
+    setUploadedImages(prev => [...prev, ...newImages]);
+
+    // Upload each image
+    for (const image of newImages) {
+      try {
+        const result = await chatService.uploadImage(conversationId, image.file!);
+        
+        // Update the image with success status and URL
+        setUploadedImages(prev => 
+          prev.map(img => 
+            img.id === image.id 
+              ? { ...img, status: "success" as const, url: result.publicUrl }
+              : img
+          )
+        );
+      } catch (error) {
+        console.error(`Failed to upload ${image.name}:`, error);
+        
+        // Update the image with error status
+        setUploadedImages(prev => 
+          prev.map(img => 
+            img.id === image.id 
+              ? { ...img, status: "error" as const, error: "Upload failed" }
+              : img
+          )
+        );
+      }
+    }
+  };
+
+  // Custom handleSubmit that includes uploaded images
+  const handleSubmit = async () => {
+    try {
+      // Get successfully uploaded images
+      const successfulImages = uploadedImages.filter(img => img.status === "success");
+      
+      if (successfulImages.length > 0) {
+        // Create a message with image URLs
+        const imageUrls = successfulImages.map(img => img.url).join('\n');
+        const messageWithImages = inputValue.trim() 
+          ? `${inputValue}\n\n[Attached images:\n${imageUrls}]`
+          : `[Attached images:\n${imageUrls}]`;
+        
+        // Update input value with image URLs
+        setInputValue(messageWithImages);
+      }
+      
+      // Submit the message
+      await originalHandleSubmit();
+      
+      // Clear images after successful submission
+      setUploadedImages([]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
 
   useEffect(() => {
     const checkIsMobile = () => {
@@ -177,6 +255,9 @@ export function ChatInterface() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           disabled={isThinking || isStreaming}
+          uploadedImages={uploadedImages}
+          onImagesChange={setUploadedImages}
+          onImageSelect={handleImageSelect}
         />
       </div>
 
