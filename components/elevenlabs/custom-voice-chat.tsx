@@ -7,9 +7,6 @@ import { useRouter } from "next/navigation";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { 
   Mic, 
-  MicOff,
-  Volume2, 
-  VolumeX, 
   MessageCircle, 
   X, 
   PhoneOff,
@@ -17,7 +14,8 @@ import {
   Maximize2,
   Send,
   Keyboard,
-  Sparkles
+  Sparkles,
+  Volume2
 } from "lucide-react";
 
 interface ConversationMessage {
@@ -40,6 +38,8 @@ export function CustomVoiceChat() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
+  const [hasDragged, setHasDragged] = useState(false);
   
   // Connection state
   const [isConnected, setIsConnected] = useState(false);
@@ -47,8 +47,6 @@ export function CustomVoiceChat() {
   const [connectionQuality] = useState<'excellent' | 'good' | 'poor'>('excellent');
   
   // Audio state
-  const [isMuted, setIsMuted] = useState(false);
-  const [isMicMuted, setIsMicMuted] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   
   // Initialize position on client side
@@ -235,8 +233,8 @@ export function CustomVoiceChat() {
         barHeight = (dataArray[i] / 255) * canvas.height;
 
         const gradient = ctx.createLinearGradient(0, canvas.height - barHeight, 0, canvas.height);
-        gradient.addColorStop(0, 'rgba(0, 85, 255, 0.8)');
-        gradient.addColorStop(1, 'rgba(138, 43, 226, 0.8)');
+        gradient.addColorStop(0, 'rgba(0, 85, 255, 0.6)');
+        gradient.addColorStop(1, 'rgba(0, 85, 255, 0.3)');
 
         ctx.fillStyle = gradient;
         ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
@@ -307,27 +305,6 @@ export function CustomVoiceChat() {
     }
   };
 
-  const toggleMute = () => {
-    try {
-      const newMuteState = !isMuted;
-      conversation.setVolume?.({ volume: newMuteState ? 0 : 1 });
-      setIsMuted(newMuteState);
-    } catch (error) {
-      console.error("Failed to toggle mute:", error);
-    }
-  };
-
-  const toggleMicMute = () => {
-    const newMuteState = !isMicMuted;
-    setIsMicMuted(newMuteState);
-    
-    // Mute/unmute the actual microphone stream
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getAudioTracks().forEach(track => {
-        track.enabled = !newMuteState;
-      });
-    }
-  };
 
   const sendTextMessage = () => {
     if (!textInput.trim()) return;
@@ -344,26 +321,37 @@ export function CustomVoiceChat() {
   };
 
   // Handle drag functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleDragStart = (clientX: number, clientY: number) => {
     if (viewMode !== 'orb') return;
     
     setIsDragging(true);
-    setDragOffset({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y
-    });
+    setHasDragged(false);
+    const startX = clientX - position.x;
+    const startY = clientY - position.y;
+    setDragOffset({ x: startX, y: startY });
+    setDragStartPos({ x: clientX, y: clientY });
   };
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
+  const handleDragMove = (clientX: number, clientY: number) => {
     if (!isDragging) return;
     
-    const newX = Math.max(0, Math.min(window.innerWidth - 80, e.clientX - dragOffset.x));
-    const newY = Math.max(0, Math.min(window.innerHeight - 80, e.clientY - dragOffset.y));
+    // Check if we've moved enough to consider it a drag (5px threshold)
+    const dragDistance = Math.sqrt(
+      Math.pow(clientX - dragStartPos.x, 2) + 
+      Math.pow(clientY - dragStartPos.y, 2)
+    );
+    
+    if (dragDistance > 5) {
+      setHasDragged(true);
+    }
+    
+    const newX = Math.max(0, Math.min(window.innerWidth - 56, clientX - dragOffset.x));
+    const newY = Math.max(0, Math.min(window.innerHeight - 56, clientY - dragOffset.y));
     
     setPosition({ x: newX, y: newY });
-  }, [isDragging, dragOffset]);
+  };
 
-  const handleMouseUp = useCallback(() => {
+  const handleDragEnd = () => {
     setIsDragging(false);
     
     // Magnetic dock to edges
@@ -372,106 +360,145 @@ export function CustomVoiceChat() {
     
     if (position.x < threshold) {
       newPosition.x = 20;
-    } else if (position.x > window.innerWidth - 80 - threshold) {
-      newPosition.x = window.innerWidth - 100;
+    } else if (position.x > window.innerWidth - 56 - threshold) {
+      newPosition.x = window.innerWidth - 76;
     }
     
     if (position.y < threshold) {
       newPosition.y = 20;
-    } else if (position.y > window.innerHeight - 80 - threshold) {
-      newPosition.y = window.innerHeight - 100;
+    } else if (position.y > window.innerHeight - 56 - threshold) {
+      newPosition.y = window.innerHeight - 76;
     }
     
     setPosition(newPosition);
+    
+    // Reset drag flag after a short delay to prevent click interference
+    setTimeout(() => setHasDragged(false), 100);
+  };
+
+  // Mouse event handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleDragStart(e.clientX, e.clientY);
+  };
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    handleDragMove(e.clientX, e.clientY);
+  }, [isDragging, dragOffset, dragStartPos]);
+
+  const handleMouseUp = useCallback(() => {
+    handleDragEnd();
+  }, [position]);
+
+  // Touch event handlers for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    handleDragStart(touch.clientX, touch.clientY);
+  };
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    handleDragMove(touch.clientX, touch.clientY);
+  }, [isDragging, dragOffset, dragStartPos]);
+
+  const handleTouchEnd = useCallback(() => {
+    handleDragEnd();
   }, [position]);
 
   useEffect(() => {
     if (isDragging) {
+      // Mouse events
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      
+      // Touch events
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
       
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
       };
     }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
   // Render floating orb
   if (viewMode === 'orb') {
     return (
       <div
         ref={orbRef}
-        className="fixed z-50 cursor-move select-none"
+        className="fixed z-50 cursor-move select-none touch-none"
         style={{
           left: `${position.x}px`,
           top: `${position.y}px`,
-          transition: isDragging ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          transition: isDragging ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          opacity: isDragging ? 0.8 : 1
         }}
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
       >
-        {/* Outer glow effect - more subtle */}
+        {/* Outer glow effect - subtle blue accent */}
         <div className={`absolute inset-0 rounded-full transition-all duration-1000 ${
           isConnected 
-            ? 'bg-gradient-to-r from-blue-400/30 via-purple-400/30 to-blue-400/30 blur-lg' 
-            : 'bg-gradient-to-r from-gray-400/20 to-gray-500/20 blur-md'
+            ? 'bg-[#0055FF]/20 blur-md' 
+            : 'bg-gray-300/30 blur-sm'
         }`}
           style={{
-            transform: `scale(${isConnected ? 1.3 + audioLevel * 0.3 : 1.2})`,
+            transform: `scale(${isConnected ? 1.3 + audioLevel * 0.2 : 1.2})`,
             animation: isConnected ? 'pulse 3s infinite' : 'pulse 4s infinite'
           }}
         />
         
-        {/* Main orb */}
+        {/* Main orb - smaller and lighter */}
         <button
           onClick={(e) => {
             e.stopPropagation();
-            setViewMode('expanded');
+            // Only expand if we haven't dragged
+            if (!hasDragged) {
+              setViewMode('expanded');
+            }
           }}
-          className={`relative w-20 h-20 rounded-full transition-all duration-300 transform hover:scale-110 ${
+          className={`relative w-14 h-14 rounded-full transition-all duration-300 transform ${
+            !isDragging ? 'hover:scale-110' : 'scale-95'
+          } ${
             isConnected 
-              ? 'bg-gradient-to-br from-blue-500/70 to-purple-500/70' 
-              : 'bg-gradient-to-br from-gray-500/50 to-gray-600/50'
-          } shadow-lg backdrop-blur-md border border-white/10`}
-          style={{
-            background: isConnected
-              ? `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 70%), linear-gradient(135deg, #0055FF99, #8A2BE299)`
-              : `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1), transparent 70%), linear-gradient(135deg, #6b7280, #4b5563)`
-          }}
+              ? 'bg-white border-2 border-[#0055FF]' 
+              : 'bg-white border-2 border-gray-300'
+          }`}
         >
-          <div className="absolute inset-0 rounded-full overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10" />
-          </div>
-          
           {/* Icon */}
           <div className="relative z-10 flex items-center justify-center h-full">
             {isConnecting ? (
               <div className="animate-spin">
-                <Sparkles size={28} className="text-white" />
+                <Sparkles size={20} className="text-[#0055FF]" />
               </div>
             ) : isAgentSpeaking ? (
               <div className="animate-pulse">
-                <Volume2 size={28} className="text-white" />
+                <Volume2 size={20} className="text-[#0055FF]" />
               </div>
             ) : currentTranscript ? (
               <div className="animate-pulse">
-                <Mic size={28} className="text-white" />
+                <Mic size={20} className="text-[#0055FF]" />
               </div>
             ) : (
-              <MessageCircle size={28} className="text-white" />
+              <MessageCircle size={20} className="text-[#0055FF]" />
             )}
           </div>
           
           {/* Status indicator */}
-          <div className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white ${
-            isConnected ? 'bg-green-500' : isConnecting ? 'bg-yellow-500 animate-pulse' : 'bg-gray-400'
+          <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+            isConnected ? 'bg-[#2ECC71]' : isConnecting ? 'bg-[#FFC107] animate-pulse' : 'bg-gray-400'
           }`} />
         </button>
         
         {/* Notification badge */}
         {messages.length > 0 && (
-          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-bounce">
-            {messages.length}
+          <div className="absolute -top-1 -right-1 bg-[#F44336] text-white text-xs rounded-full w-4 h-4 flex items-center justify-center animate-bounce">
+            {messages.length > 9 ? '9+' : messages.length}
           </div>
         )}
       </div>
@@ -482,22 +509,22 @@ export function CustomVoiceChat() {
   if (viewMode === 'minimized') {
     return (
       <div className="fixed bottom-6 right-6 z-50">
-        <div className="bg-gray-900/90 backdrop-blur-sm rounded-full px-6 py-3 flex items-center gap-4 shadow-lg border border-gray-700/50">
-          <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'} animate-pulse`} />
-          <span className="text-white text-sm font-medium">
+        <div className="bg-white rounded-full px-4 py-2 flex items-center gap-3 border border-[#E0E0E0]">
+          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-[#2ECC71]' : 'bg-gray-400'} animate-pulse`} />
+          <span className="text-gray-700 text-sm font-medium font-nunito">
             {isAgentSpeaking ? t("speaking", { ns: "chat" }) : currentTranscript ? t("listening", { ns: "chat" }) : t("voiceAssistant", { ns: "chat" })}
           </span>
           <button
             onClick={() => setViewMode('expanded')}
-            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+            className="p-1.5 hover:bg-[#F0F2F5] rounded-full transition-colors"
           >
-            <Maximize2 size={16} className="text-white" />
+            <Maximize2 size={14} className="text-gray-600" />
           </button>
           <button
             onClick={() => setViewMode('orb')}
-            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+            className="p-1.5 hover:bg-[#F0F2F5] rounded-full transition-colors"
           >
-            <X size={16} className="text-white" />
+            <X size={14} className="text-gray-600" />
           </button>
         </div>
       </div>
@@ -509,27 +536,27 @@ export function CustomVoiceChat() {
     <div className={`fixed z-50 ${
       viewMode === 'fullscreen' 
         ? 'inset-0' 
-        : 'bottom-6 right-6 w-[420px] h-[600px]'
+        : 'bottom-6 right-6 w-[380px] h-[520px]'
     }`}>
-      <div className={`h-full bg-gray-900/95 backdrop-blur-sm rounded-2xl shadow-xl flex flex-col border border-gray-700/50 overflow-hidden ${
+      <div className={`h-full bg-white rounded-xl flex flex-col border border-[#E0E0E0] overflow-hidden ${
         viewMode === 'fullscreen' ? '' : 'animate-slideUp'
       }`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-600/30 to-purple-600/30 backdrop-blur-sm border-b border-gray-700/50">
+        <div className="flex items-center justify-between p-4 bg-[#F0F2F5] border-b border-[#E0E0E0]">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-gray-800/50 flex items-center justify-center backdrop-blur-sm border border-gray-700/50">
-                <Sparkles size={20} className="text-white" />
+              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-[#E0E0E0]">
+                <Sparkles size={20} className="text-[#0055FF]" />
               </div>
               <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-                isConnected ? 'bg-green-500' : isConnecting ? 'bg-yellow-500 animate-pulse' : 'bg-gray-400'
+                isConnected ? 'bg-[#2ECC71]' : isConnecting ? 'bg-[#FFC107] animate-pulse' : 'bg-gray-400'
               }`} />
             </div>
             <div>
-              <h3 className="font-semibold text-white text-sm">
+              <h3 className="font-semibold text-gray-900 text-sm font-nunito">
                 {t("voiceAssistant", { ns: "chat" })}
               </h3>
-              <p className="text-xs text-white/70">
+              <p className="text-xs text-gray-600">
                 {isConnected 
                   ? t("connected", { ns: "common" })
                   : isConnecting 
@@ -542,67 +569,67 @@ export function CustomVoiceChat() {
           <div className="flex items-center gap-1">
             <button
               onClick={() => setViewMode('minimized')}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label="Minimize"
             >
-              <Minimize2 size={16} className="text-white" />
+              <Minimize2 size={16} className="text-gray-600" />
             </button>
             <button
               onClick={() => setViewMode(viewMode === 'fullscreen' ? 'expanded' : 'fullscreen')}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label={viewMode === 'fullscreen' ? "Exit fullscreen" : "Fullscreen"}
             >
-              <Maximize2 size={16} className="text-white" />
+              <Maximize2 size={16} className="text-gray-600" />
             </button>
             <button
               onClick={() => setViewMode('orb')}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label={t("close", { ns: "common" })}
             >
-              <X size={16} className="text-white" />
+              <X size={16} className="text-gray-600" />
             </button>
           </div>
         </div>
 
         {/* Waveform Visualizer */}
         {isConnected && (isAgentSpeaking || currentTranscript) && (
-          <div className="relative h-16 bg-gradient-to-b from-gray-800/30 to-transparent">
+          <div className="relative h-12 bg-gradient-to-b from-[#0055FF]/5 to-transparent">
             <canvas
               ref={canvasRef}
               className="absolute inset-0 w-full h-full"
-              width={viewMode === 'fullscreen' ? window.innerWidth : 420}
-              height={64}
+              width={viewMode === 'fullscreen' ? window.innerWidth : 380}
+              height={48}
             />
           </div>
         )}
 
         {/* Messages Area */}
-        <div className="flex-1 p-4 overflow-y-auto bg-gray-900/50 voice-chat-messages">
+        <div className="flex-1 p-4 overflow-y-auto bg-[#F6F7F9] voice-chat-messages">
           {messages.length === 0 && !isConnected && (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gray-700/30 to-gray-800/30 flex items-center justify-center mb-4 animate-pulse">
-                <MessageCircle size={32} className="text-white/60" />
+              <div className="w-16 h-16 rounded-full bg-[#0055FF]/10 flex items-center justify-center mb-4 animate-pulse">
+                <MessageCircle size={24} className="text-[#0055FF]" />
               </div>
-              <p className="text-white/70 text-sm mb-2">{t("startVoiceConversation", { ns: "chat" })}</p>
+              <p className="text-gray-600 text-sm mb-2 font-nunito">{t("startVoiceConversation", { ns: "chat" })}</p>
             </div>
           )}
           
           {messages.map((message, index) => (
             <div
               key={message.id}
-              className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
+              className={`mb-3 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <div
-                className={`max-w-[80%] p-3 rounded-2xl ${
+                className={`max-w-[80%] p-3 rounded-xl ${
                   message.type === 'user'
-                    ? 'bg-blue-600/40 text-white rounded-br-sm border border-blue-500/30'
-                    : 'bg-gray-800/60 text-gray-100 rounded-bl-sm border border-gray-700/50'
+                    ? 'bg-[#0055FF] text-white rounded-br-sm'
+                    : 'bg-white text-gray-800 rounded-bl-sm border border-[#E0E0E0]'
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm font-nunito">{message.content}</p>
                 <p className={`text-xs mt-1 ${
-                  message.type === 'user' ? 'text-white/70' : 'text-white/50'
+                  message.type === 'user' ? 'text-white/80' : 'text-gray-500'
                 }`}>
                   {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
@@ -612,20 +639,20 @@ export function CustomVoiceChat() {
           
           {/* Current transcript */}
           {currentTranscript && (
-            <div className="mb-4 flex justify-end animate-fadeIn">
-              <div className="max-w-[80%] p-3 rounded-2xl bg-blue-600/20 text-gray-100 rounded-br-sm border border-blue-500/20">
-                <p className="text-sm italic">{currentTranscript}</p>
+            <div className="mb-3 flex justify-end animate-fadeIn">
+              <div className="max-w-[80%] p-3 rounded-xl bg-[#0055FF]/10 text-gray-700 rounded-br-sm">
+                <p className="text-sm italic font-nunito">{currentTranscript}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="flex gap-1">
                     {[0, 1, 2].map((i) => (
                       <div
                         key={i}
-                        className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
+                        className="w-1 h-1 bg-[#0055FF] rounded-full animate-bounce"
                         style={{ animationDelay: `${i * 150}ms` }}
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-blue-200">{t("listening", { ns: "chat" })}</span>
+                  <span className="text-xs text-[#0055FF]">{t("listening", { ns: "chat" })}</span>
                 </div>
               </div>
             </div>
@@ -633,20 +660,20 @@ export function CustomVoiceChat() {
           
           {/* Current agent message */}
           {currentAgentMessage && (
-            <div className="mb-4 flex justify-start animate-fadeIn">
-              <div className="max-w-[80%] p-3 rounded-2xl bg-gray-800/40 text-gray-100 rounded-bl-sm border border-gray-700/30">
-                <p className="text-sm">{currentAgentMessage}</p>
+            <div className="mb-3 flex justify-start animate-fadeIn">
+              <div className="max-w-[80%] p-3 rounded-xl bg-white text-gray-800 rounded-bl-sm border border-[#E0E0E0]">
+                <p className="text-sm font-nunito">{currentAgentMessage}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="flex gap-1">
                     {[0, 1, 2].map((i) => (
                       <div
                         key={i}
-                        className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"
+                        className="w-1 h-1 bg-[#0055FF] rounded-full animate-pulse"
                         style={{ animationDelay: `${i * 150}ms` }}
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-purple-200">{t("speaking", { ns: "chat" })}</span>
+                  <span className="text-xs text-[#0055FF]">{t("speaking", { ns: "chat" })}</span>
                 </div>
               </div>
             </div>
@@ -657,7 +684,7 @@ export function CustomVoiceChat() {
 
         {/* Input Area (for text mode) */}
         {inputMode === 'text' && isConnected && (
-          <div className="p-3 border-t border-gray-700/50">
+          <div className="p-3 border-t border-[#E0E0E0]">
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -665,11 +692,11 @@ export function CustomVoiceChat() {
                 onChange={(e) => setTextInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendTextMessage())}
                 placeholder={t("typeYourMessage", { ns: "chat" })}
-                className="flex-1 px-3 py-2 bg-gray-800/50 rounded-lg text-gray-100 placeholder-gray-500 border border-gray-700/50 focus:outline-none focus:border-blue-500/50 text-sm"
+                className="flex-1 px-3 py-2 bg-[#F0F2F5] rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:border-b-2 focus:border-[#0055FF] text-sm font-nunito"
               />
               <button
                 onClick={sendTextMessage}
-                className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg transition-all"
+                className="p-2 bg-[#0055FF] hover:bg-[#0055FF]/90 text-white rounded-lg transition-all"
               >
                 <Send size={18} />
               </button>
@@ -678,61 +705,40 @@ export function CustomVoiceChat() {
         )}
 
         {/* Controls */}
-        <div className="p-4 bg-gray-900/70 border-t border-gray-700/50">
+        <div className="p-4 bg-white border-t border-[#E0E0E0]">
+          {/* Top Row: Connection Status and Mode Toggle */}
           <div className="flex items-center justify-between mb-3">
             {/* Connection Status */}
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${
-                connectionQuality === 'excellent' ? 'bg-green-500' :
-                connectionQuality === 'good' ? 'bg-yellow-500' : 'bg-red-500'
+                connectionQuality === 'excellent' ? 'bg-[#2ECC71]' :
+                connectionQuality === 'good' ? 'bg-[#FFC107]' : 'bg-[#F44336]'
               }`} />
-              <span className="text-xs text-white/70">
+              <span className="text-xs text-gray-600 font-nunito">
                 {connectionQuality === 'excellent' ? 'Excellent' :
                  connectionQuality === 'good' ? 'Good' : 'Poor'} connection
               </span>
             </div>
 
             {/* Mode Toggle */}
-            <div className="flex items-center gap-1 bg-gray-800/50 rounded-lg p-1 border border-gray-700/50">
+            <div className="flex items-center gap-1 bg-[#F0F2F5] rounded-lg p-0.5">
               <button
                 onClick={() => setInputMode('voice')}
                 className={`p-2 rounded transition-all ${
-                  inputMode === 'voice' ? 'bg-blue-600/30 border border-blue-500/30' : 'hover:bg-gray-700/30'
+                  inputMode === 'voice' ? 'bg-white' : 'hover:bg-white/50'
                 }`}
                 aria-label="Voice mode"
               >
-                <Mic size={14} className="text-white" />
+                <Mic size={16} className={inputMode === 'voice' ? 'text-[#0055FF]' : 'text-gray-600'} />
               </button>
               <button
                 onClick={() => setInputMode('text')}
                 className={`p-2 rounded transition-all ${
-                  inputMode === 'text' ? 'bg-blue-600/30 border border-blue-500/30' : 'hover:bg-gray-700/30'
+                  inputMode === 'text' ? 'bg-white' : 'hover:bg-white/50'
                 }`}
                 aria-label="Text mode"
               >
-                <Keyboard size={14} className="text-white" />
-              </button>
-            </div>
-
-            {/* Audio Controls */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleMicMute}
-                className={`p-2 rounded-lg transition-all ${
-                  isMicMuted ? 'bg-red-600/30 text-red-400 border border-red-500/30' : 'text-gray-400 hover:bg-gray-700/30 border border-gray-700/50'
-                }`}
-                aria-label={isMicMuted ? "Unmute microphone" : "Mute microphone"}
-              >
-                {isMicMuted ? <MicOff size={14} /> : <Mic size={14} />}
-              </button>
-              <button
-                onClick={toggleMute}
-                className={`p-2 rounded-lg transition-all ${
-                  isMuted ? 'bg-red-600/30 text-red-400 border border-red-500/30' : 'text-gray-400 hover:bg-gray-700/30 border border-gray-700/50'
-                }`}
-                aria-label={isMuted ? t("unmute", { ns: "common" }) : t("mute", { ns: "common" })}
-              >
-                {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                <Keyboard size={16} className={inputMode === 'text' ? 'text-[#0055FF]' : 'text-gray-600'} />
               </button>
             </div>
           </div>
@@ -743,7 +749,7 @@ export function CustomVoiceChat() {
               <button
                 onClick={startConversation}
                 disabled={isConnecting}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600/70 to-purple-600/70 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-xl transition-all transform hover:scale-105 font-medium shadow-md border border-blue-500/30"
+                className="flex items-center gap-2 px-6 py-3 bg-[#0055FF] hover:bg-[#0055FF]/90 disabled:bg-gray-400 text-white rounded-full transition-all font-medium font-nunito text-sm"
               >
                 {isConnecting ? (
                   <div className="animate-spin">
@@ -757,7 +763,7 @@ export function CustomVoiceChat() {
             ) : (
               <button
                 onClick={endConversation}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600/70 to-orange-600/70 hover:from-red-600 hover:to-orange-600 text-white rounded-xl transition-all transform hover:scale-105 font-medium shadow-md border border-red-500/30"
+                className="flex items-center gap-2 px-6 py-3 bg-[#F44336] hover:bg-[#F44336]/90 text-white rounded-full transition-all font-medium font-nunito text-sm"
               >
                 <PhoneOff size={18} />
                 {t("endCall", { ns: "chat" })}

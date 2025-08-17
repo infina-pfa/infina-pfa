@@ -2,10 +2,10 @@
 
 @keyframes pulse {
   0%, 100% {
-    opacity: 0.4;
+    opacity: 0.3;
   }
   50% {
-    opacity: 0.2;
+    opacity: 0.15;
   }
 }
 
@@ -103,17 +103,17 @@
 }
 
 .voice-chat-messages::-webkit-scrollbar-track {
-  background: rgba(55, 65, 81, 0.3);
+  background: transparent;
   border-radius: 3px;
 }
 
 .voice-chat-messages::-webkit-scrollbar-thumb {
-  background: rgba(107, 114, 128, 0.5);
+  background: rgba(224, 224, 224, 0.8);
   border-radius: 3px;
 }
 
 .voice-chat-messages::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.7);
+  background: rgba(209, 213, 219, 1);
 }
 
 /* Smooth Volume Slider */
