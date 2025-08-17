@@ -27,7 +27,11 @@ interface UseChatFlowReturn {
   // Actions
   sendMessage: (
     content: string,
-    options?: { isToolMessage?: boolean; sender?: MessageSender }
+    options?: {
+      isToolMessage?: boolean;
+      sender?: MessageSender;
+      imageUrls?: string[];
+    }
   ) => Promise<void>;
   createNewSession: () => Promise<void>;
   clearError: () => void;
@@ -148,7 +152,11 @@ export const useChatFlow = (): UseChatFlowReturn => {
    */
   const sendMessage = async (
     content: string,
-    options?: { isToolMessage?: boolean; sender?: MessageSender }
+    options?: {
+      isToolMessage?: boolean;
+      sender?: MessageSender;
+      imageUrls?: string[];
+    }
   ) => {
     // Hide suggestions after first message
     setShowSuggestions(false);
@@ -174,7 +182,9 @@ export const useChatFlow = (): UseChatFlowReturn => {
         updated_at: new Date().toISOString(),
         sender: options?.sender || "user",
         type: "text",
-        metadata: {},
+        metadata: {
+          imageUrls: options?.imageUrls || [],
+        },
         user_id: user?.id || "",
       });
 
@@ -183,6 +193,7 @@ export const useChatFlow = (): UseChatFlowReturn => {
         conversationId: conversationId,
         message: content,
         sender: options?.sender || "user",
+        imageUrls: options?.imageUrls || [],
       };
 
       if (options?.isToolMessage) {
@@ -192,6 +203,8 @@ export const useChatFlow = (): UseChatFlowReturn => {
       }
     } catch {
       // Error handling will be done by individual hooks
+    } finally {
+      setInputValue("");
     }
   };
 
@@ -199,7 +212,6 @@ export const useChatFlow = (): UseChatFlowReturn => {
     if (!inputValue.trim() || isSubmitting) return;
 
     const messageContent = inputValue.trim();
-    setInputValue("");
 
     await sendMessage(messageContent);
   };

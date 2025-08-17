@@ -109,7 +109,8 @@ export const chatService = {
   async startAIAdvisorStream(
     conversationId: string,
     userMessage: string,
-    sender: MessageSender
+    sender: MessageSender,
+    imageUrls?: string[]
   ): Promise<ReadableStream<Uint8Array>> {
     const response = await fetch(
       `/api/conversations/${conversationId}/stream`,
@@ -118,7 +119,7 @@ export const chatService = {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content: userMessage, sender }),
+        body: JSON.stringify({ content: userMessage, sender, imageUrls }),
       }
     );
 

@@ -85,21 +85,13 @@ export function ChatInterface() {
       const imageUrls = getImageUrls();
 
       if (imageUrls.length > 0) {
-        // Create a message with image URLs
-        const imageUrlsText = imageUrls.join("\n");
-        const messageWithImages = inputValue.trim()
-          ? `${inputValue}\n\n[Attached images:\n${imageUrlsText}]`
-          : `[Attached images:\n${imageUrlsText}]`;
-
-        // Update input value with image URLs
-        setInputValue(messageWithImages);
+        clearImages();
+        await sendMessage(inputValue, {
+          imageUrls,
+        });
+      } else {
+        await originalHandleSubmit();
       }
-
-      // Submit the message
-      await originalHandleSubmit();
-
-      // Clear images after successful submission
-      clearImages();
     } catch (error) {
       console.error("Error sending message:", error);
     }

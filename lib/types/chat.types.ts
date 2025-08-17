@@ -221,6 +221,7 @@ export interface AdvisorStreamRequest {
   conversationId: string;
   message: string;
   sender: MessageSender;
+  imageUrls?: string[];
 }
 
 // Response Data Event Types (matching the backend)
