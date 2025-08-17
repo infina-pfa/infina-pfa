@@ -181,6 +181,6 @@ export const chatService = {
       throw new Error(error.error || "Failed to upload image");
     }
 
-    return response.json();
+    return (await response.json()).data;
   },
 };

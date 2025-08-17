@@ -22,7 +22,7 @@ interface ChatInputProps {
   onAttachFile?: () => void;
   onVoiceInput?: () => void;
   uploadedImages?: UploadedImage[];
-  onImagesChange?: (images: UploadedImage[]) => void;
+  onRemoveImage?: (imageId: string) => void;
   onImageSelect?: (files: File[]) => void;
 }
 
@@ -35,7 +35,7 @@ export function ChatInput({
   onAttachFile,
   onVoiceInput,
   uploadedImages = [],
-  onImagesChange,
+  onRemoveImage,
   onImageSelect,
 }: ChatInputProps) {
   const { t } = useAppTranslation(["chat", "common"]);
@@ -95,9 +95,8 @@ export function ChatInput({
   };
 
   const handleRemoveImage = (imageId: string) => {
-    if (onImagesChange) {
-      const newImages = uploadedImages.filter(img => img.id !== imageId);
-      onImagesChange(newImages);
+    if (onRemoveImage) {
+      onRemoveImage(imageId);
     }
   };
 

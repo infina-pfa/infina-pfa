@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/auth/use-auth";
 import { useChatFlow } from "@/hooks/use-chat-flow";
 import { useOnboardingCheck } from "@/hooks/use-onboarding-check";
 import { useAppTranslation } from "@/hooks/use-translation";
+import { useImageUpload } from "@/hooks/use-image-upload";
 import { ChatToolId } from "@/lib/types/ai-streaming.types";
 import { redirect } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -13,13 +14,10 @@ import { SuggestionList } from "./suggestion-list";
 import { ToolPanel } from "./tool-panel";
 import { TypingIndicator } from "./typing-indicator";
 import { aiService } from "@/lib/services/ai.service";
-import { chatService } from "@/lib/services/chat.service";
-import { UploadedImage } from "@/lib/types/image-upload.types";
 
 export function ChatInterface() {
   const { t } = useAppTranslation(["chat", "common"]);
   const [isMobile, setIsMobile] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const { user } = useAuth();
   const sentFirstMessage = useRef(false);
   const { needsOnboarding, isLoading: isOnboardingLoading } =
@@ -49,76 +47,59 @@ export function ChatInterface() {
     sendMessage,
   } = chatFlow;
 
-  // Handle image selection and immediate upload
+  // Custom handler to ensure conversation exists before uploading
   const handleImageSelect = async (files: File[]) => {
     if (!conversationId) {
-      console.error("No conversation ID available for image upload");
+      alert(
+        "Please send a message first to start a conversation before uploading images."
+      );
       return;
     }
 
-    // Create temporary upload entries
-    const newImages: UploadedImage[] = files.map(file => ({
-      id: `${Date.now()}-${Math.random()}`,
-      file,
-      name: file.name,
-      size: file.size,
-      mimeType: file.type,
-      status: "uploading" as const,
-    }));
-
-    // Add to state immediately to show loading
-    setUploadedImages(prev => [...prev, ...newImages]);
-
-    // Upload each image
-    for (const image of newImages) {
-      try {
-        const result = await chatService.uploadImage(conversationId, image.file!);
-        
-        // Update the image with success status and URL
-        setUploadedImages(prev => 
-          prev.map(img => 
-            img.id === image.id 
-              ? { ...img, status: "success" as const, url: result.publicUrl }
-              : img
-          )
-        );
-      } catch (error) {
-        console.error(`Failed to upload ${image.name}:`, error);
-        
-        // Update the image with error status
-        setUploadedImages(prev => 
-          prev.map(img => 
-            img.id === image.id 
-              ? { ...img, status: "error" as const, error: "Upload failed" }
-              : img
-          )
-        );
-      }
-    }
+    // Upload the images
+    await uploadImages(files);
   };
+
+  // Use the image upload hook
+  const {
+    uploadedImages,
+    isUploading,
+    uploadImages,
+    removeImage,
+    clearImages,
+    getImageUrls,
+  } = useImageUpload({
+    conversationId,
+    onUploadComplete: (image) => {
+      console.log("Image uploaded successfully:", image.name);
+    },
+    onUploadError: (image, error) => {
+      console.error(`Failed to upload ${image.name}:`, error);
+    },
+  });
 
   // Custom handleSubmit that includes uploaded images
   const handleSubmit = async () => {
     try {
-      // Get successfully uploaded images
-      const successfulImages = uploadedImages.filter(img => img.status === "success");
-      
-      if (successfulImages.length > 0) {
+      // Get image URLs if any
+      const imageUrls = getImageUrls();
+
+      if (imageUrls.length > 0) {
         // Create a message with image URLs
-        const imageUrls = successfulImages.map(img => img.url).join('\n');
-        const messageWithImages = inputValue.trim() 
-          ? `${inputValue}\n\n[Attached images:\n${imageUrls}]`
-          : `[Attached images:\n${imageUrls}]`;
-        
+        const imageUrlsText = imageUrls.join("\n");
+        const messageWithImages = inputValue.trim()
+          ? `${inputValue}\n\n[Attached images:\n${imageUrlsText}]`
+          : `[Attached images:\n${imageUrlsText}]`;
+
         // Update input value with image URLs
         setInputValue(messageWithImages);
       }
-      
+
       // Submit the message
       await originalHandleSubmit();
-      
+
       // Clear images after successful submission
-      setUploadedImages([]);
+      clearImages();
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -254,9 +235,9 @@ export function ChatInterface() {
           onChange={setInputValue}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
-          disabled={isThinking || isStreaming}
+          disabled={isThinking || isStreaming || isUploading}
           uploadedImages={uploadedImages}
-          onImagesChange={setUploadedImages}
+          onRemoveImage={removeImage}
           onImageSelect={handleImageSelect}
         />
       </div>

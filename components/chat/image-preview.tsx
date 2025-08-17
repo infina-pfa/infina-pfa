@@ -21,7 +21,7 @@ export function ImagePreview({ images, onRemove }: ImagePreviewProps) {
     const newUrls = new Map<string, string>();
     const urlsToRevoke: string[] = [];
 
-    images.forEach(image => {
+    images.forEach((image) => {
       if (image.file && !image.url) {
         const url = URL.createObjectURL(image.file);
         newUrls.set(image.id, url);
@@ -35,7 +35,7 @@ export function ImagePreview({ images, onRemove }: ImagePreviewProps) {
 
     // Cleanup function to revoke object URLs
     return () => {
-      urlsToRevoke.forEach(url => URL.revokeObjectURL(url));
+      urlsToRevoke.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [images]);
 
