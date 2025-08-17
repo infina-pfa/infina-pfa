@@ -124,6 +124,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                 }
               } else if (parsed.type === "text") {
                 setIsThinking(false);
+                setIsPreparingTool(false);
                 fullContent += parsed.content;
                 if (!currentAIMessageId) {
                   currentAIMessageId = `ai-${Date.now()}`;
@@ -201,6 +202,7 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
               } else if (parsed.type === "error") {
               }
             } catch (parseError) {
+              setIsPreparingTool(false);
               console.error("Error parsing SSE data:", parseError);
             }
           }
