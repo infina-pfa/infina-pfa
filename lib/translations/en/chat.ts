@@ -32,6 +32,15 @@ export const chatEn = {
   uploadFailed: "Failed",
   uploading: "Uploading...",
   uploadSuccess: "Uploaded",
+  
+  // Voice Recording
+  recording: "Recording...",
+  stopRecording: "Stop recording",
+  transcribing: "Transcribing...",
+  recordingError: "Failed to start recording. Please check your microphone permissions.",
+  transcriptionError: "Failed to transcribe audio. Please try again.",
+  transcriptionSuccess: "Voice transcribed successfully",
+  noSpeechDetected: "No speech detected in the recording",
 
   // Suggestions
   suggestionsTitle: "Try asking about:",

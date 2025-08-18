@@ -29,6 +29,11 @@ export interface UploadImageResponse {
   mimeType: string;
 }
 
+// Speech to text response
+export interface SpeechToTextResponse {
+  text: string;
+}
+
 // Extended message types for the chat interface
 export interface ChatMessage extends Message {
   isStreaming?: boolean;

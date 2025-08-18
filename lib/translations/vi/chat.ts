@@ -32,6 +32,15 @@ export const chatVi = {
   uploadFailed: "Thất bại",
   uploading: "Đang tải...",
   uploadSuccess: "Đã tải",
+  
+  // Voice Recording
+  recording: "Đang ghi âm...",
+  stopRecording: "Dừng ghi âm",
+  transcribing: "Đang chuyển đổi...",
+  recordingError: "Không thể bắt đầu ghi âm. Vui lòng kiểm tra quyền truy cập microphone.",
+  transcriptionError: "Không thể chuyển đổi âm thanh. Vui lòng thử lại.",
+  transcriptionSuccess: "Đã chuyển đổi giọng nói thành công",
+  noSpeechDetected: "Không phát hiện giọng nói trong bản ghi âm",
 
   // Suggestions
   suggestionsTitle: "Thử hỏi về:",

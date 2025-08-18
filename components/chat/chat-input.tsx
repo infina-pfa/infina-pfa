@@ -2,8 +2,9 @@
 
 import { useRef, useEffect, useState } from "react";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { Plus, Mic, Send, Image as ImageIcon, FileText } from "lucide-react";
+import { Plus, Send, Image as ImageIcon, FileText, Loader2, Mic } from "lucide-react";
 import { ImagePreview } from "./image-preview";
+import { VoiceRecorder } from "./voice-recorder";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -41,8 +42,10 @@ export function ChatInput({
   const { t } = useAppTranslation(["chat", "common"]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [charCount, setCharCount] = useState<number>(0);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
+  
   const maxLength = 500;
 
   // Auto-resize textarea and update character count
@@ -102,6 +105,12 @@ export function ChatInput({
 
   const handleImageButtonClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleTranscription = (text: string) => {
+    // Append transcribed text to existing value
+    const newValue = value ? `${value} ${text}` : text;
+    onChange(newValue.slice(0, maxLength)); // Respect max length
   };
 
   const isOverLimit = charCount > maxLength;
@@ -190,21 +199,38 @@ export function ChatInput({
         </DropdownMenu>
 
         {/* Voice/Send Button */}
-        <Button
-          size="icon"
-          variant="default"
-          onClick={(value.trim() || uploadedImages.some(img => img.status === "success")) ? handleSubmit : onVoiceInput}
-          disabled={disabled || isSubmitting || isOverLimit || uploadedImages.some(img => img.status === "uploading")}
-          aria-label={(value.trim() || uploadedImages.some(img => img.status === "success")) ? t("sendMessage") : t("voiceInput")}
-        >
-          {isSubmitting ? (
-            <div className="w-4 h-4 bg-white rounded-full animate-pulse" />
-          ) : (value.trim() || uploadedImages.some(img => img.status === "success")) ? (
-            <Send className="w-5 h-5" />
-          ) : (
+        {(value.trim() || uploadedImages.some(img => img.status === "success")) ? (
+          <Button
+            size="icon"
+            variant="default"
+            onClick={handleSubmit}
+            disabled={disabled || isSubmitting || isOverLimit || uploadedImages.some(img => img.status === "uploading")}
+            aria-label={t("sendMessage")}
+          >
+            {isSubmitting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </Button>
+        ) : onVoiceInput ? (
+          <Button
+            size="icon"
+            variant="default"
+            onClick={onVoiceInput}
+            disabled={disabled || isSubmitting}
+            aria-label={t("voiceInput")}
+          >
             <Mic className="w-5 h-5" />
-          )}
-        </Button>
+          </Button>
+        ) : (
+          <div className="relative">
+            <VoiceRecorder
+              onTranscription={handleTranscription}
+              disabled={disabled || isSubmitting}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
