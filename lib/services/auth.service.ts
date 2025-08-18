@@ -15,12 +15,23 @@ export const authService = {
    * Get the current authenticated user
    */
   async getCurrentUser(): Promise<AuthUser | null> {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-    if (error) throw error;
-    return user as AuthUser | null;
+    try {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+      
+      // Don't throw error if it's just a missing session
+      if (error && error.message !== "Auth session missing!") {
+        throw error;
+      }
+      
+      return user as AuthUser | null;
+    } catch (error) {
+      // Return null if session is missing or expired
+      console.log("getCurrentUser error:", error);
+      return null;
+    }
   },
 
   /**

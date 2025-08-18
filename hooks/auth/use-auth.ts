@@ -41,6 +41,11 @@ export const useAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      setState({
+        user: null,
+        loading: true,
+      });
+
       await authService.signIn({ email, password });
 
       setState({
@@ -48,16 +53,22 @@ export const useAuth = () => {
         loading: false,
       });
     } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error(t(error.errorCode as string));
-      } else {
-        toast.error(t("unexpectedError"));
-      }
+      throw error;
+    } finally {
+      setState({
+        user: null,
+        loading: false,
+      });
     }
   };
 
   const signUp = async (email: string, password: string) => {
     try {
+      setState({
+        user: null,
+        loading: true,
+      });
+
       await authService.signUp({ email, password });
 
       setState({
@@ -65,51 +76,77 @@ export const useAuth = () => {
         loading: false,
       });
     } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error(t(error.errorCode as string));
-      } else {
-        toast.error(t("unexpectedError"));
-      }
+      throw error;
+    } finally {
+      setState({
+        user: null,
+        loading: false,
+      });
     }
   };
 
   const forgotPassword = async (email: string) => {
     try {
+      setState({
+        user: null,
+        loading: true,
+      });
+
       await authService.forgotPassword({ email });
     } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error(t(error.errorCode as string));
-      } else {
-        toast.error(t("unexpectedError"));
-      }
+      throw error;
+    } finally {
+      setState({
+        user: null,
+        loading: false,
+      });
     }
   };
 
   const resetPassword = async (password: string, confirmPassword: string) => {
     try {
+      setState({
+        user: null,
+        loading: true,
+      });
+
       await authService.resetPassword({
         password,
         confirmPassword,
       });
     } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error(t(error.errorCode as string));
-      } else {
-        toast.error(t("unexpectedError"));
-      }
+      throw error;
+    } finally {
+      setState({
+        user: null,
+        loading: false,
+      });
     }
   };
 
   const signOut = async () => {
-    await authService.signOut();
+    try {
+      setState({
+        user: null,
+        loading: true,
+      });
 
-    setState({
-      user: null,
-      loading: false,
-    });
+      await authService.signOut();
 
-    // Redirect to sign-in page after successful sign out
-    router.push("/auth/sign-in");
+      setState({
+        user: null,
+        loading: false,
+      });
+
+      router.push("/auth/sign-in");
+    } catch {
+      setState({
+        user: null,
+        loading: false,
+      });
+      // Still redirect even if there's an error, as the session might be invalid
+      router.push("/auth/sign-in");
+    }
   };
 
   const resendEmailVerification = async (email: string): Promise<void> => {

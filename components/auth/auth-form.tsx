@@ -71,7 +71,9 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
       }
     } catch (error) {
       if (error instanceof ApiError) {
-        toast.error(t(error.errorCode as string));
+        toast.error(
+          t((error.errorCode as string).toUpperCase(), { ns: "errors" })
+        );
       } else {
         toast.error(t("unexpectedError"));
       }
@@ -92,7 +94,11 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white p-8">
+    <Card
+      className={`w-full max-w-md mx-auto bg-white p-8 transition-opacity duration-200 ${
+        loading ? "pointer-events-none" : ""
+      }`}
+    >
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
           {mode === "sign-in" ? t("signInTitle") : t("signUpTitle")}
@@ -114,6 +120,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
             setShowConfirmPassword(!showConfirmPassword)
           }
           t={t}
+          disabled={loading}
         />
 
         {/* Forgot Password Link (Sign In Only) */}
@@ -122,7 +129,8 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
             <button
               type="button"
               onClick={() => router.push("/auth/forgot-password")}
-              className="text-sm text-infina-blue hover:text-blue-700 font-medium cursor-pointer"
+              className="text-sm text-infina-blue hover:text-blue-700 font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-opacity duration-200"
+              disabled={loading}
             >
               {t("forgotPassword")}
             </button>
@@ -149,7 +157,7 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
 
         {/* Toggle Mode */}
         <div className="text-center">
-          <span className="text-gray-600">
+          <span className={`text-gray-600 ${loading ? "opacity-50" : ""}`}>
             {mode === "sign-in"
               ? t("dontHaveAccount") + " "
               : t("alreadyHaveAccount") + " "}
@@ -157,7 +165,8 @@ export function AuthForm({ mode, onToggleMode }: AuthFormProps) {
           <button
             type="button"
             onClick={onToggleMode}
-            className="text-infina-blue hover:text-blue-700 font-medium cursor-pointer"
+            className="text-infina-blue hover:text-blue-700 font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-opacity duration-200"
+            disabled={loading}
           >
             {mode === "sign-in" ? t("signUp") : t("signIn")}
           </button>

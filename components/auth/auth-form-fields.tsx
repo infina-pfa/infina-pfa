@@ -16,6 +16,7 @@ interface AuthFormFieldsProps {
   onToggleShowPassword: () => void;
   onToggleShowConfirmPassword: () => void;
   t: TFunction;
+  disabled?: boolean;
 }
 
 export function AuthFormFields({
@@ -27,6 +28,7 @@ export function AuthFormFields({
   onToggleShowPassword,
   onToggleShowConfirmPassword,
   t,
+  disabled = false,
 }: AuthFormFieldsProps) {
   return (
     <>
@@ -48,6 +50,7 @@ export function AuthFormFields({
             error={!!errors.email}
             className="pl-12"
             placeholder={t("enterEmail")}
+            disabled={disabled}
           />
         </div>
         {errors.email && (
@@ -75,11 +78,13 @@ export function AuthFormFields({
             error={!!errors.password}
             className="pl-12"
             placeholder={t("enterPassword")}
+            disabled={disabled}
           />
           <button
             type="button"
             onClick={onToggleShowPassword}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={disabled}
           >
             {showPassword ? (
               <EyeOff className="w-5 h-5" />
@@ -113,11 +118,13 @@ export function AuthFormFields({
               error={!!errors.confirmPassword}
               className="pl-12"
               placeholder={t("confirmPasswordPlaceholder")}
+              disabled={disabled}
             />
             <button
               type="button"
               onClick={onToggleShowConfirmPassword}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={disabled}
             >
               {showConfirmPassword ? (
                 <EyeOff className="w-5 h-5" />
