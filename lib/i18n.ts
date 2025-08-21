@@ -35,6 +35,8 @@ import { spendingVi } from "./translations/vi/spending";
 import { spendingEn } from "./translations/en/spending";
 import { errorsVi } from "./translations/vi/errors";
 import { errorsEn } from "./translations/en/errors";
+import { debtVi } from "./translations/vi/debt";
+import { debtEn } from "./translations/en/debt";
 
 // Translation resources
 const resources = {
@@ -55,6 +57,7 @@ const resources = {
     goals: goalsVi,
     spending: spendingVi,
     errors: errorsVi,
+    debt: debtVi,
   },
   en: {
     common: commonEn,
@@ -73,6 +76,7 @@ const resources = {
     goals: goalsEn,
     spending: spendingEn,
     errors: errorsEn,
+    debt: debtEn,
   },
 };
 

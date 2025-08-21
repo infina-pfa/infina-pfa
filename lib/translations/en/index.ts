@@ -14,6 +14,7 @@ import { incomeEn } from "./income";
 import { goalsEn } from "./goals";
 import { spendingEn } from "./spending";
 import { errorsEn } from "./errors";
+import { debtEn } from "./debt";
 
 export const enTranslations = {
   ...commonEn,
@@ -32,4 +33,5 @@ export const enTranslations = {
   goals: goalsEn,
   spending: spendingEn,
   errors: errorsEn,
+  debt: debtEn,
 };
