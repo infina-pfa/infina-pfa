@@ -20,12 +20,12 @@ export const authService = {
         data: { user },
         error,
       } = await supabase.auth.getUser();
-      
+
       // Don't throw error if it's just a missing session
       if (error && error.message !== "Auth session missing!") {
         throw error;
       }
-      
+
       return user as AuthUser | null;
     } catch (error) {
       // Return null if session is missing or expired
@@ -56,7 +56,7 @@ export const authService = {
     const { data, error } = await supabase.auth.signUp({
       ...credentials,
       options: {
-        emailRedirectTo: `${window.location.origin}/sign-in`,
+        emailRedirectTo: `${window.location.origin}/auth/sign-in`,
       },
     });
 
