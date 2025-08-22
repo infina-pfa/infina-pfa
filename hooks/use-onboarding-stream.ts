@@ -6,6 +6,7 @@ import {
   UserProfile,
   FinancialStage,
   OnboardingComponentType,
+  ComponentData,
 } from "@/lib/types/onboarding.types";
 import { useTranslation } from "react-i18next";
 import { onboardingService } from "@/lib/services/onboarding.service";
@@ -193,7 +194,8 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
                     title: parsed.data.result.title,
                     type: parsed.data.result
                       .component_type as OnboardingComponentType,
-                    context: parsed.data.result.context,
+                    context: parsed.data.result
+                      .context as unknown as ComponentData,
                     isCompleted: false,
                   },
                 };

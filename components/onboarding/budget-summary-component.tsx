@@ -44,7 +44,7 @@ export default function BudgetSummaryComponent({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(component.isCompleted);
 
-  const context = component.context as BudgetSummaryContext;
+  const context = component.context as unknown as BudgetSummaryContext;
   const { monthlyIncome, budgetCategories } = context.budgetSummary;
 
   const formatCurrency = (amount: number) =>
