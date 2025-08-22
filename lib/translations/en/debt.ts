@@ -16,6 +16,7 @@ export const debtEn = {
   timeLeft: "Time Left",
   paidAmount: "Paid Amount",
   remainingAmount: "Remaining Amount",
+  currentPaidAmount: "Current Paid Amount",
 
   // Actions
   createDebt: "Create Debt",
@@ -30,11 +31,19 @@ export const debtEn = {
   enterPurpose: "Enter debt purpose",
   enterAmount: "Enter debt amount",
   enterInterestRate: "Enter interest rate (%)",
+  enterCurrentPaidAmount: "Enter amount already paid (optional)",
+  enterPaymentAmount: "Enter payment amount",
+  enterPaymentDescription: "Enter payment description",
   selectDueDate: "Select due date",
   lenderRequired: "Lender is required",
   purposeRequired: "Purpose is required",
   amountRequired: "Amount is required",
   dueDateRequired: "Due date is required",
+  dueDatePast: "Due date cannot be in the past",
+  rateInvalid: "Interest rate must be between 0 and 100",
+  descriptionRequired: "Description is required",
+  paymentExceedsDebt: "Payment amount cannot exceed remaining debt",
+  paymentAmount: "Payment Amount",
 
   // Status
   overdue: "Overdue",
@@ -46,8 +55,13 @@ export const debtEn = {
   debtCreatedSuccess: "Debt created successfully",
   debtUpdatedSuccess: "Debt updated successfully",
   debtDeletedSuccess: "Debt deleted successfully",
+  debtCreateError: "Failed to create debt",
+  debtUpdateError: "Failed to update debt",
+  debtDeleteError: "Failed to delete debt",
   paymentAddedSuccess: "Payment added successfully",
+  paymentError: "Failed to add payment",
   noDebtsFound: "No debts found",
+  payNow: "Pay Now",
 
   // Confirmation
   confirmDeleteDebt: "Are you sure you want to delete this debt?",
