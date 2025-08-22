@@ -3,6 +3,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { useDeleteDebt } from "@/hooks/swr/debt";
 import { Plus } from "lucide-react";
@@ -13,6 +23,17 @@ import { PayDebtModal } from "./pay-debt-modal";
 import { toast } from "sonner";
 import { DebtResponse } from "@/lib/types/debt.types";
 
+interface Payment {
+  id: string;
+  name: string;
+  description: string;
+  amount: number;
+  type?: string;
+  recurring?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DebtItem {
   id: string;
   lender: string;
@@ -21,6 +42,7 @@ interface DebtItem {
   currentPaidAmount: number;
   dueDate: string;
   rate: number;
+  payments?: Payment[];
 }
 
 interface DebtListProps {
@@ -44,6 +66,8 @@ export function DebtList({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDebt, setSelectedDebt] = useState<DebtItem | null>(null);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+  const [deleteDebtId, setDeleteDebtId] = useState<string | null>(null);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   const handleAddDebt = () => {
     if (onAddDebt) {
@@ -73,20 +97,25 @@ export function DebtList({
     }
   };
 
-  const handleDelete = async (debtId: string) => {
-    // Show confirmation dialog
-    if (
-      window.confirm(t("confirmDeleteDebt") + "\n" + t("deleteDebtWarning"))
-    ) {
-      try {
-        await deleteDebt(debtId);
-        toast.success(t("debtDeletedSuccess"));
-        if (onDebtDeleted) {
-          onDebtDeleted();
-        }
-      } catch {
-        toast.error(t("debtDeleteError", { ns: "debt" }));
+  const handleDeleteClick = (debtId: string) => {
+    setDeleteDebtId(debtId);
+    setIsDeleteAlertOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteDebtId) return;
+    
+    try {
+      await deleteDebt(deleteDebtId);
+      toast.success(t("debtDeletedSuccess"));
+      if (onDebtDeleted) {
+        onDebtDeleted();
       }
+    } catch {
+      toast.error(t("debtDeleteError", { ns: "debt" }));
+    } finally {
+      setIsDeleteAlertOpen(false);
+      setDeleteDebtId(null);
     }
   };
 
@@ -98,6 +127,17 @@ export function DebtList({
   const handlePaySuccess = () => {
     setIsPayModalOpen(false);
     setSelectedDebt(null);
+    // Trigger refresh of debts list after payment
+    if (onDebtUpdated) {
+      onDebtUpdated();
+    }
+  };
+
+  const handlePaymentDeleted = () => {
+    // Trigger refresh of debts list after payment deletion
+    if (onDebtUpdated) {
+      onDebtUpdated();
+    }
   };
 
   return (
@@ -125,8 +165,9 @@ export function DebtList({
                 key={debt.id}
                 debt={debt}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={handleDeleteClick}
                 onPay={handlePay}
+                onPaymentDeleted={handlePaymentDeleted}
               />
             ))}
           </div>
@@ -158,6 +199,35 @@ export function DebtList({
         onSuccess={handlePaySuccess}
         debt={selectedDebt}
       />
+
+      {/* Delete Debt Confirmation Dialog */}
+      <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
+        <AlertDialogContent className="font-nunito">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("confirmDeleteDebt")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("deleteDebtWarning")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => {
+                setIsDeleteAlertOpen(false);
+                setDeleteDebtId(null);
+              }}
+              className="font-nunito"
+            >
+              {t("cancel", { ns: "common" })}
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 font-nunito"
+            >
+              {t("delete", { ns: "common" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

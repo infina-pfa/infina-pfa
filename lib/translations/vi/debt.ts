@@ -59,11 +59,16 @@ export const debtVi = {
   debtUpdateError: "Không thể cập nhật khoản nợ",
   debtDeleteError: "Không thể xóa khoản nợ",
   paymentAddedSuccess: "Thêm thanh toán thành công",
+  paymentDeletedSuccess: "Xóa thanh toán thành công",
   paymentError: "Không thể thêm thanh toán",
+  paymentDeleteError: "Không thể xóa thanh toán",
   noDebtsFound: "Không tìm thấy khoản nợ nào",
+  noPaymentsYet: "Chưa có thanh toán nào",
   payNow: "Thanh toán ngay",
+  paymentHistory: "Lịch sử thanh toán",
 
   // Confirmation
   confirmDeleteDebt: "Bạn có chắc chắn muốn xóa khoản nợ này?",
+  confirmDeletePayment: "Bạn có chắc chắn muốn xóa thanh toán này?",
   deleteDebtWarning: "Hành động này không thể hoàn tác",
 };

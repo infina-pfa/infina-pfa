@@ -59,11 +59,16 @@ export const debtEn = {
   debtUpdateError: "Failed to update debt",
   debtDeleteError: "Failed to delete debt",
   paymentAddedSuccess: "Payment added successfully",
+  paymentDeletedSuccess: "Payment deleted successfully",
   paymentError: "Failed to add payment",
+  paymentDeleteError: "Failed to delete payment",
   noDebtsFound: "No debts found",
+  noPaymentsYet: "No payments yet",
   payNow: "Pay Now",
+  paymentHistory: "Payment History",
 
   // Confirmation
   confirmDeleteDebt: "Are you sure you want to delete this debt?",
+  confirmDeletePayment: "Are you sure you want to delete this payment?",
   deleteDebtWarning: "This action cannot be undone",
 };

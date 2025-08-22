@@ -5,14 +5,15 @@ import { DebtSummaryHeader } from "@/components/debt/debt-summary-header";
 import { DebtList } from "@/components/debt/debt-list";
 
 export default function DebtPage() {
-  const { debts, isLoading } = useDebts();
+  const { debts, isLoading, mutate } = useDebts();
 
   // Calculate summary data
   const totalAmount = debts?.reduce((sum, debt) => sum + debt.amount, 0) || 0;
-  const nearestDueDate = debts?.reduce((nearest, debt) => {
-    const debtDate = new Date(debt.dueDate);
-    return !nearest || debtDate < nearest ? debtDate : nearest;
-  }, null as Date | null) || null;
+  const nearestDueDate =
+    debts?.reduce((nearest, debt) => {
+      const debtDate = new Date(debt.dueDate);
+      return !nearest || debtDate < nearest ? debtDate : nearest;
+    }, null as Date | null) || null;
 
   if (isLoading) {
     return (
@@ -30,13 +31,17 @@ export default function DebtPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <DebtSummaryHeader 
+      <DebtSummaryHeader
         summaryData={{
           totalAmount,
-          nearestDueDate
-        }} 
+          nearestDueDate,
+        }}
       />
-      <DebtList debts={debts} />
+      <DebtList 
+        debts={debts} 
+        onDebtUpdated={() => mutate()}
+        onDebtDeleted={() => mutate()}
+      />
     </div>
   );
 }
