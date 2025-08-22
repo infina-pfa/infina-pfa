@@ -16,6 +16,9 @@ import { Suggestions } from "./suggestions";
 import BudgetCategoryEducation from "./budget-category-education";
 import BudgetSummaryComponent from "./budget-summary-component";
 import PhilosophySelection from "./philosophy-selection";
+import { DebtList } from "./debt-list";
+import { DebtCard } from "./debt-card";
+import { DebtTable } from "./debt-table";
 
 interface OnboardingComponentRendererProps {
   component: OnboardingComponent;
@@ -110,6 +113,24 @@ export function OnboardingComponentRenderer({
           onResponse={handleResponse}
         />
       );
+
+    case "debt_list":
+      return <DebtList debts={component.context.debts || []} />;
+
+    case "debt_card":
+      return (
+        <DebtCard
+          lender={component.context.debt.lender}
+          purpose={component.context.debt.purpose}
+          interestRate={component.context.debt.rate}
+          dueDate={component.context.debt.dueDate}
+          amount={component.context.debt.amount}
+          currentPaidAmount={component.context.debt.currentPaidAmount}
+        />
+      );
+
+    case "debt_table":
+      return <DebtTable debts={component.context.debtTable?.debts || []} />;
 
     default:
       return (

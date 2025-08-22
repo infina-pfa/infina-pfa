@@ -11,8 +11,8 @@ export interface DebtCardProps {
   purpose: string;
   interestRate: number;
   dueDate: string;
-  totalAmount: number;
-  paidAmount: number;
+  amount: number;
+  currentPaidAmount: number;
   onClick?: () => void;
   className?: string;
 }
@@ -23,8 +23,8 @@ export function DebtCard({
   purpose,
   interestRate,
   dueDate,
-  totalAmount,
-  paidAmount,
+  amount: totalAmount,
+  currentPaidAmount: paidAmount,
   onClick,
   className,
 }: DebtCardProps) {

@@ -143,7 +143,10 @@ export type OnboardingComponentType =
   | "budget_category_education"
   | "budget_allocation_tool"
   | "free_to_spend_choice"
-  | "budget_summary";
+  | "budget_summary"
+  | "debt_card"
+  | "debt_list"
+  | "debt_table";
 
 export interface ComponentData {
   // Multiple choice
@@ -255,6 +258,33 @@ export interface ComponentData {
     features?: string[];
     timeCommitment?: string;
   }>;
+
+  debt: {
+    lender: string;
+    purpose: string;
+    rate: number;
+    dueDate: string;
+    amount: number;
+    currentPaidAmount: number;
+  };
+
+  debts?: {
+    lender: string;
+    purpose: string;
+    rate: number;
+    dueDate: string;
+    amount: number;
+    currentPaidAmount: number;
+  }[];
+
+  debtTable?: {
+    debts: {
+      lender: string;
+      purpose: string;
+      rate: number;
+      amount: number;
+    }[];
+  };
 }
 
 // New education content structure
