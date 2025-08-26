@@ -98,6 +98,8 @@ export const authVi = {
   enterNewPassword: "Nhập mật khẩu mới",
   confirmNewPasswordPlaceholder: "Xác nhận mật khẩu mới",
   updatePasswordButton: "Cập nhật mật khẩu",
+  updatingPassword: "Đang cập nhật mật khẩu...",
+  passwordsMatch: "Mật khẩu khớp nhau",
   
   // Password Requirements
   passwordRequirements: "Yêu cầu mật khẩu:",
@@ -168,6 +170,7 @@ export const authVi = {
   checkEmailForInstructions: "Kiểm tra email để nhận hướng dẫn đặt lại mật khẩu",
   resetPasswordFailed: "Không thể đặt lại mật khẩu",
   passwordResetSuccess: "Đặt lại mật khẩu thành công!",
+  errorResettingPassword: "Lỗi khi đặt lại mật khẩu. Vui lòng thử lại",
   signInWithNewPassword: "Bây giờ bạn có thể đăng nhập với mật khẩu mới",
   signOutSuccess: "Đăng xuất thành công",
   seeYouNextTime: "Hẹn gặp lại!",

@@ -91,6 +91,9 @@ export const authService = {
     const { error } = await supabase.auth.resend({
       type: "signup",
       email: email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/sign-in`,
+      },
     });
 
     if (error) {
@@ -117,6 +120,8 @@ export const authService = {
     const { error } = await supabase.auth.updateUser({
       password: request.password,
     });
+
+    console.log("🚀 ~ resetPassword ~ error:", error);
 
     if (error) {
       throw new ApiError(error.code as AUTH_ERROR_CODES, error.message);

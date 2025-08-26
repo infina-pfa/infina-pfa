@@ -8,6 +8,8 @@ import { Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/auth/use-auth";
 import { useRouter } from "next/navigation";
 import { useAppTranslation } from "@/hooks/use-translation";
+import { ApiError } from "@/lib/api/type";
+import { AUTH_ERROR_CODES } from "@/lib/api/error-code/auth";
 
 interface ResetPasswordFormProps {
   onBackToSignIn?: () => void;
@@ -22,7 +24,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
 
   const { resetPassword, loading } = useAuth();
   const router = useRouter();
-  const { t } = useAppTranslation(["auth", "common"]);
+  const { t } = useAppTranslation(["auth", "common", "errors"]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,19 +45,30 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
       return;
     }
 
-    await resetPassword(password, confirmPassword);
-
-    // Redirect to sign in page after successful reset
-    router.push("/auth/sign-in");
+    try {
+      await resetPassword(password, confirmPassword);
+      // Redirect to sign in page after successful reset
+      router.push("/auth/sign-in");
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setFormError(
+          t(error.errorCode?.toUpperCase() as AUTH_ERROR_CODES, {
+            ns: "errors",
+          })
+        );
+      } else {
+        setFormError(t("errorResettingPassword"));
+      }
+    }
   };
 
   return (
     <Card className="w-full max-w-md mx-auto bg-white p-8">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Reset your password
+          {t("resetPasswordTitle", { ns: "auth" })}
         </h1>
-        <p className="text-gray-600">Enter your new password below</p>
+        <p className="text-gray-600">{t("resetPasswordDescription", { ns: "auth" })}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -65,7 +78,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
             htmlFor="password"
             className="block text-sm font-medium text-gray-700"
           >
-            New password
+            {t("newPassword", { ns: "auth" })}
           </label>
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -75,7 +88,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pl-12 pr-12"
-              placeholder="Enter new password"
+              placeholder={t("enterNewPassword", { ns: "auth" })}
               required
             />
             <button
@@ -98,7 +111,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
             htmlFor="confirmPassword"
             className="block text-sm font-medium text-gray-700"
           >
-            Confirm new password
+            {t("confirmNewPassword", { ns: "auth" })}
           </label>
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -108,7 +121,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="pl-12 pr-12"
-              placeholder="Confirm new password"
+              placeholder={t("confirmNewPasswordPlaceholder", { ns: "auth" })}
               required
             />
             <button
@@ -127,14 +140,14 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
 
         {/* Password Requirements */}
         <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-          <p className="font-medium mb-1">Password requirements:</p>
+          <p className="font-medium mb-1">{t("passwordRequirements", { ns: "auth" })}</p>
           <ul className="text-xs space-y-1">
             <li
               className={
                 password.length >= 6 ? "text-infina-green" : "text-gray-500"
               }
             >
-              • At least 6 characters
+              • {t("passwordMinLength", { ns: "auth" })}
             </li>
             <li
               className={
@@ -143,7 +156,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
                   : "text-gray-500"
               }
             >
-              • Passwords match
+              • {t("passwordsMatch", { ns: "auth" })}
             </li>
           </ul>
         </div>
@@ -164,7 +177,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
           {loading ? (
             <div className="flex items-center justify-center">
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-              Updating password...
+              {t("updatingPassword", { ns: "auth" }) || "Updating password..."}
             </div>
           ) : (
             t("updatePasswordButton")
@@ -179,7 +192,7 @@ export function ResetPasswordForm({ onBackToSignIn }: ResetPasswordFormProps) {
             className="flex items-center justify-center w-full text-gray-600 hover:text-gray-800 transition-colors duration-200 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to sign in
+            {t("backToSignIn", { ns: "auth" })}
           </button>
         )}
       </form>

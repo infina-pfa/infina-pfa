@@ -98,6 +98,8 @@ export const authEn = {
   enterNewPassword: "Enter new password",
   confirmNewPasswordPlaceholder: "Confirm new password",
   updatePasswordButton: "Update password",
+  updatingPassword: "Updating password...",
+  passwordsMatch: "Passwords match",
   
   // Password Requirements
   passwordRequirements: "Password requirements:",
@@ -168,6 +170,7 @@ export const authEn = {
   checkEmailForInstructions: "Check your email for password reset instructions",
   resetPasswordFailed: "Failed to reset password",
   passwordResetSuccess: "Password reset successful!",
+  errorResettingPassword: "Error resetting password. Please try again",
   signInWithNewPassword: "You can now sign in with your new password",
   signOutSuccess: "Signed out successfully",
   seeYouNextTime: "See you next time!",
