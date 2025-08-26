@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { OnboardingComponent, ComponentResponse } from "@/lib/types/onboarding.types";
+import {
+  OnboardingComponent,
+  ComponentResponse,
+} from "@/lib/types/onboarding.types";
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,13 +31,14 @@ export function DecisionTreeComponent({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const questions = (component.context.questions || []) as DecisionTreeQuestion[];
+  const questions = (component.context.questions ||
+    []) as DecisionTreeQuestion[];
   const currentQuestion = questions[currentQuestionIndex];
 
   const handleAnswer = (answer: boolean) => {
     const newAnswers = {
       ...answers,
-      [currentQuestion.id]: answer
+      [currentQuestion.id]: answer,
     };
     setAnswers(newAnswers);
 
@@ -51,12 +55,12 @@ export function DecisionTreeComponent({
   const determineStage = (allAnswers: Record<string, boolean>): string => {
     // Question 1: Do you have high-interest debt (>8%)?
     // Question 2: Do you have 3+ months emergency fund?
-    
+
     const hasHighInterestDebt = allAnswers["high_interest_debt"];
     const hasEmergencyFund = allAnswers["emergency_fund"];
 
     if (hasHighInterestDebt) {
-      return "debt"; // GET OUT OF DEBT
+      return "get_out_of_debt"; // GET OUT OF DEBT
     } else if (!hasEmergencyFund) {
       return "start_saving"; // START SAVING FOR EMERGENCY FUND
     } else {
@@ -64,7 +68,10 @@ export function DecisionTreeComponent({
     }
   };
 
-  const handleSubmit = async (allAnswers: Record<string, boolean>, determinedStage: string) => {
+  const handleSubmit = async (
+    allAnswers: Record<string, boolean>,
+    determinedStage: string
+  ) => {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
@@ -82,16 +89,22 @@ export function DecisionTreeComponent({
     }
   };
 
-  const getStageReasoning = (allAnswers: Record<string, boolean>, stage: string): string => {
+  const getStageReasoning = (
+    allAnswers: Record<string, boolean>,
+    stage: string
+  ): string => {
     const hasHighInterestDebt = allAnswers["high_interest_debt"];
     const hasEmergencyFund = allAnswers["emergency_fund"];
 
-    if (stage === "debt") {
+    if (stage === "get_out_of_debt") {
       return t("debtStageReasoning", { hasHighInterestDebt });
     } else if (stage === "start_saving") {
       return t("savingStageReasoning", { hasEmergencyFund });
     } else {
-      return t("investingStageReasoning", { hasHighInterestDebt, hasEmergencyFund });
+      return t("investingStageReasoning", {
+        hasHighInterestDebt,
+        hasEmergencyFund,
+      });
     }
   };
 
@@ -108,11 +121,14 @@ export function DecisionTreeComponent({
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-[#6B7280]">
-          <span>{t("questionNumber")} {currentQuestionIndex + 1} {t("ofTotal")} {questions.length}</span>
+          <span>
+            {t("questionNumber")} {currentQuestionIndex + 1} {t("ofTotal")}{" "}
+            {questions.length}
+          </span>
           <span>{Math.round(getProgressWidth())}%</span>
         </div>
         <div className="w-full bg-[#F0F2F5] rounded-full h-2">
-          <div 
+          <div
             className="bg-[#0055FF] h-2 rounded-full transition-all duration-300"
             style={{ width: `${getProgressWidth()}%` }}
           />
@@ -125,7 +141,7 @@ export function DecisionTreeComponent({
           <h3 className="font-semibold text-[#111827] text-lg leading-relaxed">
             {currentQuestion.question}
           </h3>
-          
+
           {currentQuestion.explanation && (
             <p className="text-[#6B7280] text-sm leading-relaxed">
               {currentQuestion.explanation}
@@ -140,7 +156,7 @@ export function DecisionTreeComponent({
             >
               {currentQuestion.yesLabel || t("yesAnswer")}
             </Button>
-            
+
             <Button
               onClick={() => handleAnswer(false)}
               disabled={isSubmitting}
@@ -162,9 +178,13 @@ export function DecisionTreeComponent({
             </h4>
             {questions.slice(0, currentQuestionIndex).map((q, index) => (
               <div key={q.id} className="flex justify-between text-sm">
-                <span className="text-[#6B7280]">{t("questionNumber")} {index + 1}:</span>
+                <span className="text-[#6B7280]">
+                  {t("questionNumber")} {index + 1}:
+                </span>
                 <span className="text-[#111827] font-medium">
-                  {answers[q.id] ? (q.yesLabel || t("yesAnswer")) : (q.noLabel || t("noAnswer"))}
+                  {answers[q.id]
+                    ? q.yesLabel || t("yesAnswer")
+                    : q.noLabel || t("noAnswer")}
                 </span>
               </div>
             ))}
@@ -173,4 +193,4 @@ export function DecisionTreeComponent({
       )}
     </div>
   );
-} 
+}

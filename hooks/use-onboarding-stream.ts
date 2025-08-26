@@ -550,9 +550,6 @@ export const useOnboarding = (): UseOnboardingStreamReturn => {
         profileUpdates.goalDetails = response.goalDetails;
       }
 
-      console.log("🚀 ~ profileUpdates:", profileUpdates);
-      console.log("🚀 ~ response:", response);
-
       // Update profile
       await fetch("/api/onboarding/profile-v2", {
         method: "PUT",

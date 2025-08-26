@@ -67,7 +67,10 @@ export interface QualitativeAssessment {
 }
 
 // New financial stages based on user requirements
-export type FinancialStage = "debt" | "start_saving" | "start_investing";
+export type FinancialStage =
+  | "get_out_of_debt"
+  | "start_saving"
+  | "start_investing";
 
 // Stage-specific flows
 export type StageFlow =

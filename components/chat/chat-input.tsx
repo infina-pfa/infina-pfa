@@ -2,7 +2,14 @@
 
 import { useRef, useEffect, useState } from "react";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { Plus, Send, Image as ImageIcon, FileText, Loader2, Mic } from "lucide-react";
+import {
+  Plus,
+  Send,
+  Image as ImageIcon,
+  FileText,
+  Loader2,
+  Mic,
+} from "lucide-react";
 import { ImagePreview } from "./image-preview";
 import { VoiceRecorder } from "./voice-recorder";
 import { Button } from "@/components/ui/button";
@@ -42,10 +49,10 @@ export function ChatInput({
   const { t } = useAppTranslation(["chat", "common"]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [charCount, setCharCount] = useState<number>(0);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
-  
+
   const maxLength = 500;
 
   // Auto-resize textarea and update character count
@@ -77,7 +84,9 @@ export function ChatInput({
   };
 
   const handleSubmit = () => {
-    const hasUploadedImages = uploadedImages.some(img => img.status === "success");
+    const hasUploadedImages = uploadedImages.some(
+      (img) => img.status === "success"
+    );
     if ((value.trim() || hasUploadedImages) && !isSubmitting && !disabled) {
       onSubmit();
     }
@@ -86,14 +95,14 @@ export function ChatInput({
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && onImageSelect) {
-      const imageFiles = Array.from(files).filter(file => 
-        file.type.startsWith('image/')
+      const imageFiles = Array.from(files).filter((file) =>
+        file.type.startsWith("image/")
       );
       onImageSelect(imageFiles);
     }
     setShowAttachMenu(false);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -130,10 +139,7 @@ export function ChatInput({
 
       {/* Image preview */}
       {uploadedImages.length > 0 && (
-        <ImagePreview
-          images={uploadedImages}
-          onRemove={handleRemoveImage}
-        />
+        <ImagePreview images={uploadedImages} onRemove={handleRemoveImage} />
       )}
 
       {/* Text Input Row */}
@@ -180,7 +186,9 @@ export function ChatInput({
               aria-label={t("attachFile")}
             >
               <Plus
-                className={`w-5 h-5 ${showAttachMenu ? "rotate-45" : ""} transition-transform`}
+                className={`w-5 h-5 ${
+                  showAttachMenu ? "rotate-45" : ""
+                } transition-transform`}
               />
             </Button>
           </DropdownMenuTrigger>
@@ -199,12 +207,19 @@ export function ChatInput({
         </DropdownMenu>
 
         {/* Voice/Send Button */}
-        {(value.trim() || uploadedImages.some(img => img.status === "success")) ? (
+        {value.trim() ||
+        uploadedImages.some((img) => img.status === "success") ? (
           <Button
             size="icon"
             variant="default"
             onClick={handleSubmit}
-            disabled={disabled || isSubmitting || isOverLimit || uploadedImages.some(img => img.status === "uploading")}
+            disabled={
+              charCount === 0 ||
+              disabled ||
+              isSubmitting ||
+              isOverLimit ||
+              uploadedImages.some((img) => img.status === "uploading")
+            }
             aria-label={t("sendMessage")}
           >
             {isSubmitting ? (
