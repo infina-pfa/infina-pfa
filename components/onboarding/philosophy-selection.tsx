@@ -136,10 +136,6 @@ export default function PhilosophySelection({
     }
   };
 
-  const selectedOption = philosophyOptions.find(
-    (option) => option.id === selectedPhilosophy
-  );
-
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Title */}
@@ -188,15 +184,6 @@ export default function PhilosophySelection({
           );
         })}
       </div>
-
-      {/* Selection Summary */}
-      {selectedOption && (
-        <div className="bg-[#F6F7F9] rounded p-3 border border-[#E5E7EB]">
-          <p className="text-sm text-[#4B5563]">
-            Selected: {selectedOption.title}
-          </p>
-        </div>
-      )}
 
       {/* Submit Button */}
       {!isCompleted && (

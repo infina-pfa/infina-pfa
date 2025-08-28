@@ -48,7 +48,8 @@ export const budgetingVi = {
   // Actions
   actions: "Thao tác",
   createBudget: "Tạo ngân sách",
-  createBudgetDesc: "Thiết lập ngân sách mới để theo dõi chi tiêu và quản lý tài chính tốt hơn",
+  createBudgetDesc:
+    "Thiết lập ngân sách mới để theo dõi chi tiêu và quản lý tài chính tốt hơn",
   editBudget: "Chỉnh sửa ngân sách",
   editBudgetDesc: "Cập nhật chi tiết ngân sách để quản lý tài chính tốt hơn",
   addExpense: "Thêm chi tiêu",
@@ -185,7 +186,8 @@ export const budgetingVi = {
   // Surplus Allocation Component
   surplusAllocationTitle: "Phân Bổ Số Tiền Dư",
   surplusNoSurplus: "Không Có Tiền Dư Tháng Này",
-  surplusComeBackNext: "Hãy tiếp tục quản lý ngân sách tốt! Quay lại tháng sau để xem tiền dư.",
+  surplusComeBackNext:
+    "Hãy tiếp tục quản lý ngân sách tốt! Quay lại tháng sau để xem tiền dư.",
   surplusNoEmergencyFund: "Không Tìm Thấy Quỹ Khẩn Cấp",
   surplusCreateFirst: "Tạo mục tiêu quỹ khẩn cấp trước để phân bổ tiền dư.",
   surplusCreateGoal: "Tạo Quỹ Khẩn Cấp",
@@ -207,19 +209,25 @@ export const budgetingVi = {
 
   // Budget Category Education Component
   emergencyFundDescription: "Quỹ Dự Phòng (PYF)",
-  emergencyFundPriorityDescription: "Ưu tiên cao nhất - đây là số tiền PYF để bảo đảm tài chính",
+  emergencyFundPriorityDescription:
+    "Ưu tiên cao nhất - đây là số tiền PYF để bảo đảm tài chính",
   emergencyFundRule: "Phân bổ trước, không bao giờ thỏa hiệp số tiền này",
-  emergencyFundAllocationDescription: "Lưới an toàn tài chính của bạn - ưu tiên cao nhất",
-  
+  emergencyFundAllocationDescription:
+    "Lưới an toàn tài chính của bạn - ưu tiên cao nhất",
+
   livingExpenses: "Chi Phí Sinh Hoạt",
   livingExpensesDescription: "Chi Phí Sinh Hoạt & Kế Hoạch Tương Lai",
-  livingExpensesPriorityDescription: "Chi phí sinh hoạt thiết yếu và các kế hoạch tương lai",
-  livingExpensesRule: "Phân bổ sau quỹ dự phòng - bao gồm nhu cầu thiết yếu và kế hoạch",
-  livingExpensesAllocationDescription: "Nhà ở, ăn uống, di chuyển và chi phí theo kế hoạch",
-  
+  livingExpensesPriorityDescription:
+    "Chi phí sinh hoạt thiết yếu và các kế hoạch tương lai",
+  livingExpensesRule:
+    "Phân bổ sau quỹ dự phòng - bao gồm nhu cầu thiết yếu và kế hoạch",
+  livingExpensesAllocationDescription:
+    "Nhà ở, ăn uống, di chuyển và chi phí theo kế hoạch",
+
   freeToSpend: "Chi Tiêu Tự Do",
   freeToSpendDescription: "Chi Tiêu Tự Do",
-  freeToSpendPriorityDescription: "Tiền chi tiêu tùy ý cho giải trí và những gì bạn muốn",
+  freeToSpendPriorityDescription:
+    "Tiền chi tiêu tùy ý cho giải trí và những gì bạn muốn",
   freeToSpendRule: "Không được vượt quá 2 lần số tiền quỹ dự phòng",
   freeToSpendAllocationDescription: "Giải trí, mua sắm và chi tiêu tùy ý",
 
@@ -246,8 +254,8 @@ export const budgetingVi = {
   detailTrackerSubtitle: "",
   detailTrackerDescription: "Ghi chú chi tiết từng khoản chi tiêu",
 
-  confirmPhilosophy: "Xác Nhận Triết Lý Của Tôi",
-  
+  confirmPhilosophy: "Xác Nhận",
+
   // Emergency Fund Lock Message
   emergencyFundLocked: "Đã khóa - đã xác nhận ở bước trước",
-}; 
+};

@@ -358,7 +358,7 @@ export const onboardingVi = {
   budgetAllocationCompleted: "Hoàn thành phân bổ ngân sách!",
 
   // Philosophy Selection Component
-  philosophySelectionTitle: "Chọn Triết lý Lập Ngân sách",
+  philosophySelectionTitle: "Cách bạn lập ngân sách",
   philosophySelectionSubtitle:
     "Chọn phương pháp phù hợp nhất với lối sống và mục tiêu của bạn",
   youSelected: "Bạn đã chọn:",
@@ -368,9 +368,9 @@ export const onboardingVi = {
     "Tôi đã chọn phương pháp Theo dõi chi tiết. Tôi muốn phân loại và theo dõi từng khoản chi tiêu để hiểu rõ dòng tiền của mình. Điều này sẽ giúp tôi tối ưu hóa ngân sách và tìm cơ hội tiết kiệm thêm.",
   aiWillTailor:
     "Tôi sẽ điều chỉnh lời khuyên và tính năng để phù hợp với phương pháp bạn chọn. Bạn có thể thay đổi điều này sau trong cài đặt.",
-  philosophySelectionCompleted: "Hoàn thành chọn triết lý!",
+  philosophySelectionCompleted: "Hoàn thành chọn phương pháp!",
   philosophyChangeNote:
-    "Đừng lo - bạn có thể thay đổi triết lý của mình bất cứ lúc nào trong cài đặt tài khoản.",
+    "Đừng lo - bạn có thể thay đổi phương pháp của mình bất cứ lúc nào trong cài đặt tài khoản.",
 
   // Component User Messages
   budgetCategoryEducationUserMessage:
@@ -378,7 +378,7 @@ export const onboardingVi = {
   budgetAllocationUserMessage:
     "Tôi đã phân bổ ngân sách hàng tháng theo hệ thống ưu tiên. Tôi hiểu việc phân bổ này tuân theo nguyên tắc Quỹ Dự phòng trước, sau đó Chi phí Sinh hoạt, cuối cùng là Chi tiêu Tự do trong giới hạn 2 lần quỹ dự phòng.",
   philosophySelectionUserMessage:
-    "Tôi đã chọn triết lý lập ngân sách của mình và hiểu cách điều này sẽ ảnh hưởng đến lời khuyên và tính năng tôi nhận được. Tôi sẵn sàng tiến hành kế hoạch tài chính của mình.",
+    "Tôi đã chọn cách lập ngân sách của mình và hiểu cách điều này sẽ ảnh hưởng đến lời khuyên và tính năng tôi nhận được. Tôi sẵn sàng tiến hành kế hoạch tài chính của mình.",
   expenseCategoriesUserMessage:
     "Tôi đã chi tiết hóa chi phí sinh hoạt hàng tháng qua {{categoriesCount}} danh mục. Tổng chi phí hàng tháng: {{totalExpenses}} VND. Chi tiết: {{categories}}. Việc phân tích chi tiết này sẽ giúp thiết lập theo dõi ngân sách toàn diện với các danh mục riêng cho từng loại chi phí.",
   goalConfirmationUserMessage:
