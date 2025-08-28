@@ -8,8 +8,9 @@ import {
 import { useAppTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { MoneyInput } from "@/components/ui/money-input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Label } from "@/components/ui/label";
 import {
   Home,
   Utensils,
@@ -178,6 +179,7 @@ export function ExpenseCategoriesComponent({
 
   const categories = (component.context.categories || []) as ExpenseCategory[];
 
+  // State management
   const [expenseValues, setExpenseValues] = useState<Record<string, number>>(
     () => {
       const initialValues: Record<string, number> = {};
@@ -191,36 +193,62 @@ export function ExpenseCategoriesComponent({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [focusedCategory, setFocusedCategory] = useState<string | null>(null);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const handleExpenseChange = (categoryId: string, value: number) => {
+  const handleExpenseChange = (categoryId: string, value: string | number) => {
+    // Parse the value if it's a string
+    const numericValue =
+      typeof value === "string"
+        ? parseFloat(value.replace(/[^0-9.-]/g, "")) || 0
+        : value;
+
     setExpenseValues((prev) => ({
       ...prev,
-      [categoryId]: value,
+      [categoryId]: numericValue,
     }));
 
     // Clear error when user starts typing
-    if (errors[categoryId]) {
+    if (errors[categoryId] && numericValue > 0) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[categoryId];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleFieldBlur = (categoryId: string) => {
+    setTouched((prev) => ({ ...prev, [categoryId]: true }));
+
+    // Validate on blur
+    const category = categories.find((c) => c.id === categoryId);
+    if (
+      category?.required &&
+      (!expenseValues[categoryId] || expenseValues[categoryId] <= 0)
+    ) {
       setErrors((prev) => ({
         ...prev,
-        [categoryId]: "",
+        [categoryId]: t("fieldRequired", { ns: "common" }),
       }));
     }
   };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+    const newTouched: Record<string, boolean> = {};
 
     categories.forEach((category) => {
+      newTouched[category.id] = true;
       if (
         category.required &&
         (!expenseValues[category.id] || expenseValues[category.id] <= 0)
       ) {
-        newErrors[category.id] = t("fieldRequired");
+        newErrors[category.id] = t("fieldRequired", { ns: "common" });
       }
     });
 
     setErrors(newErrors);
+    setTouched(newTouched);
     return Object.keys(newErrors).length === 0;
   };
 
@@ -286,173 +314,166 @@ export function ExpenseCategoriesComponent({
   };
 
   return (
-    <div className="space-y-4 font-nunito max-w-full sm:max-w-md mx-auto">
-      {/* Header */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#0055FF] mb-2">
-          <TrendingUp className="w-6 h-6 text-white" />
-        </div>
-        <h3 className="text-lg font-bold text-[#111827]">
-          {t("expenseCategoriesTitle", {
-            defaultValue: "Chi tiết chi phí hàng tháng",
-          })}
-        </h3>
-        <p className="text-sm text-[#6B7280]">
-          {t("expenseCategoriesDescription", {
-            defaultValue: "Nhập số tiền dự kiến cho từng danh mục",
-          })}
-        </p>
-      </div>
+    <div className="space-y-2 sm:space-y-3 font-nunito w-full max-w-2xl mx-auto p-2 sm:p-3">
+      {/* Header Card */}
+      <Card className="bg-white border-0">
+        <CardContent className="p-3 sm:p-4 text-center space-y-1 sm:space-y-2">
+          <div className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#0055FF]/10">
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#0055FF]" />
+          </div>
+          <h3 className="text-base sm:text-lg font-semibold text-[#111827] font-nunito">
+            {t("expenseCategoriesTitle", {
+              ns: "onboarding",
+              defaultValue: "Chi tiết chi phí hàng tháng",
+            })}
+          </h3>
+          <p className="text-xs sm:text-sm text-[#6B7280] font-nunito px-2">
+            {t("expenseCategoriesDescription", {
+              ns: "onboarding",
+              defaultValue: "Nhập số tiền dự kiến cho từng danh mục",
+            })}
+          </p>
+        </CardContent>
+      </Card>
 
-      {/* Categories */}
-      <div className="space-y-3">
+      {/* Categories Form */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        className="space-y-2 sm:space-y-3"
+      >
         {categories.map((category) => {
           const IconComponent = getCategoryIcon(category.name, category.id);
           const categoryColor = getCategoryColor(category.name, category.id);
           const hasValue = expenseValues[category.id] > 0;
-          const isFocused = focusedCategory === category.id;
-          const hasError = errors[category.id];
+          const hasError = touched[category.id] && errors[category.id];
 
           return (
             <Card
               key={category.id}
-              className={`
-                p-4 transition-all duration-200 hover:bg-[#F9FAFB]
-                ${
-                  isFocused
-                    ? "border-[#0055FF] shadow-sm transform scale-[1.01]"
-                    : "border-[#E5E7EB]"
-                }
-                ${hasError ? "border-[#F44336] bg-[#F44336]/5" : ""}
-                ${hasValue ? "border-[#2ECC71] bg-[#2ECC71]/5" : ""}
-              `}
+              className="bg-white border-0 overflow-hidden px-0 md:px-2"
             >
-              <CardContent className="p-0 space-y-3">
-                {/* Category Header */}
-                <div className="flex items-center gap-3">
+              <CardHeader className="p-0">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <div
-                    className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
+                    className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: `${categoryColor}20` }}
                   >
                     <IconComponent
-                      className="w-5 h-5"
+                      className="w-4 h-4 sm:w-5 sm:h-5"
                       style={{ color: categoryColor }}
                     />
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-base font-semibold text-[#111827]">
-                      {category.name}
-                      {category.required && (
-                        <span className="text-[#F44336] ml-1 text-sm">*</span>
-                      )}
-                    </h4>
-                    {hasValue && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <Check className="w-4 h-4 text-[#2ECC71]" />
-                        <span className="text-sm text-[#2ECC71] font-medium">
-                          {expenseValues[category.id].toLocaleString()} VNĐ
-                        </span>
-                      </div>
+                  <Label className="flex-1 text-sm sm:text-base font-semibold text-[#111827] font-nunito truncate">
+                    {category.name}
+                    {category.required && (
+                      <span className="text-[#F44336] ml-0.5 sm:ml-1 text-xs sm:text-sm">
+                        *
+                      </span>
                     )}
-                  </div>
+                  </Label>
+                  {hasValue && (
+                    <div className="flex items-center gap-0.5 sm:gap-1">
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#2ECC71]" />
+                      <span className="text-xs sm:text-sm text-[#2ECC71] font-medium font-nunito hidden xs:inline">
+                        {expenseValues[category.id].toLocaleString("vi-VN")} ₫
+                      </span>
+                    </div>
+                  )}
                 </div>
-
-                {/* Money Input */}
+              </CardHeader>
+              <CardContent className="p-0 px-3">
                 <MoneyInput
                   label=""
                   value={expenseValues[category.id] || 0}
-                  onChange={(value) =>
-                    handleExpenseChange(category.id, parseInt(value) || 0)
-                  }
-                  onFocus={() => setFocusedCategory(category.id)}
-                  onBlur={() => setFocusedCategory(null)}
+                  onChange={(value) => handleExpenseChange(category.id, value)}
+                  onBlur={() => handleFieldBlur(category.id)}
                   placeholder={category.placeholder}
-                  className={`
-                    bg-[#F9FAFB] border-0 border-b-2 rounded-lg
-                    ${
-                      hasError
-                        ? "border-b-[#F44336] focus:border-b-[#F44336]"
-                        : hasValue
-                        ? "border-b-[#2ECC71] focus:border-b-[#2ECC71]"
-                        : "border-b-[#E5E7EB] focus:border-b-[#0055FF]"
-                    }
-                  `}
+                  error={hasError ? errors[category.id] : undefined}
+                  touched={touched[category.id]}
+                  required={category.required}
                 />
-
-                {hasError && (
-                  <div className="flex items-center gap-2 text-sm text-[#F44336] mt-2">
-                    <div className="w-4 h-4 rounded-full bg-[#F44336] flex items-center justify-center">
-                      <span className="text-white text-xs">!</span>
-                    </div>
-                    {errors[category.id]}
-                  </div>
-                )}
               </CardContent>
             </Card>
           );
         })}
-      </div>
+      </form>
 
-      {/* Summary */}
+      {/* Summary Card */}
       {getTotalExpenses() > 0 && (
-        <Card className="bg-[#0055FF] border-[#0055FF] text-white">
-          <CardContent className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="w-5 h-5 text-white" />
-                <div>
-                  <h4 className="font-semibold text-base">
+        <Card className="bg-gradient-to-r from-[#0055FF] to-[#0044DD] border-0 sticky bottom-0 z-10">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-xs sm:text-sm text-white font-nunito truncate">
                     {t("totalMonthlyExpenses", {
-                      defaultValue: "Tổng chi tiêu",
+                      ns: "onboarding",
+                      defaultValue: "Tổng chi tiêu hàng tháng",
                     })}
                   </h4>
-                  <p className="text-sm text-white/80">
-                    {getFilledCategoriesCount()}/{categories.length} danh mục
+                  <p className="text-xs sm:text-sm text-white/80 font-nunito">
+                    {getFilledCategoriesCount()}/{categories.length}{" "}
+                    <span className="hidden sm:inline">
+                      {t("categories", {
+                        ns: "common",
+                        defaultValue: "danh mục",
+                      })}
+                    </span>
+                    <span className="sm:hidden">mục</span>
                   </p>
                 </div>
               </div>
-
-              <div className="text-right">
-                <div className="text-lg font-bold">
-                  {getTotalExpenses().toLocaleString()} VNĐ
+              <div className="text-right flex-shrink-0">
+                <div className="text-base sm:text-xl font-bold text-white font-nunito">
+                  <span className="hidden xs:inline">
+                    {getTotalExpenses().toLocaleString("vi-VN")}
+                  </span>
+                  <span className="xs:hidden">
+                    {(getTotalExpenses() / 1000).toFixed(0)}k
+                  </span>
+                  <span className="text-xs sm:text-sm ml-0.5">₫</span>
                 </div>
               </div>
             </div>
-
-            {/* Progress Bar */}
             <Progress
               value={(getFilledCategoriesCount() / categories.length) * 100}
-              className="bg-white/20"
+              className="h-1.5 sm:h-2 bg-white/20"
             />
           </CardContent>
         </Card>
       )}
 
-      {/* Submit Button */}
-      <div className="flex justify-center pt-4">
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-2 pt-1 pb-safe px-2 sm:px-0">
         <Button
+          type="button"
           onClick={handleSubmit}
           disabled={isSubmitting || getTotalExpenses() === 0}
-          className={`
-            px-6 py-3 rounded-lg font-semibold transition-all duration-200
-            ${
-              getTotalExpenses() > 0 && !isSubmitting
-                ? "bg-[#0055FF] text-white hover:bg-[#0055FF]/90"
-                : "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
-            }
-          `}
+          className="w-full sm:w-auto min-w-[100px] sm:min-w-[120px] h-10 sm:h-11 bg-[#0055FF] hover:bg-[#0044DD] text-white font-nunito font-semibold text-sm sm:text-base"
         >
           {isSubmitting ? (
-            <div className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>{t("submitting", { defaultValue: "Đang xử lý..." })}</span>
-            </div>
+            <>
+              <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 animate-spin" />
+              <span className="text-xs sm:text-sm">
+                {t("submitting", {
+                  ns: "common",
+                  defaultValue: "Đang xử lý...",
+                })}
+              </span>
+            </>
           ) : (
-            <div className="flex items-center gap-2">
-              <span>{t("continue", { defaultValue: "Tiếp tục" })}</span>
-              <TrendingUp className="w-4 h-4" />
-            </div>
+            <>
+              <span className="text-xs sm:text-sm">
+                {t("continue", { ns: "common", defaultValue: "Tiếp tục" })}
+              </span>
+              <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 ml-1.5" />
+            </>
           )}
         </Button>
       </div>
