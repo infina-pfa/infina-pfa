@@ -1,13 +1,13 @@
 "use client";
 
+import { ChatInput } from "@/components/onboarding/chat-input";
+import { DevStartOverButton } from "@/components/onboarding/dev-start-over-button";
+import { MessageList } from "@/components/onboarding/message-list";
+import { ToolPreparingIndicator } from "@/components/onboarding/tool-preparing-indicator";
+import { TypingIndicator } from "@/components/onboarding/typing-indicator";
+import { useAuth } from "@/hooks/auth/use-auth";
 import { useOnboarding } from "@/hooks/use-onboarding-stream";
 import { useAppTranslation } from "@/hooks/use-translation";
-import { ChatInput } from "@/components/onboarding/chat-input";
-import { MessageList } from "@/components/onboarding/message-list";
-import { TypingIndicator } from "@/components/onboarding/typing-indicator";
-import { ToolPreparingIndicator } from "@/components/onboarding/tool-preparing-indicator";
-import { DevStartOverButton } from "@/components/onboarding/dev-start-over-button";
-import { useAuth } from "@/hooks/auth/use-auth";
 import { redirect } from "next/navigation";
 
 export default function OnboardingTestPage() {
@@ -101,11 +101,10 @@ export default function OnboardingTestPage() {
             disabled={isThinking || isStreaming}
           />
           {/* Development Start Over Button - below chat input */}
-          {process.env.NODE_ENV === "development" && (
-            <div className="flex justify-center py-2 bg-white">
-              <DevStartOverButton />
-            </div>
-          )}
+
+          <div className="flex justify-center py-2 bg-white">
+            <DevStartOverButton />
+          </div>
         </div>
       </div>
     </div>
