@@ -96,4 +96,9 @@ export const onboardingService = {
 
     return response.body;
   },
+
+  startOver: async (): Promise<{ success: boolean; message?: string }> => {
+    const response = await apiClient.post("/onboarding/start-over", {});
+    return response.data;
+  },
 };

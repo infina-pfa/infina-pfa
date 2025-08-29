@@ -6,6 +6,7 @@ import { ChatInput } from "@/components/onboarding/chat-input";
 import { MessageList } from "@/components/onboarding/message-list";
 import { TypingIndicator } from "@/components/onboarding/typing-indicator";
 import { ToolPreparingIndicator } from "@/components/onboarding/tool-preparing-indicator";
+import { DevStartOverButton } from "@/components/onboarding/dev-start-over-button";
 import { useAuth } from "@/hooks/auth/use-auth";
 import { redirect } from "next/navigation";
 
@@ -48,6 +49,9 @@ export default function OnboardingTestPage() {
 
   return (
     <div className="flex h-screen container mx-auto">
+      {/* Development Start Over Button */}
+      <DevStartOverButton />
+      
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col h-full">
         {/* Error Display */}

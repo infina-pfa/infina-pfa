@@ -348,4 +348,11 @@ export const onboardingEn = {
     "I have confirmed my Emergency Fund goal of {{amount}} VND within {{timeframe}} months with a monthly savings target of {{monthlyTarget}} VND/month. Please guide me through the next steps to start implementing this goal.",
   goalAdjustmentUserMessage:
     "I want to adjust my emergency fund goal. The current goal of {{amount}} VND within {{timeframe}} months ({{monthlyTarget}} VND/month) is not suitable for my situation. Please help me recalculate with different parameters.",
+  
+  // Development Tools
+  startOver: "Start over",
+  resetting: "Resetting...",
+  startOverConfirmTitle: "Reset Onboarding?",
+  startOverConfirmMessage: "This will reset your entire onboarding progress. Are you sure?",
+  startOverError: "Failed to reset onboarding. Please try again.",
 };

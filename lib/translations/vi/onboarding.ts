@@ -385,4 +385,11 @@ export const onboardingVi = {
     "Tôi đã xác nhận mục tiêu Quỹ Dự Phòng Khẩn Cấp {{amount}} VND trong {{timeframe}} tháng với mức tiết kiệm {{monthlyTarget}} VND/tháng. Hãy hướng dẫn tôi các bước tiếp theo để bắt đầu thực hiện mục tiêu này.",
   goalAdjustmentUserMessage:
     "Tôi muốn điều chỉnh lại mục tiêu quỹ dự phòng khẩn cấp. Mục tiêu hiện tại {{amount}} VND trong {{timeframe}} tháng ({{monthlyTarget}} VND/tháng) chưa phù hợp với tình hình của tôi. Hãy giúp tôi tính toán lại với các thông số khác.",
+  
+  // Development Tools
+  startOver: "Bắt đầu lại",
+  resetting: "Đang đặt lại...",
+  startOverConfirmTitle: "Đặt lại Onboarding?",
+  startOverConfirmMessage: "Điều này sẽ xóa toàn bộ tiến trình onboarding của bạn. Bạn có chắc chắn không?",
+  startOverError: "Không thể đặt lại onboarding. Vui lòng thử lại.",
 };
