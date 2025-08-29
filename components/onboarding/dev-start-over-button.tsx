@@ -10,17 +10,15 @@ export function DevStartOverButton() {
 
   const handleStartOver = async () => {
     if (isResetting) return;
-    
-    const confirmed = window.confirm(
-      t("startOverConfirmMessage")
-    );
-    
+
+    const confirmed = window.confirm(t("startOverConfirmMessage"));
+
     if (!confirmed) return;
 
     try {
       setIsResetting(true);
       const result = await onboardingService.startOver();
-      
+
       if (result.success) {
         // Reload the page to reset all state
         window.location.reload();
@@ -34,11 +32,6 @@ export function DevStartOverButton() {
       setIsResetting(false);
     }
   };
-
-  // Only show in development environment
-  if (process.env.NODE_ENV !== "development") {
-    return null;
-  }
 
   return (
     <button
