@@ -6,11 +6,13 @@ import { ChatInput } from "@/components/onboarding/chat-input";
 import { MessageList } from "@/components/onboarding/message-list";
 import { TypingIndicator } from "@/components/onboarding/typing-indicator";
 import { ToolPreparingIndicator } from "@/components/onboarding/tool-preparing-indicator";
+import { useAuth } from "@/hooks/auth/use-auth";
+import { redirect } from "next/navigation";
 
-export default function OnboardingV2Page() {
+export default function OnboardingTestPage() {
+  const { user, loading } = useAuth();
   const { t } = useAppTranslation(["onboarding", "common"]);
 
-  const onboardingStream = useOnboarding();
   const {
     messages,
     isLoading,
@@ -22,10 +24,10 @@ export default function OnboardingV2Page() {
     handleComponentResponse,
     handleSubmit,
     isSubmitting,
-  } = onboardingStream;
+  } = useOnboarding();
 
   // Loading state
-  if (isLoading) {
+  if (isLoading || loading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
@@ -38,6 +40,10 @@ export default function OnboardingV2Page() {
         </div>
       </div>
     );
+  }
+
+  if (!user) {
+    return redirect("/auth/sign-in");
   }
 
   return (
