@@ -49,9 +49,6 @@ export default function OnboardingTestPage() {
 
   return (
     <div className="flex h-screen container mx-auto">
-      {/* Development Start Over Button */}
-      <DevStartOverButton />
-      
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col h-full">
         {/* Error Display */}
@@ -103,6 +100,12 @@ export default function OnboardingTestPage() {
             isSubmitting={isSubmitting}
             disabled={isThinking || isStreaming}
           />
+          {/* Development Start Over Button - below chat input */}
+          {process.env.NODE_ENV === "development" && (
+            <div className="flex justify-center py-2 bg-white">
+              <DevStartOverButton />
+            </div>
+          )}
         </div>
       </div>
     </div>

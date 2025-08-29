@@ -37,7 +37,7 @@ export function DevStartOverButton() {
     <button
       onClick={handleStartOver}
       disabled={isResetting}
-      className="fixed bottom-6 right-6 z-50 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 font-nunito font-semibold"
+      className="text-xs text-gray-400 hover:text-gray-600 disabled:text-gray-300 font-nunito transition-colors duration-200 underline"
       title={t("startOver")}
     >
       {isResetting ? t("resetting") : t("startOver")}
